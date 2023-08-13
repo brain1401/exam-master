@@ -1,7 +1,15 @@
-export default function Home() {
+import { getServerSession } from "next-auth/next";
+
+export default async function Home() {
+  const session = await getServerSession();
+
   return (
     <>
-      <h1 className='text-xl text-center'>테스트</h1>
+      {session ? (
+        <h1>환영합니다. {`${session.user?.email}님!`}</h1>
+      ) : (
+        <h1>로그인이 필요합니다.</h1>
+      )}
     </>
-  )
+  );
 }
