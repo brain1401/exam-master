@@ -42,7 +42,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div
+      <div // mobile menu
         ref={menuRef}
         className={`${
           isMenuOpen
@@ -70,14 +70,16 @@ export default function Navbar() {
         </ul>
       </div>
 
-      <div
+      <div // backdrop
         className={`${
           isMenuOpen ? "block md:hidden" : "hidden"
         } fixed top-0 left-0 w-full h-full bg-black opacity-50 z-5 backdrop-blur-md`}
         onClick={() => setIsMenuOpen(false)}
       ></div>
 
-      <nav className="flex border-b border-gray-300">
+      <nav // navbar
+        className="flex border-b border-gray-300"
+      >
         <ul className="flex justify-center items-cneter md:gap-3">
           <li className="px-5 py-2 font-bold text-xl md:text-2xl ml-[1rem] md:ml-[3rem]">
             <Link href="/">
