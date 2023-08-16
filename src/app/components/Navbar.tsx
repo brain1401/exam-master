@@ -60,6 +60,11 @@ export default function Navbar() {
             </Link>
           </li>
           <li className={MOBILE_LIST_ITEM}>
+            <Link href="/manage" onClick={() => setIsMenuOpen(false)}>
+              문제 관리
+            </Link>
+          </li>
+          <li className={MOBILE_LIST_ITEM}>
             <Link href="/create" onClick={() => setIsMenuOpen(false)}>
               문제 생성
             </Link>
@@ -88,6 +93,9 @@ export default function Navbar() {
           </li>
           <li className={LIST_ITEM}>
             <Link href="/exam">문제 풀기</Link>
+          </li>
+          <li className={LIST_ITEM}>
+            <Link href="/manage">문제 관리</Link>
           </li>
           <li className={LIST_ITEM}>
             <Link href="/create">문제 생성</Link>
