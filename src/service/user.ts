@@ -1,7 +1,7 @@
 import axios from "axios";
 import qs from "qs";
 
-export async function createIfUserNotExitst(
+export async function createUserIfNotExists(
   email: string,
   name: string,
   image: string
