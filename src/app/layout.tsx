@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={open_sans.className}>
+      <body className={`${open_sans.className} overflow-x-hidden`}>
         <AuthContext>
           <Navbar />
           {children}
