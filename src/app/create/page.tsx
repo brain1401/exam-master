@@ -1,9 +1,20 @@
 import { getServerSession } from "next-auth";
+import CreateProblems from "../components/CreateProblems";
 
 export default async function CreatePage() {
   const session = await getServerSession();
 
+  if (!session) {
+    return (
+      <>
+        <h1>로그인을 해주세요!</h1>
+      </>
+    );
+  }
+
   return (
-    <>{session ? <div>Create Page</div> : <div>로그인이 필요합니다.</div>}</>
-  );
+    <>
+      <CreateProblems/>
+    </>
+  )
 }
