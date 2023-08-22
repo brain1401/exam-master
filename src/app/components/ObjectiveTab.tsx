@@ -112,7 +112,7 @@ export default function ObjectiveTab() {
         />
         <label
           htmlFor={`candidate-${index + 1}-checkbox`}
-          className="mx-2 text-md font-bold w-20"
+          className="md:mx-2 ml-[0.55rem] px-1 md:p-0  md:text-md font-bold md:w-20 text:sm w-fit"
         >
           정답여부
         </label>

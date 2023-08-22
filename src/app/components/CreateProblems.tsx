@@ -138,7 +138,7 @@ export default function CreateProblems() {
             </label>
             <input
               id="problemSetName"
-              className="border border-black p-1 rounded-md"
+              className="border w-[10rem] border-black p-1 rounded-md"
               value={problemSetName}
               onChange={(e) => setProblemSetName(e.target.value)}
             />
@@ -177,8 +177,10 @@ export default function CreateProblems() {
         >
           다음
         </button>
+      </div>
+      <div className="flex justify-center mt-3">
         <button
-          className="absolute md:right-[8rem] right-2 px-5 py-2 bg-blue-500 rounded-md text-white "
+          className="px-2 py-2 md:px-5 md:py-2 bg-blue-500 rounded-md text-white "
           onClick={handleSubmit}
         >
           최종제출

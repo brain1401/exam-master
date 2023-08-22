@@ -33,12 +33,12 @@ export default function CreateProblemsCard() {
   return (
     <section className="flex justify-center items-center">
       <Tabs.Root
-        className="flex flex-col w-9/12"
+        className="flex flex-col md:w-9/12 w-11/12"
         defaultValue={handleDefaultTab()}
         activationMode="manual"
         value={currentTab === "obj" ? "tab1" : "tab2"}
       >
-        <Tabs.List className="flex mb-2">
+        <Tabs.List className="flex mb-2 justify-center md:justify-normal">
           <Tabs.Trigger
             className={`border border-gray-300 rounded-md px-5 py-3 mr-2 ${
               currentTab === "obj" && "bg-neutral-500 text-white"
