@@ -14,5 +14,9 @@ export const isCardEmpty = (card: Card) => {
     return true;
   }
 
+  if (!card.candidates?.some((candidate) => candidate.isAnswer === true)) {
+    console.log("answer is empty");
+    return true;
+  }
   return false;
 };
