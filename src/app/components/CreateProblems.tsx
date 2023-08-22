@@ -1,15 +1,16 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CreateProblemsCard from "./CreateProblemsCard";
 import CardProvider from "@/context/CardContext";
 import { isCardEmpty } from "@/service/card";
 import { Card } from "../types/card";
 
-
-
 export default function CreateProblems() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [maxIndex, setMaxIndex] = useState<string>("10");
+  const [problemSetName, setProblemSetName] = useState<string>("");
+  const problemSetNameRef = useRef<string>("");
+
   const [cards, setCards] = useState<Card[]>([
     ...Array(parseInt(maxIndex) || 0).fill({
       type: "obj",
@@ -18,7 +19,7 @@ export default function CreateProblems() {
       additiondalViewClicked: false,
       imageButtonClicked: false,
       image: null,
-      candidates: [],
+      candidates: Array(4).fill({ text: "", isAnswer: false }),
       subAnswer: null,
     }),
   ]);
@@ -78,12 +79,22 @@ export default function CreateProblems() {
     }
   };
 
+  const handleApplyProblemSetName = () => {
+    problemSetNameRef.current = problemSetName;
+    alert("문제지 이름이 적용되었습니다.");
+  };
   const handleSubmit = () => {
     if (cards.some((card) => isCardEmpty(card))) {
       alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
-    } else {
-      //데이터베이스에 저장
+      return;
+    } 
+    if(problemSetNameRef.current === ""){
+      alert("문제지 이름을 입력해주세요.");
+      return;
     }
+
+    alert("제출 완료!");
+
   };
 
   useEffect(() => {
@@ -101,22 +112,41 @@ export default function CreateProblems() {
           e.preventDefault();
         }}
       >
-        <div className="flex items-center mb-5">
-          <label htmlFor="maxIndex" className="mr-2">
-            최대 문제 수 :
-          </label>
-          <input
-            id="maxIndex"
-            className="border border-black p-1 text-center w-[3rem] rounded-md"
-            value={maxIndex}
-            onChange={handleMaxIndexNumberChange}
-          />
-          <button
-            className="ml-2 px-5 py-1 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
-            onClick={handleApplyMaxIndex}
-          >
-            적용
-          </button>
+        <div className="flex flex-col gap-2 mb-5">
+          <div>
+            <label htmlFor="maxIndex" className="ml-5 mr-2">
+              최대 문제 수 :
+            </label>
+            <input
+              id="maxIndex"
+              className="border border-black p-1 text-center w-[3rem] rounded-md"
+              value={maxIndex}
+              onChange={handleMaxIndexNumberChange}
+            />
+            <button
+              className="ml-2 px-5 py-1 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
+              onClick={handleApplyMaxIndex}
+            >
+              확인
+            </button>
+          </div>
+          <div>
+            <label htmlFor="problemSetName" className="ml-5 mr-2">
+              문제지 이름 :
+            </label>
+            <input
+              id="problemSetName"
+              className="border border-black p-1 rounded-md"
+              value={problemSetName}
+              onChange={(e) => setProblemSetName(e.target.value)}
+            />
+            <button
+              className="ml-2 px-5 py-1 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
+              onClick={handleApplyProblemSetName}
+            >
+              확인
+            </button>
+          </div>
         </div>
       </form>
 
