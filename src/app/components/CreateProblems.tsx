@@ -2,21 +2,10 @@
 import { useEffect, useState } from "react";
 import CreateProblemsCard from "./CreateProblemsCard";
 import CardProvider from "@/context/CardContext";
-export type candidate = {
-  text: string;
-  isAnswer: boolean;
-};
+import { isCardEmpty } from "@/service/card";
+import { Card } from "../types/card";
 
-export type Card = {
-  type: "obj" | "sub";
-  question: string;
-  additionalView: string;
-  image: File | null;
-  additiondalViewClicked: boolean;
-  imageButtonClicked: boolean;
-  candidates: candidate[] | null;
-  subAnswer: string | null;
-};
+
 
 export default function CreateProblems() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -89,6 +78,14 @@ export default function CreateProblems() {
     }
   };
 
+  const handleSubmit = () => {
+    if (cards.some((card) => isCardEmpty(card))) {
+      alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
+    } else {
+      //데이터베이스에 저장
+    }
+  };
+
   useEffect(() => {
     console.log(currentIndex);
   }, [currentIndex]);
@@ -147,6 +144,12 @@ export default function CreateProblems() {
           className="px-5 py-2 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
         >
           다음
+        </button>
+        <button
+          className="absolute md:right-[8rem] right-2 px-5 py-2 bg-blue-500 rounded-md text-white "
+          onClick={handleSubmit}
+        >
+          최종제출
         </button>
       </div>
     </section>
