@@ -155,7 +155,7 @@ export default function ObjectiveTab() {
       setAdditionalView(additionalView);
       setImageUrl(image ? URL.createObjectURL(image) : null);
       imageFileRef.current = image || null;
-
+      setSelectedValue(candidates?.length.toString() || "4");
       setIsAdditionalViewButtonClicked(additiondalViewClicked);
       setIsImageAddButtonClicked(imageButtonClicked);
       setCandidateValues(
