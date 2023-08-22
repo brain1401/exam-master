@@ -141,7 +141,7 @@ export default function ObjectiveTab() {
   }, []);
 
   useEffect(() => {
-    //cards[currentIndex.index]가 있을 때 해당 값으로 초기화
+    //cards[currentIndex]가 있을 때 해당 값으로 초기화
     if (cards[currentIndex]) {
       const {
         question,

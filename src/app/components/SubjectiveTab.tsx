@@ -44,7 +44,7 @@ export default function SubjectiveTab() {
   }, []);
 
   useEffect(() => {
-    //cards[currentIndex.index]에 값이 있을 때 해당 값으로 초기값 설정
+    //cards[currentIndex]에 값이 있을 때 해당 값으로 초기값 설정
     if (cards[currentIndex]) {
       const {
         question,

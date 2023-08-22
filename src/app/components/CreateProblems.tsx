@@ -27,6 +27,7 @@ export default function CreateProblems() {
   const showNextCard = () => {
     setCurrentIndex((prevIndex) => {
       if (prevIndex < parseInt(maxIndex) - 1) {
+        window.scrollTo(0, 0);
         return prevIndex + 1;
       } else {
         return prevIndex;
@@ -37,6 +38,7 @@ export default function CreateProblems() {
   const showPreviousCard = () => {
     setCurrentIndex((prevIndex) => {
       if (prevIndex !== 0) {
+        window.scrollTo(0, 0);
         return prevIndex - 1;
       } else {
         return prevIndex;
@@ -150,7 +152,7 @@ export default function CreateProblems() {
         </div>
       </form>
 
-      <p className="text-center mb-5 text-lg">
+      <p className="text-center mb-5 text-3xl">
         {currentIndex + 1}번째 문제 / 총 {cards.length}개
       </p>
 
