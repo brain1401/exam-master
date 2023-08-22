@@ -4,23 +4,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { useCardContext } from "@/context/CardContext";
-import { Card } from "./CreateProblems";
 
-function isCardEmpty(card: Card) {
-  if (card.type === "obj") {
-    if (card.question === "" && card.candidates?.length === 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    if (card.question === "" && (card.subAnswer === null || "")) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
 export default function CreateProblemsCard() {
   const { cards, setCards, currentIndex } = useCardContext();
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
