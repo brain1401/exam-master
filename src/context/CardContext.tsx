@@ -1,4 +1,5 @@
-import { Card } from "@/app/components/CreateProblems";
+
+import { Card } from "@/app/types/card";
 import React, { createContext, useContext } from "react";
 
 type Props = {

@@ -2,11 +2,7 @@
 import Image from "next/image";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useCardContext } from "@/context/CardContext";
-
-type candidate = {
-  text: string;
-  isAnswer: boolean;
-};
+import { candidate } from "../types/card";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -227,6 +223,7 @@ export default function ObjectiveTab() {
       </div>
       <div className="flex gap-2 mb-3">
         <button
+          type="button"
           className={`${
             isAdditionalViewButtonClicked
               ? "border border-neutral-500 bg-neutral-500 text-white"
@@ -243,6 +240,7 @@ export default function ObjectiveTab() {
         </button>
 
         <button
+          type="button"
           className={`${
             isImageAddButtonClicked
               ? "border border-neutral-500 bg-neutral-500 text-white"
@@ -277,7 +275,9 @@ export default function ObjectiveTab() {
             <label
               htmlFor="image"
               className="px-4 py-2 bg-blue-500 text-white cursor-pointer hover:bg-blue-600 rounded-md"
-            >사진 선택</label>
+            >
+              사진 선택
+            </label>
           </div>
           {imageUrl && (
             <Image
