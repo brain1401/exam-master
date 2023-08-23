@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
@@ -9,32 +9,19 @@ export default function CreateProblemsCard() {
   const { cards, setCards, currentIndex } = useCardContext();
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     //현재 탭 상태를 설정
     setCurrentTab(cards[currentIndex].type);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
 
-  const handleDefaultTab = () => {
-    let defaultTab = "";
-    if (currentIndex !== 0) {
-      cards[currentIndex - 1].type === "obj"
-        ? (defaultTab = "tab1")
-        : (defaultTab = "tab2");
-    } else {
-      cards[currentIndex]?.type === "obj"
-        ? (defaultTab = "tab1")
-        : (defaultTab = "tab2");
-    }
-    return defaultTab;
-  };
 
   return (
     <section className="flex justify-center items-center">
       <Tabs.Root
         className="flex flex-col md:w-9/12 w-11/12"
-        defaultValue={handleDefaultTab()}
+        defaultValue={currentTab === "obj" ? "tab1" : "tab2"}
         activationMode="manual"
         value={currentTab === "obj" ? "tab1" : "tab2"}
       >
