@@ -134,7 +134,7 @@ export default function CreateProblems() {
           </div>
           <div>
             <label htmlFor="problemSetName" className="ml-5 mr-2">
-              문제지 이름 :
+              문제집 이름 :
             </label>
             <input
               id="problemSetName"
