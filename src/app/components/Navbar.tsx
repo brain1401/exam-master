@@ -47,7 +47,7 @@ export default function Navbar() {
         className={`${
           isMenuOpen
             ? "opacity-100 pointer-events-auto md:hidden translate-x-0"
-            : "opacity-0 pointer-events-none translate-x-full"
+            : "opacity-0 pointer-events-none max-h-0 translate-x-full overflow-hidden"
         } absolute w-3/4 h-screen bg-neutral-100 top-0 right-0 z-10 transition-all duration-300 ease-in-out`}
       >
         <ul className="flex flex-col justify-center items-center w-full">
