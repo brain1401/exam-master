@@ -1,9 +1,10 @@
 "use client";
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { useCardContext } from "@/context/CardContext";
+import { isCardEmpty, isCardOnBeingWrited } from "@/service/card";
 
 export default function CreateProblemsCard() {
   const { cards, setCards, currentIndex } = useCardContext();
@@ -16,6 +17,20 @@ export default function CreateProblemsCard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
 
+  useEffect(() => {
+    function preventClose(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = ""; //Chrome에서 동작하도록; deprecated
+    }
+
+    (() => {
+      window.addEventListener("beforeunload", preventClose);
+    })();
+
+    return () => {
+      window.removeEventListener("beforeunload", preventClose);
+    };
+  }, []);
 
   return (
     <section className="flex justify-center items-center">
@@ -32,6 +47,15 @@ export default function CreateProblemsCard() {
             }`}
             value="tab1"
             onClick={() => {
+              if (isCardOnBeingWrited(cards[currentIndex])) {
+                const value = confirm(
+                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
+                );
+                if (value === false) {
+                  setCurrentTab("sub");
+                  return;
+                }
+              }
               setCurrentTab("obj");
               setCards((prevCards) => {
                 const newCards = [...prevCards];
@@ -60,6 +84,15 @@ export default function CreateProblemsCard() {
             }`}
             value="tab2"
             onClick={() => {
+              if (isCardOnBeingWrited(cards[currentIndex])) {
+                const value = confirm(
+                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
+                );
+                if (value === false) {
+                  setCurrentTab("obj");
+                  return;
+                }
+              }
               setCurrentTab("sub");
               setCards((prevCards) => {
                 const newCards = [...prevCards];
