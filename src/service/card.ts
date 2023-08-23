@@ -41,6 +41,16 @@ export const isCardOnBeingWrited = (card: Card) => {
     return true;
   }
 
+  if (card.image !== null) {
+    console.log("image is not empty");
+    return true;
+  }
+
+  if(card.additionalView !== "") {
+    console.log("additionalView is not empty");
+    return true;
+  }
+
   if(card.type === "sub" && card.subAnswer !== "") {
     console.log("subAnswer is not empty");
     return true;
