@@ -13,7 +13,7 @@ export default function CreateProblemsSumbitButton() {
       return;
     }
     if (problemSetName === "") {
-      alert("문제지 이름을 입력해주세요.");
+      alert("문제집 이름을 입력해주세요.");
       return;
     }
 
