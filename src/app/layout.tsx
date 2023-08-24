@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import Navbar from "./components/Navbar";
 import AuthContext from "@/context/AuthContext";
+import JotaiProvider from "@/context/JotaiContext";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
@@ -21,8 +22,10 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${open_sans.className}`}>
         <AuthContext>
-          <Navbar />
-          {children}
+          <JotaiProvider>
+            <Navbar />
+            {children}
+          </JotaiProvider>
         </AuthContext>
       </body>
     </html>
