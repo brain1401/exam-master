@@ -1,14 +1,16 @@
 "use client";
 import { useState, useLayoutEffect, useEffect } from "react";
+import { cardsAtom, currentCardIndexAtom } from "../jotai/store";
+import { useAtom, useAtomValue } from "jotai";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
-import { useCardContext } from "@/context/CardContext";
-import { isCardEmpty, isCardOnBeingWrited } from "@/service/card";
+import { isCardOnBeingWrited } from "@/service/card";
 
 export default function CreateProblemsCard() {
-  const { cards, setCards, currentIndex } = useCardContext();
+  const [cards, setCards] = useAtom(cardsAtom);
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
+  const currentIndex = useAtomValue(currentCardIndexAtom);
 
   useLayoutEffect(() => {
     //현재 탭 상태를 설정
@@ -18,6 +20,7 @@ export default function CreateProblemsCard() {
   }, [currentIndex]);
 
   useEffect(() => {
+    //페이지를 닫거나 새로고침을 할 때 경고창을 띄우는 이벤트 리스너
     function preventClose(e: BeforeUnloadEvent) {
       e.preventDefault();
       e.returnValue = ""; //Chrome에서 동작하도록; deprecated
@@ -31,6 +34,10 @@ export default function CreateProblemsCard() {
       window.removeEventListener("beforeunload", preventClose);
     };
   }, []);
+
+  useEffect(() => {
+    console.log(cards);
+  }, [cards]);
 
   return (
     <section className="flex justify-center items-center">
