@@ -1,7 +1,8 @@
 "use client";
 import Image from "next/image";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
-import { useCardContext } from "@/context/CardContext";
+import { cardsAtom, currentCardIndexAtom } from "../jotai/store";
+import { useAtom, useAtomValue } from "jotai";
 import { candidate } from "../types/card";
 
 const candidatePlaceholders = [
@@ -12,7 +13,9 @@ const candidatePlaceholders = [
 ];
 
 export default function ObjectiveTab() {
-  const { cards, setCards, currentIndex } = useCardContext();
+  const [cards, setCards] = useAtom(cardsAtom);
+  const currentIndex = useAtomValue(currentCardIndexAtom);
+
   const [mounted, setMounted] = useState(false);
   const [question, setQuestion] = useState("");
   const [additionalView, setAdditionalView] = useState("");
