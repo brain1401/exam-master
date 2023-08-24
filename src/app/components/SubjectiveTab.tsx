@@ -1,10 +1,13 @@
 "use client";
-import { useCardContext } from "@/context/CardContext";
 import Image from "next/image";
 import { useCallback, useEffect, useState, useRef } from "react";
+import { cardsAtom, currentCardIndexAtom } from "../jotai/store";
+import { useAtom, useAtomValue } from "jotai";
 
 export default function SubjectiveTab() {
-  const { cards, setCards, currentIndex } = useCardContext();
+  const [cards, setCards] = useAtom(cardsAtom);
+  const currentIndex = useAtomValue(currentCardIndexAtom);
+
   const [mounted, setMounted] = useState(false);
   const [question, setQuestion] = useState("");
   const [additionalView, setAdditionalView] = useState("");
@@ -83,7 +86,7 @@ export default function SubjectiveTab() {
         return newCards;
       });
     }
-    
+
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     question,
