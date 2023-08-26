@@ -2,6 +2,7 @@
 import { useAtomValue } from "jotai";
 import { problemsSetsNameAtom, cardsAtom } from "@/app/jotai/store";
 import { isCardEmpty } from "@/service/card";
+import axios from "axios";
 
 export default function CreateProblemsSumbitButton() {
   const cards = useAtomValue(cardsAtom);
@@ -17,7 +18,13 @@ export default function CreateProblemsSumbitButton() {
       return;
     }
 
-    alert("제출 완료!");
+    const formData = new FormData();
+    cards.forEach((card, index) => {
+      formData.append(`image[${index}]`, card.image as Blob);
+      formData.append(`data[${index}]`, JSON.stringify(card));
+    });
+    formData.append("problemSetName", problemSetName);
+    axios.post("/api/postProblems", formData);
   };
   return (
     <div className="flex justify-center mt-3">
