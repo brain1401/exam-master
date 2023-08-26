@@ -6,7 +6,7 @@ import CreateProblemsSumbitButton from "./CreateProblems/CreateProblemsSumbitBut
 
 export default function CreateProblems() {
   return (
-    <section className="p-3">
+    <section className="p-3 mt-10 max-w-[70rem] mx-auto">
       <CreateProblemsOption />
       <CurrentCardIndicator />
 
