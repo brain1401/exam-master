@@ -20,7 +20,7 @@ export default function CreateProblemsCard() {
   }, [currentIndex]);
 
   useEffect(() => {
-    //페이지를 닫거나 새로고침을 할 때 경고창을 띄우는 이벤트 리스너
+    //페이지를 닫거나 새로고침을 할 때 경고창을 띄우는 이벤트 리스너 등록 및 해제
     function preventClose(e: BeforeUnloadEvent) {
       e.preventDefault();
       e.returnValue = ""; //Chrome에서 동작하도록; deprecated
@@ -42,7 +42,7 @@ export default function CreateProblemsCard() {
   return (
     <section className="flex justify-center items-center">
       <Tabs.Root
-        className="flex flex-col md:w-9/12 w-11/12"
+        className="flex flex-col md:w-[60rem] w-11/12"
         defaultValue={currentTab === "obj" ? "tab1" : "tab2"}
         activationMode="manual"
         value={currentTab === "obj" ? "tab1" : "tab2"}
@@ -73,7 +73,7 @@ export default function CreateProblemsCard() {
                   additiondalViewClicked: false,
                   imageButtonClicked: false,
                   image: null,
-                  candidates: [],
+                  candidates: Array(4).fill({ text: "", isAnswer: false }),
                   subAnswer: null,
                 };
 
