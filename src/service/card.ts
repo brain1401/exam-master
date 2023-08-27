@@ -1,6 +1,4 @@
 import { Card } from "@/app/types/card";
-import qs from "qs";
-import axios from "axios";
 import { getUser } from "./user";
 
 export const checkEnvVariables = () => {
@@ -72,26 +70,28 @@ export const isCardOnBeingWrited = (card: Card) => {
 
 export async function createProblem(card: Card): Promise<string> {
   try {
-    // 문제 생성
     let postId = "";
 
-    const response = await axios.post(
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems`,
       {
-        questionType: card.type,
-        question: card.question,
-        additionalView: card.additionalView,
-        candidates: card.candidates,
-        subjectiveAnswer: card.subAnswer,
-      },
-      {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          questionType: card.type,
+          question: card.question,
+          additionalView: card.additionalView,
+          candidates: card.candidates,
+          subjectiveAnswer: card.subAnswer,
+        }),
       }
     );
 
-    postId = response.data.data.id;
+    const data = await response.json();
+    postId = data.data.id;
     return postId;
   } catch (err) {
     console.log(err);
@@ -101,22 +101,19 @@ export async function createProblem(card: Card): Promise<string> {
 
 export async function createImage(card: Card, postId: string) {
   try {
-    // 위에서 생성한 문제에 사진 넣기
     const newFormData = new FormData();
     newFormData.append("files", card.image as Blob);
     newFormData.append("ref", "api::exam-problem.exam-problem");
     newFormData.append("refId", postId);
     newFormData.append("field", "image");
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
-      newFormData,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+
+    await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+      },
+      body: newFormData,
+    });
   } catch (err) {
     console.log(err);
     throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
@@ -130,25 +127,28 @@ export async function createProblemSets(
 ) {
   try {
     const user = await getUser(userEmail);
-    const response = await axios.post(
+
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets`,
       {
-        name: setName,
-        exam_problems: {
-          connect: [...postIdArray],
-        },
-        exam_users: {
-          connect: [user.id],
-        },
-      },
-      {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          name: setName,
+          exam_problems: {
+            connect: [...postIdArray],
+          },
+          exam_users: {
+            connect: [user.id],
+          },
+        }),
       }
     );
 
-    return response.data.data;
+    return response.statusText;
   } catch (err) {
     console.log(err);
     throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
@@ -171,7 +171,6 @@ export async function postProblems(
 
     card.image && (await createImage(card, postId));
   }
-  console.log("postIdArray :", postIdArray);
 
   const response = await createProblemSets(userEmail, setName, postIdArray);
   return response;

@@ -2,13 +2,12 @@
 import { useAtomValue } from "jotai";
 import { problemsSetsNameAtom, cardsAtom } from "@/app/jotai/store";
 import { isCardEmpty } from "@/service/card";
-import axios from "axios";
 
 export default function CreateProblemsSubmitButton() {
   const cards = useAtomValue(cardsAtom);
   const problemSetName = useAtomValue(problemsSetsNameAtom);
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     if (cards.some((card) => isCardEmpty(card))) {
       alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
       return;
@@ -24,8 +23,16 @@ export default function CreateProblemsSubmitButton() {
       formData.append(`data[${index}]`, JSON.stringify(card));
     });
     formData.append("problemSetName", problemSetName);
-    axios.post("/api/postProblems", formData);
+    const response = await fetch("/api/postProblems", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    console.log(data);
+
   };
+
   return (
     <div className="flex justify-center mt-3">
       <button
