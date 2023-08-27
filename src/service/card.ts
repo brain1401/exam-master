@@ -70,7 +70,7 @@ export const isCardOnBeingWrited = (card: Card) => {
   return false;
 };
 
-export async function createProblem(card: Card, postedId: string[]):Promise<string> {
+export async function createProblem(card: Card): Promise<string> {
   try {
     // 문제 생성
     let postId = "";
@@ -92,7 +92,6 @@ export async function createProblem(card: Card, postedId: string[]):Promise<stri
     );
 
     postId = response.data.data.id;
-    postedId.push(postId);
     return postId;
   } catch (err) {
     console.log(err);
@@ -100,56 +99,60 @@ export async function createProblem(card: Card, postedId: string[]):Promise<stri
   }
 }
 
-export async function createImage(card: Card, postId: string){
-   try {
-     // 위에서 생성한 문제에 사진 넣기
-     const newFormData = new FormData();
-     newFormData.append("files", card.image as Blob);
-     newFormData.append("ref", "api::exam-problem.exam-problem");
-     newFormData.append("refId", postId);
-     newFormData.append("field", "image");
-     await axios.post(
-       `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
-       newFormData,
-       {
-         headers: {
-           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-           "Content-Type": "multipart/form-data",
-         },
-       }
-     );
-   } catch (err) {
-     console.log(err);
-     throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
-   }
+export async function createImage(card: Card, postId: string) {
+  try {
+    // 위에서 생성한 문제에 사진 넣기
+    const newFormData = new FormData();
+    newFormData.append("files", card.image as Blob);
+    newFormData.append("ref", "api::exam-problem.exam-problem");
+    newFormData.append("refId", postId);
+    newFormData.append("field", "image");
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
+      newFormData,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
+  }
 }
 
-export async function createProblemSets(userEmail: string, setName: string, postIdArray: string[]) {
-    try {
-      const user = await getUser(userEmail);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets`,
-        {
-          name: setName,
-          exam_problems: {
-            connect: [...postIdArray],
-          },
-          exam_users: {
-            connect: [user.id],
-          },
+export async function createProblemSets(
+  userEmail: string,
+  setName: string,
+  postIdArray: string[]
+) {
+  try {
+    const user = await getUser(userEmail);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets`,
+      {
+        name: setName,
+        exam_problems: {
+          connect: [...postIdArray],
         },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-          },
-        }
-      );
+        exam_users: {
+          connect: [user.id],
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      }
+    );
 
-      return response.data.data;
-    } catch (err) {
-      console.log(err);
-      throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
-    }
+    return response.data.data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
+  }
 }
 
 export async function postProblems(
@@ -161,17 +164,15 @@ export async function postProblems(
   const postIdArray: string[] = [];
 
   for (const card of cards) {
-    if (isCardEmpty(card)) {
-      throw new Error("문제가 비어있습니다.");
-    }
+    if (isCardEmpty(card)) throw new Error("문제가 비어있습니다.");
 
-    let postId = await createProblem(card, postIdArray);
-    card.image && await createImage(card, postId);
+    const postId = await createProblem(card);
+    postIdArray.push(postId);
 
+    card.image && (await createImage(card, postId));
   }
-  console.log("postedId :",postIdArray);
+  console.log("postIdArray :", postIdArray);
 
   const response = await createProblemSets(userEmail, setName, postIdArray);
   return response;
-
 }
