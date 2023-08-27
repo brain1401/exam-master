@@ -4,7 +4,7 @@ import { problemsSetsNameAtom, cardsAtom } from "@/app/jotai/store";
 import { isCardEmpty } from "@/service/card";
 import axios from "axios";
 
-export default function CreateProblemsSumbitButton() {
+export default function CreateProblemsSubmitButton() {
   const cards = useAtomValue(cardsAtom);
   const problemSetName = useAtomValue(problemsSetsNameAtom);
 

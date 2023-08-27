@@ -2,7 +2,7 @@ import CreateProblemsCard from "./CreateProblemsCard";
 import CreateProblemsOption from "./CreateProblems/CreateProblemsOption";
 import NextOrPrevButtons from "./CreateProblems/NextOrPrevButtons";
 import CurrentCardIndicator from "./CreateProblems/CurrentCardIndicator";
-import CreateProblemsSumbitButton from "./CreateProblems/CreateProblemsSumbitButton";
+import CreateProblemsSubmitButton from "./CreateProblems/CreateProblemsSubmitButton";
 
 export default function CreateProblems() {
   return (
@@ -13,7 +13,7 @@ export default function CreateProblems() {
       <CreateProblemsCard />
 
       <NextOrPrevButtons />
-      <CreateProblemsSumbitButton />
+      <CreateProblemsSubmitButton />
     </section>
   );
 }
