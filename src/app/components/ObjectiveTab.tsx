@@ -23,9 +23,7 @@ export default function ObjectiveTab() {
   const [isAdditionalViewButtonClicked, setIsAdditionalViewButtonClicked] =
     useState(false);
   const [isImageAddButtonClicked, setIsImageAddButtonClicked] = useState(false);
-  const [candidateValues, setCandidateValues] = useState<
-    Record<string, candidate>
-  >({});
+  const [candidateValues, setCandidateValues] = useState<candidate[]>([]);
   const imageFileRef = useRef<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -34,16 +32,17 @@ export default function ObjectiveTab() {
 
     setSelectedValue(selectedValue);
     setCandidateValues((prevValues) => {
-      const newValues = { ...prevValues };
-      const prevLength = Object.keys(newValues).length;
-      const keys = Object.keys(newValues);
+      let newValues = [...prevValues];
+      const prevLength = prevValues.length;
       const selectedIntValue = parseInt(selectedValue);
 
-      if (selectedIntValue < keys.length) {
-        keys.slice(selectedIntValue).forEach((key) => delete newValues[key]);
+      if (selectedIntValue < prevLength) {
+        //선택지 수가 줄어들 때
+        newValues = newValues.slice(0, selectedIntValue);
       } else {
+        //선택지 수가 늘어날 때
         for (let i = prevLength; i < selectedIntValue; i++) {
-          newValues[`candidate-${i + 1}`] = {
+          newValues[i] = {
             text: "",
             isAnswer: false,
           };
@@ -55,28 +54,30 @@ export default function ObjectiveTab() {
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
-    const objkey = id.split("-")[0] + "-" + id.split("-")[1];
+    const index = parseInt(id.split("-")[1]);
 
-    setCandidateValues((prevValues) => ({
-      ...prevValues,
-      [objkey]: {
+    setCandidateValues((prevValues) => {
+      const newValues = [...prevValues];
+      newValues[index] = {
         text: value,
-        isAnswer: prevValues[objkey]?.isAnswer || false,
-      },
-    }));
+        isAnswer: prevValues[index]?.isAnswer || false,
+      };
+      return newValues;
+    });
   };
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = event.target;
-    const objkey = id.split("-")[0] + "-" + id.split("-")[1];
+    const index = parseInt(id.split("-")[1]);
 
-    setCandidateValues((prevValues) => ({
-      ...prevValues,
-      [objkey]: {
-        text: prevValues[objkey]?.text || "",
+    setCandidateValues((prevValues) => {
+      const newValues = [...prevValues];
+      newValues[index] = {
+        text: prevValues[index]?.text ?? "",
         isAnswer: checked,
-      },
-    }));
+      };
+      return newValues;
+    });
   };
 
   const handleImageChange = useCallback(
@@ -92,13 +93,14 @@ export default function ObjectiveTab() {
     },
     []
   );
+
   const candidates = Array.from(
     { length: parseInt(selectedValue) },
-    (_, index) => candidatePlaceholders[index]
+    (_, index) => candidatePlaceholders[index] ?? ""
   ).map((value, index) => (
     <div key={index} className="flex flex-col my-2">
       <label
-        htmlFor={`candidate-${index + 1}-text`}
+        htmlFor={`candidate-${index}-text`}
         className="text-lg font-semibold"
         onClick={(e) => e.preventDefault()}
       >
@@ -107,23 +109,23 @@ export default function ObjectiveTab() {
       <div className="flex justify-start items-center">
         <input
           type="text"
-          id={`candidate-${index + 1}-text`}
-          value={candidateValues[`candidate-${index + 1}`]?.text || ""}
+          id={`candidate-${index}-text`}
+          value={candidateValues[index]?.text ?? ""}
           className="w-full h-10 border border-gray-300 rounded-md p-2"
           onChange={handleInputChange}
           placeholder={value}
         />
         <label
-          htmlFor={`candidate-${index + 1}-checkbox`}
+          htmlFor={`candidate-${index}-checkbox`}
           className="md:mx-2 ml-[0.55rem] px-1 md:p-0  md:text-md font-bold md:w-20 text:sm w-fit"
         >
           정답여부
         </label>
         <input
           type="checkbox"
-          id={`candidate-${index + 1}-checkbox`}
-          disabled={!Boolean(candidateValues[`candidate-${index + 1}`]?.text)}
-          checked={candidateValues[`candidate-${index + 1}`]?.isAnswer || false}
+          id={`candidate-${index}-checkbox`}
+          disabled={!Boolean(candidateValues[index]?.text)}
+          checked={candidateValues[index]?.isAnswer ?? false}
           onChange={handleCheckboxChange}
         />
       </div>
@@ -165,12 +167,7 @@ export default function ObjectiveTab() {
       );
       setIsAdditionalViewButtonClicked(additiondalViewClicked);
       setIsImageAddButtonClicked(imageButtonClicked);
-      setCandidateValues(
-        candidates?.reduce((acc, cur, index) => {
-          acc[`candidate-${index + 1}`] = cur;
-          return acc;
-        }, {} as Record<string, candidate>) || {}
-      );
+      setCandidateValues(candidates ?? []);
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
@@ -187,8 +184,8 @@ export default function ObjectiveTab() {
           image: imageFileRef.current,
           additiondalViewClicked: isAdditionalViewButtonClicked,
           imageButtonClicked: isImageAddButtonClicked,
-          candidates: Object.values(candidateValues),
-          subAnswer: null,
+          candidates: candidateValues,
+          subAnswer: "",
         };
         return newCards;
       });
