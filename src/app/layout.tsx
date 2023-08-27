@@ -4,6 +4,7 @@ import { Open_Sans } from "next/font/google";
 import Navbar from "./components/Navbar";
 import AuthContext from "@/context/AuthContext";
 import JotaiProvider from "@/context/JotaiContext";
+import { Suspense } from "react";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
@@ -24,7 +25,9 @@ export default function RootLayout({
         <AuthContext>
           <JotaiProvider>
             <Navbar />
-            {children}
+            <Suspense fallback={<div>로딩중...</div>}>
+              <main>{children}</main>
+            </Suspense>
           </JotaiProvider>
         </AuthContext>
       </body>
