@@ -67,19 +67,20 @@ export const currentCardImageAtom = atom(
   }
 );
 
-
-
 export const resetCardsAtom = atom(null, (get, set) => {
   const cardsLength = get(cardsLengthAtom);
-  const newCards = [...Array(parseInt(cardsLength)).fill({
-    type: "obj",
-    question: "",
-    additionalView: "",
-    additiondalViewClicked: false,
-    imageButtonClicked: false,
-    image: null,
-    candidates: Array(4).fill({ text: "", isAnswer: false }),
-    subAnswer: null,
-  })];
+  const newCards = [
+    ...Array(parseInt(cardsLength)).fill({
+      type: "obj",
+      question: "",
+      additionalView: "",
+      additiondalViewClicked: false,
+      imageButtonClicked: false,
+      image: null,
+      candidates: Array(4).fill({ text: "", isAnswer: false }),
+      subAnswer: null,
+    }),
+  ];
   set(cardsAtom, newCards);
+  set(currentCardIndexAtom, 0);
 });
