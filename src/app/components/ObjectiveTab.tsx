@@ -30,7 +30,9 @@ export default function ObjectiveTab() {
   );
   const setCurrentCardImage = useSetAtom(currentCardImageAtom);
 
-  const [selectedValue, setSelectedValue] = useState("4");
+  const [selectedValue, setSelectedValue] = useState(
+    currentCard.candidates?.length.toString() ?? "4"
+  );
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -85,16 +87,25 @@ export default function ObjectiveTab() {
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file && file.type.startsWith("image/")) {
-        if (imageURL) {
-          // 이전 이미지 URL 해제
-          URL.revokeObjectURL(imageURL);
+      const MAX_FILE_SIZE = 9 * 1024 * 1024; // 9MB
+
+      if (file) {
+        if (file.size > MAX_FILE_SIZE) {
+          alert("파일 크기는 9MB를 초과할 수 없습니다.");
+          return;
         }
-        const newURL = URL.createObjectURL(file);
-        setImageURL(newURL); // 이미지 URL 상태를 업데이트
-        setCurrentCardImage(file);
-      } else {
-        alert("이미지 파일을 선택해주세요.");
+
+        if (file.type.startsWith("image/")) {
+          if (imageURL) {
+            // 이전 이미지 URL 해제
+            URL.revokeObjectURL(imageURL);
+          }
+          const newURL = URL.createObjectURL(file);
+          setImageURL(newURL); // 이미지 URL 상태를 업데이트
+          setCurrentCardImage(file);
+        } else {
+          alert("이미지 파일을 선택해주세요.");
+        }
       }
     },
     [imageURL, setCurrentCardImage]
@@ -116,7 +127,7 @@ export default function ObjectiveTab() {
         <input
           type="text"
           id={`candidate-${index}-text`}
-          value={currentCardCandidates?.[index].text ?? ""}
+          value={currentCardCandidates?.[index]?.text ?? ""}
           className="w-full h-10 border border-gray-300 rounded-md p-2"
           onChange={handleInputChange}
           placeholder={value}
@@ -130,8 +141,8 @@ export default function ObjectiveTab() {
         <input
           type="checkbox"
           id={`candidate-${index}-checkbox`}
-          disabled={!Boolean(currentCardCandidates?.[index].text)}
-          checked={currentCardCandidates?.[index].isAnswer ?? false}
+          disabled={!Boolean(currentCardCandidates?.[index]?.text)}
+          checked={currentCardCandidates?.[index]?.isAnswer ?? false}
           onChange={handleCheckboxChange}
         />
       </div>
@@ -139,15 +150,23 @@ export default function ObjectiveTab() {
   ));
 
   useEffect(() => {
-    // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
-    return () => {
-      if (imageURL) {
-        URL.revokeObjectURL(imageURL);
-      }
-    };
-  }, [imageURL]);
+    if (currentCard.image) {
+      const objectUrl = URL.createObjectURL(currentCard.image);
+      setImageURL(objectUrl);
+
+      // 컴포넌트가 언마운트 될 때나 currentCard가 변경될 때 이미지 URL revoke
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setImageURL(null);
+    }
+  }, [currentCard.image]);
 
   useEffect(() => {
+    setSelectedValue(currentCard.candidates?.length.toString() ?? "4");
+  }, [currentCard.candidates]);
+
+  useEffect(() => {
+    // 컴포넌트가 마운트 될 때 type을 obj로 초기화
     setCurrentCard({
       type: "obj",
     });
@@ -240,7 +259,7 @@ export default function ObjectiveTab() {
               사진 선택
             </label>
           </div>
-          {image && (
+          {imageURL && (
             <Image
               src={imageURL ?? ""}
               alt="image"
