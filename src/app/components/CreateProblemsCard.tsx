@@ -1,6 +1,10 @@
 "use client";
 import { useState, useLayoutEffect, useEffect } from "react";
-import { cardsAtom, currentCardIndexAtom } from "../jotai/store";
+import {
+  cardsAtom,
+  currentCardAtom,
+  currentCardIndexAtom,
+} from "../jotai/store";
 import { useAtom, useAtomValue } from "jotai";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
@@ -8,16 +12,16 @@ import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/card";
 
 export default function CreateProblemsCard() {
-  const [cards, setCards] = useAtom(cardsAtom);
+  const cards = useAtomValue(cardsAtom);
+  const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
+  
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
   const currentIndex = useAtomValue(currentCardIndexAtom);
 
   useLayoutEffect(() => {
     //현재 탭 상태를 설정
-    setCurrentTab(cards[currentIndex].type);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex]);
+    setCurrentTab(currentCard.type);
+  }, [currentIndex, currentCard]);
 
   useEffect(() => {
     //페이지를 닫거나 새로고침을 할 때 경고창을 띄우는 이벤트 리스너 등록 및 해제
@@ -54,7 +58,7 @@ export default function CreateProblemsCard() {
             }`}
             value="tab1"
             onClick={() => {
-              if (isCardOnBeingWrited(cards[currentIndex])) {
+              if (isCardOnBeingWrited(currentCard)) {
                 const value = confirm(
                   "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
                 );
@@ -64,20 +68,15 @@ export default function CreateProblemsCard() {
                 }
               }
               setCurrentTab("obj");
-              setCards((prevCards) => {
-                const newCards = [...prevCards];
-                newCards[currentIndex] = {
-                  type: "obj",
-                  question: "",
-                  additionalView: "",
-                  additiondalViewClicked: false,
-                  imageButtonClicked: false,
-                  image: null,
-                  candidates: Array(4).fill({ text: "", isAnswer: false }),
-                  subAnswer: null,
-                };
-
-                return newCards;
+              setCurrentCard({
+                type: "obj",
+                question: "",
+                additionalView: "",
+                isAdditiondalViewButtonClicked: false,
+                isImageButtonClicked: false,
+                image: null,
+                candidates: Array(4).fill({ text: "", isAnswer: false }),
+                subAnswer: null,
               });
             }}
             disabled={currentTab === "obj"}
@@ -91,7 +90,7 @@ export default function CreateProblemsCard() {
             }`}
             value="tab2"
             onClick={() => {
-              if (isCardOnBeingWrited(cards[currentIndex])) {
+              if (isCardOnBeingWrited(currentCard)) {
                 const value = confirm(
                   "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
                 );
@@ -101,20 +100,15 @@ export default function CreateProblemsCard() {
                 }
               }
               setCurrentTab("sub");
-              setCards((prevCards) => {
-                const newCards = [...prevCards];
-                newCards[currentIndex] = {
-                  type: "sub",
-                  question: "",
-                  additionalView: "",
-                  image: null,
-                  additiondalViewClicked: false,
-                  imageButtonClicked: false,
-                  subAnswer: "",
-                  candidates: null,
-                };
-
-                return newCards;
+              setCurrentCard({
+                type: "sub",
+                question: "",
+                additionalView: "",
+                image: null,
+                isAdditiondalViewButtonClicked: false,
+                isImageButtonClicked: false,
+                subAnswer: "",
+                candidates: null,
               });
             }}
             disabled={currentTab === "sub"}
