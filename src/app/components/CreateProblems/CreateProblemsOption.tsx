@@ -6,7 +6,7 @@ import {
   problemsSetsNameAtom,
   currentCardIndexAtom,
 } from "@/app/jotai/store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isCardOnBeingWrited } from "@/service/card";
 
 export default function CreateProblemsOption() {
@@ -25,6 +25,10 @@ export default function CreateProblemsOption() {
     const value = e.target.value;
     setCardsLengthState(value);
   };
+
+  useEffect(() => {
+    setProblemsSetsNameState(problemsSetsNameJotai);
+  }, [problemsSetsNameJotai]);
 
   const applyCardLangth = () => {
     const newMaxIndex = parseInt(cardsLengthState); // 입력한 최대 문제 수
@@ -49,7 +53,9 @@ export default function CreateProblemsOption() {
         // 입력한 최재 문제 수가 cards 배열의 현재 길이보다 작은 경우, 배열의 마지막 항목을 삭제.
 
         if (
-          cardsJotai.slice(newMaxIndex).some((card) => isCardOnBeingWrited(card))
+          cardsJotai
+            .slice(newMaxIndex)
+            .some((card) => isCardOnBeingWrited(card))
         ) {
           const value = confirm(
             `${newMaxIndex}번에서 ${cardsJotai.length}번 문제의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`
@@ -83,12 +89,12 @@ export default function CreateProblemsOption() {
   };
 
   const handleApplyProblemSetName = () => {
-    if(problemsSetsNameState.trim() === "") {
+    if (problemsSetsNameState.trim() === "") {
       alert("문제집 이름은 빈 문자열이 될 수 없습니다.");
       setProblemsSetsNameState("");
       return;
     }
-  
+
     setProblemsSetsNameJotai(problemsSetsNameState);
     alert("문제집 이름이 적용되었습니다.");
   };
