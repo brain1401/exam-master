@@ -19,8 +19,6 @@ export default function SubjectiveTab() {
     question,
     additionalView,
     isAdditiondalViewButtonClicked,
-    candidates,
-    image,
     isImageButtonClicked,
     subAnswer,
   } = currentCard;
