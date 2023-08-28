@@ -90,6 +90,9 @@ export async function createProblem(card: Card): Promise<string> {
       }
     );
 
+    if (!response.ok)
+      throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
+
     const data = await response.json();
     postId = data.data.id;
     return postId;
@@ -107,13 +110,19 @@ export async function createImage(card: Card, postId: string) {
     newFormData.append("refId", postId);
     newFormData.append("field", "image");
 
-    await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-      },
-      body: newFormData,
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+        body: newFormData,
+      }
+    );
+
+    if (!response.ok)
+      throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
   } catch (err) {
     console.log(err);
     throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
@@ -147,6 +156,8 @@ export async function createProblemSets(
         }),
       }
     );
+    if (!response.ok)
+      throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
 
     return response.statusText;
   } catch (err) {
