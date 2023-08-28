@@ -1,18 +1,11 @@
 "use client";
 import Image from "next/image";
-import { useCallback, useEffect, useState, useRef } from "react";
-import {
-  currentCardAtom,
-  currentCardCandidatesAtom,
-  currentCardImageAtom,
-} from "../jotai/store";
+import { useCallback, useEffect, useState } from "react";
+import { currentCardAtom, currentCardImageAtom } from "../jotai/store";
 import { useAtom, useSetAtom } from "jotai";
 
 export default function SubjectiveTab() {
   const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
-  const [currentCardCandidates, setCurrentCardCandidates] = useAtom(
-    currentCardCandidatesAtom
-  );
   const setCurrentCardImage = useSetAtom(currentCardImageAtom);
 
   const {
@@ -27,22 +20,32 @@ export default function SubjectiveTab() {
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file && file.type.startsWith("image/")) {
-        if (imageURL) {
-          // 이전 이미지 URL 해제
-          URL.revokeObjectURL(imageURL);
+      const MAX_FILE_SIZE = 9 * 1024 * 1024; // 9MB
+
+      if (file) {
+        if (file.size > MAX_FILE_SIZE) {
+          alert("파일 크기는 9MB를 초과할 수 없습니다.");
+          return;
         }
-        const newURL = URL.createObjectURL(file);
-        setImageURL(newURL); // 이미지 URL 상태를 업데이트
-        setCurrentCardImage(file);
-      } else {
-        alert("이미지 파일을 선택해주세요.");
+
+        if (file.type.startsWith("image/")) {
+          if (imageURL) {
+            // 이전 이미지 URL 해제
+            URL.revokeObjectURL(imageURL);
+          }
+          const newURL = URL.createObjectURL(file);
+          setImageURL(newURL); // 이미지 URL 상태를 업데이트
+          setCurrentCardImage(file);
+        } else {
+          alert("이미지 파일을 선택해주세요.");
+        }
       }
     },
     [imageURL, setCurrentCardImage]
   );
 
   useEffect(() => {
+    //컴포넌트가 마운트 될 때 type을 sub으로 초기화
     setCurrentCard({
       type: "sub",
     });
@@ -50,13 +53,16 @@ export default function SubjectiveTab() {
   }, []);
 
   useEffect(() => {
-    // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
-    return () => {
-      if (imageURL) {
-        URL.revokeObjectURL(imageURL);
-      }
-    };
-  }, [imageURL]);
+    if (currentCard.image) {
+      const objectUrl = URL.createObjectURL(currentCard.image);
+      setImageURL(objectUrl);
+
+      // 컴포넌트가 언마운트 될 때나 currentCard가 변경될 때 이미지 URL revoke
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setImageURL(null);
+    }
+  }, [currentCard.image]);
 
   return (
     <form
@@ -117,23 +123,28 @@ export default function SubjectiveTab() {
 
       {isImageButtonClicked && (
         <div>
-          <label
-            htmlFor="image"
+          <p
             className="text-lg font-semibold"
             onClick={(e) => {
               e.preventDefault();
             }}
           >
             사진
-          </label>
-          <div className="my-2 flex justify-center items-center">
+          </p>
+          <div className="my-2 flex items-center">
             <input
               type="file"
               id="image"
               accept="image/*"
-              className="w-full h-10 border border-gray-300 rounded-md p-1"
+              className="absolute opacity-0 w-0 h-0"
               onChange={handleImageChange}
             />
+            <label
+              htmlFor="image"
+              className="px-4 py-2 bg-blue-500 text-white cursor-pointer hover:bg-blue-600 rounded-md"
+            >
+              사진 선택
+            </label>
           </div>
           {imageURL && (
             <Image
