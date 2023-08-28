@@ -1,101 +1,64 @@
 "use client";
 import Image from "next/image";
 import { useCallback, useEffect, useState, useRef } from "react";
-import { cardsAtom, currentCardIndexAtom } from "../jotai/store";
-import { useAtom, useAtomValue } from "jotai";
+import {
+  currentCardAtom,
+  currentCardCandidatesAtom,
+  currentCardImageAtom,
+} from "../jotai/store";
+import { useAtom, useSetAtom } from "jotai";
 
 export default function SubjectiveTab() {
-  const [cards, setCards] = useAtom(cardsAtom);
-  const currentIndex = useAtomValue(currentCardIndexAtom);
+  const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
+  const [currentCardCandidates, setCurrentCardCandidates] = useAtom(
+    currentCardCandidatesAtom
+  );
+  const setCurrentCardImage = useSetAtom(currentCardImageAtom);
 
-  const [mounted, setMounted] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [additionalView, setAdditionalView] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [isAdditionalViewButtonClicked, setIsAdditionalViewButtonClicked] =
-    useState(false);
-  const [isImageAddButtonClicked, setIsImageAddButtonClicked] = useState(false);
-
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const imageFileRef = useRef<File | null>(null);
+  const {
+    question,
+    additionalView,
+    isAdditiondalViewButtonClicked,
+    candidates,
+    image,
+    isImageButtonClicked,
+    subAnswer,
+  } = currentCard;
+  const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file && file.type.startsWith("image/")) {
-        imageFileRef.current = file;
-        setImageUrl(URL.createObjectURL(file));
+        if (imageURL) {
+          // 이전 이미지 URL 해제
+          URL.revokeObjectURL(imageURL);
+        }
+        const newURL = URL.createObjectURL(file);
+        setImageURL(newURL); // 이미지 URL 상태를 업데이트
+        setCurrentCardImage(file);
       } else {
         alert("이미지 파일을 선택해주세요.");
       }
     },
-    []
+    [imageURL, setCurrentCardImage]
   );
 
   useEffect(() => {
-    //컴포넌트가 마운트 될 때 mounted를 true로 설정
-    setMounted(true);
+    setCurrentCard({
+      type: "sub",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    //컴포넌트가 언마운트 될 때 이미지 URL을 revoke
+    // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
     return () => {
-      if (imageFileRef.current) {
-        URL.revokeObjectURL(URL.createObjectURL(imageFileRef.current));
+      if (imageURL) {
+        URL.revokeObjectURL(imageURL);
       }
     };
-  }, []);
-
-  useEffect(() => {
-    //cards[currentIndex]에 값이 있을 때 해당 값으로 초기값 설정
-    if (cards[currentIndex]) {
-      const {
-        question,
-        additionalView,
-        subAnswer,
-        image,
-        additiondalViewClicked,
-        imageButtonClicked,
-      } = cards[currentIndex];
-      setQuestion(question);
-      setAdditionalView(additionalView);
-      setAnswer(subAnswer || "");
-      setImageUrl(image ? URL.createObjectURL(image) : null);
-      imageFileRef.current = image || null;
-      setIsAdditionalViewButtonClicked(additiondalViewClicked);
-      setIsImageAddButtonClicked(imageButtonClicked);
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex]);
-
-  useEffect(() => {
-    //의존성 배열이 바뀔 때 마다 Cards를 업데이트
-    if (mounted) {
-      setCards((prevCards) => {
-        const newCards = [...prevCards];
-        newCards[currentIndex] = {
-          type: "sub",
-          question,
-          additionalView,
-          image: imageFileRef.current,
-          additiondalViewClicked: isAdditionalViewButtonClicked,
-          imageButtonClicked: isImageAddButtonClicked,
-          subAnswer: answer,
-          candidates: null,
-        };
-        return newCards;
-      });
-    }
-
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    question,
-    additionalView,
-    imageUrl,
-    answer,
-    isAdditionalViewButtonClicked,
-    isImageAddButtonClicked,
-  ]);
+  }, [imageURL]);
 
   return (
     <form
@@ -112,20 +75,22 @@ export default function SubjectiveTab() {
           id="question"
           className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
           value={question}
-          onChange={(e) => setQuestion(e.target.value)}
+          onChange={(e) => setCurrentCard({ question: e.target.value })}
         />
       </div>
       <div className="flex gap-2 mb-3">
         <button
           className={`${
-            isAdditionalViewButtonClicked
+            isAdditiondalViewButtonClicked
               ? "border border-neutral-500 bg-neutral-500 text-white"
               : "border border-gray-300"
           }  rounded-md px-5 py-2`}
           onClick={() => {
-            setIsAdditionalViewButtonClicked(!isAdditionalViewButtonClicked);
-            if (isAdditionalViewButtonClicked === true) {
-              setAdditionalView("");
+            setCurrentCard({
+              isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
+            });
+            if (isAdditiondalViewButtonClicked === true) {
+              setCurrentCard({ additionalView: "" });
             }
           }}
         >
@@ -134,19 +99,25 @@ export default function SubjectiveTab() {
 
         <button
           className={`${
-            isImageAddButtonClicked
+            isImageButtonClicked
               ? "border border-neutral-500 bg-neutral-500 text-white"
               : "border border-gray-300"
           }  rounded-md px-5 py-2`}
           onClick={() => {
-            setIsImageAddButtonClicked(!isImageAddButtonClicked);
+            setCurrentCard({
+              isImageButtonClicked: !isImageButtonClicked,
+            });
+            if (isImageButtonClicked === true) {
+              setCurrentCardImage(null);
+              URL.revokeObjectURL(imageURL || "");
+            }
           }}
         >
           사진 추가
         </button>
       </div>
 
-      {isImageAddButtonClicked && (
+      {isImageButtonClicked && (
         <div>
           <label
             htmlFor="image"
@@ -166,9 +137,9 @@ export default function SubjectiveTab() {
               onChange={handleImageChange}
             />
           </div>
-          {imageUrl && (
+          {imageURL && (
             <Image
-              src={imageUrl}
+              src={imageURL}
               alt="image"
               width={400}
               height={200}
@@ -177,7 +148,7 @@ export default function SubjectiveTab() {
           )}
         </div>
       )}
-      {isAdditionalViewButtonClicked && (
+      {isAdditiondalViewButtonClicked && (
         <div>
           <label
             htmlFor="additional-info"
@@ -193,7 +164,7 @@ export default function SubjectiveTab() {
             className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2 my-2"
             value={additionalView}
             onChange={(e) => {
-              setAdditionalView(e.target.value);
+              setCurrentCard({ additionalView: e.target.value });
             }}
           />
         </div>
@@ -206,8 +177,8 @@ export default function SubjectiveTab() {
         <textarea
           id="question"
           className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
+          value={subAnswer ?? ""}
+          onChange={(e) => setCurrentCard({ subAnswer: e.target.value })}
         />
       </div>
     </form>

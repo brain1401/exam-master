@@ -1,9 +1,12 @@
 "use client";
 import Image from "next/image";
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
-import { cardsAtom, currentCardIndexAtom } from "../jotai/store";
-import { useAtom, useAtomValue } from "jotai";
-import { candidate } from "../types/card";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import {
+  currentCardAtom,
+  currentCardCandidatesAtom,
+  currentCardImageAtom,
+} from "../jotai/store";
+import { useAtom, useSetAtom } from "jotai";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -13,85 +16,88 @@ const candidatePlaceholders = [
 ];
 
 export default function ObjectiveTab() {
-  const [cards, setCards] = useAtom(cardsAtom);
-  const currentIndex = useAtomValue(currentCardIndexAtom);
+  const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
+  const {
+    question,
+    additionalView,
+    isAdditiondalViewButtonClicked,
+    image,
+    isImageButtonClicked,
+  } = currentCard;
 
-  const [mounted, setMounted] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [additionalView, setAdditionalView] = useState("");
+  const [currentCardCandidates, setCurrentCardCandidates] = useAtom(
+    currentCardCandidatesAtom
+  );
+  const setCurrentCardImage = useSetAtom(currentCardImageAtom);
+
   const [selectedValue, setSelectedValue] = useState("4");
-  const [isAdditionalViewButtonClicked, setIsAdditionalViewButtonClicked] =
-    useState(false);
-  const [isImageAddButtonClicked, setIsImageAddButtonClicked] = useState(false);
-  const [candidateValues, setCandidateValues] = useState<candidate[]>([]);
-  const imageFileRef = useRef<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value: selectedValue } = event.target;
-
     setSelectedValue(selectedValue);
-    setCandidateValues((prevValues) => {
-      let newValues = [...prevValues];
-      const prevLength = prevValues.length;
-      const selectedIntValue = parseInt(selectedValue);
 
-      if (selectedIntValue < prevLength) {
-        //선택지 수가 줄어들 때
-        newValues = newValues.slice(0, selectedIntValue);
-      } else {
-        //선택지 수가 늘어날 때
-        for (let i = prevLength; i < selectedIntValue; i++) {
-          newValues[i] = {
-            text: "",
-            isAnswer: false,
-          };
-        }
+    let newValues = [...(currentCardCandidates || [])];
+    const prevLength = newValues.length;
+
+    const selectedIntValue = parseInt(selectedValue);
+    if (selectedIntValue < prevLength) {
+      //선택지 수가 줄어들 때
+      newValues = newValues.slice(0, selectedIntValue);
+    } else {
+      //선택지 수가 늘어날 때
+      for (let i = prevLength; i < selectedIntValue; i++) {
+        newValues[i] = {
+          text: "",
+          isAnswer: false,
+        };
       }
-      return newValues;
-    });
+    }
+    setCurrentCardCandidates(newValues);
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
     const index = parseInt(id.split("-")[1]);
 
-    setCandidateValues((prevValues) => {
-      const newValues = [...prevValues];
-      newValues[index] = {
-        text: value,
-        isAnswer: prevValues[index]?.isAnswer || false,
-      };
-      return newValues;
-    });
+    const newCandidates = [...(currentCardCandidates || [])];
+    newCandidates[index] = {
+      text: value,
+      isAnswer: newCandidates[index]?.isAnswer ?? false,
+    };
+
+    setCurrentCardCandidates(newCandidates);
   };
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = event.target;
     const index = parseInt(id.split("-")[1]);
 
-    setCandidateValues((prevValues) => {
-      const newValues = [...prevValues];
-      newValues[index] = {
-        text: prevValues[index]?.text ?? "",
-        isAnswer: checked,
-      };
-      return newValues;
-    });
+    const newCandidates = [...(currentCardCandidates || [])];
+    newCandidates[index] = {
+      text: newCandidates[index]?.text ?? "",
+      isAnswer: checked,
+    };
+
+    setCurrentCardCandidates(newCandidates);
   };
 
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file && file.type.startsWith("image/")) {
-        const imageUrl = URL.createObjectURL(file);
-        imageFileRef.current = file;
-        setImageUrl(imageUrl);
+        if (imageURL) {
+          // 이전 이미지 URL 해제
+          URL.revokeObjectURL(imageURL);
+        }
+        const newURL = URL.createObjectURL(file);
+        setImageURL(newURL); // 이미지 URL 상태를 업데이트
+        setCurrentCardImage(file);
       } else {
         alert("이미지 파일을 선택해주세요.");
       }
     },
-    []
+    [imageURL, setCurrentCardImage]
   );
 
   const candidates = Array.from(
@@ -110,7 +116,7 @@ export default function ObjectiveTab() {
         <input
           type="text"
           id={`candidate-${index}-text`}
-          value={candidateValues[index]?.text ?? ""}
+          value={currentCardCandidates?.[index].text ?? ""}
           className="w-full h-10 border border-gray-300 rounded-md p-2"
           onChange={handleInputChange}
           placeholder={value}
@@ -124,8 +130,8 @@ export default function ObjectiveTab() {
         <input
           type="checkbox"
           id={`candidate-${index}-checkbox`}
-          disabled={!Boolean(candidateValues[index]?.text)}
-          checked={candidateValues[index]?.isAnswer ?? false}
+          disabled={!Boolean(currentCardCandidates?.[index].text)}
+          checked={currentCardCandidates?.[index].isAnswer ?? false}
           onChange={handleCheckboxChange}
         />
       </div>
@@ -133,72 +139,20 @@ export default function ObjectiveTab() {
   ));
 
   useEffect(() => {
-    //컴포넌트가 언마운트 될 때 이미지 URL revoke
+    // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
     return () => {
-      if (imageFileRef.current) {
-        URL.revokeObjectURL(URL.createObjectURL(imageFileRef.current));
+      if (imageURL) {
+        URL.revokeObjectURL(imageURL);
       }
     };
+  }, [imageURL]);
+
+  useEffect(() => {
+    setCurrentCard({
+      type: "obj",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    //cards[currentIndex]가 있을 때 해당 값으로 초기화
-    if (cards[currentIndex]) {
-      const {
-        question,
-        additionalView,
-        image,
-        candidates,
-        additiondalViewClicked,
-        imageButtonClicked,
-      } = cards[currentIndex];
-      setQuestion(question);
-      setAdditionalView(additionalView);
-      setImageUrl(image ? URL.createObjectURL(image) : null);
-      imageFileRef.current = image || null;
-      setSelectedValue(
-        candidates?.length.toString() === "0"
-          ? "4"
-          : candidates?.length.toString() || "4"
-      );
-      setIsAdditionalViewButtonClicked(additiondalViewClicked);
-      setIsImageAddButtonClicked(imageButtonClicked);
-      setCandidateValues(candidates ?? []);
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex]);
-
-  useEffect(() => {
-    //의존성 배열이 바뀔 때 마다 Cards에 저장
-    if (mounted) {
-      setCards((prevCards) => {
-        const newCards = [...prevCards];
-        newCards[currentIndex] = {
-          type: "obj",
-          question,
-          additionalView,
-          image: imageFileRef.current,
-          additiondalViewClicked: isAdditionalViewButtonClicked,
-          imageButtonClicked: isImageAddButtonClicked,
-          candidates: candidateValues,
-          subAnswer: "",
-        };
-        return newCards;
-      });
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    question,
-    additionalView,
-    imageUrl,
-    candidateValues,
-    isAdditionalViewButtonClicked,
-    isImageAddButtonClicked,
-  ]);
 
   return (
     <form
@@ -219,9 +173,11 @@ export default function ObjectiveTab() {
           id="question"
           className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
           placeholder="다음의 친구에게 해 줄 수 있는 말로 적절한 것은?"
-          value={question}
+          value={question ?? ""}
           onChange={(e) => {
-            setQuestion(e.target.value);
+            setCurrentCard({
+              question: e.target.value,
+            });
           }}
         />
       </div>
@@ -229,15 +185,14 @@ export default function ObjectiveTab() {
         <button
           type="button"
           className={`${
-            isAdditionalViewButtonClicked
+            isAdditiondalViewButtonClicked
               ? "border border-neutral-500 bg-neutral-500 text-white"
               : "border border-gray-300"
           }  rounded-md px-5 py-2`}
           onClick={() => {
-            setIsAdditionalViewButtonClicked(!isAdditionalViewButtonClicked);
-            if (isAdditionalViewButtonClicked === true) {
-              setAdditionalView("");
-            }
+            setCurrentCard({
+              isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
+            });
           }}
         >
           보기 추가
@@ -246,19 +201,21 @@ export default function ObjectiveTab() {
         <button
           type="button"
           className={`${
-            isImageAddButtonClicked
+            isImageButtonClicked
               ? "border border-neutral-500 bg-neutral-500 text-white"
               : "border border-gray-300"
           }  rounded-md px-5 py-2`}
           onClick={() => {
-            setIsImageAddButtonClicked(!isImageAddButtonClicked);
+            setCurrentCard({
+              isImageButtonClicked: !isImageButtonClicked,
+            });
           }}
         >
           사진 추가
         </button>
       </div>
 
-      {isImageAddButtonClicked && (
+      {isImageButtonClicked && (
         <div>
           <p
             className="text-lg font-semibold"
@@ -283,9 +240,9 @@ export default function ObjectiveTab() {
               사진 선택
             </label>
           </div>
-          {imageUrl && (
+          {image && (
             <Image
-              src={imageUrl}
+              src={imageURL ?? ""}
               alt="image"
               width={400}
               height={200}
@@ -294,7 +251,7 @@ export default function ObjectiveTab() {
           )}
         </div>
       )}
-      {isAdditionalViewButtonClicked && (
+      {isAdditiondalViewButtonClicked && (
         <div>
           <label
             htmlFor="additional-info"
@@ -311,7 +268,9 @@ export default function ObjectiveTab() {
             placeholder="나 이번 시험 너무 못 봤어. 평균 99점이 조금 안 되네"
             value={additionalView}
             onChange={(e) => {
-              setAdditionalView(e.target.value);
+              setCurrentCard({
+                additionalView: e.target.value,
+              });
             }}
           />
         </div>
