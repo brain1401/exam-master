@@ -88,9 +88,27 @@ export default function CreateProblemsOption() {
     }
   };
 
-  const handleApplyProblemSetName = () => {
+  const handleApplyProblemSetName = async () => {
     if (problemsSetsNameState.trim() === "") {
       alert("문제집 이름은 빈 문자열이 될 수 없습니다.");
+      setProblemsSetsNameState("");
+      return;
+    }
+
+    const result = await fetch(
+      `/api/checkProblemSetName?name=${problemsSetsNameState}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const isAlreadyExistName = await result.json();
+
+    if (isAlreadyExistName) {
+      alert("이미 존재하는 문제집 이름입니다.");
       setProblemsSetsNameState("");
       return;
     }
