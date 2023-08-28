@@ -1,4 +1,5 @@
 import { Card } from "@/app/types/card";
+import qs from "qs";
 import { getUser } from "./user";
 
 export const checkEnvVariables = () => {
@@ -185,4 +186,42 @@ export async function postProblems(
 
   const response = await createProblemSets(userEmail, setName, postIdArray);
   return response;
+}
+
+export async function checkProblemSetName(name: string, userEmail: string) {
+  const query = qs.stringify({
+    filters: {
+      name: {
+        $eq: name,
+      },
+      exam_users: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      }
+    );
+
+    if (!response.ok)
+      throw new Error("문제집 이름을 확인하는 중 오류가 발생했습니다.");
+
+    const data = await response.json();
+    console.log(data.data);
+
+    return data.data.length === 0 ? false : true;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 이름을 확인하는 중 오류가 발생했습니다.");
+  }
 }
