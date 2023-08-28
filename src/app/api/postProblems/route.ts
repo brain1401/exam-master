@@ -1,5 +1,4 @@
-import { NextResponse } from "next/dist/server/web/spec-extension/response";
-import { NextRequest } from "next/dist/server/web/spec-extension/request";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { Card } from "@/app/types/card";
 import { postProblems } from "@/service/card";
