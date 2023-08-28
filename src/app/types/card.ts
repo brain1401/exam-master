@@ -8,8 +8,8 @@ export type Card = {
   question: string;
   additionalView: string;
   image: File | null;
-  additiondalViewClicked: boolean;
-  imageButtonClicked: boolean;
+  isAdditiondalViewButtonClicked: boolean;
+  isImageButtonClicked: boolean;
   candidates: candidate[] | null;
   subAnswer: string | null;
 };
