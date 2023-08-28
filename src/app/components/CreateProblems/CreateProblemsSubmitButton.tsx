@@ -1,13 +1,16 @@
 "use client";
-import { useAtomValue } from "jotai";
-import { problemsSetsNameAtom, cardsAtom } from "@/app/jotai/store";
+import { useAtomValue, useAtom, useSetAtom } from "jotai";
+import { problemsSetsNameAtom, cardsAtom, resetCardsAtom } from "@/app/jotai/store";
 import { isCardEmpty } from "@/service/card";
+import { useRouter } from "next/navigation";
 
 export default function CreateProblemsSubmitButton() {
   const cards = useAtomValue(cardsAtom);
-  const problemSetName = useAtomValue(problemsSetsNameAtom);
+  const resetCards = useSetAtom(resetCardsAtom);
+  const [problemSetName, setProblemSetName] = useAtom(problemsSetsNameAtom);
+  const router = useRouter();
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     if (cards.some((card) => isCardEmpty(card))) {
       alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
       return;
@@ -29,8 +32,16 @@ export default function CreateProblemsSubmitButton() {
     });
 
     const data = await response.json();
-    console.log(data);
+    if (data === "OK") {
+      alert("문제집이 성공적으로 등록되었습니다.");
+      resetCards();
+      setProblemSetName("");
 
+      router.refresh();
+    }
+    else{
+      alert("문제집 등록에 실패했습니다.");
+    }
   };
 
   return (
