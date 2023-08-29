@@ -30,65 +30,68 @@ export default function CreateProblemsOption() {
     setProblemsSetsNameState(problemsSetsNameJotai);
   }, [problemsSetsNameJotai]);
 
-  const applyCardLangth = () => {
-    const newMaxIndex = parseInt(cardsLengthState); // 입력한 최대 문제 수
-    if (newMaxIndex > 0) {
-      if (newMaxIndex > cardsJotai.length) {
-        // 입력한 최대 문제 수가 cards 배열의 현재 길이보다 큰 경우, 배열에 새로운 항목을 추가.
-        setCardsJotai((prevCards) => [
-          ...prevCards,
-          ...Array(newMaxIndex - prevCards.length).fill({
-            type: "obj",
-            question: "",
-            additionalView: "",
-            additiondalViewClicked: false,
-            imageButtonClicked: false,
-            image: null,
-            candidates: [],
-            subAnswer: null,
-          }),
-        ]);
-        setCardsLengthJotai(newMaxIndex.toString());
-      } else if (newMaxIndex < cardsJotai.length) {
-        // 입력한 최재 문제 수가 cards 배열의 현재 길이보다 작은 경우, 배열의 마지막 항목을 삭제.
+  useEffect(() => {
+    setCardsLengthState(cardsLengthJotai);
+  }, [cardsLengthJotai]);
 
-        if (
-          cardsJotai
-            .slice(newMaxIndex)
-            .some((card) => isCardOnBeingWrited(card))
-        ) {
-          const value = confirm(
-            `${newMaxIndex}번에서 ${cardsJotai.length}번 문제의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`
-          );
-          if (value) {
-            setCardsJotai((prevCards) => prevCards.slice(0, newMaxIndex));
-            setCardIndexJotai((prev) => {
-              if (prev >= newMaxIndex) {
-                return newMaxIndex - 1;
-              } else {
-                return prev;
-              }
-            });
-            setCardsLengthJotai(newMaxIndex.toString());
-          }
-        } else {
-          setCardsJotai((prevCards) => prevCards.slice(0, newMaxIndex));
+  const applyCardLangth = () => {
+    const maxProblemLength = parseInt(cardsLengthState); // 입력한 최대 문제 수
+    if (maxProblemLength <= 0)
+      return alert("최대 문제 수는 0보다 커야 합니다.");
+
+    if (maxProblemLength > cardsJotai.length) {
+      // 입력한 최대 문제 수가 cards 배열의 현재 길이보다 큰 경우, 배열에 새로운 항목을 추가.
+      setCardsJotai((prevCards) => [
+        ...prevCards,
+        ...Array(maxProblemLength - prevCards.length).fill({
+          type: "obj",
+          question: "",
+          additionalView: "",
+          additiondalViewClicked: false,
+          imageButtonClicked: false,
+          image: null,
+          candidates: [],
+          subAnswer: null,
+        }),
+      ]);
+      setCardsLengthJotai(maxProblemLength.toString());
+    } else if (maxProblemLength < cardsJotai.length) {
+      // 입력한 최재 문제 수가 cards 배열의 현재 길이보다 작은 경우, 배열의 마지막 항목을 삭제.
+
+      if (
+        cardsJotai
+          .slice(maxProblemLength)
+          .some((card) => isCardOnBeingWrited(card))
+      ) { // 입력 중인 카드가 있을 경우
+        const value = confirm(
+          `${maxProblemLength}번에서 ${cardsJotai.length}번 문제의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`
+        );
+        if (value) {
+          setCardsJotai((prevCards) => prevCards.slice(0, maxProblemLength));
           setCardIndexJotai((prev) => {
-            if (prev >= newMaxIndex) {
-              return newMaxIndex - 1;
+            if (prev >= maxProblemLength) {
+              return maxProblemLength - 1;
             } else {
               return prev;
             }
           });
-          setCardsLengthJotai(newMaxIndex.toString());
+          setCardsLengthJotai(maxProblemLength.toString());
         }
+      } else {
+        setCardsJotai((prevCards) => prevCards.slice(0, maxProblemLength));
+        setCardIndexJotai((prev) => {
+          if (prev >= maxProblemLength) {
+            return maxProblemLength - 1;
+          } else {
+            return prev;
+          }
+        });
+        setCardsLengthJotai(maxProblemLength.toString());
       }
-    } else {
-      alert("최대 문제 수는 0보다 커야 합니다.");
     }
   };
 
-  const handleApplyProblemSetName = async () => {
+  const applyProblemSetName = async () => {
     if (problemsSetsNameState.trim() === "") {
       alert("문제집 이름은 빈 문자열이 될 수 없습니다.");
       setProblemsSetsNameState("");
@@ -96,7 +99,7 @@ export default function CreateProblemsOption() {
     }
 
     const result = await fetch(
-      `/api/checkProblemSetName?name=${problemsSetsNameState}`,
+      `/api/checkProblemSetName?name=${problemsSetsNameState.trim()}`,
       {
         method: "GET",
         headers: {
@@ -154,7 +157,7 @@ export default function CreateProblemsOption() {
           />
           <button
             className="ml-2 px-5 py-1 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
-            onClick={handleApplyProblemSetName}
+            onClick={applyProblemSetName}
           >
             확인
           </button>
