@@ -68,14 +68,13 @@ export const currentCardImageAtom = atom(
 );
 
 export const resetCardsAtom = atom(null, (get, set) => {
-  const cardsLength = get(cardsLengthAtom);
   const newCards = [
-    ...Array(parseInt(cardsLength)).fill({
+    ...Array<Card>(10).fill({
       type: "obj",
       question: "",
       additionalView: "",
-      additiondalViewClicked: false,
-      imageButtonClicked: false,
+      isAdditiondalViewButtonClicked: false,
+      isImageButtonClicked: false,
       image: null,
       candidates: Array(4).fill({ text: "", isAnswer: false }),
       subAnswer: null,
@@ -83,4 +82,6 @@ export const resetCardsAtom = atom(null, (get, set) => {
   ];
   set(cardsAtom, newCards);
   set(currentCardIndexAtom, 0);
+  set(problemsSetsNameAtom, "");
+  set(cardsLengthAtom, "10");
 });
