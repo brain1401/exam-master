@@ -8,6 +8,7 @@ import {
 } from "@/app/jotai/store";
 import { useState, useEffect } from "react";
 import { isCardOnBeingWrited } from "@/service/card";
+import { Card } from "@/app/types/card";
 
 export default function CreateProblemsOption() {
   const [cardsJotai, setCardsJotai] = useAtom(cardsAtom);
@@ -20,6 +21,8 @@ export default function CreateProblemsOption() {
     problemsSetsNameJotai
   );
   const [cardsLengthState, setCardsLengthState] = useState(cardsLengthJotai);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCardLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -43,14 +46,14 @@ export default function CreateProblemsOption() {
       // 입력한 최대 문제 수가 cards 배열의 현재 길이보다 큰 경우, 배열에 새로운 항목을 추가.
       setCardsJotai((prevCards) => [
         ...prevCards,
-        ...Array(maxProblemLength - prevCards.length).fill({
+        ...Array<Card>(maxProblemLength - prevCards.length).fill({
           type: "obj",
           question: "",
           additionalView: "",
-          additiondalViewClicked: false,
-          imageButtonClicked: false,
+          isAdditiondalViewButtonClicked: false,
+          isImageButtonClicked: false,
           image: null,
-          candidates: [],
+          candidates: Array(4).fill({ text: "", isAnswer: false }),
           subAnswer: null,
         }),
       ]);
@@ -62,7 +65,8 @@ export default function CreateProblemsOption() {
         cardsJotai
           .slice(maxProblemLength)
           .some((card) => isCardOnBeingWrited(card))
-      ) { // 입력 중인 카드가 있을 경우
+      ) {
+        // 입력 중인 카드가 있을 경우
         const value = confirm(
           `${maxProblemLength}번에서 ${cardsJotai.length}번 문제의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`
         );
@@ -98,6 +102,8 @@ export default function CreateProblemsOption() {
       return;
     }
 
+    setIsLoading(true);
+
     const result = await fetch(
       `/api/checkProblemSetName?name=${problemsSetsNameState.trim()}`,
       {
@@ -107,6 +113,12 @@ export default function CreateProblemsOption() {
         },
       }
     );
+    setIsLoading(false);
+
+    if (!result.ok) {
+      alert("문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.");
+      return;
+    }
 
     const isAlreadyExistName = await result.json();
 
@@ -158,8 +170,9 @@ export default function CreateProblemsOption() {
           <button
             className="ml-2 px-5 py-1 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
             onClick={applyProblemSetName}
+            disabled={isLoading}
           >
-            확인
+            {isLoading ? "중복 확인 중..." : "확인"}
           </button>
         </div>
       </div>
