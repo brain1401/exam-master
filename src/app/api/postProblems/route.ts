@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const entries = Array.from(formData.entries());
 
-  const intermediateResults: Card[] = [];
+  const intermediateResults: NonNullable<Card>[] = [];
   let problemSetName: string | undefined;
 
   for (const [name, value] of entries) {
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       const index = parseInt(indexStr);
 
       if (!intermediateResults[index]) {
-        intermediateResults[index] = {} as Card;
+        intermediateResults[index] = {} as NonNullable<Card>;
       }
 
       if (prefix === "data") {
