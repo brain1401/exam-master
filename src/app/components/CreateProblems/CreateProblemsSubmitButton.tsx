@@ -32,7 +32,7 @@ export default function CreateProblemsSubmitButton() {
 
     const formData = new FormData();
     cards.forEach((card, index) => {
-      formData.append(`image[${index}]`, card.image as Blob);
+      formData.append(`image[${index}]`, card?.image as Blob);
       formData.append(`data[${index}]`, JSON.stringify(card));
     });
     formData.append("problemSetName", problemSetName);
@@ -52,11 +52,9 @@ export default function CreateProblemsSubmitButton() {
       } else {
         alert("문제집 등록에 실패했습니다.");
       }
-    }
-    catch(err) {
+    } catch (err) {
       alert("문제집 등록에 실패했습니다.");
-    }
-     finally {
+    } finally {
       setIsLoading(false); // 로딩 완료
     }
   };
