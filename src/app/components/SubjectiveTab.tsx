@@ -45,14 +45,6 @@ export default function SubjectiveTab() {
   );
 
   useEffect(() => {
-    //컴포넌트가 마운트 될 때 type을 sub으로 초기화
-    setCurrentCard({
-      type: "sub",
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     if (currentCard.image) {
       const objectUrl = URL.createObjectURL(currentCard.image);
       setImageURL(objectUrl);

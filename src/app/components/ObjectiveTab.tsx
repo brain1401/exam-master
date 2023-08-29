@@ -165,14 +165,6 @@ export default function ObjectiveTab() {
     setSelectedValue(currentCard.candidates?.length.toString() ?? "4");
   }, [currentCard.candidates]);
 
-  useEffect(() => {
-    // 컴포넌트가 마운트 될 때 type을 obj로 초기화
-    setCurrentCard({
-      type: "obj",
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <form
       className="border border-gray-300 rounded-md p-5 flex flex-col"
