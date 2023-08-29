@@ -12,16 +12,37 @@ import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/card";
 
 export default function CreateProblemsCard() {
-  const cards = useAtomValue(cardsAtom);
-  const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
-  
+  const [cards, setCards] = useAtom(cardsAtom);
+  const currentCardIndex = useAtomValue(currentCardIndexAtom);
+  const currentCard = useAtomValue(currentCardAtom);
+
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
-  const currentIndex = useAtomValue(currentCardIndexAtom);
 
   useLayoutEffect(() => {
-    //현재 탭 상태를 설정
-    setCurrentTab(currentCard.type);
-  }, [currentIndex, currentCard]);
+    setCurrentTab((prev) => cards[currentCardIndex]?.type ?? prev);
+    if (
+      cards?.[currentCardIndex + 1] &&
+      !isCardOnBeingWrited(cards?.[currentCardIndex + 1])
+    ) {
+      setCards((prev) => {
+        const newCards = [...prev];
+        newCards[currentCardIndex + 1] = null;
+        return newCards;
+      });
+    }
+    if (
+      cards?.[currentCardIndex - 1] &&
+      !isCardOnBeingWrited(cards?.[currentCardIndex - 1])
+    ) {
+      setCards((prev) => {
+        const newCards = [...prev];
+        newCards[currentCardIndex - 1] = null;
+        return newCards;
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCardIndex]);
 
   useEffect(() => {
     //페이지를 닫거나 새로고침을 할 때 경고창을 띄우는 이벤트 리스너 등록 및 해제
@@ -68,16 +89,6 @@ export default function CreateProblemsCard() {
                 }
               }
               setCurrentTab("obj");
-              setCurrentCard({
-                type: "obj",
-                question: "",
-                additionalView: "",
-                isAdditiondalViewButtonClicked: false,
-                isImageButtonClicked: false,
-                image: null,
-                candidates: Array(4).fill({ text: "", isAnswer: false }),
-                subAnswer: null,
-              });
             }}
             disabled={currentTab === "obj"}
           >
@@ -100,16 +111,6 @@ export default function CreateProblemsCard() {
                 }
               }
               setCurrentTab("sub");
-              setCurrentCard({
-                type: "sub",
-                question: "",
-                additionalView: "",
-                image: null,
-                isAdditiondalViewButtonClicked: false,
-                isImageButtonClicked: false,
-                subAnswer: "",
-                candidates: null,
-              });
             }}
             disabled={currentTab === "sub"}
           >
