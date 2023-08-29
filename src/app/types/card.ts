@@ -12,4 +12,4 @@ export type Card = {
   isImageButtonClicked: boolean;
   candidates: candidate[] | null;
   subAnswer: string | null;
-};
+} | null;
