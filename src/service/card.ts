@@ -8,8 +8,10 @@ export const checkEnvVariables = () => {
   }
 };
 export const isCardEmpty = (card: Card) => {
+  if (!card) {
+    return true;
+  }
   if (card.question === "") {
-    console.log("question is empty");
     return true;
   }
 
@@ -17,7 +19,13 @@ export const isCardEmpty = (card: Card) => {
     card.candidates &&
     card.candidates.some((candidate) => candidate.text === "")
   ) {
-    console.log("candidate is empty");
+    return true;
+  }
+  if (card.isAdditiondalViewButtonClicked && card.additionalView === "") {
+    return true;
+  }
+
+  if (card.isImageButtonClicked && card.image === null) {
     return true;
   }
 
@@ -25,12 +33,10 @@ export const isCardEmpty = (card: Card) => {
     card.candidates &&
     !card.candidates?.some((candidate) => candidate.isAnswer === true)
   ) {
-    console.log("answer is empty");
     return true;
   }
 
   if (card.type === "sub" && card.subAnswer === "") {
-    console.log("subAnswer is empty");
     return true;
   }
 
@@ -38,8 +44,10 @@ export const isCardEmpty = (card: Card) => {
 };
 
 export const isCardOnBeingWrited = (card: Card) => {
+  if (!card) {
+    return false;
+  }
   if (card.question !== "") {
-    console.log("question is not empty");
     return true;
   }
 
@@ -47,22 +55,18 @@ export const isCardOnBeingWrited = (card: Card) => {
     card.candidates !== null &&
     card.candidates.some((candidate) => candidate.text !== "")
   ) {
-    console.log("candidate is not empty");
     return true;
   }
 
   if (card.image !== null) {
-    console.log("image is not empty");
     return true;
   }
 
   if (card.additionalView !== "") {
-    console.log("additionalView is not empty");
     return true;
   }
 
   if (card.type === "sub" && card.subAnswer !== "") {
-    console.log("subAnswer is not empty");
     return true;
   }
 
@@ -70,6 +74,9 @@ export const isCardOnBeingWrited = (card: Card) => {
 };
 
 export async function createProblem(card: Card): Promise<string> {
+  if (!card) {
+    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
+  }
   try {
     let postId = "";
 
@@ -104,6 +111,9 @@ export async function createProblem(card: Card): Promise<string> {
 }
 
 export async function createImage(card: Card, postId: string) {
+  if (!card) {
+    return;
+  }
   try {
     const newFormData = new FormData();
     newFormData.append("files", card.image as Blob);
@@ -181,7 +191,7 @@ export async function postProblems(
     const postId = await createProblem(card);
     postIdArray.push(postId);
 
-    card.image && (await createImage(card, postId));
+    card?.image && (await createImage(card, postId));
   }
 
   const response = await createProblemSets(userEmail, setName, postIdArray);
