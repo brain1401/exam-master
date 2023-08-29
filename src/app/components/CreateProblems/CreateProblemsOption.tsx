@@ -43,19 +43,10 @@ export default function CreateProblemsOption() {
       return alert("최대 문제 수는 0보다 커야 합니다.");
 
     if (maxProblemLength > cardsJotai.length) {
-      // 입력한 최대 문제 수가 cards 배열의 현재 길이보다 큰 경우, 배열에 새로운 항목을 추가.
+      // 입력한 최대 문제 수가 cards 배열의 현재 길이보다 큰 경우, 나머지 값 만큼 null을 추가.
       setCardsJotai((prevCards) => [
         ...prevCards,
-        ...Array<Card>(maxProblemLength - prevCards.length).fill({
-          type: "obj",
-          question: "",
-          additionalView: "",
-          isAdditiondalViewButtonClicked: false,
-          isImageButtonClicked: false,
-          image: null,
-          candidates: Array(4).fill({ text: "", isAnswer: false }),
-          subAnswer: null,
-        }),
+        ...Array<Card>(maxProblemLength - prevCards.length).fill(null),
       ]);
       setCardsLengthJotai(maxProblemLength.toString());
     } else if (maxProblemLength < cardsJotai.length) {
@@ -68,7 +59,7 @@ export default function CreateProblemsOption() {
       ) {
         // 입력 중인 카드가 있을 경우
         const value = confirm(
-          `${maxProblemLength}번에서 ${cardsJotai.length}번 문제의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`
+          `${maxProblemLength}번 문제에서 ${cardsJotai.length}번 문제까지의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`
         );
         if (value) {
           setCardsJotai((prevCards) => prevCards.slice(0, maxProblemLength));
@@ -104,33 +95,41 @@ export default function CreateProblemsOption() {
 
     setIsLoading(true);
 
-    const result = await fetch(
-      `/api/checkProblemSetName?name=${problemsSetsNameState.trim()}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    try {
+      const result = await fetch(
+        `/api/checkProblemSetName?name=${problemsSetsNameState.trim()}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!result.ok) {
+        alert(
+          "문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요."
+        );
+        return;
       }
-    );
-    setIsLoading(false);
 
-    if (!result.ok) {
-      alert("문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.");
-      return;
+      const isAlreadyExistName = await result.json();
+
+      if (isAlreadyExistName) {
+        alert("이미 존재하는 문제집 이름입니다.");
+        setProblemsSetsNameState("");
+        setProblemsSetsNameJotai("");
+        return;
+      }
+
+      setProblemsSetsNameJotai(problemsSetsNameState);
+      alert("문제집 이름이 적용되었습니다.");
+    } catch (err) {
+      alert(
+        "문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요."
+      );
+    } finally {
+      setIsLoading(false);
     }
-
-    const isAlreadyExistName = await result.json();
-
-    if (isAlreadyExistName) {
-      alert("이미 존재하는 문제집 이름입니다.");
-      setProblemsSetsNameState("");
-      setProblemsSetsNameJotai("");
-      return;
-    }
-
-    setProblemsSetsNameJotai(problemsSetsNameState);
-    alert("문제집 이름이 적용되었습니다.");
   };
 
   return (
