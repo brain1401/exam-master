@@ -7,7 +7,7 @@ export const currentCardIndexAtom = atom(0);
 export const problemsSetsNameAtom = atom("");
 
 export const cardsAtom = atom<Card[]>([
-  ...Array(10).fill({
+  ...Array<Card>(10).fill({
     type: "obj",
     question: "",
     additionalView: "",
