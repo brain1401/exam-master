@@ -110,6 +110,7 @@ export default function CreateProblemsOption() {
     if (isAlreadyExistName) {
       alert("이미 존재하는 문제집 이름입니다.");
       setProblemsSetsNameState("");
+      setProblemsSetsNameJotai("");
       return;
     }
 
