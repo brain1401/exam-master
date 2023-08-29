@@ -1,12 +1,14 @@
 "use client";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   currentCardAtom,
   currentCardCandidatesAtom,
   currentCardImageAtom,
+  currentCardIndexAtom,
 } from "../jotai/store";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import AddViewAndPhoto from "./AddViewAndPhoto";
+import { isCardOnBeingWrited } from "@/service/card";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -17,13 +19,15 @@ const candidatePlaceholders = [
 
 export default function ObjectiveTab() {
   const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
+  const currentCardIndex = useAtomValue(currentCardIndexAtom);
+
   const {
     question,
     additionalView,
     isAdditiondalViewButtonClicked,
     image,
     isImageButtonClicked,
-  } = currentCard;
+  } = currentCard ?? {};
 
   const [currentCardCandidates, setCurrentCardCandidates] = useAtom(
     currentCardCandidatesAtom
@@ -31,7 +35,7 @@ export default function ObjectiveTab() {
   const setCurrentCardImage = useSetAtom(currentCardImageAtom);
 
   const [selectedValue, setSelectedValue] = useState(
-    currentCard.candidates?.length.toString() ?? "4"
+    currentCard?.candidates?.length.toString() ?? "4"
   );
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
@@ -123,6 +127,22 @@ export default function ObjectiveTab() {
   ));
 
   useEffect(() => {
+    if (isCardOnBeingWrited(currentCard)) return;
+
+    setCurrentCard({
+      type: "obj",
+      question: "",
+      additionalView: "",
+      isAdditiondalViewButtonClicked: false,
+      isImageButtonClicked: false,
+      image: null,
+      candidates: Array(4).fill({ text: "", isAnswer: false }),
+      subAnswer: null,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCardIndex]);
+
+  useEffect(() => {
     if (image) {
       const objectUrl = URL.createObjectURL(image);
       setImageURL(objectUrl);
@@ -135,8 +155,8 @@ export default function ObjectiveTab() {
   }, [image]);
 
   useEffect(() => {
-    setSelectedValue(currentCard.candidates?.length.toString() ?? "4");
-  }, [currentCard.candidates]);
+    setSelectedValue(currentCard?.candidates?.length.toString() ?? "4");
+  }, [currentCard?.candidates]);
 
   return (
     <form
@@ -165,12 +185,12 @@ export default function ObjectiveTab() {
           }}
         />
       </div>
-      
+
       <AddViewAndPhoto
-        additionalView={additionalView}
+        additionalView={additionalView ?? ""}
         imageURL={imageURL}
-        isAdditiondalViewButtonClicked={isAdditiondalViewButtonClicked}
-        isImageButtonClicked={isImageButtonClicked}
+        isAdditiondalViewButtonClicked={isAdditiondalViewButtonClicked ?? false}
+        isImageButtonClicked={isImageButtonClicked ?? false}
         setCurrentCardImage={setCurrentCardImage}
         setImageURL={setImageURL}
         setCurrentCard={setCurrentCard}
