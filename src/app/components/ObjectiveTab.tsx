@@ -126,6 +126,7 @@ export default function ObjectiveTab() {
     </div>
   ));
 
+  // 카드가 변경될 때마다 입력폼 초기화
   useEffect(() => {
     if (isCardOnBeingWrited(currentCard)) return;
 
@@ -142,6 +143,7 @@ export default function ObjectiveTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCardIndex]);
 
+  // 이미지가 변경될 때마다 이미지 URL을 생성
   useEffect(() => {
     if (image) {
       const objectUrl = URL.createObjectURL(image);
