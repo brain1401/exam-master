@@ -73,7 +73,10 @@ export const isCardOnBeingWrited = (card: Card) => {
   return false;
 };
 
-export async function createProblem(card: Card): Promise<string> {
+export async function createProblem(
+  card: Card,
+  userId: string
+): Promise<string> {
   if (!card) {
     throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
   }
@@ -94,6 +97,9 @@ export async function createProblem(card: Card): Promise<string> {
           additionalView: card.additionalView,
           candidates: card.candidates,
           subjectiveAnswer: card.subAnswer,
+          exam_users: {
+            connect: [userId],
+          },
         }),
       }
     );
@@ -141,13 +147,11 @@ export async function createImage(card: Card, postId: string) {
 }
 
 export async function createProblemSets(
-  userEmail: string,
+  userId: string,
   setName: string,
   postIdArray: string[]
 ) {
   try {
-    const user = await getUser(userEmail);
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets`,
       {
@@ -162,7 +166,7 @@ export async function createProblemSets(
             connect: [...postIdArray],
           },
           exam_users: {
-            connect: [user.id],
+            connect: [userId],
           },
         }),
       }
@@ -177,24 +181,31 @@ export async function createProblemSets(
   }
 }
 
+
 export async function postProblems(
   setName: string,
   userEmail: string,
   cards: Card[]
 ) {
   checkEnvVariables();
-  const postIdArray: string[] = [];
+  const userId = (await getUser(userEmail)).id;
 
-  for (const card of cards) {
-    if (isCardEmpty(card)) throw new Error("문제가 비어있습니다.");
+  // 각 카드에 대한 작업을 병렬로 수행
+  const postIdArray = await Promise.all(
+    cards.map(async (card) => {
+      if (isCardEmpty(card)) throw new Error("문제가 비어있습니다.");
 
-    const postId = await createProblem(card);
-    postIdArray.push(postId);
+      // 문제와 이미지 생성은 순차적으로 처리
+      const postId = await createProblem(card, userId);
+      if (card?.image) {
+        await createImage(card, postId);
+      }
 
-    card?.image && (await createImage(card, postId));
-  }
+      return postId;
+    })
+  );
 
-  const response = await createProblemSets(userEmail, setName, postIdArray);
+  const response = await createProblemSets(userId, setName, postIdArray);
   return response;
 }
 
