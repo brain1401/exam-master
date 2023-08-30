@@ -1,4 +1,4 @@
-import { Card } from "@/app/types/card";
+import { Card } from "@/types/card";
 import qs from "qs";
 import { getUser } from "./user";
 

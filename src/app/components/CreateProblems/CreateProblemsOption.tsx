@@ -8,7 +8,7 @@ import {
 } from "@/app/jotai/store";
 import { useState, useEffect } from "react";
 import { isCardOnBeingWrited } from "@/service/card";
-import { Card } from "@/app/types/card";
+import { Card } from "@/types/card";
 
 export default function CreateProblemsOption() {
   const [cardsJotai, setCardsJotai] = useAtom(cardsAtom);

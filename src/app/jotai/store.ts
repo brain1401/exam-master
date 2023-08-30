@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { Card } from "../types/card";
+import { Card } from "../../types/card";
 
 export const isNavbarMenuOpenAtom = atom(false);
 export const cardsLengthAtom = atom("10");
