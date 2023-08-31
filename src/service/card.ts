@@ -1,4 +1,4 @@
-import { Card } from "@/types/card";
+import { Card, ProblemSet } from "@/types/card";
 import qs from "qs";
 import { getUser } from "./user";
 
@@ -244,5 +244,39 @@ export async function checkProblemSetName(name: string, userEmail: string) {
   } catch (err) {
     console.log(err);
     throw new Error("문제집 이름을 확인하는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getProblemSets(userEmail: string) {
+  const query = qs.stringify({
+    filters: {
+      exam_users: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok)
+      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+
+    const data = await response.json();
+    return data.data as ProblemSet[];
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
