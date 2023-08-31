@@ -3,9 +3,9 @@ import { useAtom, useSetAtom } from "jotai";
 import {
   cardsLengthAtom,
   cardsAtom,
-  problemsSetsNameAtom,
+  problemSetNameAtom,
   currentCardIndexAtom,
-} from "@/app/jotai/store";
+} from "@/app/jotai/createProblems";
 import { useState, useEffect } from "react";
 import { isCardOnBeingWrited } from "@/service/card";
 import { Card } from "@/types/card";
@@ -14,7 +14,7 @@ export default function CreateProblemsOption() {
   const [cardsJotai, setCardsJotai] = useAtom(cardsAtom);
   const [cardsLengthJotai, setCardsLengthJotai] = useAtom(cardsLengthAtom);
   const [problemsSetsNameJotai, setProblemsSetsNameJotai] =
-    useAtom(problemsSetsNameAtom);
+    useAtom(problemSetNameAtom);
   const setCardIndexJotai = useSetAtom(currentCardIndexAtom);
 
   const [problemsSetsNameState, setProblemsSetsNameState] = useState<string>(

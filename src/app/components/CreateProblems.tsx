@@ -5,7 +5,7 @@ import NextOrPrevButtons from "./CreateProblems/NextOrPrevButtons";
 import CurrentCardIndicator from "./CreateProblems/CurrentCardIndicator";
 import CreateProblemsSubmitButton from "./CreateProblems/CreateProblemsSubmitButton";
 import { useEffect } from "react";
-import { resetCardsAtom } from "../jotai/store";
+import { resetCardsAtom } from "../jotai/createProblems";
 import { useSetAtom } from "jotai";
 
 export default function CreateProblems() {

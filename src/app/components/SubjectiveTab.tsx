@@ -4,7 +4,7 @@ import {
   currentCardAtom,
   currentCardImageAtom,
   currentCardIndexAtom,
-} from "../jotai/store";
+} from "../jotai/createProblems";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isCardOnBeingWrited } from "@/service/card";

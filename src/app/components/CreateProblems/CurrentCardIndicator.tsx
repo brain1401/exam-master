@@ -1,5 +1,5 @@
 "use client";
-import { currentCardIndexAtom, cardsLengthAtom } from "@/app/jotai/store";
+import { currentCardIndexAtom, cardsLengthAtom } from "@/app/jotai/createProblems";
 import {useAtomValue} from "jotai";
 
 

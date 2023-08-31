@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { useAtomValue, useAtom, useSetAtom } from "jotai";
 import {
-  problemsSetsNameAtom,
+  problemSetNameAtom,
   cardsAtom,
   resetCardsAtom,
-} from "@/app/jotai/store";
+} from "@/app/jotai/createProblems";
 import { isCardEmpty } from "@/service/card";
 import { useRouter } from "next/navigation";
 
@@ -13,7 +13,7 @@ export default function CreateProblemsSubmitButton() {
   const [isLoading, setIsLoading] = useState(false);
   const cards = useAtomValue(cardsAtom);
   const resetCards = useSetAtom(resetCardsAtom);
-  const [problemSetName, setProblemSetName] = useAtom(problemsSetsNameAtom);
+  const [problemSetName, setProblemSetName] = useAtom(problemSetNameAtom);
   const router = useRouter();
 
   const handleSubmit = async () => {
