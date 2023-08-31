@@ -4,7 +4,7 @@ import { Card } from "../../types/card";
 export const isNavbarMenuOpenAtom = atom(false);
 export const cardsLengthAtom = atom("10");
 export const currentCardIndexAtom = atom(0);
-export const problemsSetsNameAtom = atom("");
+export const problemSetNameAtom = atom("");
 
 export const cardsAtom = atom<Card[]>([...Array<Card>(10).fill(null)]);
 
@@ -61,6 +61,7 @@ export const resetCardsAtom = atom(null, (get, set) => {
   const newCards = [...Array<Card>(10).fill(null)];
   set(cardsAtom, newCards);
   set(currentCardIndexAtom, 0);
-  set(problemsSetsNameAtom, "");
+  set(problemSetNameAtom, "");
   set(cardsLengthAtom, "10");
 });
+
