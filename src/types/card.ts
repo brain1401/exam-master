@@ -21,3 +21,15 @@ export type ProblemSet = {
   updatedAt: string;
   UUID: string;
 }
+
+export type ProblemSetResponse = {
+  data: ProblemSet[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+};
