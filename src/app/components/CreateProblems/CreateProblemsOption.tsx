@@ -9,6 +9,7 @@ import {
 import { useState, useEffect } from "react";
 import { isCardOnBeingWrited } from "@/service/card";
 import { Card } from "@/types/card";
+import Button from "../ui/Button";
 
 export default function CreateProblemsOption() {
   const [cardsJotai, setCardsJotai] = useAtom(cardsAtom);
@@ -149,12 +150,12 @@ export default function CreateProblemsOption() {
             value={cardsLengthState}
             onChange={handleCardLengthChange}
           />
-          <button
-            className="ml-2 px-5 py-1 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
+          <Button
+            className="ml-2 px-5 py-1"
             onClick={applyCardLangth}
           >
             확인
-          </button>
+          </Button>
         </div>
         <div>
           <label htmlFor="problemSetName" className="ml-5 mr-2">
@@ -166,13 +167,13 @@ export default function CreateProblemsOption() {
             value={problemsSetsNameState}
             onChange={(e) => setProblemsSetsNameState(e.target.value)}
           />
-          <button
-            className="ml-2 px-5 py-1 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
+          <Button
+            className="ml-2 px-5 py-1"
             onClick={applyProblemSetName}
             disabled={isLoading}
           >
             {isLoading ? "중복 확인 중..." : "확인"}
-          </button>
+          </Button>
         </div>
       </div>
     </form>

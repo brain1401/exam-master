@@ -9,6 +9,7 @@ import {
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isCardOnBeingWrited } from "@/service/card";
+import SimpleLabel from "./ui/SimpleLabel";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -162,19 +163,13 @@ export default function ObjectiveTab() {
 
   return (
     <form
-      className="border border-gray-300 rounded-md p-5 flex flex-col"
+      className="border border-gray-500 rounded-md p-5 flex flex-col space-y-4"
       onSubmit={(e) => {
         e.preventDefault();
       }}
     >
-      <div className="flex flex-col mb-3">
-        <label
-          htmlFor="question"
-          className="text-lg font-semibold mb-2"
-          onClick={(e) => e.preventDefault()}
-        >
-          문제
-        </label>
+      <div className="flex flex-col">
+        <SimpleLabel htmlFor="question">문제</SimpleLabel>
         <textarea
           id="question"
           className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
@@ -198,10 +193,8 @@ export default function ObjectiveTab() {
         setCurrentCard={setCurrentCard}
       />
 
-      <div className="flex justify-end items-center">
-        <label htmlFor="answer" className="text-lg font-semibold mx-2">
-          선택지 수
-        </label>
+      <div className="flex justify-end items-center space-x-2">
+        <SimpleLabel htmlFor="answer">선택지 수</SimpleLabel>
         <select
           value={selectedValue}
           onChange={handleSelectedChange}
@@ -215,7 +208,7 @@ export default function ObjectiveTab() {
         </select>
       </div>
 
-      <div>{candidates}</div>
+      <div className="space-y-4"> {candidates}</div>
     </form>
   );
 }
