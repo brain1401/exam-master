@@ -1,8 +1,8 @@
 import { getProblemSets } from "@/service/card";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession();
 
   if (!session) {
@@ -12,6 +12,9 @@ export async function GET() {
     );
   }
 
-  const data = await getProblemSets(session?.user?.email ?? "");
+  const param = req.nextUrl.searchParams;
+  const page = param.get("page");
+
+  const data = await getProblemSets(session?.user?.email ?? "", page ?? "1");
   return NextResponse.json(data);
 }
