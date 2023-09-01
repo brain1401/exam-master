@@ -1,4 +1,4 @@
-import { Card, ProblemSet } from "@/types/card";
+import { Card, ProblemSetResponse } from "@/types/card";
 import qs from "qs";
 import { getUser } from "./user";
 
@@ -247,7 +247,8 @@ export async function checkProblemSetName(name: string, userEmail: string) {
   }
 }
 
-export async function getProblemSets(userEmail: string) {
+
+export async function getProblemSets(userEmail: string, page: string) {
   const query = qs.stringify({
     filters: {
       exam_users: {
@@ -256,6 +257,10 @@ export async function getProblemSets(userEmail: string) {
         },
       },
     },
+    pagination: {
+      page,
+      pageSize: 10,
+    }
   });
 
   try {
@@ -273,8 +278,8 @@ export async function getProblemSets(userEmail: string) {
     if (!response.ok)
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
 
-    const data = await response.json();
-    return data.data as ProblemSet[];
+    const responseJson = await response.json();
+    return responseJson as ProblemSetResponse;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
