@@ -260,7 +260,8 @@ export async function getProblemSets(userEmail: string, page: string) {
     pagination: {
       page,
       pageSize: 10,
-    }
+    },
+    sort: 'updatedAt:desc'
   });
 
   try {
