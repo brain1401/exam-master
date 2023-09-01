@@ -14,7 +14,7 @@ export default async function ManagePage() {
 
           <Suspense
             fallback={
-              <div className="w-full flex justify-center items-center">
+              <div className="mt-[8rem] w-full text-center">
                 <ClientClipLoader size={50}/>
               </div>
             }
