@@ -181,7 +181,6 @@ export async function createProblemSets(
   }
 }
 
-
 export async function postProblems(
   setName: string,
   userEmail: string,
@@ -247,7 +246,6 @@ export async function checkProblemSetName(name: string, userEmail: string) {
   }
 }
 
-
 export async function getProblemSets(userEmail: string, page: string) {
   const query = qs.stringify({
     filters: {
@@ -261,7 +259,7 @@ export async function getProblemSets(userEmail: string, page: string) {
       page,
       pageSize: 10,
     },
-    sort: 'updatedAt:desc'
+    sort: "updatedAt:desc",
   });
 
   try {
@@ -273,14 +271,19 @@ export async function getProblemSets(userEmail: string, page: string) {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
         cache: "no-store",
-      },
+      }
     );
 
     if (!response.ok)
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
 
-    const responseJson = await response.json();
-    return responseJson as ProblemSetResponse;
+    let responseJson: ProblemSetResponse = await response.json();
+    responseJson.data.forEach((problemSet) => {
+      problemSet.updatedAt = problemSet.updatedAt.slice(0, 10);
+      problemSet.createdAt = problemSet.createdAt.slice(0, 10);
+    });
+
+    return responseJson;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
