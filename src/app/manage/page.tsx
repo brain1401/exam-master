@@ -9,7 +9,7 @@ export default async function ManagePage() {
   return (
     <>
       {session ? (
-        <section className="p-3">
+        <section className="p-3 max-w-[80rem] mx-auto">
           <h1>문제집 관리</h1>
 
           <Suspense
