@@ -5,12 +5,14 @@ type Props = {
 };
 
 export default function ProblemSetCard({ problemSet }: Props) {
+  const formattedDate = new Date(problemSet.updatedAt).toLocaleDateString();
+
   return (
-    <div className="border border-black flex flex-col items-center w-[10rem] my-2 rounded-lg p-5">
-      <h1 className="font-bold text-ellipsis overflow-hidden whitespace-nowrap w-full text-center">
+    <div className="border border-gray-300 flex flex-col items-center w-full md:w-[10rem] my-2 rounded-lg p-5 hover:shadow-lg transition-shadow duration-200 ease-in cursor-pointer">
+      <h1 className="font-bold text-lg text-gray-700 truncate w-full text-center mb-2">
         {problemSet.name}
       </h1>
-      <p>{problemSet.updatedAt}</p>
+      <p className="text-sm text-gray-500">{formattedDate}</p>
     </div>
   );
 }
