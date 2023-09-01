@@ -21,6 +21,7 @@ export default function ProblemSetGrid() {
     return () => {
       setCurrentPage(1);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -36,7 +37,7 @@ export default function ProblemSetGrid() {
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
           />
-          <button className="p-3"> 
+          <button className="p-3">
             <BsSearch className="text-gray-400" />
           </button>
         </div>
