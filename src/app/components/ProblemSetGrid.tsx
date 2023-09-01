@@ -1,31 +1,58 @@
 "use client";
-import { useAtom } from "jotai";
-import { problemSetsAtom } from "../jotai/manageProblems";
-import ProblemSet from "../components/ProblemSet";
-import { useEffect } from "react";
-import axios from "axios";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+  problemSetAtomsWithQuery,
+  problemSetCurrentPageAtom,
+} from "../jotai/manageProblems";
+import ProblemSetCard from "./ProblemSetCard";
+import { ProblemSet } from "@/types/card";
+import { useEffect, useRef } from "react";
 
 export default function ProblemSetGrid() {
-  const [problemSets, setProblemSets] = useAtom(problemSetsAtom);
+  const problemSets = useAtomValue(problemSetAtomsWithQuery);
+  const setCurrentPage = useSetAtom(problemSetCurrentPageAtom);
+  const maxPage = useRef(problemSets?.meta.pagination.pageCount ?? 0);
 
   useEffect(() => {
-    axios.get(`/api/getProblemSets`).then((res) => {
-      setProblemSets(res.data);
-    });
+    
+    return () => {
+      setCurrentPage(1);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  },[])
 
   return (
     <section>
-      <ul>
-        {problemSets.map((problemSet) => (
-          <>
-            <li>
-              <ProblemSet key={problemSet.UUID} problemSet={problemSet} />
-            </li>
-          </>
+      <ul className="flex flex-wrap">
+        {problemSets?.data.map((problemSet: ProblemSet) => (
+          <li key={problemSet.UUID}>
+            <ProblemSetCard problemSet={problemSet} />
+          </li>
         ))}
       </ul>
+
+      <div>
+        <button
+          onClick={async () => {
+            setCurrentPage((prev) => {
+              if (prev === maxPage.current ) return prev;
+              return prev + 1;
+            });
+          }}
+        >
+          다음
+        </button>
+        <button
+          onClick={async () => {
+            setCurrentPage((prev) => {
+              if (prev === 1) return prev;
+              return prev - 1;
+            });
+          }}
+        >
+          이전
+        </button>
+      </div>
     </section>
   );
 }
