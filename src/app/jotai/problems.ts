@@ -1,6 +1,8 @@
 import { atom } from "jotai";
-import { Card } from "../../types/card";
+import { Card, ProblemSetResponse } from "../../types/card";
+import { atomsWithQuery } from "jotai-tanstack-query";
 
+import axios from "axios";
 export const isNavbarMenuOpenAtom = atom(false);
 export const cardsLengthAtom = atom("10");
 export const currentCardIndexAtom = atom(0);
@@ -65,3 +67,17 @@ export const resetCardsAtom = atom(null, (get, set) => {
   set(cardsLengthAtom, "10");
 });
 
+export const problemSetCurrentPageAtom = atom(1);
+
+export const [problemSetAtomsWithQuery] = atomsWithQuery((get) => ({
+  queryKey: ["problemSets", get(problemSetCurrentPageAtom)],
+  queryFn: async ({ queryKey: [, page] }) => {
+    if (typeof window === "undefined") return null;
+    const res = await axios.get("/api/getProblemSets", {
+      params: {
+        page,
+      },
+    });
+    return res.data as ProblemSetResponse;
+  },
+}));
