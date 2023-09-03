@@ -289,3 +289,41 @@ export async function getProblemSets(userEmail: string, page: string) {
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
+
+export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
+  const query = qs.stringify({
+    filters: {
+      UUID: {
+        $eq: uuid,
+      },
+      exam_users: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+
+    populate: ["exam_problems"],
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      }
+    );
+
+    if (!response.ok)
+      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+
+    const data = await response.json();
+    return data.data[0].exam_problems;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
