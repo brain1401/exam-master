@@ -8,7 +8,7 @@ import {
 } from "../jotai/problems";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import AddViewAndPhoto from "./AddViewAndPhoto";
-import { isCardOnBeingWrited } from "@/service/card";
+import { isCardOnBeingWrited } from "@/service/problems";
 import SimpleLabel from "./ui/SimpleLabel";
 
 const candidatePlaceholders = [

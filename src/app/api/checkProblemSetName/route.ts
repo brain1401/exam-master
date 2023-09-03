@@ -1,4 +1,4 @@
-import { checkProblemSetName } from "@/service/card";
+import { checkProblemSetName } from "@/service/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 

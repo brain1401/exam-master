@@ -9,7 +9,7 @@ import { useAtom, useAtomValue } from "jotai";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
-import { isCardOnBeingWrited } from "@/service/card";
+import { isCardOnBeingWrited } from "@/service/problems";
 
 export default function EditProblems() {
   const [cards, setCards] = useAtom(cardsAtom);

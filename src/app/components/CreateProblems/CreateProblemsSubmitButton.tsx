@@ -6,7 +6,7 @@ import {
   cardsAtom,
   resetCardsAtom,
 } from "@/app/jotai/problems";
-import { isCardEmpty } from "@/service/card";
+import { isCardEmpty } from "@/service/problems";
 import { useRouter } from "next/navigation";
 
 export default function CreateProblemsSubmitButton() {
