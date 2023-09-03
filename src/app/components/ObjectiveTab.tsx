@@ -146,12 +146,15 @@ export default function ObjectiveTab() {
 
   // 이미지가 변경될 때마다 이미지 URL을 생성
   useEffect(() => {
-    if (image) {
+    if (image instanceof File) {
       const objectUrl = URL.createObjectURL(image);
       setImageURL(objectUrl);
 
       // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
       return () => URL.revokeObjectURL(objectUrl);
+    } else if (image && typeof image === "object") {
+      // null 체크와 File 체크 후에 실행
+      setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
     } else {
       setImageURL(null);
     }
