@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Logo from "../../../../public/Exam Master.svg";
 import { useAtom } from "jotai";
-import { isNavbarMenuOpenAtom } from "@/app/jotai/createProblems";
+import { isNavbarMenuOpenAtom } from "@/app/jotai/problems";
 import { HiMenu } from "react-icons/hi";
 
 const LIST_ITEM =

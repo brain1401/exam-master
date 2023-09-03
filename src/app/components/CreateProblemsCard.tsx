@@ -4,7 +4,7 @@ import {
   cardsAtom,
   currentCardAtom,
   currentCardIndexAtom,
-} from "../jotai/createProblems";
+} from "../jotai/problems";
 import { useAtom, useAtomValue } from "jotai";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";

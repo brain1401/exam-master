@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Logo from "../../../../public/Exam Master.svg";
 import { useRef, useEffect } from "react";
-import { isNavbarMenuOpenAtom } from "@/app/jotai/createProblems";
+import { isNavbarMenuOpenAtom } from "@/app/jotai/problems";
 import { useAtom } from "jotai";
 
 const MOBILE_LIST_ITEM = "py-2 w-full border-b border-gray-300 text-center";

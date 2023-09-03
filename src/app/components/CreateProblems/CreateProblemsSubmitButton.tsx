@@ -5,7 +5,7 @@ import {
   problemSetNameAtom,
   cardsAtom,
   resetCardsAtom,
-} from "@/app/jotai/createProblems";
+} from "@/app/jotai/problems";
 import { isCardEmpty } from "@/service/card";
 import { useRouter } from "next/navigation";
 

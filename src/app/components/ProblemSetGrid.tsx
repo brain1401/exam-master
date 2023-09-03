@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import {
   problemSetAtomsWithQuery,
   problemSetCurrentPageAtom,
-} from "../jotai/manageProblems";
+} from "../jotai/problems";
 import ProblemSetCard from "./ProblemSetCard";
 import { ProblemSet } from "@/types/card";
 import { useEffect, useRef, useState } from "react";

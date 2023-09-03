@@ -1,6 +1,6 @@
 "use client";
 import { useAtom } from "jotai";
-import { isNavbarMenuOpenAtom } from "@/app/jotai/createProblems";
+import { isNavbarMenuOpenAtom } from "@/app/jotai/problems";
 
 export default function NavBackDrop() {
   const [isMenuOpen, setIsMenuOpen] = useAtom(isNavbarMenuOpenAtom);

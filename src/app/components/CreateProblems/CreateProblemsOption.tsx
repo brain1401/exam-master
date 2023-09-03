@@ -5,7 +5,7 @@ import {
   cardsAtom,
   problemSetNameAtom,
   currentCardIndexAtom,
-} from "@/app/jotai/createProblems";
+} from "@/app/jotai/problems";
 import { useState, useEffect } from "react";
 import { isCardOnBeingWrited } from "@/service/card";
 import { Card } from "@/types/card";

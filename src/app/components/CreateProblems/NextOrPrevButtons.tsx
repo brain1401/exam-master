@@ -1,6 +1,6 @@
 "use client";
 import { useAtomValue, useSetAtom } from "jotai";
-import { currentCardIndexAtom, cardsLengthAtom } from "@/app/jotai/createProblems";
+import { currentCardIndexAtom, cardsLengthAtom } from "@/app/jotai/problems";
 
 export default function NextOrPrevButtons() {
   const setCurrentIndex = useSetAtom(currentCardIndexAtom);
