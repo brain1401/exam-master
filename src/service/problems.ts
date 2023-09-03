@@ -303,7 +303,11 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
       },
     },
 
-    populate: ["exam_problems"],
+    populate: {
+      exam_problems: {
+        populate: ["image"],
+      },
+    },
   });
 
   try {
