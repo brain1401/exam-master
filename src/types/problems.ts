@@ -9,5 +9,9 @@ export type Problem = {
   questionType: "obj" | "sub";
   subjectiveAnswer: string;
   updatedAt: string;
+  image: {
+    id: string;
+    url: string;
+  };
   uuid: string;
 }

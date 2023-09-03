@@ -7,7 +7,13 @@ export type Card = {
   type: "obj" | "sub";
   question: string;
   additionalView: string;
-  image: File | null;
+  image:
+    | File
+    | {
+        id: string;
+        url: string;
+      }
+    | null;
   isAdditiondalViewButtonClicked: boolean;
   isImageButtonClicked: boolean;
   candidates: candidate[] | null;
@@ -20,7 +26,7 @@ export type ProblemSet = {
   createdAt: string;
   updatedAt: string;
   UUID: string;
-}
+};
 
 export type ProblemSetResponse = {
   data: ProblemSet[];
