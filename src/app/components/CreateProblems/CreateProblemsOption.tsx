@@ -38,7 +38,7 @@ export default function CreateProblemsOption() {
     setCardsLengthState(cardsLengthJotai);
   }, [cardsLengthJotai]);
 
-  const applyCardLangth = () => {
+  const applyCardLength = () => {
     const maxProblemLength = parseInt(cardsLengthState); // 입력한 최대 문제 수
     if (maxProblemLength <= 0)
       return alert("최대 문제 수는 0보다 커야 합니다.");
@@ -152,7 +152,7 @@ export default function CreateProblemsOption() {
           />
           <Button
             className="ml-2 px-5 py-1"
-            onClick={applyCardLangth}
+            onClick={applyCardLength}
           >
             확인
           </Button>
