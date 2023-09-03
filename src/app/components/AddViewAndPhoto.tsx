@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useLayoutEffect } from "react";
 
 type Props = {
   isAdditiondalViewButtonClicked: boolean;
@@ -42,6 +43,21 @@ export default function AddViewAndPhoto({
       }
     }
   };
+
+  useLayoutEffect(() => {
+    if (additionalView !== "") {
+      setCurrentCard({
+        isAdditiondalViewButtonClicked: true,
+      });
+    }
+    if (imageURL && imageURL !== "") {
+      setCurrentCard({
+        isImageButtonClicked: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [additionalView, imageURL]);
+
   return (
     <>
       <div className="flex gap-2 mb-3">
@@ -53,13 +69,14 @@ export default function AddViewAndPhoto({
               : "border border-gray-300"
           }  rounded-md px-5 py-2`}
           onClick={() => {
-            setCurrentCard({
-              isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
-            });
             if (isAdditiondalViewButtonClicked && additionalView !== "") {
               if (!confirm("보기를 지우시겠습니까?")) return;
               setCurrentCard({
                 additionalView: "",
+              });
+            } else {
+              setCurrentCard({
+                isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
               });
             }
           }}
@@ -75,15 +92,16 @@ export default function AddViewAndPhoto({
               : "border border-gray-300"
           }  rounded-md px-5 py-2`}
           onClick={() => {
-            setCurrentCard({
-              isImageButtonClicked: !isImageButtonClicked,
-            });
             if (isImageButtonClicked && imageURL) {
               if (!confirm("이미지를 지우시겠습니까?")) return;
 
               imageURL && URL.revokeObjectURL(imageURL);
               setImageURL(null);
               setCurrentCardImage(null);
+            } else {
+              setCurrentCard({
+                isImageButtonClicked: !isImageButtonClicked,
+              });
             }
           }}
         >
@@ -91,7 +109,7 @@ export default function AddViewAndPhoto({
         </button>
       </div>
 
-      {isImageButtonClicked && (
+      {isImageButtonClicked || imageURL ? (
         <div>
           <p
             className="text-lg font-semibold"
@@ -126,8 +144,8 @@ export default function AddViewAndPhoto({
             />
           )}
         </div>
-      )}
-      {isAdditiondalViewButtonClicked && (
+      ) : null}
+      {isAdditiondalViewButtonClicked || additionalView ? (
         <div>
           <label
             htmlFor="additional-info"
@@ -150,7 +168,7 @@ export default function AddViewAndPhoto({
             }}
           />
         </div>
-      )}
+      ) : null}
     </>
   );
 }
