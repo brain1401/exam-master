@@ -1,5 +1,5 @@
 "use client";
-import CreateProblemsCard from "./CreateProblemsCard";
+import EditProblems from "./EditProblems";
 import CreateProblemsOption from "./CreateProblems/CreateProblemsOption";
 import NextOrPrevButtons from "./CreateProblems/NextOrPrevButtons";
 import CurrentCardIndicator from "./CreateProblems/CurrentCardIndicator";
@@ -22,7 +22,7 @@ export default function CreateProblems() {
       <CreateProblemsOption />
       <CurrentCardIndicator />
 
-      <CreateProblemsCard />
+      <EditProblems />
 
       <NextOrPrevButtons />
       <CreateProblemsSubmitButton />

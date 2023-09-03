@@ -11,7 +11,7 @@ import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/card";
 
-export default function CreateProblemsCard() {
+export default function EditProblems() {
   const [cards, setCards] = useAtom(cardsAtom);
   const currentCardIndex = useAtomValue(currentCardIndexAtom);
   const currentCard = useAtomValue(currentCardAtom);
