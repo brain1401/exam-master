@@ -97,7 +97,7 @@ export async function createProblem(
           additionalView: card.additionalView,
           candidates: card.candidates,
           subjectiveAnswer: card.subAnswer,
-          exam_users: {
+          exam_user: {
             connect: [userId],
           },
         }),
@@ -165,7 +165,7 @@ export async function createProblemSets(
           exam_problems: {
             connect: [...postIdArray],
           },
-          exam_users: {
+          exam_user: {
             connect: [userId],
           },
         }),
@@ -214,7 +214,7 @@ export async function checkProblemSetName(name: string, userEmail: string) {
       name: {
         $eq: name,
       },
-      exam_users: {
+      exam_user: {
         email: {
           $eq: userEmail,
         },
@@ -249,7 +249,7 @@ export async function checkProblemSetName(name: string, userEmail: string) {
 export async function getProblemSets(userEmail: string, page: string) {
   const query = qs.stringify({
     filters: {
-      exam_users: {
+      exam_user: {
         email: {
           $eq: userEmail,
         },
@@ -296,7 +296,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
       UUID: {
         $eq: uuid,
       },
-      exam_users: {
+      exam_user: {
         email: {
           $eq: userEmail,
         },
