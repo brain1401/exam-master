@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import AuthContext from "@/context/AuthContext";
 import JotaiProvider from "@/context/JotaiContext";
 import { Suspense } from "react";

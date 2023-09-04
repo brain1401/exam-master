@@ -1,8 +1,8 @@
-import LoginButton from "./ui/LoginButton";
+import LoginButton from "../ui/LoginButton";
 import { getServerSession } from "next-auth";
-import NavMobile from "./Navbar/NavMobile";
-import NavBackDrop from "./Navbar/NavBackDrop";
-import PCNavbar from "./Navbar/PCNavbar";
+import NavMobile from "./NavMobile";
+import NavBackDrop from "./NavBackDrop";
+import PCNavbar from "./PCNavbar";
 
 export default async function Navbar() {
   const session = await getServerSession();

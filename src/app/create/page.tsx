@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import CreateProblems from "../components/CreateProblems";
+import CreateProblems from "../components/CreateProblems/CreateProblems";
 
 export default async function CreatePage() {
   const session = await getServerSession();

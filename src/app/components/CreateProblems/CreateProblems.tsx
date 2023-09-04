@@ -1,11 +1,11 @@
 "use client";
-import ProblemsEditor from "./ProblemsEditor";
-import CreateProblemsOption from "./CreateProblems/CreateProblemsOption";
-import NextOrPrevButtons from "./CreateProblems/NextOrPrevButtons";
-import CurrentCardIndicator from "./CreateProblems/CurrentCardIndicator";
-import CreateProblemsSubmitButton from "./CreateProblems/CreateProblemsSubmitButton";
+import ProblemsEditor from "../ProblemsEditor";
+import CreateProblemsOption from "./CreateProblemsOption";
+import NextOrPrevButtons from "./NextOrPrevButtons";
+import CurrentCardIndicator from "./CurrentCardIndicator";
+import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
 import { useEffect } from "react";
-import { resetCardsAtom } from "../jotai/problems";
+import { resetCardsAtom } from "../../jotai/problems";
 import { useSetAtom } from "jotai";
 
 export default function CreateProblems() {
