@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { useLayoutEffect } from "react";
 
 type Props = {
   isAdditiondalViewButtonClicked: boolean;
@@ -44,19 +43,6 @@ export default function AddViewAndPhoto({
     }
   };
 
-  useLayoutEffect(() => {
-    if (additionalView !== "") {
-      setCurrentCard({
-        isAdditiondalViewButtonClicked: true,
-      });
-    }
-    if (imageURL && imageURL !== "") {
-      setCurrentCard({
-        isImageButtonClicked: true,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [additionalView, imageURL]);
 
   return (
     <>
@@ -73,6 +59,9 @@ export default function AddViewAndPhoto({
               if (!confirm("보기를 지우시겠습니까?")) return;
               setCurrentCard({
                 additionalView: "",
+              });
+              setCurrentCard({
+                isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
               });
             } else {
               setCurrentCard({
@@ -98,6 +87,9 @@ export default function AddViewAndPhoto({
               imageURL && URL.revokeObjectURL(imageURL);
               setImageURL(null);
               setCurrentCardImage(null);
+              setCurrentCard({
+                isImageButtonClicked: !isImageButtonClicked,
+              });
             } else {
               setCurrentCard({
                 isImageButtonClicked: !isImageButtonClicked,
