@@ -19,6 +19,7 @@ export default function ProblemsEditor() {
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
 
   useLayoutEffect(() => {
+    //현재 카드가 바뀔 때마다 탭을 바꿔줌
     setCurrentTab((prev) => cards[currentCardIndex]?.type ?? prev);
     if (
       cards?.[currentCardIndex + 1] &&
