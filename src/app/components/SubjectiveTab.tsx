@@ -42,15 +42,20 @@ export default function SubjectiveTab() {
   }, [currentCardIndex]);
 
   useEffect(() => {
-    if (image) {
-      const objectUrl = URL.createObjectURL(image);
-      setImageURL(objectUrl);
+   if (image instanceof File) {
+     const objectUrl = URL.createObjectURL(image);
+     setImageURL(objectUrl);
 
-      // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
-      return () => URL.revokeObjectURL(objectUrl);
-    } else {
-      setImageURL(null);
-    }
+     // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
+     return () => {
+       URL.revokeObjectURL(objectUrl);
+     };
+   } else if (image && typeof image === "object") {
+     // null 체크와 File 체크 후에 실행
+     setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
+   } else {
+     setImageURL(null);
+   }
   }, [image]);
 
   return (

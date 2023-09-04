@@ -151,7 +151,9 @@ export default function ObjectiveTab() {
       setImageURL(objectUrl);
 
       // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
-      return () => URL.revokeObjectURL(objectUrl);
+      return () => {
+        URL.revokeObjectURL(objectUrl);
+      };
     } else if (image && typeof image === "object") {
       // null 체크와 File 체크 후에 실행
       setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
@@ -163,6 +165,7 @@ export default function ObjectiveTab() {
   useEffect(() => {
     setSelectedValue(currentCard?.candidates?.length.toString() ?? "4");
   }, [currentCard?.candidates]);
+
 
   return (
     <form
