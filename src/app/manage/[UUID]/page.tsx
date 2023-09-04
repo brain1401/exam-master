@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import EditProblems from "@/app/components/EditProblems";
+import ProblemsEditor from "@/app/components/ProblemsEditor";
 import {
   cardsAtom,
   resetCardsAtom,
@@ -11,7 +11,6 @@ import { useAtom, useSetAtom } from "jotai";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CreateProblemsSubmitButton from "@/app/components/CreateProblems/CreateProblemsSubmitButton";
 import CurrentCardIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
-
 import { ClipLoader } from "react-spinners";
 type Props = {
   params: {
@@ -60,7 +59,7 @@ export default function EditProblemsByUUID({ params }: Props) {
   return !loading ? (
     <section className="mt-10">
       <CurrentCardIndicator />
-      <EditProblems />
+      <ProblemsEditor />
       <NextOrPrevButtons />
       <CreateProblemsSubmitButton />
     </section>

@@ -1,5 +1,5 @@
 "use client";
-import EditProblems from "./EditProblems";
+import ProblemsEditor from "./ProblemsEditor";
 import CreateProblemsOption from "./CreateProblems/CreateProblemsOption";
 import NextOrPrevButtons from "./CreateProblems/NextOrPrevButtons";
 import CurrentCardIndicator from "./CreateProblems/CurrentCardIndicator";
@@ -12,17 +12,19 @@ export default function CreateProblems() {
   const resetCard = useSetAtom(resetCardsAtom);
 
   useEffect(() => {
+
     return () => {
       resetCard();
     };
-  }, [resetCard]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section className="p-3 mt-10 max-w-[70rem] mx-auto">
       <CreateProblemsOption />
       <CurrentCardIndicator />
 
-      <EditProblems />
+      <ProblemsEditor />
 
       <NextOrPrevButtons />
       <CreateProblemsSubmitButton />
