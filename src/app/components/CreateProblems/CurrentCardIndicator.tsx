@@ -1,16 +1,15 @@
 "use client";
-import { currentCardIndexAtom, cardsLengthAtom } from "@/app/jotai/problems";
-import {useAtomValue} from "jotai";
+type Props = {
+  problemCurrentIndex: number;
+  problemsLength: number;
+}
+export default function CurrentCardIndicator({ problemCurrentIndex, problemsLength }: Props) {
 
 
-export default function CurrentCardIndicator() {
-
-  const currentIndex = useAtomValue(currentCardIndexAtom);
-  const cardLength = useAtomValue(cardsLengthAtom);
 
   return (
     <p className="text-center mb-5 text-3xl">
-      {currentIndex + 1}번째 문제 / 총 {cardLength}개
+      {problemCurrentIndex + 1}번째 문제 / 총 {problemsLength}개
     </p>
   );
 }

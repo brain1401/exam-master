@@ -1,4 +1,5 @@
 "use client";
+import { Problem } from "@/types/problems";
 import Image from "next/image";
 
 type Props = {
@@ -6,19 +7,41 @@ type Props = {
   isImageButtonClicked: boolean;
   additionalView: string;
   setImageURL: (url: string | null) => void;
-  setCurrentCardImage: (image: File | null) => void;
+  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
+  problemCurrentIndex: number;
   imageURL: string | null;
-  setCurrentCard: (card: Partial<Props>) => void;
 };
 export default function AddViewAndPhoto({
   isAdditiondalViewButtonClicked,
   isImageButtonClicked,
   additionalView,
+  setProblems,
   imageURL,
+  problemCurrentIndex,
   setImageURL,
-  setCurrentCardImage,
-  setCurrentCard,
 }: Props) {
+  const setCurrentProblem = (newCard: Partial<Problem>) => {
+    setProblems((prev) => {
+      const newProblems: Partial<Problem>[] = [...prev];
+      newProblems[problemCurrentIndex] = {
+        ...newProblems[problemCurrentIndex],
+        ...newCard,
+      };
+      return newProblems as NonNullable<Problem>[];
+    });
+  };
+
+  const setCurrentProblemImage = (newImage: File | null) => {
+    setProblems((prev) => {
+      const newProblems: Partial<Problem>[] = [...prev];
+      newProblems[problemCurrentIndex] = {
+        ...newProblems[problemCurrentIndex],
+        image: newImage,
+      };
+      return newProblems as NonNullable<Problem>[];
+    });
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const MAX_FILE_SIZE = 9 * 1024 * 1024; // 9MB
@@ -36,13 +59,12 @@ export default function AddViewAndPhoto({
         }
         const newURL = URL.createObjectURL(file);
         setImageURL(newURL); // 이미지 URL 상태를 업데이트
-        setCurrentCardImage(file);
+        setCurrentProblemImage(file);
       } else {
         alert("이미지 파일을 선택해주세요.");
       }
     }
   };
-
 
   return (
     <>
@@ -57,14 +79,14 @@ export default function AddViewAndPhoto({
           onClick={() => {
             if (isAdditiondalViewButtonClicked && additionalView !== "") {
               if (!confirm("보기를 지우시겠습니까?")) return;
-              setCurrentCard({
+              setCurrentProblem({
                 additionalView: "",
               });
-              setCurrentCard({
+              setCurrentProblem({
                 isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
               });
             } else {
-              setCurrentCard({
+              setCurrentProblem({
                 isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
               });
             }
@@ -86,12 +108,12 @@ export default function AddViewAndPhoto({
 
               imageURL && URL.revokeObjectURL(imageURL);
               setImageURL(null);
-              setCurrentCardImage(null);
-              setCurrentCard({
+              setCurrentProblemImage(null);
+              setCurrentProblem({
                 isImageButtonClicked: !isImageButtonClicked,
               });
             } else {
-              setCurrentCard({
+              setCurrentProblem({
                 isImageButtonClicked: !isImageButtonClicked,
               });
             }
@@ -154,7 +176,7 @@ export default function AddViewAndPhoto({
             placeholder="나 이번 시험 너무 못 봤어. 평균 99점이 조금 안 되네"
             value={additionalView}
             onChange={(e) => {
-              setCurrentCard({
+              setCurrentProblem({
                 additionalView: e.target.value,
               });
             }}

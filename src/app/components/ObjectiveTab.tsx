@@ -1,15 +1,9 @@
 "use client";
 import { ChangeEvent, useEffect, useState } from "react";
-import {
-  currentCardAtom,
-  currentCardCandidatesAtom,
-  currentCardImageAtom,
-  currentCardIndexAtom,
-} from "../jotai/problems";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isCardOnBeingWrited } from "@/service/problems";
 import SimpleLabel from "./ui/SimpleLabel";
+import { Problem, candidate } from "@/types/problems";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -18,9 +12,34 @@ const candidatePlaceholders = [
   "다른 데서 그런 식으로 말하면 너는 학교 폭력의 피해자가 될지도 몰라",
 ];
 
-export default function ObjectiveTab() {
-  const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
-  const currentCardIndex = useAtomValue(currentCardIndexAtom);
+type Props = {
+  problemCurrentIndex: number;
+  problems: Problem[];
+  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
+};
+export default function ObjectiveTab({
+  problemCurrentIndex,
+  problems,
+  setProblems,
+}: Props) {
+  const currentProblem = problems[problemCurrentIndex];
+  const currentCardCandidates = currentProblem?.candidates;
+
+  const setCurrentProblemCandidates = (newCandidates: candidate[]) => {
+    setProblems((prev) => {
+      const newProblems: Partial<Problem>[] = [...prev];
+      newProblems[problemCurrentIndex] = {
+        ...newProblems[problemCurrentIndex],
+        candidates: newCandidates,
+      };
+      return newProblems as NonNullable<Problem>[];
+    });
+  };
+
+  const [selectedValue, setSelectedValue] = useState(
+    currentProblem?.candidates?.length.toString() ?? "4"
+  );
+  const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   const {
     question,
@@ -28,17 +47,7 @@ export default function ObjectiveTab() {
     isAdditiondalViewButtonClicked,
     image,
     isImageButtonClicked,
-  } = currentCard ?? {};
-
-  const [currentCardCandidates, setCurrentCardCandidates] = useAtom(
-    currentCardCandidatesAtom
-  );
-  const setCurrentCardImage = useSetAtom(currentCardImageAtom);
-
-  const [selectedValue, setSelectedValue] = useState(
-    currentCard?.candidates?.length.toString() ?? "4"
-  );
-  const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
+  } = currentProblem ?? {};
 
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value: selectedValue } = event.target;
@@ -60,7 +69,7 @@ export default function ObjectiveTab() {
         };
       }
     }
-    setCurrentCardCandidates(newValues);
+    setCurrentProblemCandidates(newValues);
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -73,7 +82,7 @@ export default function ObjectiveTab() {
       isAnswer: newCandidates[index]?.isAnswer ?? false,
     };
 
-    setCurrentCardCandidates(newCandidates);
+    setCurrentProblemCandidates(newCandidates);
   };
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +95,7 @@ export default function ObjectiveTab() {
       isAnswer: checked,
     };
 
-    setCurrentCardCandidates(newCandidates);
+    setCurrentProblemCandidates(newCandidates);
   };
 
   const candidates = Array.from(
@@ -129,20 +138,25 @@ export default function ObjectiveTab() {
 
   // 카드가 변경될 때마다 입력폼 초기화
   useEffect(() => {
-    if (isCardOnBeingWrited(currentCard)) return;
+    // 현재 문제에 무언가 적혀있으면 초기화하지 않음
+    if (isCardOnBeingWrited(currentProblem)) return;
 
-    setCurrentCard({
-      type: "obj",
-      question: "",
-      additionalView: "",
-      isAdditiondalViewButtonClicked: false,
-      isImageButtonClicked: false,
-      image: null,
-      candidates: Array(4).fill({ text: "", isAnswer: false }),
-      subAnswer: null,
+    setProblems((prev) => {
+      const newProblems = [...prev];
+      newProblems[problemCurrentIndex] = {
+        type: "obj",
+        question: "",
+        additionalView: "",
+        isAdditiondalViewButtonClicked: false,
+        isImageButtonClicked: false,
+        image: null,
+        candidates: Array<candidate>(4).fill({ text: "", isAnswer: false }),
+        subAnswer: null,
+      };
+      return newProblems;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCardIndex]);
+  }, [problemCurrentIndex]);
 
   // 이미지가 변경될 때마다 이미지 URL을 생성
   useEffect(() => {
@@ -163,9 +177,8 @@ export default function ObjectiveTab() {
   }, [image]);
 
   useEffect(() => {
-    setSelectedValue(currentCard?.candidates?.length.toString() ?? "4");
-  }, [currentCard?.candidates]);
-
+    setSelectedValue(currentProblem?.candidates?.length.toString() ?? "4");
+  }, [currentProblem?.candidates]);
 
   return (
     <form
@@ -182,8 +195,14 @@ export default function ObjectiveTab() {
           placeholder="다음의 친구에게 해 줄 수 있는 말로 적절한 것은?"
           value={question ?? ""}
           onChange={(e) => {
-            setCurrentCard({
-              question: e.target.value,
+            setProblems((prev) => {
+              const newProblems: Partial<Problem>[] = [...prev];
+              newProblems[problemCurrentIndex] = {
+                ...newProblems[problemCurrentIndex],
+                question: e.target.value,
+              };
+
+              return newProblems as NonNullable<Problem>[];
             });
           }}
         />
@@ -194,9 +213,9 @@ export default function ObjectiveTab() {
         imageURL={imageURL}
         isAdditiondalViewButtonClicked={isAdditiondalViewButtonClicked ?? false}
         isImageButtonClicked={isImageButtonClicked ?? false}
-        setCurrentCardImage={setCurrentCardImage}
         setImageURL={setImageURL}
-        setCurrentCard={setCurrentCard}
+        setProblems={setProblems}
+        problemCurrentIndex={problemCurrentIndex}
       />
 
       <div className="flex justify-end items-center space-x-2">

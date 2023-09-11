@@ -1,14 +1,15 @@
 "use client";
-import { useAtomValue, useSetAtom } from "jotai";
-import { currentCardIndexAtom, cardsLengthAtom } from "@/app/jotai/problems";
-
-export default function NextOrPrevButtons() {
-  const setCurrentIndex = useSetAtom(currentCardIndexAtom);
-  const maxIndex = useAtomValue(cardsLengthAtom);
-
+type Props = {
+  setCurrentProblemIndex: React.Dispatch<React.SetStateAction<number>>;
+  problemLength: number;
+};
+export default function NextOrPrevButtons({
+  setCurrentProblemIndex,
+  problemLength,
+}: Props) {
   const showNextCard = () => {
-    setCurrentIndex((prevIndex) => {
-      if (prevIndex < parseInt(maxIndex) - 1) {
+    setCurrentProblemIndex((prevIndex) => {
+      if (prevIndex < problemLength - 1) {
         window.scrollTo(0, 0);
         return prevIndex + 1;
       } else {
@@ -18,7 +19,7 @@ export default function NextOrPrevButtons() {
   };
 
   const showPreviousCard = () => {
-    setCurrentIndex((prevIndex) => {
+    setCurrentProblemIndex((prevIndex) => {
       if (prevIndex !== 0) {
         window.scrollTo(0, 0);
         return prevIndex - 1;

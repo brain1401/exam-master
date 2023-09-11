@@ -1,49 +1,48 @@
 "use client";
 import { useState, useLayoutEffect, useEffect } from "react";
-import {
-  cardsAtom,
-  currentCardAtom,
-  currentCardIndexAtom,
-} from "../jotai/problems";
-import { useAtom, useAtomValue } from "jotai";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/problems";
+import { Problem } from "@/types/problems";
 
-export default function ProblemsEditor() {
-  const [cards, setCards] = useAtom(cardsAtom);
-  const currentCardIndex = useAtomValue(currentCardIndexAtom);
-  const currentCard = useAtomValue(currentCardAtom);
+type Props = {
+  problems: Problem[];
+  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
+  problemCurrentIndex: number;
+};
+export default function ProblemsEditor({
+  problems,
+  setProblems,
+  problemCurrentIndex,
+}: Props) {
+  const currentProblem = problems[problemCurrentIndex];
 
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
 
   useLayoutEffect(() => {
+    const prevProblem = problems?.[problemCurrentIndex - 1];
+    const nextProblem = problems?.[problemCurrentIndex + 1];
+
     //현재 카드가 바뀔 때마다 탭을 바꿔줌
-    setCurrentTab((prev) => cards[currentCardIndex]?.type ?? prev);
-    if (
-      cards?.[currentCardIndex + 1] &&
-      !isCardOnBeingWrited(cards?.[currentCardIndex + 1])
-    ) {
-      setCards((prev) => {
+    setCurrentTab((prev) => currentProblem?.type ?? prev);
+    if (nextProblem && !isCardOnBeingWrited(nextProblem)) {
+      setProblems((prev) => {
         const newCards = [...prev];
-        newCards[currentCardIndex + 1] = null;
+        newCards[problemCurrentIndex + 1] = null;
         return newCards;
       });
     }
-    if (
-      cards?.[currentCardIndex - 1] &&
-      !isCardOnBeingWrited(cards?.[currentCardIndex - 1])
-    ) {
-      setCards((prev) => {
+    if (prevProblem && !isCardOnBeingWrited(prevProblem)) {
+      setProblems((prev) => {
         const newCards = [...prev];
-        newCards[currentCardIndex - 1] = null;
+        newCards[problemCurrentIndex - 1] = null;
         return newCards;
       });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCardIndex]);
+  }, [problemCurrentIndex]);
 
   useEffect(() => {
     //페이지를 닫거나 새로고침을 할 때 경고창을 띄우는 이벤트 리스너 등록 및 해제
@@ -61,10 +60,6 @@ export default function ProblemsEditor() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(cards);
-  }, [cards]);
-
   return (
     <section className="flex justify-center items-center">
       <Tabs.Root
@@ -80,7 +75,7 @@ export default function ProblemsEditor() {
             }`}
             value="tab1"
             onClick={() => {
-              if (isCardOnBeingWrited(currentCard)) {
+              if (isCardOnBeingWrited(currentProblem)) {
                 const value = confirm(
                   "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
                 );
@@ -102,7 +97,7 @@ export default function ProblemsEditor() {
             }`}
             value="tab2"
             onClick={() => {
-              if (isCardOnBeingWrited(currentCard)) {
+              if (isCardOnBeingWrited(currentProblem)) {
                 const value = confirm(
                   "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
                 );
@@ -120,11 +115,19 @@ export default function ProblemsEditor() {
         </Tabs.List>
         <Tabs.Content value="tab1">
           {/*객관식*/}
-          <ObjectiveTab />
+          <ObjectiveTab
+            problemCurrentIndex={problemCurrentIndex}
+            problems={problems}
+            setProblems={setProblems}
+          />
         </Tabs.Content>
         <Tabs.Content value="tab2">
           {/*주관식*/}
-          <SubjectiveTab />
+          <SubjectiveTab
+            problemCurrentIndex={problemCurrentIndex}
+            problems={problems}
+            setProblems={setProblems}
+          />
         </Tabs.Content>
       </Tabs.Root>
     </section>

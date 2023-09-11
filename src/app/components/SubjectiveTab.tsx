@@ -1,18 +1,31 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  currentCardAtom,
-  currentCardImageAtom,
-  currentCardIndexAtom,
-} from "../jotai/problems";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isCardOnBeingWrited } from "@/service/problems";
+import { Problem } from "@/types/problems";
 
-export default function SubjectiveTab() {
-  const [currentCard, setCurrentCard] = useAtom(currentCardAtom);
-  const setCurrentCardImage = useSetAtom(currentCardImageAtom);
-  const currentCardIndex = useAtomValue(currentCardIndexAtom);
+type Props = {
+  problems: Problem[];
+  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
+  problemCurrentIndex: number;
+};
+
+export default function SubjectiveTab({
+  problems,
+  setProblems,
+  problemCurrentIndex,
+}: Props) {
+  const currentProblem = problems[problemCurrentIndex];
+  const setCurrentProblem = (newCard: Partial<Problem>) => {
+    setProblems((prev) => {
+      const newProblems: Partial<Problem>[] = [...prev];
+      newProblems[problemCurrentIndex] = {
+        ...newProblems[problemCurrentIndex],
+        ...newCard,
+      };
+      return newProblems as NonNullable<Problem>[];
+    });
+  };
 
   const {
     question,
@@ -21,14 +34,14 @@ export default function SubjectiveTab() {
     isImageButtonClicked,
     subAnswer,
     image,
-  } = currentCard || {};
+  } = currentProblem || {};
 
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   useEffect(() => {
-    if (isCardOnBeingWrited(currentCard)) return;
+    if (isCardOnBeingWrited(currentProblem)) return;
 
-    setCurrentCard({
+    setCurrentProblem({
       type: "sub",
       question: "",
       additionalView: "",
@@ -39,23 +52,23 @@ export default function SubjectiveTab() {
       subAnswer: "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCardIndex]);
+  }, [problemCurrentIndex]);
 
   useEffect(() => {
-   if (image instanceof File) {
-     const objectUrl = URL.createObjectURL(image);
-     setImageURL(objectUrl);
+    if (image instanceof File) {
+      const objectUrl = URL.createObjectURL(image);
+      setImageURL(objectUrl);
 
-     // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
-     return () => {
-       URL.revokeObjectURL(objectUrl);
-     };
-   } else if (image && typeof image === "object") {
-     // null 체크와 File 체크 후에 실행
-     setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
-   } else {
-     setImageURL(null);
-   }
+      // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
+      return () => {
+        URL.revokeObjectURL(objectUrl);
+      };
+    } else if (image && typeof image === "object") {
+      // null 체크와 File 체크 후에 실행
+      setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
+    } else {
+      setImageURL(null);
+    }
   }, [image]);
 
   return (
@@ -73,7 +86,7 @@ export default function SubjectiveTab() {
           id="question"
           className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
           value={question}
-          onChange={(e) => setCurrentCard({ question: e.target.value })}
+          onChange={(e) => setCurrentProblem({ question: e.target.value })}
         />
       </div>
       <AddViewAndPhoto
@@ -81,9 +94,9 @@ export default function SubjectiveTab() {
         imageURL={imageURL}
         isAdditiondalViewButtonClicked={isAdditiondalViewButtonClicked ?? false}
         isImageButtonClicked={isImageButtonClicked ?? false}
-        setCurrentCardImage={setCurrentCardImage}
+        problemCurrentIndex={problemCurrentIndex}
+        setProblems={setProblems}
         setImageURL={setImageURL}
-        setCurrentCard={setCurrentCard}
       />
 
       <div className="flex flex-col mb-3">
@@ -94,7 +107,7 @@ export default function SubjectiveTab() {
           id="question"
           className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
           value={subAnswer ?? ""}
-          onChange={(e) => setCurrentCard({ subAnswer: e.target.value })}
+          onChange={(e) => setCurrentProblem({ subAnswer: e.target.value })}
         />
       </div>
     </form>

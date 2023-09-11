@@ -1,23 +1,21 @@
 "use client";
 import { useState } from "react";
-import { useAtomValue, useAtom, useSetAtom } from "jotai";
-import {
-  problemSetNameAtom,
-  cardsAtom,
-  resetCardsAtom,
-} from "@/app/jotai/problems";
 import { isCardEmpty } from "@/service/problems";
 import { useRouter } from "next/navigation";
+import { Problem } from "@/types/problems";
 
-export default function CreateProblemsSubmitButton() {
+type Props = {
+  problems: Problem[];
+  problemSetName: string;
+  setProblemSetsName: React.Dispatch<React.SetStateAction<string>>;
+  resetProblems: () => void;
+};
+export default function CreateProblemsSubmitButton({problems, problemSetName, setProblemSetsName, resetProblems}: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const cards = useAtomValue(cardsAtom);
-  const resetCards = useSetAtom(resetCardsAtom);
-  const [problemSetName, setProblemSetName] = useAtom(problemSetNameAtom);
   const router = useRouter();
 
   const handleSubmit = async () => {
-    if (cards.some((card) => isCardEmpty(card))) {
+    if (problems.some((problem) => isCardEmpty(problem))) {
       alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
       return;
     }
@@ -31,9 +29,9 @@ export default function CreateProblemsSubmitButton() {
     setIsLoading(true); // 로딩 시작
 
     const formData = new FormData();
-    cards.forEach((card, index) => {
-      formData.append(`image[${index}]`, card?.image as Blob);
-      formData.append(`data[${index}]`, JSON.stringify(card));
+    problems.forEach((problem, index) => {
+      formData.append(`image[${index}]`, problem?.image as Blob);
+      formData.append(`data[${index}]`, JSON.stringify(problem));
     });
     formData.append("problemSetName", problemSetName);
 
@@ -46,8 +44,8 @@ export default function CreateProblemsSubmitButton() {
       const data = await response.json();
       if (data === "OK") {
         alert("문제집이 성공적으로 등록되었습니다.");
-        resetCards();
-        setProblemSetName("");
+        resetProblems();
+        setProblemSetsName("");
         router.refresh();
       } else {
         alert("문제집 등록에 실패했습니다.");
