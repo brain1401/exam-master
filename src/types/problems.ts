@@ -1,17 +1,43 @@
-import { candidate } from "./card";
+export type candidate = {
+  text: string;
+  isAnswer: boolean;
+};
 
 export type Problem = {
-  additionalView: string;
-  candidates: candidate[];
-  createdAt: string;
-  id: string;
+  type: "obj" | "sub";
   question: string;
-  questionType: "obj" | "sub";
-  subjectiveAnswer: string;
+  additionalView: string;
+  image:
+    | File
+    | {
+        id: string;
+        url: string;
+      }
+    | null;
+  isAdditiondalViewButtonClicked: boolean;
+  isImageButtonClicked: boolean;
+  candidates: candidate[] | null;
+  subAnswer: string | null;
+} | null;
+
+
+
+export type ProblemSet = {
+  id: string;
+  name: string;
+  createdAt: string;
   updatedAt: string;
-  image: {
-    id: string;
-    url: string;
+  UUID: string;
+};
+
+export type ProblemSetResponse = {
+  data: ProblemSet[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
   };
-  uuid: string;
-}
+};
