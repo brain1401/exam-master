@@ -17,7 +17,6 @@ export default function ProblemsEditor({
   problemCurrentIndex,
 }: Props) {
   const currentProblem = problems[problemCurrentIndex];
-
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
 
   useLayoutEffect(() => {
@@ -64,27 +63,37 @@ export default function ProblemsEditor({
     <section className="flex justify-center items-center">
       <Tabs.Root
         className="flex flex-col md:w-[60rem] w-11/12"
-        defaultValue={currentTab === "obj" ? "tab1" : "tab2"}
         activationMode="manual"
-        value={currentTab === "obj" ? "tab1" : "tab2"}
+        value={currentTab}
       >
         <Tabs.List className="flex mb-2 justify-center md:justify-normal">
           <Tabs.Trigger
             className={`border border-gray-300 rounded-md px-5 py-3 mr-2 ${
               currentTab === "obj" && "bg-neutral-500 text-white"
             }`}
-            value="tab1"
+            value="obj"
             onClick={() => {
               if (isCardOnBeingWrited(currentProblem)) {
                 const value = confirm(
                   "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
                 );
-                if (value === false) {
-                  setCurrentTab("sub");
-                  return;
-                }
+                if (value === false) return;
               }
               setCurrentTab("obj");
+              setProblems((prev) => {
+                const newProblems = [...prev];
+                newProblems[problemCurrentIndex] = {
+                  type: "obj",
+                  question: "",
+                  additionalView: "",
+                  isAdditiondalViewButtonClicked: false,
+                  isImageButtonClicked: false,
+                  image: null,
+                  candidates: Array(4).fill({ text: "", isAnswer: false }),
+                  subAnswer: null,
+                };
+                return newProblems;
+              });
             }}
             disabled={currentTab === "obj"}
           >
@@ -95,25 +104,36 @@ export default function ProblemsEditor({
             className={`border border-gray-300 rounded-md px-5 py-3 ${
               currentTab === "sub" && "bg-neutral-500 text-white"
             }`}
-            value="tab2"
+            value="sub"
             onClick={() => {
               if (isCardOnBeingWrited(currentProblem)) {
                 const value = confirm(
                   "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
                 );
-                if (value === false) {
-                  setCurrentTab("obj");
-                  return;
-                }
+                if (value === false) return;
               }
               setCurrentTab("sub");
+               setProblems((prev) => {
+                 const newProblems = [...prev];
+                 newProblems[problemCurrentIndex] = {
+                   type: "sub",
+                   question: "",
+                   additionalView: "",
+                   isAdditiondalViewButtonClicked: false,
+                   isImageButtonClicked: false,
+                   image: null,
+                   candidates: null,
+                   subAnswer: "",
+                 };
+                 return newProblems;
+               });
             }}
             disabled={currentTab === "sub"}
           >
             주관식
           </Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="tab1">
+        <Tabs.Content value="obj">
           {/*객관식*/}
           <ObjectiveTab
             problemCurrentIndex={problemCurrentIndex}
@@ -121,7 +141,7 @@ export default function ProblemsEditor({
             setProblems={setProblems}
           />
         </Tabs.Content>
-        <Tabs.Content value="tab2">
+        <Tabs.Content value="sub">
           {/*주관식*/}
           <SubjectiveTab
             problemCurrentIndex={problemCurrentIndex}
