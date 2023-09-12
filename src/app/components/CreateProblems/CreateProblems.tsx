@@ -22,6 +22,13 @@ export default function CreateProblems() {
     console.log(problems);
   }, [problems]);
 
+  useEffect(() => {
+    return () => {
+      resetProblems();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
+
   return (
     <section className="p-3 mt-10 max-w-[70rem] mx-auto">
       <CreateProblemsOption
