@@ -1,28 +1,32 @@
 "use client";
-import { useAtomValue, useSetAtom } from "jotai";
-import {
-  problemSetAtomsWithQuery,
-  problemSetCurrentPageAtom,
-} from "../jotai/problems";
 import ProblemSetCard from "./ProblemSetCard";
-import { ProblemSet } from "@/types/card";
+import { ProblemSetResponse, ProblemSet } from "@/types/problems";
 import { useEffect, useRef, useState } from "react";
 import Button from "./ui/Button";
 import { BsSearch } from "react-icons/bs";
+import axios from "axios";
 
 export default function ProblemSetGrid() {
-  const problemSets = useAtomValue(problemSetAtomsWithQuery);
-  const setCurrentPage = useSetAtom(problemSetCurrentPageAtom);
-  const maxPage = useRef(problemSets?.meta.pagination.pageCount ?? 0);
+  const [problemSets, setProblemSets] = useState<ProblemSetResponse>();
+  const [page, setPage] = useState(1);
+  const maxPage = useRef<number>(0);
 
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
-    return () => {
-      setCurrentPage(1);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    axios
+      .get("/api/getProblemSets", {
+        params: {
+          page,
+        },
+      })
+      .then((res) => {
+        const data: ProblemSetResponse = res.data;
+        maxPage.current = data.meta.pagination.pageCount;
+        setProblemSets(data);
+      })
+      .catch((err) => console.error(err));
+  }, [page]);
 
   return (
     <section className="p-4 md:p-8">
@@ -55,10 +59,7 @@ export default function ProblemSetGrid() {
         <Button
           className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base"
           onClick={() => {
-            setCurrentPage((prev) => {
-              if (prev === 1) return prev;
-              return prev - 1;
-            });
+            if (page > 1) setPage(page - 1);
           }}
         >
           이전
@@ -67,10 +68,7 @@ export default function ProblemSetGrid() {
         <Button
           className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base"
           onClick={() => {
-            setCurrentPage((prev) => {
-              if (prev === maxPage.current) return prev;
-              return prev + 1;
-            });
+            if (page < maxPage.current) setPage(page + 1);
           }}
         >
           다음
