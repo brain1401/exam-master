@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { Card } from "@/types/card";
+import { Problem } from "@/types/problems";
 import { postProblems } from "@/service/problems";
 
 export async function POST(req: NextRequest) {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const entries = Array.from(formData.entries());
 
-  const intermediateResults: NonNullable<Card>[] = [];
+  const intermediateResults: NonNullable<Problem>[] = [];
   let problemSetName: string | undefined;
 
   for (const [name, value] of entries) {
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       const index = parseInt(indexStr);
 
       if (!intermediateResults[index]) {
-        intermediateResults[index] = {} as NonNullable<Card>;
+        intermediateResults[index] = {} as NonNullable<Problem>;
       }
 
       if (prefix === "data") {

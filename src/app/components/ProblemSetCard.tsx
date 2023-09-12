@@ -1,4 +1,4 @@
-import { ProblemSet } from "@/types/card";
+import { ProblemSet } from "@/types/problems";
 import Link from "next/link";
 
 type Props = {

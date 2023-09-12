@@ -1,5 +1,4 @@
 import { getProblemsSetByUUID } from "@/service/problems";
-import { Card } from "@/types/card";
 import { Problem } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,12 +12,12 @@ export async function GET(req: NextRequest) {
   const param = req.nextUrl.searchParams;
   const UUID = param.get("UUID");
 
-  const data:Problem[] = await getProblemsSetByUUID(
+  const data:any[] = await getProblemsSetByUUID(
     UUID ?? "",
     session?.user?.email ?? ""
   );
 
-  const result:Partial<Card>[] = data.map( problem => ({
+  const result:Partial<Problem>[] = data.map( problem => ({
     type : problem.questionType,
     question : problem.question,
     additionalView : problem.additionalView,
