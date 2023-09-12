@@ -2,16 +2,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProblemsEditor from "@/app/components/ProblemsEditor";
-import {
-  cardsAtom,
-  resetCardsAtom,
-  cardsLengthAtom,
-} from "@/app/jotai/problems";
-import { useAtom, useSetAtom } from "jotai";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CreateProblemsSubmitButton from "@/app/components/CreateProblems/CreateProblemsSubmitButton";
 import CurrentCardIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import { ClipLoader } from "react-spinners";
+import useProblems from "@/hooks/problems";
 type Props = {
   params: {
     UUID: string;
@@ -19,13 +14,18 @@ type Props = {
 };
 
 export default function EditProblemsByUUID({ params }: Props) {
-  const [card, setCard] = useAtom(cardsAtom);
   const [loading, setLoading] = useState<boolean>(true);
-
   const [error, setError] = useState<string | null>(null);
 
-  const resetCard = useSetAtom(resetCardsAtom);
-  const setCardsLength = useSetAtom(cardsLengthAtom);
+  const {
+    problemCurrentIndex,
+    problemSetsName,
+    problems,
+    resetProblems,
+    setProblemCurrentIndex,
+    setProblemSetsName,
+    setProblems,
+  } = useProblems();
 
   useEffect(() => {
     axios
@@ -35,8 +35,7 @@ export default function EditProblemsByUUID({ params }: Props) {
         },
       })
       .then((res) => {
-        setCard(res.data);
-        setCardsLength(res.data.length);
+        setProblems(res.data);
       })
       .catch((err) => {
         setError(err.message);
@@ -47,7 +46,7 @@ export default function EditProblemsByUUID({ params }: Props) {
       });
 
     return () => {
-      resetCard();
+      resetProblems();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -58,10 +57,25 @@ export default function EditProblemsByUUID({ params }: Props) {
 
   return !loading ? (
     <section className="mt-10">
-      <CurrentCardIndicator />
-      <ProblemsEditor />
-      <NextOrPrevButtons />
-      <CreateProblemsSubmitButton />
+      <CurrentCardIndicator
+        problemCurrentIndex={problemCurrentIndex}
+        problemsLength={problems.length}
+      />
+      <ProblemsEditor
+        problemCurrentIndex={problemCurrentIndex}
+        problems={problems}
+        setProblems={setProblems}
+      />
+      <NextOrPrevButtons
+        problemLength={problems.length}
+        setCurrentProblemIndex={setProblemCurrentIndex}
+      />
+      <CreateProblemsSubmitButton
+        problemSetName={problemSetsName}
+        problems={problems}
+        setProblemSetsName={setProblemSetsName}
+        resetProblems={resetProblems}
+      />
     </section>
   ) : (
     <ClipLoader size={50} />
