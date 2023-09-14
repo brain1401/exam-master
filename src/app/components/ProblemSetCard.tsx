@@ -11,9 +11,11 @@ export default function ProblemSetCard({ problemSet }: Props) {
   return (
     <Link href={`/manage/${problemSet.UUID}`}>
       <div className="border border-gray-300 flex flex-col items-center w-full md:w-[10rem] my-2 rounded-lg p-5 hover:shadow-lg transition-shadow duration-200 ease-in cursor-pointer">
-        <h1 className="font-bold text-lg text-gray-700 truncate w-full text-center mb-2">
+        <h1 className="font-bold text-lg text-gray-700 truncate w-full text-center">
           {problemSet.name}
         </h1>
+        <p className="text-sm text-gray-500">{`${problemSet.examProblemsCount}문제` ?? 0}</p>
+        <p className="text-sm text-gray-500">{}</p>
         <p className="text-sm text-gray-500">{formattedDate}</p>
       </div>
     </Link>
