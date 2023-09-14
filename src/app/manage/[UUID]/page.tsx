@@ -14,9 +14,8 @@ type Props = {
 };
 
 export default function EditProblemsByUUID({ params }: Props) {
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [loading, setLoading] = useState(true);
   const {
     problemCurrentIndex,
     problemSetsName,
@@ -28,6 +27,7 @@ export default function EditProblemsByUUID({ params }: Props) {
   } = useProblems();
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`/api/getProblemsByUUID`, {
         params: {
@@ -55,7 +55,15 @@ export default function EditProblemsByUUID({ params }: Props) {
     return <div>존재하지 않는 문서</div>;
   }
 
-  return !loading ? (
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader size={100} />
+      </div>
+    );
+  }
+
+  return (
     <section className="mt-10">
       <CurrentCardIndicator
         problemCurrentIndex={problemCurrentIndex}
@@ -77,7 +85,5 @@ export default function EditProblemsByUUID({ params }: Props) {
         resetProblems={resetProblems}
       />
     </section>
-  ) : (
-    <ClipLoader size={50} />
   );
 }
