@@ -72,7 +72,7 @@ export default function ProblemSetGrid() {
 
       <div className="flex gap-3 justify-center mt-5">
         <Button
-          className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base"
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base border-none"
           onClick={() => {
             if (page > 1) setPage(page - 1);
           }}
@@ -81,7 +81,7 @@ export default function ProblemSetGrid() {
         </Button>
 
         <Button
-          className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base"
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base border-none"
           onClick={() => {
             if (page < maxPage.current) setPage(page + 1);
           }}
