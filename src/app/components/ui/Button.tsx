@@ -15,7 +15,7 @@ export default function Button({
   return (
     <button
       className={twMerge(
-        `border border-black px-5 py-2 rounded-md hover:bg-neutral-500 hover:text-white hover:border-transparent transition-colors duration-300 hover:border-neutral-500`,
+        ` px-5 py-2 rounded-md hover:bg-neutral-500 hover:text-white hover:border-transparent transition-colors duration-300 hover:border-neutral-500`,
         className
       )}
       onClick={onClick}
