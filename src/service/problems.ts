@@ -1,4 +1,4 @@
-import { Card, ProblemSetResponse } from "@/types/card";
+import { ProblemSetResponse, Problem } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
 
@@ -7,66 +7,66 @@ export const checkEnvVariables = () => {
     throw new Error("환경 변수가 설정되지 않았습니다.");
   }
 };
-export const isCardEmpty = (card: Card) => {
-  if (!card) {
+export const isProblemEmpty = (problem: Problem) => {
+  if (!problem) {
     return true;
   }
-  if (card.question === "") {
-    return true;
-  }
-
-  if (
-    card.candidates &&
-    card.candidates.some((candidate) => candidate.text === "")
-  ) {
-    return true;
-  }
-  if (card.isAdditiondalViewButtonClicked && card.additionalView === "") {
-    return true;
-  }
-
-  if (card.isImageButtonClicked && card.image === null) {
+  if (problem.question === "") {
     return true;
   }
 
   if (
-    card.candidates &&
-    !card.candidates?.some((candidate) => candidate.isAnswer === true)
+    problem.candidates &&
+    problem.candidates.some((candidate) => candidate.text === "")
+  ) {
+    return true;
+  }
+  if (problem.isAdditiondalViewButtonClicked && problem.additionalView === "") {
+    return true;
+  }
+
+  if (problem.isImageButtonClicked && problem.image === null) {
+    return true;
+  }
+
+  if (
+    problem.candidates &&
+    !problem.candidates?.some((candidate) => candidate.isAnswer === true)
   ) {
     return true;
   }
 
-  if (card.type === "sub" && card.subAnswer === "") {
+  if (problem.type === "sub" && problem.subAnswer === "") {
     return true;
   }
 
   return false;
 };
 
-export const isCardOnBeingWrited = (card: Card) => {
-  if (!card) {
+export const isCardOnBeingWrited = (problem: Problem) => {
+  if (!problem) {
     return false;
   }
-  if (card.question !== "") {
+  if (problem.question !== "") {
     return true;
   }
 
   if (
-    card.candidates !== null &&
-    card.candidates.some((candidate) => candidate.text !== "")
+    problem.candidates !== null &&
+    problem.candidates.some((candidate) => candidate.text !== "")
   ) {
     return true;
   }
 
-  if (card.image !== null) {
+  if (problem.image !== null) {
     return true;
   }
 
-  if (card.additionalView !== "") {
+  if (problem.additionalView !== "") {
     return true;
   }
 
-  if (card.type === "sub" && card.subAnswer !== "") {
+  if (problem.type === "sub" && problem.subAnswer !== "") {
     return true;
   }
 
@@ -74,10 +74,10 @@ export const isCardOnBeingWrited = (card: Card) => {
 };
 
 export async function createProblem(
-  card: Card,
+  problem: Problem,
   userId: string
 ): Promise<string> {
-  if (!card) {
+  if (!problem) {
     throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
   }
   try {
@@ -92,11 +92,11 @@ export async function createProblem(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          questionType: card.type,
-          question: card.question,
-          additionalView: card.additionalView,
-          candidates: card.candidates,
-          subjectiveAnswer: card.subAnswer,
+          questionType: problem.type,
+          question: problem.question,
+          additionalView: problem.additionalView,
+          candidates: problem.candidates,
+          subjectiveAnswer: problem.subAnswer,
           exam_user: {
             connect: [userId],
           },
@@ -116,13 +116,13 @@ export async function createProblem(
   }
 }
 
-export async function createImage(card: Card, postId: string) {
-  if (!card) {
+export async function createImage(problem: Problem, postId: string) {
+  if (!problem) {
     return;
   }
   try {
     const newFormData = new FormData();
-    newFormData.append("files", card.image as Blob);
+    newFormData.append("files", problem.image as Blob);
     newFormData.append("ref", "api::exam-problem.exam-problem");
     newFormData.append("refId", postId);
     newFormData.append("field", "image");
@@ -184,15 +184,15 @@ export async function createProblemSets(
 export async function postProblems(
   setName: string,
   userEmail: string,
-  cards: Card[]
+  problems: Problem[]
 ) {
   checkEnvVariables();
   const userId = (await getUser(userEmail)).id;
 
   // 각 카드에 대한 작업을 병렬로 수행
   const postIdArray = await Promise.all(
-    cards.map(async (card) => {
-      if (isCardEmpty(card)) throw new Error("문제가 비어있습니다.");
+    problems.map(async (card) => {
+      if (isProblemEmpty(card)) throw new Error("문제가 비어있습니다.");
 
       // 문제와 이미지 생성은 순차적으로 처리
       const postId = await createProblem(card, userId);
@@ -255,6 +255,7 @@ export async function getProblemSets(userEmail: string, page: string) {
         },
       },
     },
+    populate: ["exam_problems"],
     pagination: {
       page,
       pageSize: 10,
@@ -281,6 +282,8 @@ export async function getProblemSets(userEmail: string, page: string) {
     responseJson.data.forEach((problemSet) => {
       problemSet.updatedAt = problemSet.updatedAt.slice(0, 10);
       problemSet.createdAt = problemSet.createdAt.slice(0, 10);
+      problemSet.examProblemsCount = problemSet.exam_problems?.length;
+      delete problemSet.exam_problems;
     });
 
     return responseJson;
