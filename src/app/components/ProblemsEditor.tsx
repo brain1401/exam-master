@@ -17,7 +17,9 @@ export default function ProblemsEditor({
   problemCurrentIndex,
 }: Props) {
   const currentProblem = problems[problemCurrentIndex];
-  const [currentTab, setCurrentTab] = useState<"obj" | "sub">(currentProblem?.type ?? "obj");
+  const [currentTab, setCurrentTab] = useState<"obj" | "sub">(
+    currentProblem?.type ?? "obj"
+  );
 
   useLayoutEffect(() => {
     const prevProblem = problems?.[problemCurrentIndex - 1];
@@ -57,6 +59,10 @@ export default function ProblemsEditor({
       window.removeEventListener("beforeunload", preventClose);
     };
   }, []);
+
+  useEffect(() => {
+    console.log(problems);
+  }, [problems]);
 
   return (
     <section className="flex justify-center items-center">
@@ -112,20 +118,20 @@ export default function ProblemsEditor({
                 if (value === false) return;
               }
               setCurrentTab("sub");
-               setProblems((prev) => {
-                 const newProblems = [...prev];
-                 newProblems[problemCurrentIndex] = {
-                   type: "sub",
-                   question: "",
-                   additionalView: "",
-                   isAdditiondalViewButtonClicked: false,
-                   isImageButtonClicked: false,
-                   image: null,
-                   candidates: null,
-                   subAnswer: "",
-                 };
-                 return newProblems;
-               });
+              setProblems((prev) => {
+                const newProblems = [...prev];
+                newProblems[problemCurrentIndex] = {
+                  type: "sub",
+                  question: "",
+                  additionalView: "",
+                  isAdditiondalViewButtonClicked: false,
+                  isImageButtonClicked: false,
+                  image: null,
+                  candidates: null,
+                  subAnswer: "",
+                };
+                return newProblems;
+              });
             }}
             disabled={currentTab === "sub"}
           >
