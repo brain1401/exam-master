@@ -10,7 +10,7 @@ type Props = {
   setProblemSetsName: React.Dispatch<React.SetStateAction<string>>;
   setProblemCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 };
-export default function CreateProblemsOption({
+export default function EditProblemsOption({
   problems,
   setProblems,
   problemSetsName,

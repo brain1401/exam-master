@@ -1,6 +1,6 @@
 "use client";
 import ProblemsEditor from "../ProblemsEditor";
-import CreateProblemsOption from "./CreateProblemsOption";
+import EditProblemsOption from "./EditProblemsOption";
 import NextOrPrevButtons from "./NextOrPrevButtons";
 import CurrentCardIndicator from "./CurrentCardIndicator";
 import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
@@ -27,7 +27,7 @@ export default function CreateProblems() {
 
   return (
     <section className="p-3 mt-10 max-w-[70rem] mx-auto">
-      <CreateProblemsOption
+      <EditProblemsOption
         problems={problems}
         setProblems={setProblems}
         setProblemCurrentIndex={setProblemCurrentIndex}
