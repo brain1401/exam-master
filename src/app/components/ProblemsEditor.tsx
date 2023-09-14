@@ -17,7 +17,7 @@ export default function ProblemsEditor({
   problemCurrentIndex,
 }: Props) {
   const currentProblem = problems[problemCurrentIndex];
-  const [currentTab, setCurrentTab] = useState<"obj" | "sub">("obj");
+  const [currentTab, setCurrentTab] = useState<"obj" | "sub">(currentProblem?.type ?? "obj");
 
   useLayoutEffect(() => {
     const prevProblem = problems?.[problemCurrentIndex - 1];
@@ -39,7 +39,6 @@ export default function ProblemsEditor({
         return newCards;
       });
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problemCurrentIndex]);
 
