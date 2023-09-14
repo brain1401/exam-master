@@ -5,15 +5,19 @@ import { useEffect, useRef, useState } from "react";
 import Button from "./ui/Button";
 import { BsSearch } from "react-icons/bs";
 import axios from "axios";
+import { ClipLoader } from "react-spinners";
 
 export default function ProblemSetGrid() {
   const [problemSets, setProblemSets] = useState<ProblemSetResponse>();
+  const [loading, setLoading] = useState(true);
+
   const [page, setPage] = useState(1);
   const maxPage = useRef<number>(0);
 
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get("/api/getProblemSets", {
         params: {
@@ -25,8 +29,19 @@ export default function ProblemSetGrid() {
         maxPage.current = data.meta.pagination.pageCount;
         setProblemSets(data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => {
+        setLoading(false);
+      });
   }, [page]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader size={100} />
+      </div>
+    );
+  }
 
   return (
     <section className="p-4 md:p-8">
