@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { isCardEmpty } from "@/service/problems";
+import { isProblemEmpty } from "@/service/problems";
 import { useRouter } from "next/navigation";
 import { Problem } from "@/types/problems";
 
@@ -15,7 +15,7 @@ export default function CreateProblemsSubmitButton({problems, problemSetName, se
   const router = useRouter();
 
   const handleSubmit = async () => {
-    if (problems.some((problem) => isCardEmpty(problem))) {
+    if (problems.some((problem) => isProblemEmpty(problem))) {
       alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
       return;
     }
