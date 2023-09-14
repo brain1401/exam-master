@@ -19,10 +19,6 @@ export default function CreateProblems() {
   } = useProblems();
 
   useEffect(() => {
-    console.log(problems);
-  }, [problems]);
-
-  useEffect(() => {
     return () => {
       resetProblems();
     }
