@@ -1,4 +1,4 @@
-import { ProblemSetResponse, Problem } from "@/types/problems";
+import { ProblemSetResponse, Problem, ProblemSet } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
 
@@ -327,8 +327,8 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
     if (!response.ok)
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
 
-    const data = await response.json();
-    return data.data[0].exam_problems;
+    let data = await response.json();
+    return data.data[0] as ProblemSet;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");

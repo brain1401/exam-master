@@ -70,7 +70,7 @@ export default function ProblemSetGrid() {
         ))}
       </ul>
 
-      <div className="flex gap-3 justify-center mt-5">
+      <div className="flex gap-3 justify-center items-center mt-5">
         <Button
           className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base border-none"
           onClick={() => {
@@ -79,7 +79,9 @@ export default function ProblemSetGrid() {
         >
           이전
         </Button>
-
+        <span className="text-gray-500">
+          {page} / {maxPage.current}
+        </span>
         <Button
           className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 text-sm md:text-base border-none"
           onClick={() => {

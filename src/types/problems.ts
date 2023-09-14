@@ -27,19 +27,19 @@ export type ProblemSet = {
   updatedAt: string;
   UUID: string;
   exam_problems?: {
-    id: number
-    question: string
-    createdAt:string
-    updatedAt: string
-    questionType: string
-    uuid: string
+    id: number;
+    question: string;
+    createdAt: string;
+    updatedAt: string;
+    questionType: string;
+    uuid: string;
+    image: { id: string; url: string };
     candidates: candidate[] | null;
     additionalView: string;
     subjectiveAnswer: string | null;
   }[];
   examProblemsCount?: number;
 };
-
 
 export type ProblemSetResponse = {
   data: ProblemSet[];
@@ -52,3 +52,8 @@ export type ProblemSetResponse = {
     };
   };
 };
+
+export type manageProblemSet = {
+  name: string;
+  exam_problems: Problem[];
+}

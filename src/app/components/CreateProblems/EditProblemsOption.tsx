@@ -19,7 +19,9 @@ export default function EditProblemsOption({
 }: Props) {
   const [localProblemSetsName, setLocalProblemSetsName] =
     useState(problemSetsName);
-  const [cardsLength, setCardsLength] = useState("10");
+  const [cardsLength, setCardsLength] = useState(
+    problems.length.toString() ?? "10"
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCardLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {

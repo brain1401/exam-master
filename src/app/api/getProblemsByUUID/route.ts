@@ -1,5 +1,5 @@
 import { getProblemsSetByUUID } from "@/service/problems";
-import { Problem } from "@/types/problems";
+import { Problem, manageProblemSet } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,21 +12,31 @@ export async function GET(req: NextRequest) {
   const param = req.nextUrl.searchParams;
   const UUID = param.get("UUID");
 
-  const data:any[] = await getProblemsSetByUUID(
+  const data = await getProblemsSetByUUID(
     UUID ?? "",
     session?.user?.email ?? ""
   );
 
-  const result:Partial<Problem>[] = data.map( problem => ({
-    type : problem.questionType,
-    question : problem.question,
-    additionalView : problem.additionalView,
-    image : problem.image,
-    candidates : problem.candidates,
-    subAnswer : problem.subjectiveAnswer,
-    isAdditiondalViewButtonClicked : problem.additionalView ? true : false,
-    isImageButtonClicked : problem.image ? true : false,
-}))
-  
+  if (data.exam_problems === undefined)
+    return NextResponse.json(
+      { error: "문제집을 불러오는 중 오류가 발생했습니다." },
+      { status: 500 }
+    );
+  const result: manageProblemSet = {
+    name: data.name,
+    exam_problems: [
+      ...data.exam_problems.map((problem) => ({
+        type: problem.questionType as "obj" | "sub",
+        question: problem.question,
+        additionalView: problem.additionalView,
+        image: problem.image,
+        candidates: problem.candidates,
+        subAnswer: problem.subjectiveAnswer,
+        isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
+        isImageButtonClicked: problem.image ? true : false,
+      })),
+    ],
+  };
+
   return NextResponse.json(result);
 }

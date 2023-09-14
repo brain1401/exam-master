@@ -7,6 +7,7 @@ import CreateProblemsSubmitButton from "@/app/components/CreateProblems/CreatePr
 import CurrentCardIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import { ClipLoader } from "react-spinners";
 import useProblems from "@/hooks/problems";
+import EditProblemsOption from "@/app/components/CreateProblems/EditProblemsOption";
 type Props = {
   params: {
     UUID: string;
@@ -35,7 +36,8 @@ export default function EditProblemsByUUID({ params }: Props) {
         },
       })
       .then((res) => {
-        setProblems(res.data);
+        setProblems(res.data.exam_problems);
+        setProblemSetsName(res.data.name);
       })
       .catch((err) => {
         setError(err.message);
@@ -65,6 +67,13 @@ export default function EditProblemsByUUID({ params }: Props) {
 
   return (
     <section className="mt-10">
+      <EditProblemsOption
+        problems={problems}
+        setProblems={setProblems}
+        setProblemCurrentIndex={setProblemCurrentIndex}
+        problemSetsName={problemSetsName}
+        setProblemSetsName={setProblemSetsName}
+      />
       <CurrentCardIndicator
         problemCurrentIndex={problemCurrentIndex}
         problemsLength={problems.length}
