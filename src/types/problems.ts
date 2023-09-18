@@ -4,6 +4,7 @@ export type candidate = {
 };
 
 export type Problem = {
+  id?: number;
   type: "obj" | "sub";
   question: string;
   additionalView: string;
