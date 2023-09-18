@@ -6,7 +6,7 @@ type Props = {
   isAdditiondalViewButtonClicked: boolean;
   isImageButtonClicked: boolean;
   additionalView: string;
-  setImageURL: (url: string | null) => void;
+  setImageURL: React.Dispatch<React.SetStateAction<string | null>>;
   setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
   problemCurrentIndex: number;
   imageURL: string | null;
