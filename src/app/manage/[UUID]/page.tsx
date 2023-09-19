@@ -91,9 +91,6 @@ export default function EditProblemsByUUID({ params }: Props) {
       <ManageProblemSubmitButton
         problems={problems}
         problemSetName={problemSetsName}
-        setProblemSetsName={setProblemSetsName}
-        resetProblems={resetProblems}
-        UUID={params.UUID}
       />
     </section>
   );
