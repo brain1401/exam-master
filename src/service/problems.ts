@@ -533,11 +533,14 @@ export async function updateProblems(setName: string, problems: Problem[]) {
     if (!problem?.id) throw new Error("problem.id가 없습니다.");
 
     if (problem && problem?.image && isFileObject(problem?.image)) {
+      //image가 파일 타입인 경우
       const photoId = await getProblemPhotoIdByProblemId(problem.id.toString());
 
       if (photoId === "null") {
+        //기존에 이미지가 없는 경우
         await uploadImageToProblem(problem.image, problem.id.toString());
       } else {
+        //기존에 이미지가 있는 경우
         await deletePhoto(photoId.toString());
         await uploadImageToProblem(problem.image, problem.id.toString());
       }
