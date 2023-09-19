@@ -20,6 +20,7 @@ export default function SubjectiveTab({
     setProblems((prev) => {
       const newProblems: Partial<Problem>[] = [...prev];
       newProblems[problemCurrentIndex] = {
+        id: newProblems[problemCurrentIndex]?.id,
         ...newProblems[problemCurrentIndex],
         ...newCard,
       };

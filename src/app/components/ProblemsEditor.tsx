@@ -88,6 +88,7 @@ export default function ProblemsEditor({
               setProblems((prev) => {
                 const newProblems = [...prev];
                 newProblems[problemCurrentIndex] = {
+                  id: prev[problemCurrentIndex]?.id,
                   type: "obj",
                   question: "",
                   additionalView: "",
@@ -121,6 +122,7 @@ export default function ProblemsEditor({
               setProblems((prev) => {
                 const newProblems = [...prev];
                 newProblems[problemCurrentIndex] = {
+                  id: prev[problemCurrentIndex]?.id,
                   type: "sub",
                   question: "",
                   additionalView: "",

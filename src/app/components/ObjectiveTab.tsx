@@ -144,6 +144,7 @@ export default function ObjectiveTab({
     setProblems((prev) => {
       const newProblems = [...prev];
       newProblems[problemCurrentIndex] = {
+        id: prev[problemCurrentIndex]?.id,
         type: "obj",
         question: "",
         additionalView: "",
