@@ -7,6 +7,17 @@ export const checkEnvVariables = () => {
     throw new Error("환경 변수가 설정되지 않았습니다.");
   }
 };
+
+function isFileObject(image: any): image is File {
+  return (
+    image &&
+    typeof image === "object" &&
+    typeof image.name === "string" &&
+    typeof image.size === "number" &&
+    typeof image.type === "string" &&
+    typeof image.lastModified === "number"
+  );
+}
 export const isProblemEmpty = (problem: Problem) => {
   if (!problem) {
     return true;
@@ -116,15 +127,13 @@ export async function createProblem(
   }
 }
 
-export async function createImage(problem: Problem, postId: string) {
-  if (!problem) {
-    return;
-  }
+export async function uploadImageToProblem(image: File, problemId: string) {
+  if (!image) throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
   try {
     const newFormData = new FormData();
-    newFormData.append("files", problem.image as Blob);
+    newFormData.append("files", image as Blob);
     newFormData.append("ref", "api::exam-problem.exam-problem");
-    newFormData.append("refId", postId);
+    newFormData.append("refId", problemId);
     newFormData.append("field", "image");
 
     const response = await fetch(
@@ -191,13 +200,13 @@ export async function postProblems(
 
   // 각 카드에 대한 작업을 병렬로 수행
   const postIdArray = await Promise.all(
-    problems.map(async (card) => {
-      if (isProblemEmpty(card)) throw new Error("문제가 비어있습니다.");
+    problems.map(async (problem) => {
+      if (isProblemEmpty(problem)) throw new Error("문제가 비어있습니다.");
 
       // 문제와 이미지 생성은 순차적으로 처리
-      const postId = await createProblem(card, userId);
-      if (card?.image) {
-        await createImage(card, postId);
+      const postId = await createProblem(problem, userId);
+      if (problem?.image && isFileObject(problem?.image)) {
+        await uploadImageToProblem(problem.image, postId);
       }
 
       return postId;
@@ -333,4 +342,208 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
+}
+export async function getProblemsSetIdByUUID(uuid: string) {
+  const query = qs.stringify({
+    filters: {
+      UUID: {
+        $eq: uuid,
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      }
+    );
+
+    if (!response.ok)
+      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+
+    let data = await response.json();
+    return data.data[0].id;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+export async function getProblemByUUID(uuid: string, userEmail: string) {
+  const query = qs.stringify({
+    filters: {
+      UUID: {
+        $eq: uuid,
+      },
+      exam_user: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      }
+    );
+
+    if (!response.ok)
+      throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
+
+    let data = await response.json();
+    return data.data[0] as Problem;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getProblemById(id: string, userEmail: string) {
+  const query = qs.stringify({
+    filters: {
+      id: {
+        $eq: id,
+      },
+      exam_user: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      }
+    );
+
+    if (!response.ok)
+      throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
+
+    let data = await response.json();
+    return data.data[0] as Problem;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function updateProblem(id: string, problem: Problem) {
+  checkEnvVariables();
+
+  if (!problem) {
+    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        questionType: problem.type,
+        question: problem.question,
+        additionalView: problem.additionalView,
+        candidates: problem.candidates,
+        subjectiveAnswer: problem.subAnswer,
+      }),
+    }
+  );
+  if (!response.ok)
+    throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
+}
+
+export async function deletePhoto(id: string) {
+  checkEnvVariables();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload/files/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+      },
+    }
+  );
+  if (!response.ok)
+    throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
+}
+
+export async function updatePhoto(image: File) {}
+
+export async function getProblemPhotoIdByProblemId(id: string) {
+  const query = qs.stringify({
+    filters: {
+      id: {
+        $eq: id,
+      },
+    },
+    populate: ["image"],
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      }
+    );
+    if (!response.ok)
+      throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
+
+    const data = await response.json();
+    const imageId = data?.data?.[0]?.image?.id;
+    const result = imageId ?? "null";
+    return result as string;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+export async function updateProblems(setName: string, problems: Problem[]) {
+  checkEnvVariables();
+
+  console.log("problems", problems);
+  console.log("setName", setName);
+
+  for (const problem of problems) {
+    if (!problem?.id) throw new Error("problem.id가 없습니다.");
+
+    if (problem && problem?.image && isFileObject(problem?.image)) {
+      const photoId = await getProblemPhotoIdByProblemId(problem.id.toString());
+
+      if (photoId === "null") {
+        await uploadImageToProblem(problem.image, problem.id.toString());
+      } else {
+        await deletePhoto(photoId.toString());
+        await uploadImageToProblem(problem.image, problem.id.toString());
+      }
+    }
+    await updateProblem(problem.id.toString(), problem);
+  }
+
+  return true;
 }
