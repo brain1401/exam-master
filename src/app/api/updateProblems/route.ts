@@ -18,10 +18,15 @@ export async function POST(req: NextRequest) {
 
   const intermediateResults: NonNullable<Problem>[] = [];
   let problemSetName: string | undefined;
+  let uuid: string | undefined;
 
   for (const [name, value] of entries) {
     if (name === "problemSetName") {
       problemSetName = value as string;
+      continue;
+    }
+    if (name === "uuid") {
+      uuid = value as string;
       continue;
     }
 
@@ -46,7 +51,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  if (!problemSetName || !intermediateResults ) {
+  if (!problemSetName || !intermediateResults || !uuid) {
     return NextResponse.json(
       { error: "문제를 생성하는 중 오류가 발생했습니다." },
       { status: 500 }
@@ -56,6 +61,7 @@ export async function POST(req: NextRequest) {
   const result = await updateProblems(
     problemSetName,
     intermediateResults,
+    uuid,
   );
 
   return NextResponse.json(result ? "OK" : "NO", { status: 200 });

@@ -523,7 +523,28 @@ export async function getProblemPhotoIdByProblemId(id: string) {
     throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
   }
 }
-export async function updateProblems(setName: string, problems: Problem[]) {
+
+export async function updateProblemSetName(name: string, uuid: string) {
+  checkEnvVariables();
+  const problemSetId = await getProblemsSetIdByUUID(uuid);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets/${problemSetId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name,
+      }),
+    }
+  );
+  if (!response.ok)
+    throw new Error("문제집 이름을 수정하는 중 오류가 발생했습니다.");
+
+}
+export async function updateProblems(setName: string, problems: Problem[], uuid: string) {
   checkEnvVariables();
 
   console.log("problems", problems);
@@ -546,6 +567,7 @@ export async function updateProblems(setName: string, problems: Problem[]) {
       }
     }
     await updateProblem(problem.id.toString(), problem);
+    await updateProblemSetName(setName, uuid);
   }
 
   return true;

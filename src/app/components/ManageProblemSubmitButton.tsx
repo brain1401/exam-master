@@ -6,10 +6,12 @@ import { Problem } from "@/types/problems";
 type Props = {
   problems: Problem[];
   problemSetName: string;
+  uuid: string;
 };
 export default function ManageProblemSubmitButton({
   problems,
   problemSetName,
+  uuid
 }: Props) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +36,7 @@ export default function ManageProblemSubmitButton({
       formData.append(`data[${index}]`, JSON.stringify(problem));
     });
     formData.append("problemSetName", problemSetName);
-
+    formData.append("uuid", uuid);
     try {
       const response = await fetch("/api/updateProblems", {
         method: "POST",
