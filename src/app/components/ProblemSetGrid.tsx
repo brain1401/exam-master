@@ -9,11 +9,12 @@ import LeftRightButton from "./ui/LeftRightButton";
 
 export default function ProblemSetGrid() {
   const [problemSets, setProblemSets] = useState<ProblemSetResponse>();
+  const [filteredProblemSets, setFilteredProblemSets] = useState<ProblemSet[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
-
   const [page, setPage] = useState(1);
   const maxPage = useRef<number>(0);
-
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
@@ -35,6 +36,15 @@ export default function ProblemSetGrid() {
       });
   }, [page]);
 
+  useEffect(() => {
+    if (!problemSets) return;
+    setFilteredProblemSets(
+      problemSets.data.filter((problemSet) =>
+        problemSet.name.includes(searchString)
+      )
+    );
+  }, [problemSets, searchString]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -51,14 +61,24 @@ export default function ProblemSetGrid() {
       />
 
       <ul className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5  gap-4 w-full mx-auto">
-        {problemSets?.data.map((problemSet: ProblemSet) => (
-          <li key={problemSet.UUID} className="flex justify-center">
-            <ProblemSetCard problemSet={problemSet} />
-          </li>
-        ))}
+        {filteredProblemSets.length === 0
+          ? problemSets?.data.map((problemSet: ProblemSet) => (
+              <li key={problemSet.UUID} className="flex justify-center">
+                <ProblemSetCard problemSet={problemSet} />
+              </li>
+            ))
+          : filteredProblemSets.map((problemSet: ProblemSet) => (
+              <li key={problemSet.UUID} className="flex justify-center">
+                <ProblemSetCard problemSet={problemSet} />
+              </li>
+            ))}
       </ul>
 
-      <LeftRightButton page={page} setPage={setPage} maxPage={maxPage.current} />
+      <LeftRightButton
+        page={page}
+        setPage={setPage}
+        maxPage={maxPage.current}
+      />
     </section>
   );
 }
