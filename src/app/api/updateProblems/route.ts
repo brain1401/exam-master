@@ -12,6 +12,12 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
   }
+  if(!session?.user?.email)
+    return NextResponse.json(
+      { error: "로그인이 필요합니다." },
+      { status: 401 }
+    );
+    
 
   const formData = await req.formData();
   const entries = Array.from(formData.entries());
@@ -63,7 +69,7 @@ export async function POST(req: NextRequest) {
     problemSetName,
     intermediateResults,
     problemSetUUID,
-    session?.user?.email ?? ""
+    session?.user?.email
   );
 
   return NextResponse.json(result ? "OK" : "NO", { status: 200 });
