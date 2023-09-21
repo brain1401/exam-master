@@ -12,9 +12,16 @@ export async function GET(req: NextRequest) {
   const param = req.nextUrl.searchParams;
   const UUID = param.get("UUID");
 
+  if (!UUID || !session?.user?.email)
+    return NextResponse.json(
+      { error: "api 사용법을 확인해주세요" },
+      { status: 400 }
+    );
+
+
   const data = await getProblemsSetByUUID(
-    UUID ?? "",
-    session?.user?.email ?? ""
+    UUID,
+    session?.user?.email
   );
 
   if (data.exam_problems === undefined)

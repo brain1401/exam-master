@@ -15,7 +15,12 @@ export async function GET(req: NextRequest) {
   const name = params.get("name");
   const userEmail = session?.user?.email ?? "";
 
-  const result = await checkProblemSetName(name ?? "", userEmail);
+  if (!name)
+    return NextResponse.json(
+      { error: "api 사용법을 확인해주세요" },
+      { status: 400 }
+    );
+  const result = await checkProblemSetName(name, userEmail);
 
   return NextResponse.json(result);
 }

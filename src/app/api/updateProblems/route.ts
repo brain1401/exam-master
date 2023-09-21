@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { Problem } from "@/types/problems";
-import { postProblems, updateProblems } from "@/service/problems";
+import { updateProblems, validateProblemSetUUID } from "@/service/problems";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession();
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   const intermediateResults: NonNullable<Problem>[] = [];
   let problemSetName: string | undefined;
-  let uuid: string | undefined;
+  let problemSetUUID: string | undefined;
 
   for (const [name, value] of entries) {
     if (name === "problemSetName") {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       continue;
     }
     if (name === "uuid") {
-      uuid = value as string;
+      problemSetUUID = value as string;
       continue;
     }
 
@@ -51,17 +51,19 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  if (!problemSetName || !intermediateResults || !uuid) {
+  if (!problemSetName || !intermediateResults || !problemSetUUID) {
     return NextResponse.json(
       { error: "문제를 생성하는 중 오류가 발생했습니다." },
       { status: 500 }
     );
   }
+
   
   const result = await updateProblems(
     problemSetName,
     intermediateResults,
-    uuid,
+    problemSetUUID,
+    session?.user?.email ?? ""
   );
 
   return NextResponse.json(result ? "OK" : "NO", { status: 200 });

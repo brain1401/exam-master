@@ -13,6 +13,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (!session?.user?.email)
+    return NextResponse.json(
+      { error: "로그인이 필요합니다." },
+      { status: 401 }
+    );
+
   const formData = await req.formData();
   const entries = Array.from(formData.entries());
 
@@ -46,9 +52,16 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  if(!problemSetName || !intermediateResults) {
+    return NextResponse.json(
+      { error: "FormData가 정상적인지 확인하십시오." },
+      { status: 500 }
+    );
+  }
+
   const response = await postProblems(
-    problemSetName ?? "",
-    session?.user?.email ?? "",
+    problemSetName,
+    session?.user?.email,
     intermediateResults
   );
 
