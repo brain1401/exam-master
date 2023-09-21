@@ -566,6 +566,15 @@ export async function updateProblems(setName: string, problems: Problem[], uuid:
         await uploadImageToProblem(problem.image, problem.id.toString());
       }
     }
+    else if(problem && problem?.image === null){
+      //image가 null인 경우
+      const photoId = await getProblemPhotoIdByProblemId(problem.id.toString());
+      if (photoId !== "null") {
+        //기존에 이미지가 있는 경우
+        await deletePhoto(photoId.toString());
+      }
+    }
+    
     await updateProblem(problem.id.toString(), problem);
     await updateProblemSetName(setName, uuid);
   }
