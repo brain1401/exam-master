@@ -7,7 +7,10 @@ import { ClipLoader } from "react-spinners";
 import SearchBox from "./ui/SearchBox";
 import LeftRightButton from "./ui/LeftRightButton";
 
-export default function ProblemSetGrid() {
+type Props = {
+  type: "manage" | "exam";
+};
+export default function ProblemSetGrid({ type }: Props) {
   const [problemSets, setProblemSets] = useState<ProblemSetResponse>();
   const [filteredProblemSets, setFilteredProblemSets] = useState<ProblemSet[]>(
     []
@@ -64,12 +67,12 @@ export default function ProblemSetGrid() {
         {filteredProblemSets.length === 0
           ? problemSets?.data.map((problemSet: ProblemSet) => (
               <li key={problemSet.UUID} className="flex justify-center">
-                <ProblemSetCard problemSet={problemSet} />
+                <ProblemSetCard problemSet={problemSet} type={type} />
               </li>
             ))
           : filteredProblemSets.map((problemSet: ProblemSet) => (
               <li key={problemSet.UUID} className="flex justify-center">
-                <ProblemSetCard problemSet={problemSet} />
+                <ProblemSetCard problemSet={problemSet} type={type} />
               </li>
             ))}
       </ul>
