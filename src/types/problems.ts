@@ -54,7 +54,7 @@ export type ProblemSetResponse = {
   };
 };
 
-export type manageProblemSet = {
+export type ProblemSetWithName = {
   name: string;
   exam_problems: Problem[];
 }

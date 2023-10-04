@@ -1,5 +1,5 @@
 import { getProblemsSetByUUID } from "@/service/problems";
-import { manageProblemSet } from "@/types/problems";
+import { ProblemSetWithName } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       { error: "문제집을 불러오는 중 오류가 발생했습니다." },
       { status: 500 }
     );
-  const result: manageProblemSet = {
+  const result: ProblemSetWithName = {
     name: data.name,
     exam_problems: [
       ...data.exam_problems.map((problem) => ({
