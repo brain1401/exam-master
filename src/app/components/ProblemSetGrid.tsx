@@ -14,7 +14,6 @@ type Props = {
 export default function ProblemSetGrid({ type }: Props) {
   const [problemSets, setProblemSets] = useState<ProblemSetResponse>();
   const [loading, setLoading] = useState(true);
-  const [isPageResetting, setIsPageResetting] = useState(false);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
 
@@ -45,7 +44,7 @@ export default function ProblemSetGrid({ type }: Props) {
         })
         .then((res) => {
           const data: ProblemSetResponse = res.data;
-          setMaxPage(data.meta.pagination.pageCount);
+          setMaxPage(data.meta.pagination.pageCount || 1);
           setProblemSets(data);
         })
         .catch((err) => console.error(err))
@@ -86,13 +85,19 @@ export default function ProblemSetGrid({ type }: Props) {
         setSearchString={setSearchString}
       />
 
-      <ul className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5  gap-4 w-full mx-auto">
-        {problemSets?.data.map((problemSet: ProblemSet) => (
-          <li key={problemSet.UUID}>
-            <ProblemSetCard problemSet={problemSet} type={type} />
-          </li>
-        ))}
-      </ul>
+      {problemSets?.data.length && problemSets?.data.length > 0 ? (
+        <ul className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5  gap-4 w-full mx-auto">
+          {problemSets?.data.map((problemSet: ProblemSet) => (
+            <li key={problemSet.UUID}>
+              <ProblemSetCard problemSet={problemSet} type={type} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="flex justify-center items-center h-64">
+          <p className="text-center text-lg">해당하는 문제집을 찾을 수 없습니다!</p>
+        </div>
+      )}
 
       <LeftRightButton page={page} setPage={setPage} maxPage={maxPage} />
     </section>
