@@ -21,6 +21,20 @@ export type Problem = {
   subAnswer: string | null;
 } | null;
 
+export type ExamProblem = {
+  id?: number;
+  type: "obj" | "sub";
+  question: string;
+  additionalView: string;
+  image: {
+    id: string;
+    url: string;
+  } | null;
+  candidates: 
+  candidate[] | null;
+  subAnswer: string | null;
+};
+
 export type ProblemSet = {
   id: string;
   name: string;
@@ -57,4 +71,9 @@ export type ProblemSetResponse = {
 export type ProblemSetWithName = {
   name: string;
   exam_problems: Problem[];
-}
+};
+
+export type ExamProblemSet = {
+  name: string;
+  exam_problems: ExamProblem[];
+};

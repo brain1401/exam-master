@@ -3,6 +3,7 @@
 import { Problem, ProblemSetWithName } from "@/types/problems";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { ClipLoader } from "react-spinners";
 type Props = {
   params: {
     UUID: string;
@@ -16,7 +17,7 @@ export default function DetailedExamPage({ params: { UUID } }: Props) {
 
   useEffect(() => {
     axios
-      .get(`/api/getProblemsByUUID`, {
+      .get(`/api/getExamProblemsByProblemSetUUID`, {
         params: {
           UUID,
         },
@@ -41,20 +42,22 @@ export default function DetailedExamPage({ params: { UUID } }: Props) {
   }, [problems]);
 
   if (error) return <div>에러가 발생했습니다.</div>;
-  if (loading) return <div>로딩중...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen">
+      <ClipLoader size={100} />
+    </div>
+  );
 
   return (
-    <section>
+    <section className="mt-10 p-3 max-w-[80rem] mx-auto">
       <div>DetailExamPage</div>
       <ul>
-        {problems?.exam_problems && problems?.exam_problems.map((problem: Problem) => 
-          (
+        {problems?.exam_problems &&
+          problems?.exam_problems.map((problem: Problem) => (
             <li key={problem?.id}>
               <div>{problem?.question}</div>
             </li>
-          
           ))}
-
       </ul>
     </section>
   );

@@ -17,7 +17,8 @@ export default function ProblemSetGrid({ type }: Props) {
   );
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const maxPage = useRef<number>(0);
+  const [maxPage, setMaxPage] = useState(1);
+
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function ProblemSetGrid({ type }: Props) {
       })
       .then((res) => {
         const data: ProblemSetResponse = res.data;
-        maxPage.current = data.meta.pagination.pageCount;
+        setMaxPage(data.meta.pagination.pageCount);
         setProblemSets(data);
       })
       .catch((err) => console.error(err))
@@ -64,24 +65,26 @@ export default function ProblemSetGrid({ type }: Props) {
       />
 
       <ul className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5  gap-4 w-full mx-auto">
-        {filteredProblemSets.length === 0
-          ? problemSets?.data.map((problemSet: ProblemSet) => (
+        {filteredProblemSets.length === 0 ? (
+          searchString.length !== 0 ? (
+            <li>결과가 없습니다.</li>
+          ) : (
+            problemSets?.data.map((problemSet: ProblemSet) => (
               <li key={problemSet.UUID} className="flex justify-center">
                 <ProblemSetCard problemSet={problemSet} type={type} />
               </li>
             ))
-          : filteredProblemSets.map((problemSet: ProblemSet) => (
-              <li key={problemSet.UUID} className="flex justify-center">
-                <ProblemSetCard problemSet={problemSet} type={type} />
-              </li>
-            ))}
+          )
+        ) : (
+          filteredProblemSets.map((problemSet: ProblemSet) => (
+            <li key={problemSet.UUID} className="flex justify-center">
+              <ProblemSetCard problemSet={problemSet} type={type} />
+            </li>
+          ))
+        )}
       </ul>
 
-      <LeftRightButton
-        page={page}
-        setPage={setPage}
-        maxPage={maxPage.current}
-      />
+      <LeftRightButton page={page} setPage={setPage} maxPage={maxPage} />
     </section>
   );
 }
