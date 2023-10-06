@@ -21,51 +21,55 @@ export default function ProblemSetGrid({ type }: Props) {
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 
+  const [isSearching, setIsSearching] = useState(false);
+
   useEffect(() => {
-    if (isPageResetting === false) {
-      if (debouncedSearchString.length === 0) {
-        axios
-          .get("/api/getProblemSets", {
-            params: {
-              page,
-            },
-          })
-          .then((res) => {
-            const data: ProblemSetResponse = res.data;
-            setMaxPage(data.meta.pagination.pageCount);
-            setProblemSets(data);
-          })
-          .catch((err) => console.error(err))
-          .finally(() => {
-            setLoading(false);
-          });
-      } else {
-        if (page > 1) {
-          setPage(1);
-          setIsPageResetting(true);
-        }
-        axios
-          .get("/api/getProblemSetsByName", {
-            params: {
-              name: debouncedSearchString.trim(),
-              page,
-            },
-          })
-          .then((res) => {
-            const data: ProblemSetResponse = res.data;
-            setMaxPage(data.meta.pagination.pageCount);
-            setProblemSets(data);
-          })
-          .catch((err) => console.error(err))
-          .finally(() => {
-            setLoading(false);
-          });
-      }
+    if (debouncedSearchString.length > 0) {
+      setPage(1);
+      setIsSearching(true);
     } else {
-      setIsPageResetting(false);
+      setPage(1);
+      setIsSearching(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, debouncedSearchString]);
+  }, [debouncedSearchString]);
+
+  useEffect(() => {
+    if (isSearching) {
+      if (debouncedSearchString.trim().length === 0) return;
+      axios
+        .get("/api/getProblemSetsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page,
+          },
+        })
+        .then((res) => {
+          const data: ProblemSetResponse = res.data;
+          setMaxPage(data.meta.pagination.pageCount);
+          setProblemSets(data);
+        })
+        .catch((err) => console.error(err))
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      axios
+        .get("/api/getProblemSets", {
+          params: {
+            page,
+          },
+        })
+        .then((res) => {
+          const data: ProblemSetResponse = res.data;
+          setMaxPage(data.meta.pagination.pageCount);
+          setProblemSets(data);
+        })
+        .catch((err) => console.error(err))
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [page, isSearching, debouncedSearchString]);
 
   if (loading) {
     return (
