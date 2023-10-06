@@ -302,6 +302,57 @@ export async function getProblemSets(userEmail: string, page: string) {
   }
 }
 
+export async function getProblemSetsByName(userEmail: string, name:string, page:string) {
+  const query = qs.stringify({
+    filters: {
+      name: {
+        $contains: name,
+      },
+      exam_user: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+    populate: ["exam_problems"],
+    pagination: {
+      page,
+      pageSize: 10,
+    },
+    sort: "updatedAt:desc",
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok)
+      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+
+    let responseJson: ProblemSetResponse = await response.json();
+    responseJson.data.forEach((problemSet) => {
+      problemSet.updatedAt = problemSet.updatedAt.slice(0, 10);
+      problemSet.createdAt = problemSet.createdAt.slice(0, 10);
+      problemSet.examProblemsCount = problemSet.exam_problems?.length;
+      delete problemSet.exam_problems;
+    });
+
+    return responseJson;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+
+}
+
 export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
   // filter 조건에 userEmail을 추가해서 해당 유저의 문제집만 가져오도록 했음
   const query = qs.stringify({
