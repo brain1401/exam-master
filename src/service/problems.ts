@@ -619,7 +619,7 @@ export async function updateProblems(
     userEmail
   );
   if (validatePrtoblemSetUUIDResult === "NO")
-    throw new Error("유효하지 않은 문제집입니다.");
+    throw new Error("다른 사용자의 문제집은 수정할 수 없습니다.");
 
   //문제집 이름 수정
   await updateProblemSetName(setName, problemSetUUID);
