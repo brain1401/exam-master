@@ -1,6 +1,7 @@
 import { ProblemSetResponse, Problem, ProblemSet } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
+import { link } from "fs";
 
 export const checkEnvVariables = () => {
   if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
@@ -302,7 +303,11 @@ export async function getProblemSets(userEmail: string, page: string) {
   }
 }
 
-export async function getProblemSetsByName(userEmail: string, name:string, page:string) {
+export async function getProblemSetsByName(
+  userEmail: string,
+  name: string,
+  page: string
+) {
   const query = qs.stringify({
     filters: {
       name: {
@@ -350,7 +355,6 @@ export async function getProblemSetsByName(userEmail: string, name:string, page:
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
-
 }
 
 export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
@@ -390,8 +394,6 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
 
     let data = await response.json();
     return data.data[0] as ProblemSet;
-
-    
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
@@ -612,16 +614,40 @@ export async function updateProblems(
   console.log("problems", problems);
   console.log("setName", setName);
 
+  const validatePrtoblemSetUUIDResult = await validateProblemSetUUID(
+    problemSetUUID,
+    userEmail
+  );
+  if (validatePrtoblemSetUUIDResult === "NO")
+    throw new Error("유효하지 않은 문제집입니다.");
+
+  //문제집 이름 수정
+  await updateProblemSetName(setName, problemSetUUID);
+
   try {
     for (const problem of problems) {
-      if (!problem?.id) throw new Error("problem.id가 없습니다.");
+      if (!problem?.id) {
+        if (problem) {
+          problem.id = Number(
+            await createProblem(problem, (await getUser(userEmail)).id)
+          );
+        }
 
-      const validateProblemIdResult = await validateProblemId(
-        problem.id.toString(),
-        userEmail
-      );
-      if (validateProblemIdResult === "NO")
-        throw new Error("유효하지 않은 문제입니다.");
+        if (problem?.id) {
+          if (problem?.image && isFileObject(problem?.image)) {
+            await uploadImageToProblem(problem.image, problem.id.toString());
+          }
+          await linkProblemToProblemSet(
+            problem.id.toString(),
+            (await getProblemsSetIdByUUID(problemSetUUID)).toString()
+          );
+          continue;
+        }
+      }
+
+      if (!problem?.id) {
+        throw new Error("문제를 수정하는 중 오류가 발생했습니다.");
+      }
 
       if (problem && problem?.image && isFileObject(problem?.image)) {
         //image가 파일 타입인 경우
@@ -648,15 +674,8 @@ export async function updateProblems(
         }
       }
 
-      const validatePrtoblemSetUUIDResult = await validateProblemSetUUID(
-        problemSetUUID,
-        userEmail
-      );
-      if (validatePrtoblemSetUUIDResult === "NO")
-        throw new Error("유효하지 않은 문제집입니다.");
-
+      //이미지를 제외한 나머지 문제 정보 수정
       await updateProblem(problem.id.toString(), problem);
-      await updateProblemSetName(setName, problemSetUUID);
     }
   } catch (err) {
     console.log(err);
@@ -741,4 +760,28 @@ export async function validateProblemId(problemId: string, userEmail: string) {
     console.log(err);
     throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
   }
+}
+export async function linkProblemToProblemSet(
+  problemId: string,
+  problemSetId: string
+) {
+  checkEnvVariables();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems/${problemId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        exam_problem_sets: {
+          connect: [problemSetId],
+        },
+      }),
+    }
+  );
+  if (!response.ok)
+    throw new Error("문제를 문제집에 연결하는 중 오류가 발생했습니다.");
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { Problem } from "@/types/problems";
-import { updateProblems, validateProblemSetUUID } from "@/service/problems";
+import { updateProblems } from "@/service/problems";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession();
