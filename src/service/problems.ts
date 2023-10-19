@@ -182,12 +182,12 @@ export async function createProblemSets(
       }
     );
     if (!response.ok)
-      throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
+      throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
 
     return response.statusText;
   } catch (err) {
     console.log(err);
-    throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
+    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
   }
 }
 
