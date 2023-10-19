@@ -5,6 +5,7 @@ import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
+import usePreventClose from "@/hooks/preventClose";
 
 type Props = {
   problems: Problem[];
@@ -44,21 +45,7 @@ export default function ProblemsEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problemCurrentIndex]);
 
-  useEffect(() => {
-    //페이지를 닫거나 새로고침을 할 때 경고창을 띄우는 이벤트 리스너 등록 및 해제
-    function preventClose(e: BeforeUnloadEvent) {
-      e.preventDefault();
-      e.returnValue = ""; //Chrome에서 동작하도록; deprecated
-    }
-
-    (() => {
-      window.addEventListener("beforeunload", preventClose);
-    })();
-
-    return () => {
-      window.removeEventListener("beforeunload", preventClose);
-    };
-  }, []);
+  usePreventClose();
 
   useEffect(() => {
     console.log(problems);
