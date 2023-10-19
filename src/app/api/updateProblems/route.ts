@@ -12,12 +12,11 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
   }
-  if(!session?.user?.email)
+  if (!session?.user?.email)
     return NextResponse.json(
       { error: "로그인이 필요합니다." },
       { status: 401 }
     );
-    
 
   const formData = await req.formData();
   const entries = Array.from(formData.entries());
@@ -64,7 +63,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  
   const result = await updateProblems(
     problemSetName,
     intermediateResults,
@@ -72,5 +70,8 @@ export async function POST(req: NextRequest) {
     session?.user?.email
   );
 
-  return NextResponse.json(result ? "OK" : "NO", { status: 200 });
+  return NextResponse.json(
+    result ? "OK" : "NO",
+    result ? { status: 200 } : { status: 500 }
+  );
 }
