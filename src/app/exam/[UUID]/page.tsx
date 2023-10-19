@@ -23,7 +23,6 @@ export default function DetailedExamPage({ params: { UUID } }: Props) {
         },
       })
       .then((res) => {
-        console.log(res.data)
         setProblems({
           name: res.data.name,
           exam_problems: res.data.exam_problems,
