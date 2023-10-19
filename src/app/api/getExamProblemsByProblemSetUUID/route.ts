@@ -1,5 +1,5 @@
 import { getProblemsSetByUUID } from "@/service/problems";
-import { ExamProblemSet, ProblemSetWithName } from "@/types/problems";
+import { ExamProblemSet } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -1,4 +1,4 @@
-import { getProblemSets, getProblemSetsByName } from "@/service/problems";
+import { getProblemSetsByName } from "@/service/problems";
 import { getServerSession } from "next-auth";
 import { NextResponse, NextRequest } from "next/server";
 
