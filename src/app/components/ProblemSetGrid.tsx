@@ -33,6 +33,8 @@ export default function ProblemSetGrid({ type }: Props) {
   }, [debouncedSearchString]);
 
   useEffect(() => {
+    setLoading(true);
+
     if (isSearching) {
       if (debouncedSearchString.trim().length === 0) return;
       axios
@@ -70,14 +72,6 @@ export default function ProblemSetGrid({ type }: Props) {
     }
   }, [page, isSearching, debouncedSearchString]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <ClipLoader size={100} />
-      </div>
-    );
-  }
-
   return (
     <section className="p-4 md:p-8">
       <SearchBox
@@ -85,17 +79,25 @@ export default function ProblemSetGrid({ type }: Props) {
         setSearchString={setSearchString}
       />
 
-      {problemSets?.data.length && problemSets?.data.length > 0 ? (
-        <ul className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5  gap-4 w-full mx-auto">
-          {problemSets?.data.map((problemSet: ProblemSet) => (
-            <li key={problemSet.UUID}>
-              <ProblemSetCard problemSet={problemSet} type={type} />
-            </li>
-          ))}
-        </ul>
+      {!loading ? (
+        problemSets?.data.length && problemSets?.data.length > 0 ? (
+          <ul className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5  gap-4 w-full mx-auto">
+            {problemSets?.data.map((problemSet: ProblemSet) => (
+              <li key={problemSet.UUID}>
+                <ProblemSetCard problemSet={problemSet} type={type} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="flex justify-center items-center h-64">
+            <p className="text-center text-lg">
+              해당하는 문제집을 찾을 수 없습니다!
+            </p>
+          </div>
+        )
       ) : (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-center text-lg">해당하는 문제집을 찾을 수 없습니다!</p>
+        <div className="flex w-full justify-center items-center h-screen">
+          <ClipLoader size={100} />
         </div>
       )}
 
