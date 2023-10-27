@@ -1,7 +1,7 @@
 "use client";
 import usePreventClose from "@/hooks/preventClose";
 import { ProblemSetWithName } from "@/types/problems";
-import { arrayShuffle } from "@/utils/arrayShuffle";
+import { problemShuffle } from "@/utils/problemShuffle";
 import { useState, useEffect } from "react";
 import Button from "./ui/Button";
 import candidateNumber from "@/utils/candidateNumber";
@@ -15,7 +15,7 @@ export default function ExamProblems({ problems }: Props) {
   const [shuffledExamProblems, setShuffledExamProblems] =
     useState<ProblemSetWithName>({
       name,
-      exam_problems: arrayShuffle(exam_problems),
+      exam_problems: problemShuffle(exam_problems),
     });
 
   const { exam_problems: shuffledExamProblemsArray } = shuffledExamProblems;
