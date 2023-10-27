@@ -5,6 +5,7 @@ import { problemShuffle } from "@/utils/problemShuffle";
 import { useState, useEffect } from "react";
 import Button from "./ui/Button";
 import candidateNumber from "@/utils/candidateNumber";
+import Image from "next/image";
 
 type Props = {
   problems: ProblemSetWithName;
@@ -47,6 +48,14 @@ export default function ExamProblems({ problems }: Props) {
             {currentShuffledExamProblem.additionalView}
           </div>
         )}
+
+        {
+          currentShuffledExamProblem.image && typeof currentShuffledExamProblem.image === "object" && (
+            <div className="mb-5">
+              <Image src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${currentShuffledExamProblem.image?.url}`} width={400} height={400} alt="이미지" />
+            </div>
+          )
+        }
 
         {currentShuffledExamProblem.type === "obj" && (
           <>
