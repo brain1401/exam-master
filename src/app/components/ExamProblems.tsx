@@ -4,6 +4,7 @@ import { ProblemSetWithName } from "@/types/problems";
 import { arrayShuffle } from "@/utils/arrayShuffle";
 import { useState, useEffect } from "react";
 import Button from "./ui/Button";
+import candidateNumber from "@/utils/candidateNumber";
 
 type Props = {
   problems: ProblemSetWithName;
@@ -35,11 +36,17 @@ export default function ExamProblems({ problems }: Props) {
     <section>
       <div>문제집 이름 : {name}</div>
 
-      <div className="border border-black rounded-lg p-3">
+      <div className="bg-slate-200 rounded-lg p-3">
         <div className="text-2xl mb-5">
           <span>Q{currentProblemIndex + 1}. </span>
           {currentShuffledExamProblem.question}
         </div>
+
+        {currentShuffledExamProblem.additionalView && (
+          <div className="mb-5 border border-black p-3">
+            {currentShuffledExamProblem.additionalView}
+          </div>
+        )}
 
         {currentShuffledExamProblem.type === "obj" && (
           <>
@@ -49,8 +56,7 @@ export default function ExamProblems({ problems }: Props) {
                   {currentShuffledExamProblem.candidates?.map(
                     (candidate, i) => (
                       <li key={i}>
-                        <span>{i + 1}. </span>
-                        {candidate.text}
+                        {`${candidateNumber(i + 1)} ${candidate.text}`}
                       </li>
                     )
                   )}
@@ -70,7 +76,7 @@ export default function ExamProblems({ problems }: Props) {
         )}
       </div>
 
-      <div className="flex gap-4">
+      <div className="mt-2 flex gap-4">
         <Button
           onClick={() => {
             currentProblemIndex > 0 &&
