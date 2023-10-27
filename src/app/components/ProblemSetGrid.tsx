@@ -96,7 +96,7 @@ export default function ProblemSetGrid({ type }: Props) {
           </div>
         )
       ) : (
-        <div className="flex w-full justify-center items-center h-screen">
+        <div className="flex w-full justify-center items-center">
           <ClipLoader size={100} />
         </div>
       )}
