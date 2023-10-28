@@ -8,6 +8,7 @@ export type Problem = {
   type: "obj" | "sub";
   question: string;
   additionalView: string;
+  isAnswerMultiple: boolean | null;
   image:
     | File
     | {

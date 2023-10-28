@@ -151,6 +151,7 @@ export default function ObjectiveTab({
         isAdditiondalViewButtonClicked: false,
         isImageButtonClicked: false,
         image: null,
+        isAnswerMultiple: false,
         candidates: Array<candidate>(4).fill({ text: "", isAnswer: false }),
         subAnswer: null,
       };
@@ -220,18 +221,38 @@ export default function ObjectiveTab({
       />
 
       <div className="flex justify-end items-center space-x-2">
-        <SimpleLabel htmlFor="answer">선택지 수</SimpleLabel>
-        <select
-          value={selectedValue}
-          onChange={handleSelectedChange}
-          className="h-10 border border-gray-300 rounded-md p-2"
-        >
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-        </select>
+        <div>
+          <SimpleLabel>복수정답</SimpleLabel>
+          <input
+            type="checkbox"
+            checked={currentProblem?.isAnswerMultiple ?? false}
+            onChange={(e) => {
+              setProblems((prev) => {
+                const newProblems: Partial<Problem>[] = [...prev];
+                newProblems[problemCurrentIndex] = {
+                  ...newProblems[problemCurrentIndex],
+                  isAnswerMultiple: e.target.checked,
+                };
+
+                return newProblems as NonNullable<Problem>[];
+              });
+            }}
+          />
+        </div>
+        <div>
+          <SimpleLabel htmlFor="answer">선택지 수</SimpleLabel>
+          <select
+            value={selectedValue}
+            onChange={handleSelectedChange}
+            className="h-10 border border-gray-300 rounded-md p-2"
+          >
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
       </div>
 
       <div className="space-y-4"> {candidates}</div>
