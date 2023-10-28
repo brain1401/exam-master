@@ -220,11 +220,12 @@ export default function ObjectiveTab({
         problemCurrentIndex={problemCurrentIndex}
       />
 
-      <div className="flex justify-end items-center space-x-2">
+      <div className="flex items-center justify-between">
         <div>
-          <SimpleLabel>복수정답</SimpleLabel>
+          <SimpleLabel> 복수정답</SimpleLabel>
           <input
             type="checkbox"
+            className="ml-2 "
             checked={currentProblem?.isAnswerMultiple ?? false}
             onChange={(e) => {
               setProblems((prev) => {
