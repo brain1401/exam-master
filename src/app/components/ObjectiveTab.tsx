@@ -136,7 +136,7 @@ export default function ObjectiveTab({
     </div>
   ));
 
-  // 카드가 변경될 때마다 입력폼 초기화
+  // 카드 인덱스가 변경될 때마다 입력폼 초기화
   useEffect(() => {
     // 현재 문제에 무언가 적혀있으면 초기화하지 않음
     if (isCardOnBeingWrited(currentProblem)) return;

@@ -109,6 +109,7 @@ export async function createProblem(
           additionalView: problem.additionalView,
           candidates: problem.candidates,
           subjectiveAnswer: problem.subAnswer,
+          isAnswerMultiple: problem.isAnswerMultiple,
           exam_user: {
             connect: [userId],
           },
@@ -523,6 +524,7 @@ export async function updateProblem(id: string, problem: Problem) {
         additionalView: problem.additionalView,
         candidates: problem.candidates,
         subjectiveAnswer: problem.subAnswer,
+        isAnswerMultiple: problem.isAnswerMultiple,
       }),
     }
   );
@@ -627,6 +629,7 @@ export async function updateProblems(
   try {
     for (const problem of problems) {
       if (!problem?.id) {
+        //새로 추가된 문제인 경우
         if (problem) {
           problem.id = Number(
             await createProblem(problem, (await getUser(userEmail)).id)

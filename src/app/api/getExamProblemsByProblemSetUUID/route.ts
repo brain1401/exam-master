@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
         question: problem.question,
         additionalView: problem.additionalView,
         image: problem.image,
+        isAnswerMultiple: problem.isAnswerMultiple,
         candidates: [
           ...(problem.candidates?.map((candidate) => ({
             text: candidate.text,

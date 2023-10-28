@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
         subAnswer: problem.subjectiveAnswer,
         isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
         isImageButtonClicked: problem.image ? true : false,
+        isAnswerMultiple: problem.isAnswerMultiple,
         id: problem.id,
       })),
     ],

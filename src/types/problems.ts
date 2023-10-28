@@ -27,12 +27,12 @@ export type ExamProblem = {
   type: "obj" | "sub";
   question: string;
   additionalView: string;
+  isAnswerMultiple: boolean | null;
   image: {
     id: string;
     url: string;
   } | null;
-  candidates: 
-  candidate[] | null;
+  candidates: candidate[] | null;
   subAnswer: string | null;
 };
 
@@ -53,6 +53,7 @@ export type ProblemSet = {
     candidates: candidate[] | null;
     additionalView: string;
     subjectiveAnswer: string | null;
+    isAnswerMultiple: boolean | null;
   }[];
   examProblemsCount?: number;
 };
