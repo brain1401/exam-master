@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import Button from "./ui/Button";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
+import cloneDeep from "lodash/cloneDeep";
+import checkImage from "/public/check-303494_960_720.png"
 
 type Props = {
   problems: ProblemSetWithName;
@@ -24,6 +26,25 @@ export default function ExamProblems({ problems }: Props) {
 
   const currentShuffledExamProblem =
     shuffledExamProblemsArray[currentProblemIndex];
+
+  const onClickCandidate = (i: number) => {
+    setShuffledExamProblems((prev) => {
+      const newShuffledExamProblems = cloneDeep(prev);
+
+      const currentProblem =
+        newShuffledExamProblems.exam_problems?.[currentProblemIndex];
+      const currentCandidate = currentProblem?.candidates?.[i];
+
+      if (currentCandidate?.isAnswer === undefined) {
+        throw new Error("isAnswer가 없습니다.");
+      }
+
+      // isAnswer의 값을 토글
+      currentCandidate.isAnswer = !currentCandidate.isAnswer;
+
+      return newShuffledExamProblems;
+    });
+  };
 
   usePreventClose();
 
@@ -49,13 +70,17 @@ export default function ExamProblems({ problems }: Props) {
           </div>
         )}
 
-        {
-          currentShuffledExamProblem.image && typeof currentShuffledExamProblem.image === "object" && (
+        {currentShuffledExamProblem.image &&
+          typeof currentShuffledExamProblem.image === "object" && (
             <div className="mb-5">
-              <Image src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${currentShuffledExamProblem.image?.url}`} width={400} height={400} alt="이미지" />
+              <Image
+                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${currentShuffledExamProblem.image?.url}`}
+                width={400}
+                height={400}
+                alt="이미지"
+              />
             </div>
-          )
-        }
+          )}
 
         {currentShuffledExamProblem.type === "obj" && (
           <>
@@ -64,8 +89,20 @@ export default function ExamProblems({ problems }: Props) {
                 <ul>
                   {currentShuffledExamProblem.candidates?.map(
                     (candidate, i) => (
-                      <li key={i}>
-                        {`${candidateNumber(i + 1)} ${candidate.text}`}
+                      <li key={i} className="flex">
+                        <div className={`${candidate.isAnswer ? "" : "opacity-0"} relative left-4 top-1 h-3 w-3`}>
+                          <Image
+                            src={checkImage}
+                            alt="체크"
+                            fill
+                            />
+                        </div>
+                        <div
+                          className="cursor-pointer hover:font-bold"
+                          onClick={(e) => {
+                            onClickCandidate(i);
+                          }}
+                        >{`${candidateNumber(i + 1)} ${candidate.text}`}</div>
                       </li>
                     )
                   )}
