@@ -98,7 +98,7 @@ export default function ExamProblems({ problems }: Props) {
                           <Image src={checkImage} alt="체크" fill />
                         </div>
                         <div
-                          className="cursor-pointer md:hover:font-bold"
+                          className="cursor-pointer select-none md:hover:font-bold"
                           onClick={(e) => {
                             onClickCandidate(i);
                           }}
