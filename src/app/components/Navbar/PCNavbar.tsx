@@ -19,10 +19,10 @@ export default function PCNavbar({ loginButton }: Props) {
     <nav // navbar
       className="flex border-b border-gray-300"
     >
-      <ul className="flex justify-center items-cneter md:gap-3">
-        <li className="px-5 py-2 font-bold text-xl md:text-2xl ml-[1rem] md:ml-[3rem]">
+      <ul className="items-cneter flex justify-center md:gap-3">
+        <li className="ml-[1rem] px-5 py-2 text-xl font-bold md:ml-[3rem] md:text-2xl">
           <Link href="/">
-            <Image src={Logo} alt="logo" className="w-[8rem] h-[2rem]" />
+            <Image src={Logo} alt="logo" className="h-[2rem] w-[8rem]" />
           </Link>
         </li>
         <li className={LIST_ITEM}>
@@ -34,12 +34,12 @@ export default function PCNavbar({ loginButton }: Props) {
         <li className={LIST_ITEM}>
           <Link href="/create">문제 생성</Link>
         </li>
-        <li className="hidden md:list-item md:absolute md:top-0 md:right-[10vw]">
+        <li className="hidden md:absolute md:right-[10vw] md:top-0 md:list-item">
           {loginButton}
         </li>
         <li className="md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            <HiMenu className="text-[1.9rem] absolute top-[0.5rem] right-5" />
+            <HiMenu className="absolute right-5 top-[0.5rem] text-[1.9rem]" />
           </button>
         </li>
       </ul>

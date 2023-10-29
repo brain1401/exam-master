@@ -39,13 +39,13 @@ export default function NavMobile({ loginButton }: Props) {
       ref={menuRef}
       className={`${
         isMenuOpen
-          ? "opacity-100 pointer-events-auto md:hidden translate-x-0"
-          : "opacity-0 pointer-events-none max-h-0 translate-x-full overflow-hidden"
-      } absolute w-3/4 h-screen bg-neutral-100 top-0 right-0 z-10 transition-all duration-300 ease-in-out`}
+          ? "pointer-events-auto translate-x-0 opacity-100 md:hidden"
+          : "pointer-events-none max-h-0 translate-x-full overflow-hidden opacity-0"
+      } absolute right-0 top-0 z-10 h-screen w-3/4 bg-neutral-100 transition-all duration-300 ease-in-out`}
     >
-      <ul className="flex flex-col justify-center items-center w-full">
-        <li className="flex justify-center items-center border-b border-gray-300 w-full py-2 ">
-          <Image src={Logo} alt="logo" className="w-[8rem] h-[2rem]" />
+      <ul className="flex w-full flex-col items-center justify-center">
+        <li className="flex w-full items-center justify-center border-b border-gray-300 py-2 ">
+          <Image src={Logo} alt="logo" className="h-[2rem] w-[8rem]" />
         </li>
         <li className={MOBILE_LIST_ITEM}>
           <Link href="/exam" onClick={() => setIsMenuOpen(false)}>

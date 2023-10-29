@@ -19,7 +19,7 @@ export default function ProblemsEditor({
 }: Props) {
   const currentProblem = problems[problemCurrentIndex];
   const [currentTab, setCurrentTab] = useState<"obj" | "sub">(
-    currentProblem?.type ?? "obj"
+    currentProblem?.type ?? "obj",
   );
 
   useLayoutEffect(() => {
@@ -52,22 +52,22 @@ export default function ProblemsEditor({
   }, [problems]);
 
   return (
-    <section className="flex justify-center items-center">
+    <section className="flex items-center justify-center">
       <Tabs.Root
-        className="flex flex-col md:w-[60rem] w-11/12"
+        className="flex w-11/12 flex-col md:w-[60rem]"
         activationMode="manual"
         value={currentTab}
       >
-        <Tabs.List className="flex mb-2 justify-center md:justify-normal">
+        <Tabs.List className="mb-2 flex justify-center md:justify-normal">
           <Tabs.Trigger
-            className={`border border-gray-300 rounded-md px-5 py-3 mr-2 ${
+            className={`mr-2 rounded-md border border-gray-300 px-5 py-3 ${
               currentTab === "obj" && "bg-neutral-500 text-white"
             }`}
             value="obj"
             onClick={() => {
               if (isCardOnBeingWrited(currentProblem)) {
                 const value = confirm(
-                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
+                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?",
                 );
                 if (value === false) return;
               }
@@ -95,14 +95,14 @@ export default function ProblemsEditor({
           </Tabs.Trigger>
 
           <Tabs.Trigger
-            className={`border border-gray-300 rounded-md px-5 py-3 ${
+            className={`rounded-md border border-gray-300 px-5 py-3 ${
               currentTab === "sub" && "bg-neutral-500 text-white"
             }`}
             value="sub"
             onClick={() => {
               if (isCardOnBeingWrited(currentProblem)) {
                 const value = confirm(
-                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?"
+                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?",
                 );
                 if (value === false) return;
               }

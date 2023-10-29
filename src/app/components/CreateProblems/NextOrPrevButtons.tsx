@@ -30,16 +30,16 @@ export default function NextOrPrevButtons({
   };
 
   return (
-    <div className="flex justify-center mt-8 gap-5">
+    <div className="mt-8 flex justify-center gap-5">
       <button
         onClick={showPreviousCard}
-        className="px-5 py-2 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
+        className="rounded-md border border-black px-5 py-2 hover:border-slate-300 hover:bg-slate-300"
       >
         이전
       </button>
       <button
         onClick={showNextCard}
-        className="px-5 py-2 border border-black rounded-md hover:bg-slate-300 hover:border-slate-300"
+        className="rounded-md border border-black px-5 py-2 hover:border-slate-300 hover:bg-slate-300"
       >
         다음
       </button>

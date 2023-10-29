@@ -1,20 +1,23 @@
-import { IoMdArrowDropleftCircle, IoMdArrowDroprightCircle } from "react-icons/io";
+import {
+  IoMdArrowDropleftCircle,
+  IoMdArrowDroprightCircle,
+} from "react-icons/io";
 
 type Props = {
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   maxPage: number;
-}
+};
 export default function LeftRightButton({ page, setPage, maxPage }: Props) {
   return (
-    <div className="flex gap-3 justify-center items-center mt-5">
+    <div className="mt-5 flex items-center justify-center gap-3">
       <button
         className="px-3 py-5"
         onClick={() => {
           if (page > 1) setPage(page - 1);
         }}
       >
-        <IoMdArrowDropleftCircle className="w-10 h-10" />
+        <IoMdArrowDropleftCircle className="h-10 w-10" />
       </button>
 
       <span className="text-gray-500">
@@ -26,7 +29,7 @@ export default function LeftRightButton({ page, setPage, maxPage }: Props) {
           if (page < maxPage) setPage(page + 1);
         }}
       >
-        <IoMdArrowDroprightCircle className="w-10 h-10" />
+        <IoMdArrowDroprightCircle className="h-10 w-10" />
       </button>
     </div>
   );

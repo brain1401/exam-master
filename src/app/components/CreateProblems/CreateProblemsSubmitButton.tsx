@@ -10,7 +10,12 @@ type Props = {
   setProblemSetsName: React.Dispatch<React.SetStateAction<string>>;
   resetProblems: () => void;
 };
-export default function CreateProblemsSubmitButton({problems, problemSetName, setProblemSetsName, resetProblems}: Props) {
+export default function CreateProblemsSubmitButton({
+  problems,
+  problemSetName,
+  setProblemSetsName,
+  resetProblems,
+}: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -58,9 +63,9 @@ export default function CreateProblemsSubmitButton({problems, problemSetName, se
   };
 
   return (
-    <div className="flex justify-center mt-3">
+    <div className="mt-3 flex justify-center">
       <button
-        className="px-2 py-2 md:px-5 md:py-2 bg-blue-500 rounded-md text-white"
+        className="rounded-md bg-blue-500 px-2 py-2 text-white md:px-5 md:py-2"
         onClick={handleSubmit}
         disabled={isLoading}
       >

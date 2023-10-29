@@ -20,7 +20,7 @@ export default function EditProblemsOption({
   const [localProblemSetsName, setLocalProblemSetsName] =
     useState(problemSetsName);
   const [cardsLength, setCardsLength] = useState(
-    problems.length.toString() ?? "10"
+    problems.length.toString() ?? "10",
   );
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,7 +50,7 @@ export default function EditProblemsOption({
       ) {
         // 입력 중인 카드가 있을 경우
         const value = confirm(
-          `${maxProblemLength}번 문제에서 ${problems.length}번 문제까지의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`
+          `${maxProblemLength}번 문제에서 ${problems.length}번 문제까지의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`,
         );
         if (value) {
           setProblems((prevCards) => prevCards.slice(0, maxProblemLength));
@@ -91,11 +91,11 @@ export default function EditProblemsOption({
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (!result.ok) {
         alert(
-          "문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요."
+          "문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.",
         );
         return;
       }
@@ -111,7 +111,7 @@ export default function EditProblemsOption({
       alert("문제집 이름이 적용되었습니다.");
     } catch (err) {
       alert(
-        "문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요."
+        "문제집 이름을 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.",
       );
     } finally {
       setIsLoading(false);
@@ -124,14 +124,14 @@ export default function EditProblemsOption({
         e.preventDefault();
       }}
     >
-      <div className="flex flex-col gap-2 mb-5">
+      <div className="mb-5 flex flex-col gap-2">
         <div>
           <label htmlFor="maxIndex" className="ml-5 mr-2">
             최대 문제 수 :
           </label>
           <input
             id="maxIndex"
-            className="border border-black p-1 text-center w-[3rem] rounded-md"
+            className="w-[3rem] rounded-md border border-black p-1 text-center"
             value={cardsLength}
             onChange={handleCardLengthChange}
           />
@@ -145,7 +145,7 @@ export default function EditProblemsOption({
           </label>
           <input
             id="problemSetName"
-            className="border w-[10rem] border-black p-1 rounded-md"
+            className="w-[10rem] rounded-md border border-black p-1"
             value={localProblemSetsName}
             onChange={(e) => setLocalProblemSetsName(e.target.value)}
           />

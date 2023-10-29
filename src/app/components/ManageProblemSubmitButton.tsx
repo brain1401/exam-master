@@ -11,7 +11,7 @@ type Props = {
 export default function ManageProblemSubmitButton({
   problems,
   problemSetName,
-  uuid
+  uuid,
 }: Props) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,9 +57,9 @@ export default function ManageProblemSubmitButton({
   };
 
   return (
-    <div className="flex justify-center mt-3">
+    <div className="mt-3 flex justify-center">
       <button
-        className="px-2 py-2 md:px-5 md:py-2 bg-blue-500 rounded-md text-white"
+        className="rounded-md bg-blue-500 px-2 py-2 text-white md:px-5 md:py-2"
         onClick={handleSubmit}
         disabled={isLoading}
       >

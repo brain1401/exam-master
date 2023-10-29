@@ -1,13 +1,12 @@
-
 type Props = {
   children: string;
   htmlFor?: string;
-}
+};
 
-export default function SimpleLabel({children, htmlFor}: Props) {
+export default function SimpleLabel({ children, htmlFor }: Props) {
   return (
     <label
-      className="text-lg font-semibold mb-2"
+      className="mb-2 text-lg font-semibold"
       onClick={(e) => e.preventDefault()}
       htmlFor={htmlFor}
     >

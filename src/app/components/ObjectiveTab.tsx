@@ -37,7 +37,7 @@ export default function ObjectiveTab({
   };
 
   const [selectedValue, setSelectedValue] = useState(
-    currentProblem?.candidates?.length.toString() ?? "4"
+    currentProblem?.candidates?.length.toString() ?? "4",
   );
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
@@ -100,9 +100,9 @@ export default function ObjectiveTab({
 
   const candidates = Array.from(
     { length: parseInt(selectedValue) },
-    (_, index) => candidatePlaceholders[index] ?? ""
+    (_, index) => candidatePlaceholders[index] ?? "",
   ).map((value, index) => (
-    <div key={index} className="flex flex-col my-2">
+    <div key={index} className="my-2 flex flex-col">
       <label
         htmlFor={`candidate-${index}-text`}
         className="text-lg font-semibold"
@@ -110,18 +110,18 @@ export default function ObjectiveTab({
       >
         선택지 {index + 1}
       </label>
-      <div className="flex justify-start items-center">
+      <div className="flex items-center justify-start">
         <input
           type="text"
           id={`candidate-${index}-text`}
           value={currentCardCandidates?.[index]?.text ?? ""}
-          className="w-full h-10 border border-gray-300 rounded-md p-2"
+          className="h-10 w-full rounded-md border border-gray-300 p-2"
           onChange={handleInputChange}
           placeholder={value}
         />
         <label
           htmlFor={`candidate-${index}-checkbox`}
-          className="md:mx-2 ml-[0.55rem] px-1 md:p-0  md:text-md font-bold md:w-20 text:sm w-fit"
+          className="md:text-md text:sm ml-[0.55rem] w-fit  px-1 font-bold md:mx-2 md:w-20 md:p-0"
         >
           정답여부
         </label>
@@ -184,7 +184,7 @@ export default function ObjectiveTab({
 
   return (
     <form
-      className="border border-gray-500 rounded-md p-5 flex flex-col space-y-4"
+      className="flex flex-col space-y-4 rounded-md border border-gray-500 p-5"
       onSubmit={(e) => {
         e.preventDefault();
       }}
@@ -193,7 +193,7 @@ export default function ObjectiveTab({
         <SimpleLabel htmlFor="question">문제</SimpleLabel>
         <textarea
           id="question"
-          className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
+          className="h-[6rem] w-full resize-none rounded-md border border-gray-300 p-2"
           placeholder="다음의 친구에게 해 줄 수 있는 말로 적절한 것은?"
           value={question ?? ""}
           onChange={(e) => {
@@ -245,7 +245,7 @@ export default function ObjectiveTab({
           <select
             value={selectedValue}
             onChange={handleSelectedChange}
-            className="h-10 border border-gray-300 rounded-md p-2"
+            className="h-10 rounded-md border border-gray-300 p-2"
           >
             <option value="2">2</option>
             <option value="3">3</option>

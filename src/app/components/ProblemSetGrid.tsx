@@ -81,7 +81,7 @@ export default function ProblemSetGrid({ type }: Props) {
 
       {!loading ? (
         problemSets?.data.length && problemSets?.data.length > 0 ? (
-          <ul className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5  gap-4 w-full mx-auto">
+          <ul className="mx-auto grid w-full grid-cols-1 gap-4  xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5">
             {problemSets?.data.map((problemSet: ProblemSet) => (
               <li key={problemSet.UUID}>
                 <ProblemSetCard problemSet={problemSet} type={type} />
@@ -89,14 +89,14 @@ export default function ProblemSetGrid({ type }: Props) {
             ))}
           </ul>
         ) : (
-          <div className="flex justify-center items-center h-64">
+          <div className="flex h-64 items-center justify-center">
             <p className="text-center text-lg">
               해당하는 문제집을 찾을 수 없습니다!
             </p>
           </div>
         )
       ) : (
-        <div className="flex w-full justify-center items-center">
+        <div className="flex w-full items-center justify-center">
           <ClipLoader size={100} />
         </div>
       )}

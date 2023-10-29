@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProblemsEditor from "@/app/components/ProblemsEditor";
-import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";;
+import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CurrentCardIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import { ClipLoader } from "react-spinners";
 import useProblems from "@/hooks/problems";
@@ -60,14 +60,14 @@ export default function EditProblemsByUUID({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex h-screen items-center justify-center">
         <ClipLoader size={100} />
       </div>
     );
   }
 
   return (
-    <section className="mt-10 p-3 max-w-[80rem] mx-auto">
+    <section className="mx-auto mt-10 max-w-[80rem] p-3">
       <EditProblemsOption
         problems={problems}
         setProblems={setProblems}

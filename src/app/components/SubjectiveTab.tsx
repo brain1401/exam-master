@@ -74,18 +74,18 @@ export default function SubjectiveTab({
 
   return (
     <form
-      className=" border border-gray-300 rounded-md p-5"
+      className=" rounded-md border border-gray-300 p-5"
       onSubmit={(e) => {
         e.preventDefault();
       }}
     >
-      <div className="flex flex-col mb-3">
+      <div className="mb-3 flex flex-col">
         <label htmlFor="question" className="text-lg font-semibold">
           문제
         </label>
         <textarea
           id="question"
-          className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
+          className="h-[6rem] w-full resize-none rounded-md border border-gray-300 p-2"
           value={question}
           onChange={(e) => setCurrentProblem({ question: e.target.value })}
         />
@@ -100,13 +100,13 @@ export default function SubjectiveTab({
         setImageURL={setImageURL}
       />
 
-      <div className="flex flex-col mb-3">
+      <div className="mb-3 flex flex-col">
         <label htmlFor="question" className="text-lg font-semibold">
           답
         </label>
         <textarea
           id="question"
-          className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2"
+          className="h-[6rem] w-full resize-none rounded-md border border-gray-300 p-2"
           value={subAnswer ?? ""}
           onChange={(e) => setCurrentProblem({ subAnswer: e.target.value })}
         />

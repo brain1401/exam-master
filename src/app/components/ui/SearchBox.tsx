@@ -3,14 +3,14 @@ import { BsSearch } from "react-icons/bs";
 type Props = {
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
-}
+};
 export default function SearchBox({ searchString, setSearchString }: Props) {
   return (
-    <div className="flex justify-end items-center mb-4">
-      <div className="flex items-center border rounded-full pl-3 pr-2">
+    <div className="mb-4 flex items-center justify-end">
+      <div className="flex items-center rounded-full border pl-3 pr-2">
         <input
           type="text"
-          className="flex-grow py-2 pl-4 rounded-full focus:outline-none focus:border-indigo-500"
+          className="flex-grow rounded-full py-2 pl-4 focus:border-indigo-500 focus:outline-none"
           name="search"
           id="search"
           placeholder="검색어를 입력하세요."

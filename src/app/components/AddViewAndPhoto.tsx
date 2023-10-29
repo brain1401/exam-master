@@ -68,7 +68,7 @@ export default function AddViewAndPhoto({
 
   return (
     <>
-      <div className="flex gap-2 mb-3">
+      <div className="mb-3 flex gap-2">
         <button
           type="button"
           className={`${
@@ -138,12 +138,12 @@ export default function AddViewAndPhoto({
               type="file"
               id="image"
               accept="image/*"
-              className="absolute opacity-0 w-0 h-0"
+              className="absolute h-0 w-0 opacity-0"
               onChange={handleImageChange}
             />
             <label
               htmlFor="image"
-              className="px-4 py-2 bg-blue-500 text-white cursor-pointer hover:bg-blue-600 rounded-md"
+              className="cursor-pointer rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               사진 선택
             </label>
@@ -163,7 +163,7 @@ export default function AddViewAndPhoto({
         <div>
           <label
             htmlFor="additional-info"
-            className="text-lg font-semibold mb-3"
+            className="mb-3 text-lg font-semibold"
             onClick={(e) => {
               e.preventDefault();
             }}
@@ -172,7 +172,7 @@ export default function AddViewAndPhoto({
           </label>
           <textarea
             id="additional-info"
-            className="w-full resize-none h-[6rem] border border-gray-300 rounded-md p-2 my-2"
+            className="my-2 h-[6rem] w-full resize-none rounded-md border border-gray-300 p-2"
             placeholder="나 이번 시험 너무 못 봤어. 평균 99점이 조금 안 되네"
             value={additionalView}
             onChange={(e) => {

@@ -40,13 +40,13 @@ export default function DetailedExamPage({ params: { UUID } }: Props) {
   if (error) return <div>에러가 발생했습니다.</div>;
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex h-screen items-center justify-center">
         <ClipLoader size={100} />
       </div>
     );
 
   return (
-    <section className="mt-10 p-3 max-w-[80rem] mx-auto">
+    <section className="mx-auto mt-10 max-w-[80rem] p-3">
       <div>DetailExamPage</div>
       {problems && <ExamProblems problems={problems} />}
     </section>
