@@ -7,7 +7,7 @@ import Button from "./ui/Button";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
 import cloneDeep from "lodash/cloneDeep";
-import checkImage from "/public/check-303494_960_720.png"
+import checkImage from "/public/check-303494_960_720.png";
 
 type Props = {
   problems: ProblemSetWithName;
@@ -58,8 +58,8 @@ export default function ExamProblems({ problems }: Props) {
     <section>
       <div>문제집 이름 : {name}</div>
 
-      <div className="bg-slate-200 rounded-lg p-3">
-        <div className="text-2xl mb-5">
+      <div className="rounded-lg bg-slate-200 p-3">
+        <div className="mb-5 text-2xl">
           <span>Q{currentProblemIndex + 1}. </span>
           {currentShuffledExamProblem.question}
         </div>
@@ -90,21 +90,21 @@ export default function ExamProblems({ problems }: Props) {
                   {currentShuffledExamProblem.candidates?.map(
                     (candidate, i) => (
                       <li key={i} className="flex">
-                        <div className={`${candidate.isAnswer ? "" : "opacity-0"} relative left-4 top-1 h-3 w-3`}>
-                          <Image
-                            src={checkImage}
-                            alt="체크"
-                            fill
-                            />
+                        <div
+                          className={`${
+                            candidate.isAnswer ? "" : "opacity-0"
+                          } relative bottom-1 left-[1.2rem] h-5 w-10 md:left-4 md:top-1 md:h-3 md:w-3`}
+                        >
+                          <Image src={checkImage} alt="체크" fill />
                         </div>
                         <div
-                          className="cursor-pointer hover:font-bold"
+                          className="cursor-pointer md:hover:font-bold"
                           onClick={(e) => {
                             onClickCandidate(i);
                           }}
                         >{`${candidateNumber(i + 1)} ${candidate.text}`}</div>
                       </li>
-                    )
+                    ),
                   )}
                 </ul>
               </div>
@@ -115,7 +115,7 @@ export default function ExamProblems({ problems }: Props) {
         {currentShuffledExamProblem.type === "sub" && (
           <div>
             <textarea
-              className="border border-black rounded-md p-3"
+              className="rounded-md border border-black p-3"
               placeholder="답을 입력하세요."
             ></textarea>
           </div>
