@@ -91,20 +91,21 @@ export default function ExamProblems({ problems }: Props) {
                   {currentShuffledExamProblem.candidates?.map(
                     (candidate, i) => (
                       <li key={i} className="flex">
-                        <div className="relative">
+                        <div
+                          className="relative cursor-pointer select-none md:hover:font-bold"
+                          onClick={(e) => {
+                            onClickCandidate(i);
+                          }}
+                        >
                           <div
                             className={`${
                               candidate.isAnswer ? "" : "opacity-0"
-                            } absolute bottom-2 left-1 h-5 w-5`}
+                            } absolute top-[-.2rem] left-1 h-5 w-5`}
                           >
                             <Image src={checkImage} alt="체크" fill />
                           </div>
-                          <div
-                            className="cursor-pointer select-none md:hover:font-bold"
-                            onClick={(e) => {
-                              onClickCandidate(i);
-                            }}
-                          >{`${candidateNumber(i + 1)} ${candidate.text}`}</div>
+                          <span>{candidateNumber(i + 1)}</span>
+                          {`${candidate.text}`}
                         </div>
                       </li>
                     ),
