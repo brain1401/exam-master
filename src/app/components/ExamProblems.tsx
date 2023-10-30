@@ -76,6 +76,23 @@ export default function ExamProblems({ problems }: Props) {
     });
   };
 
+  const onTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setShuffledExamProblems((prev) => {
+      const newShuffledExamProblems = cloneDeep(prev);
+
+      const currentProblem =
+        newShuffledExamProblems.exam_problems?.[currentProblemIndex];
+
+      if (!currentProblem) {
+        throw new Error("무언가가 잘못되었습니다.");
+      }
+
+      currentProblem.subAnswer = e.target.value;
+
+      return newShuffledExamProblems;
+    });
+  };
+
   usePreventClose();
 
   useEffect(() => {
@@ -94,11 +111,6 @@ export default function ExamProblems({ problems }: Props) {
           {currentShuffledExamProblem.question}
         </div>
 
-        {currentShuffledExamProblem.additionalView && (
-          <div className="mb-5 border border-black p-3">
-            {currentShuffledExamProblem.additionalView}
-          </div>
-        )}
 
         {currentShuffledExamProblem.image &&
           isImageUrlObject(currentShuffledExamProblem.image) && (
@@ -108,10 +120,15 @@ export default function ExamProblems({ problems }: Props) {
                 width={400}
                 height={400}
                 alt="이미지"
-              />
+                />
             </div>
           )}
 
+{currentShuffledExamProblem.additionalView && (
+  <div className="mb-5 border border-black p-3">
+    {currentShuffledExamProblem.additionalView}
+  </div>
+)}
         {currentShuffledExamProblem.type === "obj" && (
           <>
             {
@@ -154,6 +171,8 @@ export default function ExamProblems({ problems }: Props) {
             <textarea
               className="rounded-md border border-black p-3"
               placeholder="답을 입력하세요."
+              onChange={onTextAreaChange}
+              value={currentShuffledExamProblem.subAnswer ?? ""}
             ></textarea>
           </div>
         )}
