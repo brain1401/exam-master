@@ -41,20 +41,19 @@ export default function ObjectiveTab({
   );
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
-  if (!currentProblem || !currentCardCandidates)
-    throw new Error("무언가가 잘못되었습니다.");
-
   const {
     question,
     additionalView,
     isAdditiondalViewButtonClicked,
     image,
     isImageButtonClicked,
-  } = currentProblem;
+  } = currentProblem ?? {};
 
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value: selectedValue } = event.target;
     setSelectedValue(selectedValue);
+
+    if (!currentCardCandidates) throw new Error("무언가가 잘못되었습니다.");
 
     let newValues = [...currentCardCandidates];
     const prevLength = newValues.length;
@@ -80,6 +79,8 @@ export default function ObjectiveTab({
     const { id, value } = event.target;
     const index = parseInt(id.split("-")[1]);
 
+    if (!currentCardCandidates) throw new Error("무언가가 잘못되었습니다.");
+
     const newCandidates = [...currentCardCandidates];
     newCandidates[index] = {
       id: index,
@@ -93,6 +94,7 @@ export default function ObjectiveTab({
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = event.target;
     const index = parseInt(id.split("-")[1]);
+    if (!currentCardCandidates) throw new Error("무언가가 잘못되었습니다.");
 
     const changedCandidateCheck = (checked: boolean) => {
       const candidates = {
@@ -133,6 +135,8 @@ export default function ObjectiveTab({
   const handleMultipleAnswerCheckboxChange = (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
+    if(!currentProblem) throw new Error("무언가가 잘못되었습니다.");
+
     const count = currentProblem.candidates?.reduce((acc, cur) => {
       if (cur.isAnswer === true) {
         acc++;
