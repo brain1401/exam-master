@@ -155,7 +155,7 @@ export default function ExamProblems({ problems }: Props) {
                             <Image src={checkImage} alt="체크" fill />
                           </div>
                           <span>{candidateNumber(i + 1)}</span>
-                          {`${candidate.text}`}
+                          {` ${candidate.text}`}
                         </div>
                       </li>
                     ),
