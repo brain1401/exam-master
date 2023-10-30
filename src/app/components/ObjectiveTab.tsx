@@ -139,7 +139,7 @@ export default function ObjectiveTab({
       }
       return acc;
     }, 0);
-    if (!count) throw new Error("무언가가 잘못되었습니다.");
+    if (count === undefined) throw new Error("무언가가 잘못되었습니다.");
 
     if (event.target.checked === false && count >= 2) {
       // 체크를 해제하려고 하는데 이미 2개 이상의 정답이 선택되어 있으면 경고창을 띄우고 체크를 해제하지 않음
