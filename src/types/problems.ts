@@ -1,4 +1,5 @@
 export type candidate = {
+  id: number | null;
   text: string;
   isAnswer: boolean;
 };
@@ -36,30 +37,32 @@ export type ExamProblem = {
   subAnswer: string | null;
 };
 
-export type ProblemSet = {
+export type ProblemResponse = {
+  id: number;
+  question: string;
+  createdAt: string;
+  updatedAt: string;
+  questionType: string;
+  uuid: string;
+  image: { id: string; url: string };
+  candidates: candidate[] | null;
+  additionalView: string;
+  subjectiveAnswer: string | null;
+  isAnswerMultiple: boolean | null;
+};
+
+export type ProblemSetResponse = {
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
   UUID: string;
-  exam_problems?: {
-    id: number;
-    question: string;
-    createdAt: string;
-    updatedAt: string;
-    questionType: string;
-    uuid: string;
-    image: { id: string; url: string };
-    candidates: candidate[] | null;
-    additionalView: string;
-    subjectiveAnswer: string | null;
-    isAnswerMultiple: boolean | null;
-  }[];
+  exam_problems?: ProblemResponse[];
   examProblemsCount?: number;
 };
 
-export type ProblemSetResponse = {
-  data: ProblemSet[];
+export type RawProblemSetResponse = {
+  data: ProblemSetResponse[];
   meta: {
     pagination: {
       page: number;

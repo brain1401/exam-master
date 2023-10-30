@@ -1,6 +1,6 @@
 "use client";
 import ProblemSetCard from "./ProblemSetCard";
-import { ProblemSetResponse, ProblemSet } from "@/types/problems";
+import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
@@ -12,7 +12,7 @@ type Props = {
   type: "manage" | "exam";
 };
 export default function ProblemSetGrid({ type }: Props) {
-  const [problemSets, setProblemSets] = useState<ProblemSetResponse>();
+  const [problemSets, setProblemSets] = useState<RawProblemSetResponse>();
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
@@ -45,7 +45,7 @@ export default function ProblemSetGrid({ type }: Props) {
           },
         })
         .then((res) => {
-          const data: ProblemSetResponse = res.data;
+          const data: RawProblemSetResponse = res.data;
           setMaxPage(data.meta.pagination.pageCount || 1);
           setProblemSets(data);
         })
@@ -61,7 +61,7 @@ export default function ProblemSetGrid({ type }: Props) {
           },
         })
         .then((res) => {
-          const data: ProblemSetResponse = res.data;
+          const data: RawProblemSetResponse = res.data;
           setMaxPage(data.meta.pagination.pageCount);
           setProblemSets(data);
         })
@@ -82,7 +82,7 @@ export default function ProblemSetGrid({ type }: Props) {
       {!loading ? (
         problemSets?.data.length && problemSets?.data.length > 0 ? (
           <ul className="mx-auto grid w-full grid-cols-1 gap-4  xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5">
-            {problemSets?.data.map((problemSet: ProblemSet) => (
+            {problemSets?.data.map((problemSet: ProblemSetResponse) => (
               <li key={problemSet.UUID}>
                 <ProblemSetCard problemSet={problemSet} type={type} />
               </li>

@@ -1,9 +1,9 @@
-import { ProblemSet } from "@/types/problems";
+import { ProblemSetResponse } from "@/types/problems";
 import Link from "next/link";
 
 type Props = {
   type: "manage" | "exam";
-  problemSet: ProblemSet;
+  problemSet: ProblemSetResponse;
 };
 
 export default function ProblemSetCard({ type, problemSet }: Props) {

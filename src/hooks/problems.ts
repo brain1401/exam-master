@@ -3,7 +3,7 @@ import { useState } from "react";
 
 export default function useProblems() {
   const [problems, setProblems] = useState<Problem[]>(
-    Array<Problem>(10).fill(null)
+    Array<Problem>(10).fill(null),
   );
   const [problemCurrentIndex, setProblemCurrentIndex] = useState(0);
   const [problemSetsName, setProblemSetsName] = useState<string>("");
@@ -21,12 +21,17 @@ export default function useProblems() {
             isImageButtonClicked: false,
             image: null,
             isAnswerMultiple: false,
-            candidates: Array<candidate>(4).fill({ text: "", isAnswer: false }),
+            candidates: Array.from(new Array<candidate>(4), (v, i) => ({
+              id: i,
+              text: "",
+              isAnswer: false,
+            })),
+
             subAnswer: null,
           },
           0,
-          1
-        )
+          1,
+        ),
     );
     setProblemCurrentIndex(0);
   };

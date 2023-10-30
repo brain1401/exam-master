@@ -1,4 +1,4 @@
-import { ProblemSetResponse, Problem, ProblemSet } from "@/types/problems";
+import { RawProblemSetResponse, Problem, ProblemSetResponse } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
 
@@ -300,7 +300,7 @@ export async function getProblemSets(userEmail: string, page: string) {
     if (!response.ok)
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
 
-    let responseJson: ProblemSetResponse = await response.json();
+    let responseJson: RawProblemSetResponse = await response.json();
     responseJson.data.forEach((problemSet) => {
       problemSet.updatedAt = problemSet.updatedAt.slice(0, 10);
       problemSet.createdAt = problemSet.createdAt.slice(0, 10);
@@ -354,7 +354,7 @@ export async function getProblemSetsByName(
     if (!response.ok)
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
 
-    let responseJson: ProblemSetResponse = await response.json();
+    let responseJson: RawProblemSetResponse = await response.json();
     responseJson.data.forEach((problemSet) => {
       problemSet.updatedAt = problemSet.updatedAt.slice(0, 10);
       problemSet.createdAt = problemSet.createdAt.slice(0, 10);
@@ -405,7 +405,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
 
     let data = await response.json();
-    return data.data[0] as ProblemSet;
+    return data.data[0] as ProblemSetResponse;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");

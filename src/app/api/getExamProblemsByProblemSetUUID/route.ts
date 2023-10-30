@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
         isAnswerMultiple: problem.isAnswerMultiple,
         candidates: [
           ...(problem.candidates?.map((candidate) => ({
+            id: candidate.id,
             text: candidate.text,
             isAnswer: false,
           })) || []),

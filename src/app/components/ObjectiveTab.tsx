@@ -64,6 +64,7 @@ export default function ObjectiveTab({
       //선택지 수가 늘어날 때
       for (let i = prevLength; i < selectedIntValue; i++) {
         newValues[i] = {
+          id: i,
           text: "",
           isAnswer: false,
         };
@@ -78,6 +79,7 @@ export default function ObjectiveTab({
 
     const newCandidates = [...(currentCardCandidates || [])];
     newCandidates[index] = {
+      id: index,
       text: value,
       isAnswer: newCandidates[index]?.isAnswer ?? false,
     };
@@ -91,6 +93,7 @@ export default function ObjectiveTab({
 
     const newCandidates = [...(currentCardCandidates || [])];
     newCandidates[index] = {
+      id: newCandidates[index]?.id ?? index,
       text: newCandidates[index]?.text ?? "",
       isAnswer: checked,
     };
@@ -152,7 +155,12 @@ export default function ObjectiveTab({
         isImageButtonClicked: false,
         image: null,
         isAnswerMultiple: false,
-        candidates: Array<candidate>(4).fill({ text: "", isAnswer: false }),
+        candidates: Array.from(Array<candidate>(4), (v, i) => ({
+          id: i,
+          text: "",
+          isAnswer: false,
+        })),
+
         subAnswer: null,
       };
       return newProblems;
