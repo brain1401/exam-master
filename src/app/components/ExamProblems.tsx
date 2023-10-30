@@ -28,21 +28,49 @@ export default function ExamProblems({ problems }: Props) {
   const currentShuffledExamProblem =
     shuffledExamProblemsArray[currentProblemIndex];
 
-  const onClickCandidate = (i: number) => {
+  const onClickCandidate = (i: number, isMultipleAnswer: boolean) => {
     setShuffledExamProblems((prev) => {
       const newShuffledExamProblems = cloneDeep(prev);
 
       const currentProblem =
         newShuffledExamProblems.exam_problems?.[currentProblemIndex];
-      
+
       const currentCandidate = currentProblem?.candidates?.[i];
 
-      if (currentCandidate?.isAnswer === undefined) {
-        throw new Error("isAnswer가 없습니다.");
+      if (
+        currentCandidate?.isAnswer === undefined ||
+        currentProblem?.isAnswerMultiple === undefined ||
+        currentProblem?.type === undefined ||
+        !currentProblem?.candidates
+      ) {
+        throw new Error("무언가가 잘못되었습니다.");
       }
 
-      // isAnswer의 값을 토글
-      currentCandidate.isAnswer = !currentCandidate.isAnswer;
+      if (isMultipleAnswer) {
+        // 현재 문제가 다중 선택지이면
+        currentCandidate.isAnswer = !currentCandidate.isAnswer;
+      } else {
+        // 현재 문제가 단일 선택지이면
+        if (
+          currentProblem.candidates.some(
+            (candidate) => candidate.isAnswer === true,
+          )
+        ) {
+          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 있으면
+          if (
+            currentCandidate.text ===
+            currentProblem.candidates.find(
+              (candidate) => candidate.isAnswer === true,
+            )?.text
+          ) {
+            // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 같으면
+            currentCandidate.isAnswer = !currentCandidate.isAnswer;
+          } 
+        } else {
+          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
+          currentCandidate.isAnswer = !currentCandidate.isAnswer;
+        }
+      }
 
       return newShuffledExamProblems;
     });
@@ -95,13 +123,17 @@ export default function ExamProblems({ problems }: Props) {
                         <div
                           className="relative cursor-pointer select-none md:hover:font-bold"
                           onClick={(e) => {
-                            onClickCandidate(i);
+                            onClickCandidate(
+                              i,
+                              currentShuffledExamProblem.isAnswerMultiple ??
+                                false,
+                            );
                           }}
                         >
                           <div
                             className={`${
                               candidate.isAnswer ? "" : "opacity-0"
-                            } absolute top-[-.2rem] left-1 h-5 w-5`}
+                            } absolute left-1 top-[-.2rem] h-5 w-5`}
                           >
                             <Image src={checkImage} alt="체크" fill />
                           </div>
