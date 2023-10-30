@@ -41,19 +41,22 @@ export default function ObjectiveTab({
   );
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
+  if (!currentProblem || !currentCardCandidates)
+    throw new Error("무언가가 잘못되었습니다.");
+
   const {
     question,
     additionalView,
     isAdditiondalViewButtonClicked,
     image,
     isImageButtonClicked,
-  } = currentProblem ?? {};
+  } = currentProblem;
 
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value: selectedValue } = event.target;
     setSelectedValue(selectedValue);
 
-    let newValues = [...(currentCardCandidates || [])];
+    let newValues = [...currentCardCandidates];
     const prevLength = newValues.length;
 
     const selectedIntValue = parseInt(selectedValue);
@@ -77,7 +80,7 @@ export default function ObjectiveTab({
     const { id, value } = event.target;
     const index = parseInt(id.split("-")[1]);
 
-    const newCandidates = [...(currentCardCandidates || [])];
+    const newCandidates = [...currentCardCandidates];
     newCandidates[index] = {
       id: index,
       text: value,
@@ -91,14 +94,68 @@ export default function ObjectiveTab({
     const { id, checked } = event.target;
     const index = parseInt(id.split("-")[1]);
 
-    const newCandidates = [...(currentCardCandidates || [])];
-    newCandidates[index] = {
-      id: newCandidates[index]?.id ?? index,
-      text: newCandidates[index]?.text ?? "",
-      isAnswer: checked,
+    const changedCandidateCheck = (checked: boolean) => {
+      const candidates = {
+        id: newCandidates[index]?.id ?? index,
+        text: newCandidates[index]?.text ?? "",
+        isAnswer: checked,
+      };
+
+      return candidates;
     };
 
+    const newCandidates = [...currentCardCandidates];
+
+    if (currentProblem.isAnswerMultiple === true) {
+      newCandidates[index] = changedCandidateCheck(checked);
+    } else {
+      if (
+        currentProblem.candidates?.some(
+          (candidate) => candidate.isAnswer === true,
+        )
+      ) {
+        if (
+          newCandidates[index]?.text ===
+          currentProblem.candidates.find(
+            (candidate) => candidate.isAnswer === true,
+          )?.text
+        ) {
+          newCandidates[index] = changedCandidateCheck(checked);
+        }
+      } else {
+        newCandidates[index] = changedCandidateCheck(checked);
+      }
+    }
+
     setCurrentProblemCandidates(newCandidates);
+  };
+
+  const handleMultipleAnswerCheckboxChange = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const count = currentProblem.candidates?.reduce((acc, cur) => {
+      if (cur.isAnswer === true) {
+        acc++;
+      }
+      return acc;
+    }, 0);
+    if (!count) throw new Error("무언가가 잘못되었습니다.");
+
+    if (event.target.checked === false && count >= 2) {
+      // 체크를 해제하려고 하는데 이미 2개 이상의 정답이 선택되어 있으면 경고창을 띄우고 체크를 해제하지 않음
+      alert(`이미 ${count}개의 정답이 선택되어 있습니다. 다시 확인해주세요.`);
+      return;
+    }
+
+    setProblems((prev) => {
+      const newProblems: Partial<Problem>[] = [...prev];
+      newProblems[problemCurrentIndex] = {
+        ...newProblems[problemCurrentIndex],
+        isAnswerMultiple: event.target.checked,
+      };
+
+      return newProblems as NonNullable<Problem>[];
+    });
   };
 
   const candidates = Array.from(
@@ -155,7 +212,7 @@ export default function ObjectiveTab({
         isImageButtonClicked: false,
         image: null,
         isAnswerMultiple: false,
-        candidates: Array.from(Array<candidate>(4), (v, i) => ({
+        candidates: Array.from(Array<candidate>(4), (_, i) => ({
           id: i,
           text: "",
           isAnswer: false,
@@ -235,17 +292,7 @@ export default function ObjectiveTab({
             type="checkbox"
             className="ml-2 "
             checked={currentProblem?.isAnswerMultiple ?? false}
-            onChange={(e) => {
-              setProblems((prev) => {
-                const newProblems: Partial<Problem>[] = [...prev];
-                newProblems[problemCurrentIndex] = {
-                  ...newProblems[problemCurrentIndex],
-                  isAnswerMultiple: e.target.checked,
-                };
-
-                return newProblems as NonNullable<Problem>[];
-              });
-            }}
+            onChange={handleMultipleAnswerCheckboxChange}
           />
         </div>
         <div>
