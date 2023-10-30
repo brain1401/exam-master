@@ -1,7 +1,7 @@
 "use client";
 import { ChangeEvent, useEffect, useState } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
-import { isCardOnBeingWrited } from "@/service/problems";
+import { isCardOnBeingWrited, isImageFileObject } from "@/service/problems";
 import SimpleLabel from "./ui/SimpleLabel";
 import { Problem, candidate } from "@/types/problems";
 
@@ -143,6 +143,7 @@ export default function ObjectiveTab({
       }
       return acc;
     }, 0);
+
     if (count === undefined) throw new Error("무언가가 잘못되었습니다.");
 
     if (event.target.checked === false && count >= 2) {
@@ -200,7 +201,7 @@ export default function ObjectiveTab({
     </div>
   ));
 
-  // 카드 인덱스가 변경될 때마다 입력폼 초기화
+  // 문제 인덱스가 변경(사용자가 이전, 다음 버튼으로 이동)될 때마다 입력폼 초기화
   useEffect(() => {
     // 현재 문제에 무언가 적혀있으면 초기화하지 않음
     if (isCardOnBeingWrited(currentProblem)) return;
@@ -231,7 +232,7 @@ export default function ObjectiveTab({
 
   // 이미지가 변경될 때마다 이미지 URL을 생성
   useEffect(() => {
-    if (image instanceof File) {
+    if (isImageFileObject(image)) {
       const objectUrl = URL.createObjectURL(image);
       setImageURL(objectUrl);
 
@@ -291,7 +292,7 @@ export default function ObjectiveTab({
 
       <div className="flex items-center justify-between">
         <div>
-          <SimpleLabel> 복수정답</SimpleLabel>
+          <SimpleLabel>복수정답</SimpleLabel>
           <input
             type="checkbox"
             className="ml-2 "
