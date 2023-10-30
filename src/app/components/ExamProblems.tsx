@@ -34,6 +34,7 @@ export default function ExamProblems({ problems }: Props) {
 
       const currentProblem =
         newShuffledExamProblems.exam_problems?.[currentProblemIndex];
+      
       const currentCandidate = currentProblem?.candidates?.[i];
 
       if (currentCandidate?.isAnswer === undefined) {
