@@ -21,12 +21,12 @@ export function isImageFileObject(image: any): image is File {
 
 export function isImageUrlObject(
   image: any,
-): image is { url: string; id: string } {
+): image is { url: string; id: number } {
   return (
     image &&
     typeof image === "object" &&
     typeof image.url === "string" &&
-    typeof image.id === "string"
+    typeof image.id === "number"
   );
 }
 
