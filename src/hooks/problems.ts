@@ -20,6 +20,7 @@ export default function useProblems() {
             isAdditiondalViewButtonClicked: false,
             isImageButtonClicked: false,
             image: null,
+            isAnswerMultiple: false,
             candidates: Array<candidate>(4).fill({ text: "", isAnswer: false }),
             subAnswer: null,
           },

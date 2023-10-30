@@ -1,7 +1,6 @@
 import { ProblemSetResponse, Problem, ProblemSet } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
-import { link } from "fs";
 
 export const checkEnvVariables = () => {
   if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
@@ -9,7 +8,7 @@ export const checkEnvVariables = () => {
   }
 };
 
-function isFileObject(image: any): image is File {
+export function isImageFileObject(image: any): image is File {
   return (
     image &&
     typeof image === "object" &&
@@ -19,6 +18,18 @@ function isFileObject(image: any): image is File {
     typeof image.lastModified === "number"
   );
 }
+
+export function isImageUrlObject(
+  image: any,
+): image is { url: string; id: string } {
+  return (
+    image &&
+    typeof image === "object" &&
+    typeof image.url === "string" &&
+    typeof image.id === "string"
+  );
+}
+
 export const isProblemEmpty = (problem: Problem) => {
   if (!problem) {
     return true;
@@ -87,7 +98,7 @@ export const isCardOnBeingWrited = (problem: Problem) => {
 
 export async function createProblem(
   problem: Problem,
-  userId: string
+  userId: string,
 ): Promise<string> {
   if (!problem) {
     throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
@@ -114,7 +125,7 @@ export async function createProblem(
             connect: [userId],
           },
         }),
-      }
+      },
     );
 
     if (!response.ok)
@@ -146,7 +157,7 @@ export async function uploadImageToProblem(image: File, problemId: string) {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
         body: newFormData,
-      }
+      },
     );
 
     if (!response.ok)
@@ -160,7 +171,7 @@ export async function uploadImageToProblem(image: File, problemId: string) {
 export async function createProblemSets(
   userId: string,
   setName: string,
-  postIdArray: string[]
+  postIdArray: string[],
 ) {
   try {
     const response = await fetch(
@@ -180,7 +191,7 @@ export async function createProblemSets(
             connect: [userId],
           },
         }),
-      }
+      },
     );
     if (!response.ok)
       throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
@@ -195,7 +206,7 @@ export async function createProblemSets(
 export async function postProblems(
   setName: string,
   userEmail: string,
-  problems: Problem[]
+  problems: Problem[],
 ) {
   checkEnvVariables();
   const userId = (await getUser(userEmail)).id;
@@ -207,12 +218,12 @@ export async function postProblems(
 
       // 문제와 이미지 생성은 순차적으로 처리
       const postId = await createProblem(problem, userId);
-      if (problem?.image && isFileObject(problem?.image)) {
+      if (problem?.image && isImageFileObject(problem?.image)) {
         await uploadImageToProblem(problem.image, postId);
       }
 
       return postId;
-    })
+    }),
   );
 
   const response = await createProblemSets(userId, setName, postIdArray);
@@ -241,7 +252,7 @@ export async function checkProblemSetName(name: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
 
     if (!response.ok)
@@ -283,7 +294,7 @@ export async function getProblemSets(userEmail: string, page: string) {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
         cache: "no-store",
-      }
+      },
     );
 
     if (!response.ok)
@@ -307,7 +318,7 @@ export async function getProblemSets(userEmail: string, page: string) {
 export async function getProblemSetsByName(
   userEmail: string,
   name: string,
-  page: string
+  page: string,
 ) {
   const query = qs.stringify({
     filters: {
@@ -337,7 +348,7 @@ export async function getProblemSetsByName(
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
         cache: "no-store",
-      }
+      },
     );
 
     if (!response.ok)
@@ -387,7 +398,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
 
     if (!response.ok)
@@ -417,7 +428,7 @@ export async function getProblemsSetIdByUUID(uuid: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
 
     if (!response.ok)
@@ -453,7 +464,7 @@ export async function getProblemByUUID(uuid: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
 
     if (!response.ok)
@@ -489,7 +500,7 @@ export async function getProblemById(id: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
 
     if (!response.ok)
@@ -526,7 +537,7 @@ export async function updateProblem(id: string, problem: Problem) {
         subjectiveAnswer: problem.subAnswer,
         isAnswerMultiple: problem.isAnswerMultiple,
       }),
-    }
+    },
   );
   if (!response.ok)
     throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
@@ -542,7 +553,7 @@ export async function deletePhoto(id: string) {
       headers: {
         Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
       },
-    }
+    },
   );
   if (!response.ok)
     throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
@@ -568,7 +579,7 @@ export async function getProblemPhotoIdByProblemId(id: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
     if (!response.ok)
       throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
@@ -585,7 +596,7 @@ export async function getProblemPhotoIdByProblemId(id: string) {
 
 export async function updateProblemSetName(
   name: string,
-  problemSetUUID: string
+  problemSetUUID: string,
 ) {
   checkEnvVariables();
   const problemSetId = await getProblemsSetIdByUUID(problemSetUUID);
@@ -600,7 +611,7 @@ export async function updateProblemSetName(
       body: JSON.stringify({
         name: name,
       }),
-    }
+    },
   );
   if (!response.ok)
     throw new Error("문제집 이름을 수정하는 중 오류가 발생했습니다.");
@@ -609,7 +620,7 @@ export async function updateProblems(
   setName: string,
   problems: Problem[],
   problemSetUUID: string,
-  userEmail: string
+  userEmail: string,
 ) {
   checkEnvVariables();
 
@@ -618,7 +629,7 @@ export async function updateProblems(
 
   const validatePrtoblemSetUUIDResult = await validateProblemSetUUID(
     problemSetUUID,
-    userEmail
+    userEmail,
   );
   if (validatePrtoblemSetUUIDResult === "NO")
     throw new Error("다른 사용자의 문제집은 수정할 수 없습니다.");
@@ -632,17 +643,17 @@ export async function updateProblems(
         //새로 추가된 문제인 경우
         if (problem) {
           problem.id = Number(
-            await createProblem(problem, (await getUser(userEmail)).id)
+            await createProblem(problem, (await getUser(userEmail)).id),
           );
         }
 
         if (problem?.id) {
-          if (problem?.image && isFileObject(problem?.image)) {
+          if (problem?.image && isImageFileObject(problem?.image)) {
             await uploadImageToProblem(problem.image, problem.id.toString());
           }
           await linkProblemToProblemSet(
             problem.id.toString(),
-            (await getProblemsSetIdByUUID(problemSetUUID)).toString()
+            (await getProblemsSetIdByUUID(problemSetUUID)).toString(),
           );
           continue;
         }
@@ -652,10 +663,10 @@ export async function updateProblems(
         throw new Error("문제를 수정하는 중 오류가 발생했습니다.");
       }
 
-      if (problem && problem?.image && isFileObject(problem?.image)) {
+      if (problem && problem?.image && isImageFileObject(problem?.image)) {
         //image가 파일 타입인 경우
         const photoId = await getProblemPhotoIdByProblemId(
-          problem.id.toString()
+          problem.id.toString(),
         );
 
         if (photoId === "null") {
@@ -669,7 +680,7 @@ export async function updateProblems(
       } else if (problem && problem?.image === null) {
         //image가 null인 경우
         const photoId = await getProblemPhotoIdByProblemId(
-          problem.id.toString()
+          problem.id.toString(),
         );
         if (photoId !== "null") {
           //기존에 이미지가 있는 경우
@@ -690,7 +701,7 @@ export async function updateProblems(
 
 export async function validateProblemSetUUID(
   problemSetUUID: string,
-  userEmail: string
+  userEmail: string,
 ) {
   const query = qs.stringify({
     filters: {
@@ -713,7 +724,7 @@ export async function validateProblemSetUUID(
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
     if (!response.ok)
       throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
@@ -750,7 +761,7 @@ export async function validateProblemId(problemId: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
-      }
+      },
     );
     if (!response.ok)
       throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
@@ -766,7 +777,7 @@ export async function validateProblemId(problemId: string, userEmail: string) {
 }
 export async function linkProblemToProblemSet(
   problemId: string,
-  problemSetId: string
+  problemSetId: string,
 ) {
   checkEnvVariables();
 
@@ -783,7 +794,7 @@ export async function linkProblemToProblemSet(
           connect: [problemSetId],
         },
       }),
-    }
+    },
   );
   if (!response.ok)
     throw new Error("문제를 문제집에 연결하는 중 오류가 발생했습니다.");

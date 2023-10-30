@@ -8,6 +8,7 @@ import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
 import cloneDeep from "lodash/cloneDeep";
 import checkImage from "/public/check-303494_960_720.png";
+import { isImageUrlObject } from "@/service/problems";
 
 type Props = {
   problems: ProblemSetWithName;
@@ -71,10 +72,10 @@ export default function ExamProblems({ problems }: Props) {
         )}
 
         {currentShuffledExamProblem.image &&
-          typeof currentShuffledExamProblem.image === "object" && (
+          isImageUrlObject(currentShuffledExamProblem.image) && (
             <div className="mb-5">
               <Image
-                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${currentShuffledExamProblem.image?.url}`}
+                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${currentShuffledExamProblem.image.url}`}
                 width={400}
                 height={400}
                 alt="이미지"
