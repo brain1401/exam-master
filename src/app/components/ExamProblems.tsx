@@ -51,6 +51,7 @@ export default function ExamProblems({ problems }: Props) {
         currentCandidate.isAnswer = !currentCandidate.isAnswer;
       } else {
         // 현재 문제가 단일 선택지이면
+        
         if (
           currentProblem.candidates.some(
             (candidate) => candidate.isAnswer === true,
@@ -58,14 +59,14 @@ export default function ExamProblems({ problems }: Props) {
         ) {
           // 현재 문제가 단일 선택지이면서 이미 체크된 답이 있으면
           if (
-            currentCandidate.text ===
+            currentCandidate.id ===
             currentProblem.candidates.find(
               (candidate) => candidate.isAnswer === true,
-            )?.text
+            )?.id
           ) {
             // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 같으면
             currentCandidate.isAnswer = !currentCandidate.isAnswer;
-          } 
+          }
         } else {
           // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
           currentCandidate.isAnswer = !currentCandidate.isAnswer;
@@ -111,7 +112,6 @@ export default function ExamProblems({ problems }: Props) {
           {currentShuffledExamProblem.question}
         </div>
 
-
         {currentShuffledExamProblem.image &&
           isImageUrlObject(currentShuffledExamProblem.image) && (
             <div className="mb-5">
@@ -120,15 +120,15 @@ export default function ExamProblems({ problems }: Props) {
                 width={400}
                 height={400}
                 alt="이미지"
-                />
+              />
             </div>
           )}
 
-{currentShuffledExamProblem.additionalView && (
-  <div className="mb-5 border border-black p-3">
-    {currentShuffledExamProblem.additionalView}
-  </div>
-)}
+        {currentShuffledExamProblem.additionalView && (
+          <div className="mb-5 border border-black p-3">
+            {currentShuffledExamProblem.additionalView}
+          </div>
+        )}
         {currentShuffledExamProblem.type === "obj" && (
           <>
             {
