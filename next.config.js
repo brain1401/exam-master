@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["strapi-exam.brain1401.duckdns.org"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "strapi-exam.brain1401.duckdns.org",
+      },
+    ],
   },
 };
 
