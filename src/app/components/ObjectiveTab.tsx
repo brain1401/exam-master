@@ -227,6 +227,8 @@ export default function ObjectiveTab({
       };
       return newProblems;
     });
+    
+    // 문제 인덱스(현재 문제)가 변경될 때만 실행( 아래 eslint-disable-next-line를 없애고 Lint가 제시한 의존성 배열을 추가하면 무한루프에 빠짐 )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problemCurrentIndex]);
 
