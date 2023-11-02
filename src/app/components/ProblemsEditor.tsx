@@ -42,8 +42,7 @@ export default function ProblemsEditor({
         return newCards;
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problemCurrentIndex]);
+  }, [problemCurrentIndex, currentProblem?.type, problems, setProblems]);
 
   usePreventClose();
 

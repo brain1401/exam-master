@@ -1,5 +1,5 @@
 import { Problem, candidate } from "@/types/problems";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 export default function useProblems() {
   const [problems, setProblems] = useState<Problem[]>(
@@ -8,7 +8,7 @@ export default function useProblems() {
   const [problemCurrentIndex, setProblemCurrentIndex] = useState(0);
   const [problemSetsName, setProblemSetsName] = useState<string>("");
 
-  const resetProblems = () => {
+  const resetProblems = useCallback(() => {
     setProblems(
       Array<Problem>(10)
         .fill(null)
@@ -34,7 +34,7 @@ export default function useProblems() {
         ),
     );
     setProblemCurrentIndex(0);
-  };
+  }, []);
 
   return {
     problemCurrentIndex,

@@ -22,8 +22,7 @@ export default function CreateProblems() {
     return () => {
       resetProblems();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [resetProblems]);
 
   return (
     <section className="mx-auto mt-10 max-w-[70rem] p-3">

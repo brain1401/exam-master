@@ -51,8 +51,7 @@ export default function EditProblemsByUUID({ params }: Props) {
     return () => {
       resetProblems();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params.UUID, resetProblems, setProblemSetsName, setProblems]);
 
   if (error) {
     return <div>존재하지 않는 문서</div>;

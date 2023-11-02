@@ -31,8 +31,7 @@ export default function NavMobile({ loginButton }: Props) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMenuOpen]);
+  }, [isMenuOpen, setIsMenuOpen]);
 
   return (
     <div // mobile menu
