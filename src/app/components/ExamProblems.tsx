@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import Button from "./ui/Button";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
-import cloneDeep from "lodash/cloneDeep";
 import checkImage from "/public/check-303494_960_720.png";
 import { isImageUrlObject } from "@/service/problems";
 import {
@@ -14,6 +13,7 @@ import {
   examProblemsAtom,
 } from "../jotai/examProblems";
 import { useAtom, useAtomValue } from "jotai";
+import { Problem } from "@/types/problems";
 
 export default function ExamProblems() {
   const [currentExamProblem, setCurrentExamProblem] = useAtom(
@@ -26,8 +26,12 @@ export default function ExamProblems() {
   const name = useAtomValue(examProblemNameAtom);
 
   const onClickCandidate = (i: number, isMultipleAnswer: boolean) => {
-    const newCurrentExamProblems = cloneDeep(currentExamProblem);
-    const currentCandidate = newCurrentExamProblems?.candidates?.[i];
+    const newCurrentExamProblems = {...currentExamProblem};
+
+    if (!newCurrentExamProblems || !newCurrentExamProblems.candidates) {
+      throw new Error("무언가가 잘못되었습니다.");
+    }
+    const currentCandidate = [...newCurrentExamProblems.candidates]?.[i];
 
     if (
       currentCandidate?.isAnswer === undefined ||
@@ -70,18 +74,28 @@ export default function ExamProblems() {
         currentCandidate.isAnswer = !currentCandidate.isAnswer;
       }
     }
+    
+    newCurrentExamProblems.candidates = newCurrentExamProblems.candidates.map(
+      (candidate) => {
+        if (candidate.id === currentCandidate.id) {
+          return currentCandidate;
+        } else {
+          return candidate;
+        }
+      },
+    );
 
-    setCurrentExamProblem(newCurrentExamProblems);
+    setCurrentExamProblem(newCurrentExamProblems as NonNullable<Problem>);
   };
 
   const onTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newCurrentExamProblems = cloneDeep(currentExamProblem);
+    const newCurrentExamProblems = {...currentExamProblem};
     if (!newCurrentExamProblems) {
       throw new Error("무언가가 잘못되었습니다.");
     }
     newCurrentExamProblems.subAnswer = e.target.value;
 
-    setCurrentExamProblem(newCurrentExamProblems);
+    setCurrentExamProblem(newCurrentExamProblems as NonNullable<Problem>);
   };
 
   usePreventClose();
