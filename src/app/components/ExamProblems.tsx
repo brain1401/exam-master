@@ -66,6 +66,12 @@ export default function ExamProblems() {
         ) {
           // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 같으면
           currentCandidate.isAnswer = !currentCandidate.isAnswer;
+        } else {
+          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 다르면
+          newCurrentExamProblems.candidates.forEach((candidate) => {
+            candidate.isAnswer = false;
+          });
+          currentCandidate.isAnswer = true;
         }
       } else {
         // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
