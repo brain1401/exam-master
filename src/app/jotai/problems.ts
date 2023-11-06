@@ -73,6 +73,7 @@ export const resetProblemsAtom = atom(null, (get, set) => {
   set(problemsAtom, Array<Problem>(10).fill(null));
   set(currentProblemIndexAtom, 0);
   set(problemLengthAtom, "10");
+  set(currentTabAtom, "obj");
   set(problemSetsNameAtom, "");
   set(localProblemSetsNameAtom, "");
 });
