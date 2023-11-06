@@ -1,19 +1,19 @@
 "use client";
 import { useState } from "react";
 import { isProblemEmpty } from "@/service/problems";
-import { Problem } from "@/types/problems";
+import { problemsAtom, problemSetsNameAtom } from "@/app/jotai/problems";
+import { useAtomValue } from "jotai";
 
 type Props = {
-  problems: Problem[];
-  problemSetName: string;
   uuid: string;
 };
 export default function ManageProblemSubmitButton({
-  problems,
-  problemSetName,
   uuid,
 }: Props) {
   const [isLoading, setIsLoading] = useState(false);
+
+  const problems = useAtomValue(problemsAtom);
+  const problemSetName = useAtomValue(problemSetsNameAtom);
 
   const handleSubmit = async () => {
     if (problems.some((problem) => isProblemEmpty(problem))) {

@@ -5,9 +5,19 @@ import ProblemsEditor from "@/app/components/ProblemsEditor";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import { ClipLoader } from "react-spinners";
-import useProblems from "@/hooks/problems";
 import EditProblemsOption from "@/app/components/CreateProblems/EditProblemsOption";
 import ManageProblemSubmitButton from "@/app/components/ManageProblemSubmitButton";
+import {
+  problemsAtom,
+  problemSetsNameAtom,
+  currentTabAtom,
+  localProblemSetsNameAtom,
+  problemLengthAtom,
+  resetProblemsAtom,
+
+} from "@/app/jotai/problems";
+import { useSetAtom } from "jotai";
+import { ProblemResponse, ProblemSetWithName } from "@/types/problems";
 type Props = {
   params: {
     UUID: string;
@@ -18,15 +28,12 @@ export default function EditProblemsByUUID({ params }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const {
-    problemCurrentIndex,
-    problemSetsName,
-    problems,
-    resetProblems,
-    setProblemCurrentIndex,
-    setProblemSetsName,
-    setProblems,
-  } = useProblems();
+  const setProblems = useSetAtom(problemsAtom);
+  const setProblemSetsName = useSetAtom(problemSetsNameAtom);
+  const resetProblems = useSetAtom(resetProblemsAtom);
+  const setLocalProblemSetsName = useSetAtom(localProblemSetsNameAtom);
+  const setCurrentTab = useSetAtom(currentTabAtom);
+  const setProblemLength = useSetAtom(problemLengthAtom);
 
   useEffect(() => {
     setLoading(true);
@@ -39,6 +46,9 @@ export default function EditProblemsByUUID({ params }: Props) {
       .then((res) => {
         setProblems(res.data.exam_problems);
         setProblemSetsName(res.data.name);
+        setProblemLength(res.data.exam_problems.length);
+        setLocalProblemSetsName(res.data.name);
+        setCurrentTab(res.data.exam_problems[0].type);
       })
       .catch((err) => {
         setError(err.message);
@@ -51,7 +61,7 @@ export default function EditProblemsByUUID({ params }: Props) {
     return () => {
       resetProblems();
     };
-  }, [params.UUID, resetProblems, setProblemSetsName, setProblems]);
+  }, [params.UUID, resetProblems, setProblemSetsName, setProblems, setLocalProblemSetsName, setCurrentTab, setProblemLength]);
 
   if (error) {
     return <div>존재하지 않는 문서</div>;
@@ -67,31 +77,12 @@ export default function EditProblemsByUUID({ params }: Props) {
 
   return (
     <section className="mx-auto mt-10 max-w-[80rem] p-3">
-      <EditProblemsOption
-        problems={problems}
-        setProblems={setProblems}
-        setProblemCurrentIndex={setProblemCurrentIndex}
-        problemSetsName={problemSetsName}
-        setProblemSetsName={setProblemSetsName}
-      />
-      <CurrentProblemIndicator
-        problemCurrentIndex={problemCurrentIndex}
-        problemsLength={problems.length}
-      />
-      <ProblemsEditor
-        problemCurrentIndex={problemCurrentIndex}
-        problems={problems}
-        setProblems={setProblems}
-      />
-      <NextOrPrevButtons
-        problemLength={problems.length}
-        setCurrentProblemIndex={setProblemCurrentIndex}
-      />
-      <ManageProblemSubmitButton
-        problems={problems}
-        problemSetName={problemSetsName}
-        uuid={params.UUID}
-      />
+      <EditProblemsOption />
+      <CurrentProblemIndicator />
+      <ProblemsEditor />
+      <NextOrPrevButtons />
+
+      <ManageProblemSubmitButton uuid={params.UUID} />
     </section>
   );
 }
