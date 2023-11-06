@@ -7,14 +7,12 @@ import {
   currentProblemIndexAtom,
   initCurrentProblemAtom,
 } from "../jotai/problems";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useSetAtom, useAtomValue } from "jotai";
 
 export default function SubjectiveTab() {
   const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
   const [problems, setProblems] = useAtom(problemsAtom);
-  const [problemCurrentIndex, setProblemCurrentIndex] = useAtom(
-    currentProblemIndexAtom,
-  );
+  const problemCurrentIndex = useAtomValue(currentProblemIndexAtom);
   const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
 
   const {

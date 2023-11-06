@@ -14,10 +14,8 @@ import {
   localProblemSetsNameAtom,
   problemLengthAtom,
   resetProblemsAtom,
-
 } from "@/app/jotai/problems";
 import { useSetAtom } from "jotai";
-import { ProblemResponse, ProblemSetWithName } from "@/types/problems";
 type Props = {
   params: {
     UUID: string;
@@ -61,7 +59,15 @@ export default function EditProblemsByUUID({ params }: Props) {
     return () => {
       resetProblems();
     };
-  }, [params.UUID, resetProblems, setProblemSetsName, setProblems, setLocalProblemSetsName, setCurrentTab, setProblemLength]);
+  }, [
+    params.UUID,
+    resetProblems,
+    setProblemSetsName,
+    setProblems,
+    setLocalProblemSetsName,
+    setCurrentTab,
+    setProblemLength,
+  ]);
 
   if (error) {
     return <div>존재하지 않는 문서</div>;

@@ -12,9 +12,8 @@ import {
   currentExamProblemIndexAtom,
   examProblemNameAtom,
   examProblemsAtom,
-  resetExamProblemsAtom,
 } from "../jotai/examProblems";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 export default function ExamProblems() {
   const [currentExamProblem, setCurrentExamProblem] = useAtom(
@@ -25,13 +24,6 @@ export default function ExamProblems() {
   );
   const [examProblems] = useAtom(examProblemsAtom);
   const name = useAtomValue(examProblemNameAtom);
-  const resetExamProblems = useSetAtom(resetExamProblemsAtom);
-
-  useEffect(() => {
-    return () => {
-      resetExamProblems();
-    };
-  }, [resetExamProblems]);
 
   const onClickCandidate = (i: number, isMultipleAnswer: boolean) => {
     const newCurrentExamProblems = cloneDeep(currentExamProblem);

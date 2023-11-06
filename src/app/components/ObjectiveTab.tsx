@@ -3,7 +3,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isImageFileObject, isImageUrlObject } from "@/service/problems";
 import SimpleLabel from "./ui/SimpleLabel";
-import { Problem, candidate } from "@/types/problems";
+import { Problem } from "@/types/problems";
 import {
   problemsAtom,
   currentProblemAtom,
@@ -11,7 +11,7 @@ import {
   currentProblemIndexAtom,
   initCurrentProblemAtom,
 } from "@/app/jotai/problems";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useSetAtom, useAtomValue } from "jotai";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -26,7 +26,7 @@ export default function ObjectiveTab() {
   const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
     currentProblemCandidatesAtom,
   );
-  const [currentProblemIndex, setCurrentProblemIndex] = useAtom(
+  const currentProblemIndex = useAtomValue(
     currentProblemIndexAtom,
   );
   const initCurrentProblem = useSetAtom(initCurrentProblemAtom);

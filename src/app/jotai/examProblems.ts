@@ -37,7 +37,7 @@ export const examProblemNameAtom = atom(
   },
 );
 
-export const resetExamProblemsAtom = atom(null, (get, set) => {
+export const resetExamProblemsAtom = atom(null, (_, set) => {
   set(examProblemsAtom, { name: "", exam_problems: [] });
   set(currentExamProblemIndexAtom, 0);
 });

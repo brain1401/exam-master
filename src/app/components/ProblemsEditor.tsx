@@ -1,10 +1,9 @@
 "use client";
-import { useState, useLayoutEffect, useEffect } from "react";
+import { useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/problems";
-import { Problem } from "@/types/problems";
 import usePreventClose from "@/hooks/preventClose";
 import {
   currentProblemAtom,
@@ -12,7 +11,7 @@ import {
   problemsAtom,
   currentProblemIndexAtom,
 } from "../jotai/problems";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 
 export default function ProblemsEditor() {
   const [problems, setProblems] = useAtom(problemsAtom);

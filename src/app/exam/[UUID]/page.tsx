@@ -1,12 +1,14 @@
 "use client";
 
-import { ProblemSetWithName } from "@/types/problems";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import ExamProblems from "@/app/components/ExamProblems";
-import { examProblemsAtom } from "@/app/jotai/examProblems";
-import { useAtom } from "jotai";
+import {
+  examProblemsAtom,
+  resetExamProblemsAtom,
+} from "@/app/jotai/examProblems";
+import { useAtom, useSetAtom } from "jotai";
 
 type Props = {
   params: {
@@ -16,11 +18,13 @@ type Props = {
 
 export default function DetailedExamPage({ params: { UUID } }: Props) {
   const [examProblems, setExamProblems] = useAtom(examProblemsAtom);
+  const resetExamProblems = useSetAtom(resetExamProblemsAtom);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`/api/getExamProblemsByProblemSetUUID`, {
         params: {
@@ -39,7 +43,11 @@ export default function DetailedExamPage({ params: { UUID } }: Props) {
       .finally(() => {
         setLoading(false);
       });
-  }, [UUID, setExamProblems]);
+
+    return () => {
+      resetExamProblems();
+    };
+  }, [UUID, setExamProblems, resetExamProblems]);
 
   if (error) return <div>에러가 발생했습니다.</div>;
   if (loading)
@@ -51,8 +59,7 @@ export default function DetailedExamPage({ params: { UUID } }: Props) {
 
   return (
     <section className="mx-auto mt-10 max-w-[80rem] p-3">
-      <div>DetailExamPage</div>
-      {examProblems && <ExamProblems/>}
+      {examProblems && <ExamProblems />}
     </section>
   );
 }
