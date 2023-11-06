@@ -6,45 +6,44 @@ import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
 import usePreventClose from "@/hooks/preventClose";
+import { currentProblemAtom, currentTabAtom, problemsAtom, currentProblemIndexAtom } from "../jotai/problems";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
-type Props = {
-  problems: Problem[];
-  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
-  problemCurrentIndex: number;
-};
-export default function ProblemsEditor({
-  problems,
-  setProblems,
-  problemCurrentIndex,
-}: Props) {
-  const currentProblem = problems[problemCurrentIndex];
-  const [currentTab, setCurrentTab] = useState<"obj" | "sub">(
-    currentProblem?.type ?? "obj",
-  );
+export default function ProblemsEditor() {
 
-  useLayoutEffect(() => {
-    const prevProblem = problems?.[problemCurrentIndex - 1];
-    const nextProblem = problems?.[problemCurrentIndex + 1];
+  const [problems, setProblems] = useAtom(problemsAtom);
+  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const [currentTab, setCurrentTab] = useAtom(currentTabAtom);
+  const [problemCurrentIndex, setProblemCurrentIndex] = useAtom(currentProblemIndexAtom);
 
-    //현재 카드가 바뀔 때마다 탭을 바꿔줌
-    setCurrentTab((prev) => currentProblem?.type ?? prev);
-    if (nextProblem && !isCardOnBeingWrited(nextProblem)) {
-      setProblems((prev) => {
-        const newCards = [...prev];
-        newCards[problemCurrentIndex + 1] = null;
-        return newCards;
-      });
-    }
-    if (prevProblem && !isCardOnBeingWrited(prevProblem)) {
-      setProblems((prev) => {
-        const newCards = [...prev];
-        newCards[problemCurrentIndex - 1] = null;
-        return newCards;
-      });
-    }
-  }, [problemCurrentIndex, currentProblem?.type, problems, setProblems]);
 
   usePreventClose();
+
+  const onTabChange = (tab:"obj"|"sub") => {
+    if (isCardOnBeingWrited(currentProblem)) {
+      const value = confirm(
+        "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?",
+      );
+      if (value === false) return;
+    }
+    setCurrentTab(tab);
+    setProblems((prev) => {
+      const newProblems = [...prev];
+      newProblems[problemCurrentIndex] = {
+        id: prev[problemCurrentIndex]?.id,
+        type: tab,
+        question: "",
+        additionalView: "",
+        isAdditiondalViewButtonClicked: false,
+        isImageButtonClicked: false,
+        isAnswerMultiple: false,
+        image: null,
+        candidates: tab === "obj" ? Array(4).fill({ text: "", isAnswer: false }) : null,
+        subAnswer: tab === "obj" ? null : "",
+      };
+      return newProblems;
+    });
+  }
 
   useEffect(() => {
     console.log(problems);
@@ -64,29 +63,7 @@ export default function ProblemsEditor({
             }`}
             value="obj"
             onClick={() => {
-              if (isCardOnBeingWrited(currentProblem)) {
-                const value = confirm(
-                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?",
-                );
-                if (value === false) return;
-              }
-              setCurrentTab("obj");
-              setProblems((prev) => {
-                const newProblems = [...prev];
-                newProblems[problemCurrentIndex] = {
-                  id: prev[problemCurrentIndex]?.id,
-                  type: "obj",
-                  question: "",
-                  additionalView: "",
-                  isAdditiondalViewButtonClicked: false,
-                  isImageButtonClicked: false,
-                  isAnswerMultiple: false,
-                  image: null,
-                  candidates: Array(4).fill({ text: "", isAnswer: false }),
-                  subAnswer: null,
-                };
-                return newProblems;
-              });
+              onTabChange("obj");
             }}
             disabled={currentTab === "obj"}
           >
@@ -99,29 +76,7 @@ export default function ProblemsEditor({
             }`}
             value="sub"
             onClick={() => {
-              if (isCardOnBeingWrited(currentProblem)) {
-                const value = confirm(
-                  "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?",
-                );
-                if (value === false) return;
-              }
-              setCurrentTab("sub");
-              setProblems((prev) => {
-                const newProblems = [...prev];
-                newProblems[problemCurrentIndex] = {
-                  id: prev[problemCurrentIndex]?.id,
-                  type: "sub",
-                  question: "",
-                  additionalView: "",
-                  isAdditiondalViewButtonClicked: false,
-                  isImageButtonClicked: false,
-                  isAnswerMultiple: false,
-                  image: null,
-                  candidates: null,
-                  subAnswer: "",
-                };
-                return newProblems;
-              });
+              onTabChange("sub");
             }}
             disabled={currentTab === "sub"}
           >
@@ -130,19 +85,11 @@ export default function ProblemsEditor({
         </Tabs.List>
         <Tabs.Content value="obj">
           {/*객관식*/}
-          <ObjectiveTab
-            problemCurrentIndex={problemCurrentIndex}
-            problems={problems}
-            setProblems={setProblems}
-          />
+          <ObjectiveTab/>
         </Tabs.Content>
         <Tabs.Content value="sub">
           {/*주관식*/}
-          <SubjectiveTab
-            problemCurrentIndex={problemCurrentIndex}
-            problems={problems}
-            setProblems={setProblems}
-          />
+          <SubjectiveTab/>
         </Tabs.Content>
       </Tabs.Root>
     </section>

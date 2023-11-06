@@ -2,31 +2,21 @@
 import { useEffect, useState } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isCardOnBeingWrited } from "@/service/problems";
-import { Problem } from "@/types/problems";
+import {
+  currentProblemAtom,
+  problemsAtom,
+  currentProblemIndexAtom,
+  initCurrentProblemAtom,
+} from "../jotai/problems";
+import { useAtom, useSetAtom } from "jotai";
 
-type Props = {
-  problems: Problem[];
-  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
-  problemCurrentIndex: number;
-};
-
-export default function SubjectiveTab({
-  problems,
-  setProblems,
-  problemCurrentIndex,
-}: Props) {
-  const currentProblem = problems[problemCurrentIndex];
-  const setCurrentProblem = (newCard: Partial<Problem>) => {
-    setProblems((prev) => {
-      const newProblems: Partial<Problem>[] = [...prev];
-      newProblems[problemCurrentIndex] = {
-        id: newProblems[problemCurrentIndex]?.id,
-        ...newProblems[problemCurrentIndex],
-        ...newCard,
-      };
-      return newProblems as NonNullable<Problem>[];
-    });
-  };
+export default function SubjectiveTab() {
+  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const [problems, setProblems] = useAtom(problemsAtom);
+  const [problemCurrentIndex, setProblemCurrentIndex] = useAtom(
+    currentProblemIndexAtom,
+  );
+  const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
 
   const {
     question,
@@ -40,22 +30,8 @@ export default function SubjectiveTab({
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   useEffect(() => {
-    if (isCardOnBeingWrited(currentProblem)) return;
-
-    setCurrentProblem({
-      type: "sub",
-      question: "",
-      additionalView: "",
-      isAdditiondalViewButtonClicked: false,
-      isImageButtonClicked: false,
-      image: null,
-      candidates: null,
-      subAnswer: "",
-    });
-    
-    // 문제 인덱스(현재 문제)가 변경될 때만 실행( 아래 eslint-disable-next-line를 없애고 Lint가 제시한 의존성 배열을 추가하면 무한루프에 빠짐 )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problemCurrentIndex]);
+    initCurrentProblem();
+  }, [initCurrentProblem]);
 
   useEffect(() => {
     if (image instanceof File) {
@@ -76,7 +52,7 @@ export default function SubjectiveTab({
 
   return (
     <form
-      className=" rounded-md border border-gray-300 p-5"
+      className=" flex flex-col space-y-4 rounded-md border border-gray-500 p-5"
       onSubmit={(e) => {
         e.preventDefault();
       }}

@@ -1,9 +1,17 @@
 "use client";
 import { ChangeEvent, useEffect, useState } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
-import { isCardOnBeingWrited, isImageFileObject } from "@/service/problems";
+import { isImageFileObject, isImageUrlObject } from "@/service/problems";
 import SimpleLabel from "./ui/SimpleLabel";
 import { Problem, candidate } from "@/types/problems";
+import {
+  problemsAtom,
+  currentProblemAtom,
+  currentProblemCandidatesAtom,
+  currentProblemIndexAtom,
+  initCurrentProblemAtom,
+} from "@/app/jotai/problems";
+import { useAtom, useSetAtom } from "jotai";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -12,29 +20,16 @@ const candidatePlaceholders = [
   "다른 데서 그런 식으로 말하면 너는 학교 폭력의 피해자가 될지도 몰라",
 ];
 
-type Props = {
-  problemCurrentIndex: number;
-  problems: Problem[];
-  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
-};
-export default function ObjectiveTab({
-  problemCurrentIndex,
-  problems,
-  setProblems,
-}: Props) {
-  const currentProblem = problems[problemCurrentIndex];
-  const currentCardCandidates = currentProblem?.candidates;
-
-  const setCurrentProblemCandidates = (newCandidates: candidate[]) => {
-    setProblems((prev) => {
-      const newProblems: Partial<Problem>[] = [...prev];
-      newProblems[problemCurrentIndex] = {
-        ...newProblems[problemCurrentIndex],
-        candidates: newCandidates,
-      };
-      return newProblems as NonNullable<Problem>[];
-    });
-  };
+export default function ObjectiveTab() {
+  const [problems, setProblems] = useAtom(problemsAtom);
+  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
+    currentProblemCandidatesAtom,
+  );
+  const [currentProblemIndex, setCurrentProblemIndex] = useAtom(
+    currentProblemIndexAtom,
+  );
+  const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
 
   const [selectedValue, setSelectedValue] = useState(
     currentProblem?.candidates?.length.toString() ?? "4",
@@ -49,13 +44,17 @@ export default function ObjectiveTab({
     isImageButtonClicked,
   } = currentProblem ?? {};
 
+  useEffect(() => {
+    initCurrentProblem();
+  }, [initCurrentProblem]);
+
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value: selectedValue } = event.target;
     setSelectedValue(selectedValue);
 
-    if (!currentCardCandidates) throw new Error("무언가가 잘못되었습니다.");
+    if (!currentProblemCandidates) throw new Error("무언가가 잘못되었습니다.");
 
-    let newValues = [...currentCardCandidates];
+    let newValues = [...currentProblemCandidates];
     const prevLength = newValues.length;
 
     const selectedIntValue = parseInt(selectedValue);
@@ -79,9 +78,9 @@ export default function ObjectiveTab({
     const { id, value } = event.target;
     const index = parseInt(id.split("-")[1]);
 
-    if (!currentCardCandidates) throw new Error("무언가가 잘못되었습니다.");
+    if (!currentProblemCandidates) throw new Error("무언가가 잘못되었습니다.");
 
-    const newCandidates = [...currentCardCandidates];
+    const newCandidates = [...currentProblemCandidates];
     newCandidates[index] = {
       id: index,
       text: value,
@@ -94,7 +93,8 @@ export default function ObjectiveTab({
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = event.target;
     const index = parseInt(id.split("-")[1]);
-    if (!currentCardCandidates) throw new Error("무언가가 잘못되었습니다.");
+    if (!currentProblemCandidates || !currentProblem)
+      throw new Error("무언가가 잘못되었습니다.");
 
     const changedCandidateCheck = (checked: boolean) => {
       const candidates = {
@@ -106,7 +106,7 @@ export default function ObjectiveTab({
       return candidates;
     };
 
-    const newCandidates = [...currentCardCandidates];
+    const newCandidates = [...currentProblemCandidates];
 
     if (currentProblem.isAnswerMultiple === true) {
       newCandidates[index] = changedCandidateCheck(checked);
@@ -135,7 +135,7 @@ export default function ObjectiveTab({
   const handleMultipleAnswerCheckboxChange = (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
-    if(!currentProblem) throw new Error("무언가가 잘못되었습니다.");
+    if (!currentProblem) throw new Error("무언가가 잘못되었습니다.");
 
     const count = currentProblem.candidates?.reduce((acc, cur) => {
       if (cur.isAnswer === true) {
@@ -152,14 +152,8 @@ export default function ObjectiveTab({
       return;
     }
 
-    setProblems((prev) => {
-      const newProblems: Partial<Problem>[] = [...prev];
-      newProblems[problemCurrentIndex] = {
-        ...newProblems[problemCurrentIndex],
-        isAnswerMultiple: event.target.checked,
-      };
-
-      return newProblems as NonNullable<Problem>[];
+    setCurrentProblem({
+      isAnswerMultiple: event.target.checked,
     });
   };
 
@@ -179,7 +173,7 @@ export default function ObjectiveTab({
         <input
           type="text"
           id={`candidate-${index}-text`}
-          value={currentCardCandidates?.[index]?.text ?? ""}
+          value={currentProblemCandidates?.[index]?.text ?? ""}
           className="h-10 w-full rounded-md border border-gray-300 p-2"
           onChange={handleInputChange}
           placeholder={value}
@@ -193,44 +187,13 @@ export default function ObjectiveTab({
         <input
           type="checkbox"
           id={`candidate-${index}-checkbox`}
-          disabled={!Boolean(currentCardCandidates?.[index]?.text)}
-          checked={currentCardCandidates?.[index]?.isAnswer ?? false}
+          disabled={!Boolean(currentProblemCandidates?.[index]?.text)}
+          checked={currentProblemCandidates?.[index]?.isAnswer ?? false}
           onChange={handleCheckboxChange}
         />
       </div>
     </div>
   ));
-
-  // 문제 인덱스가 변경(사용자가 이전, 다음 버튼으로 이동)될 때마다 입력폼 초기화
-  useEffect(() => {
-    // 현재 문제에 무언가 적혀있으면 초기화하지 않음
-    if (isCardOnBeingWrited(currentProblem)) return;
-
-    setProblems((prev) => {
-      const newProblems = [...prev];
-      newProblems[problemCurrentIndex] = {
-        id: prev[problemCurrentIndex]?.id,
-        type: "obj",
-        question: "",
-        additionalView: "",
-        isAdditiondalViewButtonClicked: false,
-        isImageButtonClicked: false,
-        image: null,
-        isAnswerMultiple: false,
-        candidates: Array.from(Array<candidate>(4), (_, i) => ({
-          id: i,
-          text: "",
-          isAnswer: false,
-        })),
-
-        subAnswer: null,
-      };
-      return newProblems;
-    });
-    
-    // 문제 인덱스(현재 문제)가 변경될 때만 실행( 아래 eslint-disable-next-line를 없애고 Lint가 제시한 의존성 배열을 추가하면 무한루프에 빠짐 )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problemCurrentIndex]);
 
   // 이미지가 변경될 때마다 이미지 URL을 생성
   useEffect(() => {
@@ -242,7 +205,7 @@ export default function ObjectiveTab({
       return () => {
         URL.revokeObjectURL(objectUrl);
       };
-    } else if (image && typeof image === "object") {
+    } else if (isImageUrlObject(image)) {
       // null 체크와 File 체크 후에 실행
       setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
     } else {
@@ -271,8 +234,8 @@ export default function ObjectiveTab({
           onChange={(e) => {
             setProblems((prev) => {
               const newProblems: Partial<Problem>[] = [...prev];
-              newProblems[problemCurrentIndex] = {
-                ...newProblems[problemCurrentIndex],
+              newProblems[currentProblemIndex] = {
+                ...newProblems[currentProblemIndex],
                 question: e.target.value,
               };
 
@@ -289,7 +252,7 @@ export default function ObjectiveTab({
         isImageButtonClicked={isImageButtonClicked ?? false}
         setImageURL={setImageURL}
         setProblems={setProblems}
-        problemCurrentIndex={problemCurrentIndex}
+        problemCurrentIndex={currentProblemIndex}
       />
 
       <div className="flex items-center justify-between">

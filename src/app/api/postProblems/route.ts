@@ -9,25 +9,25 @@ export async function POST(req: NextRequest) {
   if (!session) {
     return NextResponse.json(
       { error: "로그인이 필요합니다." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   if (!session?.user?.email)
     return NextResponse.json(
       { error: "로그인이 필요합니다." },
-      { status: 401 }
+      { status: 401 },
     );
 
   const formData = await req.formData();
   const entries = Array.from(formData.entries());
 
   const intermediateResults: NonNullable<Problem>[] = [];
-  let problemSetName: string | undefined;
+  let problemSetsName: string | undefined;
 
   for (const [name, value] of entries) {
-    if (name === "problemSetName") {
-      problemSetName = value as string;
+    if (name === "problemSetsName") {
+      problemSetsName = value as string;
       continue;
     }
 
@@ -52,17 +52,17 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  if(!problemSetName || !intermediateResults) {
+  if (!problemSetsName || !intermediateResults) {
     return NextResponse.json(
       { error: "FormData가 정상적인지 확인하십시오." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   const response = await postProblems(
-    problemSetName,
+    problemSetsName,
     session?.user?.email,
-    intermediateResults
+    intermediateResults,
   );
 
   return NextResponse.json(response);

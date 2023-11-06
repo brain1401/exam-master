@@ -3,34 +3,33 @@ import { useState } from "react";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
 import Button from "../ui/Button";
-type Props = {
-  problems: Problem[];
-  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
-  problemSetsName: string;
-  setProblemSetsName: React.Dispatch<React.SetStateAction<string>>;
-  setProblemCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
-};
-export default function EditProblemsOption({
-  problems,
-  setProblems,
-  problemSetsName,
-  setProblemSetsName,
-  setProblemCurrentIndex,
-}: Props) {
-  const [localProblemSetsName, setLocalProblemSetsName] =
-    useState(problemSetsName);
-  const [cardsLength, setCardsLength] = useState(
-    problems.length.toString() ?? "10",
+import {
+  problemSetsNameAtom,
+  localProblemSetsNameAtom,
+  problemsAtom,
+  currentProblemIndexAtom,
+  problemLengthAtom
+} from "@/app/jotai/problems";
+import { useAtom, useSetAtom } from "jotai";
+
+export default function EditProblemsOption() {
+  const setProblemSetsName = useSetAtom(problemSetsNameAtom);
+  const [localProblemSetsName, setLocalProblemSetsName] = useAtom(
+    localProblemSetsNameAtom,
   );
+  const [problems, setProblems] = useAtom(problemsAtom);
+  const setCurrentProblemIndex = useSetAtom(currentProblemIndexAtom);
+  const [problemLength, setProblemLength] = useAtom(problemLengthAtom);
+
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCardLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProblemLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setCardsLength(value);
+    setProblemLength(value);
   };
 
-  const applyCardLength = () => {
-    const maxProblemLength = parseInt(cardsLength); // 입력한 최대 문제 수
+  const applyProblemLength = () => {
+    const maxProblemLength = parseInt(problemLength); // 입력한 최대 문제 수
     if (maxProblemLength <= 0)
       return alert("최대 문제 수는 0보다 커야 합니다.");
 
@@ -54,7 +53,7 @@ export default function EditProblemsOption({
         );
         if (value) {
           setProblems((prevCards) => prevCards.slice(0, maxProblemLength));
-          setProblemCurrentIndex((prev) => {
+          setCurrentProblemIndex((prev) => {
             if (prev >= maxProblemLength) {
               return maxProblemLength - 1;
             } else {
@@ -64,7 +63,7 @@ export default function EditProblemsOption({
         }
       } else {
         setProblems((prevCards) => prevCards.slice(0, maxProblemLength));
-        setProblemCurrentIndex((prev) => {
+        setCurrentProblemIndex((prev) => {
           if (prev >= maxProblemLength) {
             return maxProblemLength - 1;
           } else {
@@ -132,10 +131,10 @@ export default function EditProblemsOption({
           <input
             id="maxIndex"
             className="w-[3rem] rounded-md border border-black p-1 text-center"
-            value={cardsLength}
-            onChange={handleCardLengthChange}
+            value={problemLength}
+            onChange={handleProblemLengthChange}
           />
-          <Button className="ml-2 px-5 py-1" onClick={applyCardLength}>
+          <Button className="ml-2 px-5 py-1" onClick={applyProblemLength}>
             확인
           </Button>
         </div>

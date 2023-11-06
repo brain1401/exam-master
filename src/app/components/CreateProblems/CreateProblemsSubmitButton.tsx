@@ -1,30 +1,26 @@
 "use client";
 import { useState } from "react";
 import { isProblemEmpty } from "@/service/problems";
-import { useRouter } from "next/navigation";
-import { Problem } from "@/types/problems";
+import {
+  problemsAtom,
+  problemSetsNameAtom,
+  resetProblemsAtom,
+} from "@/app/jotai/problems";
+import { useAtom, useSetAtom } from "jotai";
 
-type Props = {
-  problems: Problem[];
-  problemSetName: string;
-  setProblemSetsName: React.Dispatch<React.SetStateAction<string>>;
-  resetProblems: () => void;
-};
-export default function CreateProblemsSubmitButton({
-  problems,
-  problemSetName,
-  setProblemSetsName,
-  resetProblems,
-}: Props) {
+export default function CreateProblemsSubmitButton() {
+  const [problems, setProblems] = useAtom(problemsAtom);
+  const [problemSetsName, setProblemSetsName] = useAtom(problemSetsNameAtom);
+  const resetProblems = useSetAtom(resetProblemsAtom);
+
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async () => {
     if (problems.some((problem) => isProblemEmpty(problem))) {
       alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
       return;
     }
-    if (problemSetName === "") {
+    if (problemSetsName === "") {
       alert("문제집 이름을 입력해주세요.");
       return;
     }
@@ -38,7 +34,7 @@ export default function CreateProblemsSubmitButton({
       formData.append(`image[${index}]`, problem?.image as Blob);
       formData.append(`data[${index}]`, JSON.stringify(problem));
     });
-    formData.append("problemSetName", problemSetName);
+    formData.append("problemSetsName", problemSetsName);
 
     try {
       const response = await fetch("/api/postProblems", {
@@ -51,7 +47,6 @@ export default function CreateProblemsSubmitButton({
         alert("문제집이 성공적으로 등록되었습니다.");
         resetProblems();
         setProblemSetsName("");
-        router.refresh();
       } else {
         alert("문제집 등록에 실패했습니다.");
       }

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ProblemsEditor from "@/app/components/ProblemsEditor";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
-import CurrentCardIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
+import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import { ClipLoader } from "react-spinners";
 import useProblems from "@/hooks/problems";
 import EditProblemsOption from "@/app/components/CreateProblems/EditProblemsOption";
@@ -74,7 +74,7 @@ export default function EditProblemsByUUID({ params }: Props) {
         problemSetsName={problemSetsName}
         setProblemSetsName={setProblemSetsName}
       />
-      <CurrentCardIndicator
+      <CurrentProblemIndicator
         problemCurrentIndex={problemCurrentIndex}
         problemsLength={problems.length}
       />
