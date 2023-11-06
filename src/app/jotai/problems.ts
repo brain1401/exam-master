@@ -8,14 +8,6 @@ export const currentProblemIndexAtom = atom(0);
 export const problemSetsNameAtom = atom("");
 export const localProblemSetsNameAtom = atom("");
 
-export const resetProblemsAtom = atom(null, (get, set) => {
-  set(problemsAtom, Array<Problem>(10).fill(null));
-  set(currentProblemIndexAtom, 0);
-  set(problemLengthAtom, "10");
-  set(problemSetsNameAtom, "");
-  set(localProblemSetsNameAtom, "");
-});
-
 export const currentTabAtom = atom<"obj" | "sub">("obj");
 
 export const currentProblemAtom = atom(
@@ -76,3 +68,11 @@ export const initCurrentProblemAtom = atom(null, (get, set) => {
 });
 
 export const problemLengthAtom = atom("10");
+
+export const resetProblemsAtom = atom(null, (get, set) => {
+  set(problemsAtom, Array<Problem>(10).fill(null));
+  set(currentProblemIndexAtom, 0);
+  set(problemLengthAtom, "10");
+  set(problemSetsNameAtom, "");
+  set(localProblemSetsNameAtom, "");
+});

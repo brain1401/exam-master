@@ -1,7 +1,9 @@
-import { Problem } from "@/types/problems";
+import { ExamProblem, Problem } from "@/types/problems";
 
-export function problemShuffle(array: Problem[]) {
-  const newArray = [...array];
+export function problemShuffle<T extends Problem[] | ExamProblem[]>(
+  array: T,
+): T {
+  const newArray = [...array] as T;
 
   for (let i = newArray.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));

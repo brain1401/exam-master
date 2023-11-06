@@ -1,106 +1,98 @@
 "use client";
 import usePreventClose from "@/hooks/preventClose";
-import { ProblemSetWithName } from "@/types/problems";
-import { problemShuffle } from "@/utils/problemShuffle";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Button from "./ui/Button";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
 import cloneDeep from "lodash/cloneDeep";
 import checkImage from "/public/check-303494_960_720.png";
 import { isImageUrlObject } from "@/service/problems";
+import {
+  currentExamProblemAtom,
+  currentExamProblemIndexAtom,
+  examProblemNameAtom,
+  examProblemsAtom,
+  resetExamProblemsAtom,
+} from "../jotai/examProblems";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
-type Props = {
-  problems: ProblemSetWithName;
-};
+export default function ExamProblems() {
+  const [currentExamProblem, setCurrentExamProblem] = useAtom(
+    currentExamProblemAtom,
+  );
+  const [currentProblemIndex, setCurrentProblemIndex] = useAtom(
+    currentExamProblemIndexAtom,
+  );
+  const [examProblems] = useAtom(examProblemsAtom);
+  const name = useAtomValue(examProblemNameAtom);
+  const resetExamProblems = useSetAtom(resetExamProblemsAtom);
 
-export default function ExamProblems({ problems }: Props) {
-  const { name, exam_problems } = problems;
-  const [shuffledExamProblems, setShuffledExamProblems] =
-    useState<ProblemSetWithName>({
-      name,
-      exam_problems: problemShuffle(exam_problems),
-    });
-
-  const { exam_problems: shuffledExamProblemsArray } = shuffledExamProblems;
-  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
-
-  const currentShuffledExamProblem =
-    shuffledExamProblemsArray[currentProblemIndex];
+  useEffect(() => {
+    return () => {
+      resetExamProblems();
+    };
+  }, [resetExamProblems]);
 
   const onClickCandidate = (i: number, isMultipleAnswer: boolean) => {
-    setShuffledExamProblems((prev) => {
-      const newShuffledExamProblems = cloneDeep(prev);
+    const newCurrentExamProblems = cloneDeep(currentExamProblem);
+    const currentCandidate = newCurrentExamProblems?.candidates?.[i];
 
-      const currentProblem =
-        newShuffledExamProblems.exam_problems?.[currentProblemIndex];
+    if (
+      currentCandidate?.isAnswer === undefined ||
+      newCurrentExamProblems?.isAnswerMultiple === undefined ||
+      newCurrentExamProblems?.type === undefined ||
+      !newCurrentExamProblems?.candidates
+    ) {
+      throw new Error("무언가가 잘못되었습니다.");
+    }
 
-      const currentCandidate = currentProblem?.candidates?.[i];
+    if (isMultipleAnswer) {
+      // 현재 문제가 다중 선택지이면
+      currentCandidate.isAnswer = !currentCandidate.isAnswer;
+    } else {
+      // 현재 문제가 단일 선택지이면
 
       if (
-        currentCandidate?.isAnswer === undefined ||
-        currentProblem?.isAnswerMultiple === undefined ||
-        currentProblem?.type === undefined ||
-        !currentProblem?.candidates
+        newCurrentExamProblems.candidates.some(
+          (candidate) => candidate.isAnswer === true,
+        )
       ) {
-        throw new Error("무언가가 잘못되었습니다.");
-      }
-
-      if (isMultipleAnswer) {
-        // 현재 문제가 다중 선택지이면
-        currentCandidate.isAnswer = !currentCandidate.isAnswer;
-      } else {
-        // 현재 문제가 단일 선택지이면
-        
+        // 현재 문제가 단일 선택지이면서 이미 체크된 답이 있으면
         if (
-          currentProblem.candidates.some(
+          currentCandidate.id ===
+          newCurrentExamProblems.candidates.find(
             (candidate) => candidate.isAnswer === true,
-          )
+          )?.id
         ) {
-          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 있으면
-          if (
-            currentCandidate.id ===
-            currentProblem.candidates.find(
-              (candidate) => candidate.isAnswer === true,
-            )?.id
-          ) {
-            // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 같으면
-            currentCandidate.isAnswer = !currentCandidate.isAnswer;
-          }
-        } else {
-          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
+          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 같으면
           currentCandidate.isAnswer = !currentCandidate.isAnswer;
         }
+      } else {
+        // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
+        currentCandidate.isAnswer = !currentCandidate.isAnswer;
       }
+    }
 
-      return newShuffledExamProblems;
-    });
+    setCurrentExamProblem(newCurrentExamProblems);
   };
 
   const onTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setShuffledExamProblems((prev) => {
-      const newShuffledExamProblems = cloneDeep(prev);
+    const newCurrentExamProblems = cloneDeep(currentExamProblem);
+    if (!newCurrentExamProblems) {
+      throw new Error("무언가가 잘못되었습니다.");
+    }
+    newCurrentExamProblems.subAnswer = e.target.value;
 
-      const currentProblem =
-        newShuffledExamProblems.exam_problems?.[currentProblemIndex];
-
-      if (!currentProblem) {
-        throw new Error("무언가가 잘못되었습니다.");
-      }
-
-      currentProblem.subAnswer = e.target.value;
-
-      return newShuffledExamProblems;
-    });
+    setCurrentExamProblem(newCurrentExamProblems);
   };
 
   usePreventClose();
 
   useEffect(() => {
-    console.log("shuffledExamProblems", shuffledExamProblems);
-  }, [shuffledExamProblems]);
+    console.log("currentExamProblem", currentExamProblem);
+  }, [currentExamProblem]);
 
-  if (!currentShuffledExamProblem) return <div>문제가 없습니다.</div>;
+  if (!currentExamProblem) return <div>문제가 없습니다.</div>;
 
   return (
     <section>
@@ -109,14 +101,14 @@ export default function ExamProblems({ problems }: Props) {
       <div className="rounded-lg bg-slate-200 p-3">
         <div className="mb-5 text-2xl">
           <span>Q{currentProblemIndex + 1}. </span>
-          {currentShuffledExamProblem.question}
+          {currentExamProblem.question}
         </div>
 
-        {currentShuffledExamProblem.image &&
-          isImageUrlObject(currentShuffledExamProblem.image) && (
+        {currentExamProblem.image &&
+          isImageUrlObject(currentExamProblem.image) && (
             <div className="mb-5">
               <Image
-                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${currentShuffledExamProblem.image.url}`}
+                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${currentExamProblem.image.url}`}
                 width={400}
                 height={400}
                 alt="이미지"
@@ -124,55 +116,52 @@ export default function ExamProblems({ problems }: Props) {
             </div>
           )}
 
-        {currentShuffledExamProblem.additionalView && (
+        {currentExamProblem.additionalView && (
           <div className="mb-5 border border-black p-3">
-            {currentShuffledExamProblem.additionalView}
+            {currentExamProblem.additionalView}
           </div>
         )}
-        {currentShuffledExamProblem.type === "obj" && (
+        {currentExamProblem.type === "obj" && (
           <>
             {
               <div>
                 <ul>
-                  {currentShuffledExamProblem.candidates?.map(
-                    (candidate, i) => (
-                      <li key={i} className="flex">
+                  {currentExamProblem.candidates?.map((candidate, i) => (
+                    <li key={i} className="flex">
+                      <div
+                        className="relative cursor-pointer select-none md:hover:font-bold"
+                        onClick={(e) => {
+                          onClickCandidate(
+                            i,
+                            currentExamProblem.isAnswerMultiple ?? false,
+                          );
+                        }}
+                      >
                         <div
-                          className="relative cursor-pointer select-none md:hover:font-bold"
-                          onClick={(e) => {
-                            onClickCandidate(
-                              i,
-                              currentShuffledExamProblem.isAnswerMultiple ??
-                                false,
-                            );
-                          }}
+                          className={`${
+                            candidate.isAnswer ? "" : "opacity-0"
+                          } absolute left-1 top-[-.2rem] h-5 w-5`}
                         >
-                          <div
-                            className={`${
-                              candidate.isAnswer ? "" : "opacity-0"
-                            } absolute left-1 top-[-.2rem] h-5 w-5`}
-                          >
-                            <Image src={checkImage} alt="체크" fill />
-                          </div>
-                          <span>{candidateNumber(i + 1)}</span>
-                          {` ${candidate.text}`}
+                          <Image src={checkImage} alt="체크" fill />
                         </div>
-                      </li>
-                    ),
-                  )}
+                        <span>{candidateNumber(i + 1)}</span>
+                        {` ${candidate.text}`}
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               </div>
             }
           </>
         )}
 
-        {currentShuffledExamProblem.type === "sub" && (
+        {currentExamProblem.type === "sub" && (
           <div>
             <textarea
               className="rounded-md border border-black p-3"
               placeholder="답을 입력하세요."
               onChange={onTextAreaChange}
-              value={currentShuffledExamProblem.subAnswer ?? ""}
+              value={currentExamProblem.subAnswer ?? ""}
             ></textarea>
           </div>
         )}
@@ -189,7 +178,7 @@ export default function ExamProblems({ problems }: Props) {
         </Button>
         <Button
           onClick={() => {
-            currentProblemIndex < shuffledExamProblemsArray.length - 1 &&
+            currentProblemIndex < examProblems.exam_problems.length - 1 &&
               setCurrentProblemIndex(currentProblemIndex + 1);
           }}
         >
