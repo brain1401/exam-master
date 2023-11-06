@@ -13,14 +13,14 @@ export default function ManageProblemSubmitButton({
   const [isLoading, setIsLoading] = useState(false);
 
   const problems = useAtomValue(problemsAtom);
-  const problemSetName = useAtomValue(problemSetsNameAtom);
+  const problemSetsName = useAtomValue(problemSetsNameAtom);
 
   const handleSubmit = async () => {
     if (problems.some((problem) => isProblemEmpty(problem))) {
       alert("문제와 선택지를 전부 입력했는지 확인해주세요.");
       return;
     }
-    if (problemSetName === "") {
+    if (problemSetsName === "") {
       alert("문제집 이름을 입력해주세요.");
       return;
     }
@@ -35,7 +35,7 @@ export default function ManageProblemSubmitButton({
       formData.append(`image[${index}]`, problem?.image as Blob);
       formData.append(`data[${index}]`, JSON.stringify(problem));
     });
-    formData.append("problemSetName", problemSetName);
+    formData.append("problemSetsName", problemSetsName);
     formData.append("uuid", uuid);
     try {
       const response = await fetch("/api/updateProblems", {
