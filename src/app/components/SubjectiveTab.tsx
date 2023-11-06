@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
-import { isCardOnBeingWrited } from "@/service/problems";
 import {
   currentProblemAtom,
   problemsAtom,

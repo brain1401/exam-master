@@ -7,9 +7,7 @@ import { useAtomValue } from "jotai";
 type Props = {
   uuid: string;
 };
-export default function ManageProblemSubmitButton({
-  uuid,
-}: Props) {
+export default function ManageProblemSubmitButton({ uuid }: Props) {
   const [isLoading, setIsLoading] = useState(false);
 
   const problems = useAtomValue(problemsAtom);

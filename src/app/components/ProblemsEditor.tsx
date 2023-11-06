@@ -6,20 +6,25 @@ import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
 import usePreventClose from "@/hooks/preventClose";
-import { currentProblemAtom, currentTabAtom, problemsAtom, currentProblemIndexAtom } from "../jotai/problems";
+import {
+  currentProblemAtom,
+  currentTabAtom,
+  problemsAtom,
+  currentProblemIndexAtom,
+} from "../jotai/problems";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 export default function ProblemsEditor() {
-
   const [problems, setProblems] = useAtom(problemsAtom);
   const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
   const [currentTab, setCurrentTab] = useAtom(currentTabAtom);
-  const [problemCurrentIndex, setProblemCurrentIndex] = useAtom(currentProblemIndexAtom);
-
+  const [problemCurrentIndex, setProblemCurrentIndex] = useAtom(
+    currentProblemIndexAtom,
+  );
 
   usePreventClose();
 
-  const onTabChange = (tab:"obj"|"sub") => {
+  const onTabChange = (tab: "obj" | "sub") => {
     if (isCardOnBeingWrited(currentProblem)) {
       const value = confirm(
         "현재 문제에 입력된 내용이 삭제됩니다. 계속하시겠습니까?",
@@ -38,12 +43,13 @@ export default function ProblemsEditor() {
         isImageButtonClicked: false,
         isAnswerMultiple: false,
         image: null,
-        candidates: tab === "obj" ? Array(4).fill({ text: "", isAnswer: false }) : null,
+        candidates:
+          tab === "obj" ? Array(4).fill({ text: "", isAnswer: false }) : null,
         subAnswer: tab === "obj" ? null : "",
       };
       return newProblems;
     });
-  }
+  };
 
   useEffect(() => {
     console.log(problems);
@@ -85,11 +91,11 @@ export default function ProblemsEditor() {
         </Tabs.List>
         <Tabs.Content value="obj">
           {/*객관식*/}
-          <ObjectiveTab/>
+          <ObjectiveTab />
         </Tabs.Content>
         <Tabs.Content value="sub">
           {/*주관식*/}
-          <SubjectiveTab/>
+          <SubjectiveTab />
         </Tabs.Content>
       </Tabs.Root>
     </section>

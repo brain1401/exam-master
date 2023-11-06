@@ -1,7 +1,7 @@
 "use client";
 import ProblemSetCard from "./ProblemSetCard";
 import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import SearchBox from "./ui/SearchBox";
