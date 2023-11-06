@@ -88,11 +88,11 @@ export default function ProblemsEditor() {
             주관식
           </Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="obj">
+        <Tabs.Content value="obj" asChild>
           {/*객관식*/}
           <ObjectiveTab />
         </Tabs.Content>
-        <Tabs.Content value="sub">
+        <Tabs.Content value="sub" asChild>
           {/*주관식*/}
           <SubjectiveTab />
         </Tabs.Content>

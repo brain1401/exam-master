@@ -257,16 +257,17 @@ export default function ObjectiveTab() {
 
       <div className="flex items-center justify-between">
         <div>
-          <SimpleLabel>복수정답</SimpleLabel>
+          <SimpleLabel htmlFor="isAnswerMultiple">복수정답</SimpleLabel>
           <input
             type="checkbox"
-            className="ml-2 "
+            className="ml-2"
+            id="isAnswerMultiple"
             checked={currentProblem?.isAnswerMultiple ?? false}
             onChange={handleMultipleAnswerCheckboxChange}
           />
         </div>
         <div>
-          <SimpleLabel htmlFor="answer">선택지 수</SimpleLabel>
+          <SimpleLabel>선택지 수</SimpleLabel>
           <select
             value={selectedValue}
             onChange={handleSelectedChange}
