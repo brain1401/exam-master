@@ -27,26 +27,24 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
 
-    const examProblems =  [
-      ...data.exam_problems.map((problem) => ({
-        id: problem.id,
-        type: problem.questionType as "obj" | "sub",
-        question: problem.question,
-        additionalView: problem.additionalView,
-        image: problem.image,
-        isAnswerMultiple: problem.isAnswerMultiple,
-        // 문제의 정답을 알 수 없게 함
-        candidates:
-          problem.candidates?.map((candidate) => ({
-            id: candidate.id,
-            text: candidate.text,
-            isAnswer: false,
-          })) ?? null,
+  const examProblems = data.exam_problems.map((problem) => ({
+    id: problem.id,
+    type: problem.questionType as "obj" | "sub",
+    question: problem.question,
+    additionalView: problem.additionalView,
+    image: problem.image,
+    isAnswerMultiple: problem.isAnswerMultiple,
+    // 문제의 정답을 알 수 없게 함
+    candidates:
+      problem.candidates?.map((candidate) => ({
+        id: candidate.id,
+        text: candidate.text,
+        isAnswer: false,
+      })) ?? null,
 
-        // 문제의 정답을 알 수 없게 함
-        subAnswer: "",
-      })),
-    ];
+    // 문제의 정답을 알 수 없게 함
+    subAnswer: problem.questionType === "sub" ? "" : null,
+  }));
 
   const result: ExamProblemSet = {
     name: data.name,
