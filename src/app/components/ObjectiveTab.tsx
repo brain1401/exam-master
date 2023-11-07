@@ -26,9 +26,7 @@ export default function ObjectiveTab() {
   const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
     currentProblemCandidatesAtom,
   );
-  const currentProblemIndex = useAtomValue(
-    currentProblemIndexAtom,
-  );
+  const currentProblemIndex = useAtomValue(currentProblemIndexAtom);
   const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
 
   const [selectedValue, setSelectedValue] = useState(
@@ -178,19 +176,22 @@ export default function ObjectiveTab() {
           onChange={handleInputChange}
           placeholder={value}
         />
-        <label
-          htmlFor={`candidate-${index}-checkbox`}
-          className="md:text-md text:sm ml-[0.55rem] w-fit  px-1 font-bold md:mx-2 md:w-20 md:p-0"
-        >
-          정답여부
-        </label>
-        <input
-          type="checkbox"
-          id={`candidate-${index}-checkbox`}
-          disabled={!Boolean(currentProblemCandidates?.[index]?.text)}
-          checked={currentProblemCandidates?.[index]?.isAnswer ?? false}
-          onChange={handleCheckboxChange}
-        />
+        <div className="flex w-[5rem]">
+          <SimpleLabel
+            htmlFor={`candidate-${index}-checkbox`}
+            className=""
+            margin={false}
+          >
+            정답여부
+          </SimpleLabel>
+          <input
+            type="checkbox"
+            id={`candidate-${index}-checkbox`}
+            disabled={!Boolean(currentProblemCandidates?.[index]?.text)}
+            checked={currentProblemCandidates?.[index]?.isAnswer ?? false}
+            onChange={handleCheckboxChange}
+          />
+        </div>
       </div>
     </div>
   ));

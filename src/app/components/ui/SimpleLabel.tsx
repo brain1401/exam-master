@@ -1,14 +1,25 @@
+import { twMerge } from "tailwind-merge";
+
 type Props = {
-  children: string;
+  children: React.ReactNode;
   htmlFor?: string;
+  margin?: boolean;
+  className?: string;
 };
 
-export default function SimpleLabel({ children, htmlFor }: Props) {
+export default function SimpleLabel({
+  children,
+  htmlFor,
+  margin = true,
+  className,
+}: Props) {
   return (
     <label
-      className="mb-2 text-lg font-semibold"
+      className={twMerge(
+        `text-md ${margin ? "mb-2" : ""} font-semibold ${className}`,
+      )}
       onClick={(e) => e.preventDefault()}
-      htmlFor={htmlFor}
+      htmlFor={htmlFor ?? ""}
     >
       {children}
     </label>

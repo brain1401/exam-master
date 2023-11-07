@@ -1,11 +1,51 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
 import Navbar from "./components/Navbar/Navbar";
 import AuthContext from "@/context/AuthContext";
 import JotaiProvider from "@/context/JotaiContext";
+import localFont from 'next/font/local';
 
-const open_sans = Open_Sans({ subsets: ["latin"] });
+
+const NotoSansKR = localFont({
+  src: [
+    {
+      path: '../../public/fonts/NotoSansKR-Thin.ttf',
+      weight: "100",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-ExtraLight.ttf',
+      weight: "200",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-Light.ttf',
+      weight: "300",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-Regular.ttf',
+      weight: "400",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-Medium.ttf',
+      weight: "500",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-SemiBold.ttf',
+      weight: "600",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-Bold.ttf',
+      weight: "700",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-ExtraBold.ttf',
+      weight: "800",
+    },
+    {
+      path: '../../public/fonts/NotoSansKR-Black.ttf',
+      weight: "900",
+    },
+  ]
+})
 
 export const metadata: Metadata = {
   title: "Exam Master",
@@ -20,7 +60,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={`${open_sans.className}`}>
+      <body className={`${NotoSansKR.className}`}>
         <AuthContext>
           <JotaiProvider>
             <Navbar />
