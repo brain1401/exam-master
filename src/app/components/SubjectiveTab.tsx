@@ -49,7 +49,7 @@ export default function SubjectiveTab() {
 
   return (
     <form
-      className=" flex flex-col space-y-4 rounded-md border border-gray-500 p-5"
+      className=" flex flex-col space-y-4 rounded-md border border-gray-400 p-5"
       onSubmit={(e) => {
         e.preventDefault();
       }}
