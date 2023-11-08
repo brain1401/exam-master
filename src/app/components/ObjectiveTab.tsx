@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useLayoutEffect, useState } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isImageFileObject, isImageUrlObject } from "@/service/problems";
 import SimpleLabel from "./ui/SimpleLabel";
@@ -94,11 +94,11 @@ export default function ObjectiveTab() {
     if (!currentProblemCandidates || !currentProblem)
       throw new Error("무언가가 잘못되었습니다.");
 
-    const changedCandidateCheck = (checked: boolean) => {
+    const changedCandidateCheck = (check: boolean) => {
       const candidates = {
         id: newCandidates[index]?.id ?? index,
         text: newCandidates[index]?.text ?? "",
-        isAnswer: checked,
+        isAnswer: check,
       };
 
       return candidates;
@@ -115,11 +115,16 @@ export default function ObjectiveTab() {
         )
       ) {
         if (
-          newCandidates[index]?.text ===
+          newCandidates[index]?.id ===
           currentProblem.candidates.find(
             (candidate) => candidate.isAnswer === true,
-          )?.text
+          )?.id
         ) {
+          newCandidates[index] = changedCandidateCheck(checked);
+        } else {
+          newCandidates.forEach((candidate) => {
+            candidate.isAnswer = false;
+          });
           newCandidates[index] = changedCandidateCheck(checked);
         }
       } else {
@@ -160,14 +165,14 @@ export default function ObjectiveTab() {
     (_, index) => candidatePlaceholders[index] ?? "",
   ).map((value, index) => (
     <div key={index} className="my-2 flex flex-col">
-      <label
+      <SimpleLabel
         htmlFor={`candidate-${index}-text`}
         className="text-lg font-semibold"
-        onClick={(e) => e.preventDefault()}
+        preventDefault={true}
       >
         선택지 {index + 1}
-      </label>
-      <div className="flex items-center justify-start">
+      </SimpleLabel>
+      <div className="flex items-center">
         <input
           type="text"
           id={`candidate-${index}-text`}
@@ -176,16 +181,10 @@ export default function ObjectiveTab() {
           onChange={handleInputChange}
           placeholder={value}
         />
-        <div className="flex w-[5rem]">
-          <SimpleLabel
-            htmlFor={`candidate-${index}-checkbox`}
-            className=""
-            margin={false}
-          >
-            정답여부
-          </SimpleLabel>
+        <div className="flex w-[4rem] justify-center">
           <input
             type="checkbox"
+            className="m-2 h-4 w-4"
             id={`candidate-${index}-checkbox`}
             disabled={!Boolean(currentProblemCandidates?.[index]?.text)}
             checked={currentProblemCandidates?.[index]?.isAnswer ?? false}
@@ -214,7 +213,7 @@ export default function ObjectiveTab() {
     }
   }, [image]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setSelectedValue(currentProblem?.candidates?.length.toString() ?? "4");
   }, [currentProblem?.candidates]);
 
@@ -226,21 +225,17 @@ export default function ObjectiveTab() {
       }}
     >
       <div className="flex flex-col">
-        <SimpleLabel htmlFor="question">문제</SimpleLabel>
+        <SimpleLabel htmlFor="question" preventDefault={true}>
+          문제
+        </SimpleLabel>
         <textarea
           id="question"
           className="h-[6rem] w-full resize-none rounded-md border border-gray-300 p-2"
           placeholder="다음의 친구에게 해 줄 수 있는 말로 적절한 것은?"
           value={question ?? ""}
           onChange={(e) => {
-            setProblems((prev) => {
-              const newProblems: Partial<Problem>[] = [...prev];
-              newProblems[currentProblemIndex] = {
-                ...newProblems[currentProblemIndex],
-                question: e.target.value,
-              };
-
-              return newProblems as NonNullable<Problem>[];
+            setCurrentProblem({
+              question: e.target.value,
             });
           }}
         />
@@ -267,12 +262,12 @@ export default function ObjectiveTab() {
             onChange={handleMultipleAnswerCheckboxChange}
           />
         </div>
-        <div>
-          <SimpleLabel>선택지 수</SimpleLabel>
+        <div className="flex items-center justify-center">
+          <SimpleLabel margin={false}>선택지 수</SimpleLabel>
           <select
             value={selectedValue}
             onChange={handleSelectedChange}
-            className="h-10 rounded-md border border-gray-300 p-2"
+            className="ml-2 h-9 rounded-md border border-gray-300 px-2 text-[.9rem]"
           >
             <option value="2">2</option>
             <option value="3">3</option>
@@ -283,7 +278,15 @@ export default function ObjectiveTab() {
         </div>
       </div>
 
-      <div className="space-y-4"> {candidates}</div>
+      <div className="relative flex flex-col gap-y-2">
+        <SimpleLabel
+          className="absolute mt-2 w-[4rem] self-end text-center"
+          margin={false}
+        >
+          정답여부
+        </SimpleLabel>
+        {candidates}
+      </div>
     </form>
   );
 }
