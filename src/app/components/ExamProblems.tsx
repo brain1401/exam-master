@@ -1,17 +1,17 @@
 "use client";
 import usePreventClose from "@/hooks/preventClose";
 import { useEffect } from "react";
-import Button from "./ui/Button";
+import NextUIButton from "./ui/NextUIButton";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
-import checkImage from "/public/check-303494_960_720.png";
+import checkImage from "/public/check.png";
 import { isImageUrlObject } from "@/service/problems";
 import {
   currentExamProblemAtom,
   currentExamProblemIndexAtom,
   examProblemNameAtom,
   examProblemsAtom,
-} from "../jotai/examProblems";
+} from "../../jotai/examProblems";
 import { useAtom, useAtomValue } from "jotai";
 import { Problem } from "@/types/problems";
 
@@ -107,7 +107,7 @@ export default function ExamProblems() {
   if (!currentExamProblem) return <div>문제가 없습니다.</div>;
 
   return (
-    <section>
+    <section className="h-full">
       <div>문제집 이름 : {name}</div>
 
       <div className="rounded-lg bg-slate-200 p-3">
@@ -180,22 +180,22 @@ export default function ExamProblems() {
       </div>
 
       <div className="mt-2 flex gap-4">
-        <Button
+        <NextUIButton
           onClick={() => {
             currentProblemIndex > 0 &&
               setCurrentProblemIndex(currentProblemIndex - 1);
           }}
         >
           이전
-        </Button>
-        <Button
+        </NextUIButton>
+        <NextUIButton
           onClick={() => {
             currentProblemIndex < examProblems.exam_problems.length - 1 &&
               setCurrentProblemIndex(currentProblemIndex + 1);
           }}
         >
           다음
-        </Button>
+        </NextUIButton>
       </div>
     </section>
   );

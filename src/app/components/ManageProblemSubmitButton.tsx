@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
 import { isProblemEmpty } from "@/service/problems";
-import { problemsAtom, problemSetsNameAtom } from "@/app/jotai/problems";
+import { problemsAtom, problemSetsNameAtom } from "@/jotai/problems";
 import { useAtomValue } from "jotai";
+import NextUIButton from "./ui/NextUIButton";
 
 type Props = {
   uuid: string;
@@ -56,13 +57,12 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
 
   return (
     <div className="mt-3 flex justify-center">
-      <button
-        className="rounded-md bg-blue-500 px-2 py-2 text-white md:px-5 md:py-2"
+      <NextUIButton
         onClick={handleSubmit}
-        disabled={isLoading}
+        isLoading={isLoading}
       >
         {isLoading ? "수정 중..." : "수정"}
-      </button>
+      </NextUIButton>
     </div>
   );
 }

@@ -7,7 +7,7 @@ export default async function ManagePage() {
   return (
     <>
       {session ? (
-        <section className="mx-auto max-w-[80rem] p-3">
+        <section className="mx-auto h-full max-w-[80rem] p-3">
           <h1>문제집 관리</h1>
           <ProblemSetGrid type="manage" />
         </section>

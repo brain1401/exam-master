@@ -7,7 +7,7 @@ import ExamProblems from "@/app/components/ExamProblems";
 import {
   examProblemsAtom,
   resetExamProblemsAtom,
-} from "@/app/jotai/examProblems";
+} from "@/jotai/examProblems";
 import { useAtom, useSetAtom } from "jotai";
 
 type Props = {

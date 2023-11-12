@@ -3,14 +3,20 @@ import { ChangeEvent, useEffect, useLayoutEffect, useState } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { isImageFileObject, isImageUrlObject } from "@/service/problems";
 import SimpleLabel from "./ui/SimpleLabel";
-import { Problem } from "@/types/problems";
+import {
+  Textarea,
+  Input,
+  Checkbox,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
 import {
   problemsAtom,
   currentProblemAtom,
   currentProblemCandidatesAtom,
   currentProblemIndexAtom,
   initCurrentProblemAtom,
-} from "@/app/jotai/problems";
+} from "@/jotai/problems";
 import { useAtom, useSetAtom, useAtomValue } from "jotai";
 
 const candidatePlaceholders = [
@@ -21,7 +27,7 @@ const candidatePlaceholders = [
 ];
 
 export default function ObjectiveTab() {
-  const [problems, setProblems] = useAtom(problemsAtom);
+  const setProblems = useSetAtom(problemsAtom);
   const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
   const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
     currentProblemCandidatesAtom,
@@ -79,32 +85,34 @@ export default function ObjectiveTab() {
     if (!currentProblemCandidates) throw new Error("무언가가 잘못되었습니다.");
 
     const newCandidates = [...currentProblemCandidates];
+
     newCandidates[index] = {
       id: index,
       text: value,
-      isAnswer: newCandidates[index]?.isAnswer ?? false,
+      isAnswer:
+        (value === "" ? false : newCandidates[index]?.isAnswer) ?? false,
     };
 
     setCurrentProblemCandidates(newCandidates);
   };
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, checked } = event.target;
-    const index = parseInt(id.split("-")[1]);
+    const { name, checked } = event.target;
+    const index = parseInt(name.split("-")[1]);
     if (!currentProblemCandidates || !currentProblem)
       throw new Error("무언가가 잘못되었습니다.");
 
+    const newCandidates = [...currentProblemCandidates];
+
     const changedCandidateCheck = (check: boolean) => {
-      const candidates = {
+      const candidate = {
         id: newCandidates[index]?.id ?? index,
         text: newCandidates[index]?.text ?? "",
         isAnswer: check,
       };
 
-      return candidates;
+      return candidate;
     };
-
-    const newCandidates = [...currentProblemCandidates];
 
     if (currentProblem.isAnswerMultiple === true) {
       newCandidates[index] = changedCandidateCheck(checked);
@@ -173,21 +181,27 @@ export default function ObjectiveTab() {
         선택지 {index + 1}
       </SimpleLabel>
       <div className="flex items-center">
-        <input
+        <Input
           type="text"
           id={`candidate-${index}-text`}
           value={currentProblemCandidates?.[index]?.text ?? ""}
-          className="h-10 w-full rounded-md border border-gray-300 p-2"
+          variant="bordered"
+          classNames={{
+            inputWrapper: "border-nextUiBorder",
+            input: "text-[.9rem]",
+          }}
+          size="sm"
           onChange={handleInputChange}
           placeholder={value}
         />
         <div className="flex w-[4rem] justify-center">
-          <input
-            type="checkbox"
-            className="m-2 h-4 w-4"
-            id={`candidate-${index}-checkbox`}
-            disabled={!Boolean(currentProblemCandidates?.[index]?.text)}
-            checked={currentProblemCandidates?.[index]?.isAnswer ?? false}
+          <Checkbox
+            name={`candidate-${index}-checkbox`}
+            isDisabled={!Boolean(currentProblemCandidates?.[index]?.text)}
+            isSelected={currentProblemCandidates?.[index]?.isAnswer ?? false}
+            classNames={{
+              wrapper: `mx-auto before:border-nextUiBorder`,
+            }}
             onChange={handleCheckboxChange}
           />
         </div>
@@ -219,20 +233,25 @@ export default function ObjectiveTab() {
 
   return (
     <form
-      className="flex flex-col space-y-4 rounded-md border border-gray-400 p-5"
+      className="flex flex-col space-y-4 rounded-xl bg-gray-100 p-5"
       onSubmit={(e) => {
         e.preventDefault();
       }}
     >
       <div className="flex flex-col">
-        <SimpleLabel htmlFor="question" preventDefault={true}>
-          문제
-        </SimpleLabel>
-        <textarea
+        <Textarea
           id="question"
-          className="h-[6rem] w-full resize-none rounded-md border border-gray-300 p-2"
+          classNames={{
+            inputWrapper: `w-full !h-[6rem] border-nextUiBorder`,
+            input: "text-[1rem]",
+            label: "text-md font-semibold text-lg",
+          }}
+          maxRows={3}
+          label="문제"
+          labelPlacement="outside"
           placeholder="다음의 친구에게 해 줄 수 있는 말로 적절한 것은?"
           value={question ?? ""}
+          variant="bordered"
           onChange={(e) => {
             setCurrentProblem({
               question: e.target.value,
@@ -254,31 +273,50 @@ export default function ObjectiveTab() {
       <div className="flex items-center justify-between">
         <div>
           <SimpleLabel htmlFor="isAnswerMultiple">복수정답</SimpleLabel>
-          <input
+          <Checkbox
             type="checkbox"
-            className="ml-2"
+            classNames={{
+              wrapper: `ml-2 before:!border-nextUiBorder`,
+            }}
             id="isAnswerMultiple"
-            checked={currentProblem?.isAnswerMultiple ?? false}
+            isSelected={currentProblem?.isAnswerMultiple ?? false}
             onChange={handleMultipleAnswerCheckboxChange}
           />
         </div>
         <div className="flex items-center justify-center">
-          <SimpleLabel margin={false}>선택지 수</SimpleLabel>
-          <select
+          <Select
             value={selectedValue}
+            defaultSelectedKeys={selectedValue}
             onChange={handleSelectedChange}
-            className="ml-2 h-9 rounded-md border border-gray-300 px-2 text-[.9rem]"
+            classNames={{
+              base: "",
+              label: "text-md font-semibold justify-self-center self-center",
+              mainWrapper: `w-[3.5rem]`,
+              trigger: `border-nextUiBorder`,
+              value: "text-center",
+            }}
+            variant="bordered"
+            label="선택지 수"
+            labelPlacement="outside-left"
+            size="sm"
           >
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
+            {["2", "3", "4", "5", "6"].map((value) => (
+              <SelectItem
+                key={value}
+                value={value}
+                classNames={{
+                  selectedIcon: "hidden",
+                  title: "text-center",
+                }}
+              >
+                {value}
+              </SelectItem>
+            ))}
+          </Select>
         </div>
       </div>
 
-      <div className="relative flex flex-col gap-y-2">
+      <div className="relative flex flex-col gap-y-1">
         <SimpleLabel
           className="absolute mt-2 w-[4rem] self-end text-center"
           margin={false}

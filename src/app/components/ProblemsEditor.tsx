@@ -10,16 +10,14 @@ import {
   currentTabAtom,
   problemsAtom,
   currentProblemIndexAtom,
-} from "../jotai/problems";
-import { useAtom } from "jotai";
+} from "../../jotai/problems";
+import { useAtom, useAtomValue } from "jotai";
 
 export default function ProblemsEditor() {
   const [problems, setProblems] = useAtom(problemsAtom);
-  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const currentProblem = useAtomValue(currentProblemAtom);
   const [currentTab, setCurrentTab] = useAtom(currentTabAtom);
-  const [problemCurrentIndex, setProblemCurrentIndex] = useAtom(
-    currentProblemIndexAtom,
-  );
+  const problemCurrentIndex = useAtomValue(currentProblemIndexAtom);
 
   usePreventClose();
 
@@ -50,6 +48,22 @@ export default function ProblemsEditor() {
     });
   };
 
+  const getTriggerClassName = (tab: "obj" | "sub") => {
+    let value = "";
+
+    const BASIC_CLASS_NAME = "rounded-lg border border-gray-300 px-5 py-3";
+    const ON_CURRENT_TAB = "bg-secondary text-main";
+
+    if (tab === "obj") {
+      value = `mr-2 ${BASIC_CLASS_NAME} ${
+        currentTab === "obj" && ON_CURRENT_TAB
+      }`;
+    } else if (tab === "sub") {
+      value = `${BASIC_CLASS_NAME} ${currentTab === "sub" && ON_CURRENT_TAB}`;
+    }
+
+    return value;
+  };
   useEffect(() => {
     console.log(problems);
   }, [problems]);
@@ -63,9 +77,7 @@ export default function ProblemsEditor() {
       >
         <Tabs.List className="mb-2 flex justify-center md:justify-normal">
           <Tabs.Trigger
-            className={`mr-2 rounded-md border border-gray-300 px-5 py-3 ${
-              currentTab === "obj" && "bg-neutral-500 text-white"
-            }`}
+            className={getTriggerClassName("obj")}
             value="obj"
             onClick={() => {
               onTabChange("obj");
@@ -76,9 +88,7 @@ export default function ProblemsEditor() {
           </Tabs.Trigger>
 
           <Tabs.Trigger
-            className={`rounded-md border border-gray-300 px-5 py-3 ${
-              currentTab === "sub" && "bg-neutral-500 text-white"
-            }`}
+            className={getTriggerClassName("sub")}
             value="sub"
             onClick={() => {
               onTabChange("sub");

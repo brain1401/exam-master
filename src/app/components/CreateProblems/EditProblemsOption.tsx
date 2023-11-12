@@ -2,15 +2,18 @@
 import { useState } from "react";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
-import Button from "../ui/Button";
+import { Input } from "@nextui-org/react";
+import NextUIButton from "../ui/NextUIButton";
 import {
   problemSetsNameAtom,
   localProblemSetsNameAtom,
   problemsAtom,
   currentProblemIndexAtom,
-  problemLengthAtom
-} from "@/app/jotai/problems";
+  problemLengthAtom,
+} from "@/jotai/problems";
 import { useAtom, useSetAtom } from "jotai";
+
+const BUTTON_CLASSNAMES = "ml-2 px-[.5rem] text-[.9rem]";
 
 export default function EditProblemsOption() {
   const setProblemSetsName = useSetAtom(problemSetsNameAtom);
@@ -23,7 +26,9 @@ export default function EditProblemsOption() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleProblemLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProblemLengthChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const value = e.target.value;
     setProblemLength(value);
   };
@@ -124,37 +129,53 @@ export default function EditProblemsOption() {
       }}
     >
       <div className="mb-5 flex flex-col gap-2">
-        <div>
-          <label htmlFor="maxIndex" className="ml-5 mr-2">
-            최대 문제 수 :
-          </label>
-          <input
+        <div className="flex items-center">
+          <Input
             id="maxIndex"
-            className="w-[3rem] rounded-md border border-black p-1 text-center"
+            className="ml-5 w-fit text-center"
+            classNames={{
+              inputWrapper: "px-[.5rem] w-[3rem]",
+              input: "text-center",
+              label: "text-md z-0",
+            }}
+            label="최대 문제 수"
+            labelPlacement="outside-left"
             value={problemLength}
+            variant="bordered"
+            size="sm"
             onChange={handleProblemLengthChange}
           />
-          <Button className="ml-2 px-5 py-1" onClick={applyProblemLength}>
+          <NextUIButton
+            className={BUTTON_CLASSNAMES}
+            size="sm"
+            onClick={applyProblemLength}
+          >
             확인
-          </Button>
+          </NextUIButton>
         </div>
-        <div>
-          <label htmlFor="problemSetName" className="ml-5 mr-2">
-            문제집 이름 :
-          </label>
-          <input
+        <div className="flex items-center">
+          <Input
             id="problemSetName"
-            className="w-[10rem] rounded-md border border-black p-1"
+            className="ml-5 w-fit text-center"
+            classNames={{
+              inputWrapper: "px-[.5rem] w-[10rem]",
+              label: "text-md z-0",
+            }}
+            label="문제집 이름"
+            labelPlacement="outside-left"
+            variant="bordered"
+            size="sm"
             value={localProblemSetsName}
             onChange={(e) => setLocalProblemSetsName(e.target.value)}
           />
-          <Button
-            className="ml-2 px-5 py-1"
+          <NextUIButton
+            className={BUTTON_CLASSNAMES}
             onClick={applyProblemSetName}
-            disabled={isLoading}
+            size="sm"
+            isLoading={isLoading}
           >
             {isLoading ? "중복 확인 중..." : "확인"}
-          </Button>
+          </NextUIButton>
         </div>
       </div>
     </form>

@@ -1,6 +1,7 @@
 "use client";
 import { Problem } from "@/types/problems";
 import Image from "next/image";
+import { Textarea, Button } from "@nextui-org/react";
 
 type Props = {
   isAdditiondalViewButtonClicked: boolean;
@@ -66,16 +67,28 @@ export default function AddViewAndPhoto({
     }
   };
 
+  const getButtonsClassName = (type: "view" | "image") => {
+    let value = "";
+
+    const BASIC_CLASS_NAME =
+      "rounded-lg border border-gray-300 px-5 py-3";
+    const condition =
+      type === "view" ? isAdditiondalViewButtonClicked : isImageButtonClicked;
+
+    if (condition) {
+      value = `${BASIC_CLASS_NAME} bg-secondary text-main`;
+    } else {
+      value = `${BASIC_CLASS_NAME}`;
+    }
+
+    return value;
+  };
+
   return (
     <>
       <div className="mb-3 flex gap-2">
-        <button
-          type="button"
-          className={`${
-            isAdditiondalViewButtonClicked
-              ? "border border-neutral-500 bg-neutral-500 text-white"
-              : "border border-gray-300"
-          }  rounded-md px-5 py-2`}
+        <Button
+          className={getButtonsClassName("view")}
           onClick={() => {
             if (isAdditiondalViewButtonClicked && additionalView !== "") {
               if (!confirm("보기를 지우시겠습니까?")) return;
@@ -93,15 +106,11 @@ export default function AddViewAndPhoto({
           }}
         >
           보기 추가
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
-          className={`${
-            isImageButtonClicked
-              ? "border border-neutral-500 bg-neutral-500 text-white"
-              : "border border-gray-300"
-          }  rounded-md px-5 py-2`}
+          className={getButtonsClassName("image")}
           onClick={() => {
             if (isImageButtonClicked && imageURL) {
               if (!confirm("이미지를 지우시겠습니까?")) return;
@@ -120,10 +129,10 @@ export default function AddViewAndPhoto({
           }}
         >
           사진 추가
-        </button>
+        </Button>
       </div>
 
-      {isImageButtonClicked || imageURL ? (
+      {(isImageButtonClicked || imageURL) && (
         <div>
           <p
             className="text-lg font-semibold"
@@ -158,8 +167,8 @@ export default function AddViewAndPhoto({
             />
           )}
         </div>
-      ) : null}
-      {isAdditiondalViewButtonClicked || additionalView ? (
+      )}
+      {(isAdditiondalViewButtonClicked || additionalView) && (
         <div>
           <label
             htmlFor="additional-info"
@@ -170,11 +179,17 @@ export default function AddViewAndPhoto({
           >
             보기
           </label>
-          <textarea
+          <Textarea
             id="additional-info"
-            className="my-2 h-[6rem] w-full resize-none rounded-md border border-gray-300 p-2"
             placeholder="나 이번 시험 너무 못 봤어. 평균 99점이 조금 안 되네"
             value={additionalView}
+            variant="bordered"
+            classNames={{
+              inputWrapper: "w-full !h-[6rem]",
+              input: "text-[1rem]",
+              label: "text-md font-semibold text-lg",
+            }}
+            maxRows={3}
             onChange={(e) => {
               setCurrentProblem({
                 additionalView: e.target.value,
@@ -182,7 +197,7 @@ export default function AddViewAndPhoto({
             }}
           />
         </div>
-      ) : null}
+      )}
     </>
   );
 }

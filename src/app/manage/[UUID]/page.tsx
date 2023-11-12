@@ -14,7 +14,7 @@ import {
   localProblemSetsNameAtom,
   problemLengthAtom,
   resetProblemsAtom,
-} from "@/app/jotai/problems";
+} from "@/jotai/problems";
 import { useSetAtom } from "jotai";
 type Props = {
   params: {

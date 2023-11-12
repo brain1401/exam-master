@@ -17,15 +17,14 @@ export default function ProblemSetCard({ type, problemSet }: Props) {
           : `/exam/${problemSet.UUID}`
       }
     >
-      <div className="my-2 flex w-full cursor-pointer flex-col items-center rounded-lg border border-gray-300 p-5 transition-shadow duration-200 ease-in hover:shadow-lg md:w-[10rem]">
+      <div className="my-2 flex w-[10rem] cursor-pointer flex-col items-center rounded-lg border border-gray-300 p-5 transition-shadow duration-200 ease-in hover:shadow-lg md:w-[12rem]">
         <h1 className="w-full truncate text-center text-lg font-bold text-gray-700">
           {problemSet.name}
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="mt-3 text-sm text-gray-500">
           {`${problemSet.examProblemsCount}문제` ?? 0}
         </p>
-        <p className="text-sm text-gray-500">{}</p>
-        <p className="text-sm text-gray-500">{formattedDate}</p>
+        <p className="mt-1 text-sm text-gray-500">{formattedDate}</p>
       </div>
     </Link>
   );

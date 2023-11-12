@@ -5,8 +5,9 @@ import {
   problemsAtom,
   problemSetsNameAtom,
   resetProblemsAtom,
-} from "@/app/jotai/problems";
+} from "@/jotai/problems";
 import { useAtom, useSetAtom } from "jotai";
+import NextUIButton from "../ui/NextUIButton";
 
 export default function CreateProblemsSubmitButton() {
   const [problems, setProblems] = useAtom(problemsAtom);
@@ -59,13 +60,14 @@ export default function CreateProblemsSubmitButton() {
 
   return (
     <div className="mt-3 flex justify-center">
-      <button
-        className="rounded-md bg-blue-500 px-2 py-2 text-white md:px-5 md:py-2"
+      <NextUIButton
+        radius="sm"
         onClick={handleSubmit}
-        disabled={isLoading}
+        isLoading={isLoading}
+        className="px-8 py-1 mb-5"
       >
         {isLoading ? "제출 중..." : "최종제출"}
-      </button>
+      </NextUIButton>
     </div>
   );
 }

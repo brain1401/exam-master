@@ -5,7 +5,7 @@ import NextOrPrevButtons from "./NextOrPrevButtons";
 import CurrentProblemIndicator from "./CurrentCardIndicator";
 import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
 import { useEffect } from "react";
-import { resetProblemsAtom } from "@/app/jotai/problems";
+import { resetProblemsAtom } from "@/jotai/problems";
 import { useSetAtom } from "jotai";
 
 export default function CreateProblems() {
@@ -18,7 +18,7 @@ export default function CreateProblems() {
   }, [resetProblems]);
 
   return (
-    <section className="mx-auto mt-10 max-w-[70rem] p-3">
+    <section className="mx-auto mt-10 h-full max-w-[70rem]">
       <EditProblemsOption />
 
       <CurrentProblemIndicator />
