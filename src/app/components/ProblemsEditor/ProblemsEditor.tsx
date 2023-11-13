@@ -10,7 +10,7 @@ import {
   currentTabAtom,
   problemsAtom,
   currentProblemIndexAtom,
-} from "../../jotai/problems";
+} from "../../../jotai/problems";
 import { useAtom, useAtomValue } from "jotai";
 
 export default function ProblemsEditor() {

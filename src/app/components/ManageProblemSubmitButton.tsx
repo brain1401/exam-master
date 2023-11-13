@@ -3,7 +3,7 @@ import { useState } from "react";
 import { isProblemEmpty } from "@/service/problems";
 import { problemsAtom, problemSetsNameAtom } from "@/jotai/problems";
 import { useAtomValue } from "jotai";
-import NextUIButton from "./ui/NextUIButton";
+import { Button } from "@nextui-org/react";
 
 type Props = {
   uuid: string;
@@ -57,12 +57,15 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
 
   return (
     <div className="mt-3 flex justify-center">
-      <NextUIButton
+      <Button
         onClick={handleSubmit}
         isLoading={isLoading}
+        className="w-[7rem] px-8 py-1"
+        radius="sm"
+        color="primary"
       >
         {isLoading ? "수정 중..." : "수정"}
-      </NextUIButton>
+      </Button>
     </div>
   );
 }

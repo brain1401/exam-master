@@ -7,7 +7,7 @@ import {
   resetProblemsAtom,
 } from "@/jotai/problems";
 import { useAtom, useSetAtom } from "jotai";
-import NextUIButton from "../ui/NextUIButton";
+import { Button } from "@nextui-org/react";
 
 export default function CreateProblemsSubmitButton() {
   const [problems, setProblems] = useAtom(problemsAtom);
@@ -60,14 +60,15 @@ export default function CreateProblemsSubmitButton() {
 
   return (
     <div className="mt-3 flex justify-center">
-      <NextUIButton
+      <Button
         radius="sm"
         onClick={handleSubmit}
         isLoading={isLoading}
-        className="px-8 py-1 mb-5"
+        className="w-[7rem] px-8 py-1"
+        color="primary"
       >
         {isLoading ? "제출 중..." : "최종제출"}
-      </NextUIButton>
+      </Button>
     </div>
   );
 }

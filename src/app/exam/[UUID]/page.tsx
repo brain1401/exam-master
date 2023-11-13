@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
-import ExamProblems from "@/app/components/ExamProblems";
+import ExamProblems from "@/app/components/ExamProblems/ExamProblems";
 import {
   examProblemsAtom,
   resetExamProblemsAtom,

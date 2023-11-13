@@ -1,6 +1,6 @@
 "use client";
+import { Button } from "@nextui-org/react";
 import { signIn, signOut } from "next-auth/react";
-import NextUIButton from "./NextUIButton";
 
 type Props = {
   type: "login" | "logout";
@@ -8,8 +8,12 @@ type Props = {
 
 export default function LoginButton({ type }: Props) {
   return (
-    <NextUIButton onClick={() => (type === "login" ? signIn() : signOut())} className="">
+    <Button
+      onClick={() => (type === "login" ? signIn() : signOut())}
+      color="primary"
+      radius="sm"
+    >
       {type === "login" ? "로그인" : "로그아웃"}
-    </NextUIButton>
+    </Button>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import ProblemsEditor from "@/app/components/ProblemsEditor";
+import ProblemsEditor from "@/app/components/ProblemsEditor/ProblemsEditor";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import { ClipLoader } from "react-spinners";
-import EditProblemsOption from "@/app/components/CreateProblems/EditProblemsOption";
+import ProblemsOption from "@/app/components/ProblemsEditor/ProblemsOption";
 import ManageProblemSubmitButton from "@/app/components/ManageProblemSubmitButton";
 import {
   problemsAtom,
@@ -83,7 +83,7 @@ export default function EditProblemsByUUID({ params }: Props) {
 
   return (
     <section className="mx-auto mt-10 max-w-[80rem] p-3">
-      <EditProblemsOption />
+      <ProblemsOption />
       <CurrentProblemIndicator />
       <ProblemsEditor />
       <NextOrPrevButtons />

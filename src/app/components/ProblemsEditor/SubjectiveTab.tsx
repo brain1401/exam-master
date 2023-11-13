@@ -1,52 +1,22 @@
 "use client";
-import { useEffect, useState } from "react";
-import AddViewAndPhoto from "./AddViewAndPhoto";
+import { useEffect } from "react";
+import AddViewAndPhoto from "../ui/AddViewAndPhoto";
 import {
   currentProblemAtom,
-  problemsAtom,
-  currentProblemIndexAtom,
   initCurrentProblemAtom,
-} from "../../jotai/problems";
-import { useAtom, useSetAtom, useAtomValue } from "jotai";
+} from "../../../jotai/problems";
+import { useAtom, useSetAtom } from "jotai";
 import { Textarea } from "@nextui-org/react";
 
 export default function SubjectiveTab() {
   const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
-  const setProblems = useSetAtom(problemsAtom);
-  const problemCurrentIndex = useAtomValue(currentProblemIndexAtom);
   const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
 
-  const {
-    question,
-    additionalView,
-    isAdditiondalViewButtonClicked,
-    isImageButtonClicked,
-    subAnswer,
-    image,
-  } = currentProblem || {};
-
-  const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
+  const { question, subAnswer } = currentProblem || {};
 
   useEffect(() => {
     initCurrentProblem();
   }, [initCurrentProblem]);
-
-  useEffect(() => {
-    if (image instanceof File) {
-      const objectUrl = URL.createObjectURL(image);
-      setImageURL(objectUrl);
-
-      // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
-      return () => {
-        URL.revokeObjectURL(objectUrl);
-      };
-    } else if (image && typeof image === "object") {
-      // null 체크와 File 체크 후에 실행
-      setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
-    } else {
-      setImageURL(null);
-    }
-  }, [image]);
 
   return (
     <form
@@ -72,15 +42,7 @@ export default function SubjectiveTab() {
           onChange={(e) => setCurrentProblem({ question: e.target.value })}
         />
       </div>
-      <AddViewAndPhoto
-        additionalView={additionalView ?? ""}
-        imageURL={imageURL}
-        isAdditiondalViewButtonClicked={isAdditiondalViewButtonClicked ?? false}
-        isImageButtonClicked={isImageButtonClicked ?? false}
-        problemCurrentIndex={problemCurrentIndex}
-        setProblems={setProblems}
-        setImageURL={setImageURL}
-      />
+      <AddViewAndPhoto />
 
       <div className="mb-3 flex flex-col">
         <Textarea

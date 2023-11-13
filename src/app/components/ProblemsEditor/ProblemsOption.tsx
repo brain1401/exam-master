@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
-import { Input } from "@nextui-org/react";
-import NextUIButton from "../ui/NextUIButton";
+import { Button, Input } from "@nextui-org/react";
 import {
   problemSetsNameAtom,
   localProblemSetsNameAtom,
@@ -15,7 +14,7 @@ import { useAtom, useSetAtom } from "jotai";
 
 const BUTTON_CLASSNAMES = "ml-2 px-[.5rem] text-[.9rem]";
 
-export default function EditProblemsOption() {
+export default function ProblemsOption() {
   const setProblemSetsName = useSetAtom(problemSetsNameAtom);
   const [localProblemSetsName, setLocalProblemSetsName] = useAtom(
     localProblemSetsNameAtom,
@@ -65,6 +64,8 @@ export default function EditProblemsOption() {
               return prev;
             }
           });
+        } else {
+          setProblemLength(problems.length.toString());
         }
       } else {
         setProblems((prevCards) => prevCards.slice(0, maxProblemLength));
@@ -145,13 +146,14 @@ export default function EditProblemsOption() {
             size="sm"
             onChange={handleProblemLengthChange}
           />
-          <NextUIButton
+          <Button
             className={BUTTON_CLASSNAMES}
             size="sm"
+            color="primary"
             onClick={applyProblemLength}
           >
             확인
-          </NextUIButton>
+          </Button>
         </div>
         <div className="flex items-center">
           <Input
@@ -168,14 +170,15 @@ export default function EditProblemsOption() {
             value={localProblemSetsName}
             onChange={(e) => setLocalProblemSetsName(e.target.value)}
           />
-          <NextUIButton
+          <Button
             className={BUTTON_CLASSNAMES}
             onClick={applyProblemSetName}
             size="sm"
+            color="primary"
             isLoading={isLoading}
           >
             {isLoading ? "중복 확인 중..." : "확인"}
-          </NextUIButton>
+          </Button>
         </div>
       </div>
     </form>

@@ -1,47 +1,40 @@
 "use client";
-import { Problem } from "@/types/problems";
+
 import Image from "next/image";
 import { Textarea, Button } from "@nextui-org/react";
+import { currentProblemAtom } from "@/jotai/problems";
+import { useAtom } from "jotai";
+import { useEffect, useState } from "react";
+import { isImageFileObject, isImageUrlObject } from "@/service/problems";
 
-type Props = {
-  isAdditiondalViewButtonClicked: boolean;
-  isImageButtonClicked: boolean;
-  additionalView: string;
-  setImageURL: React.Dispatch<React.SetStateAction<string | null>>;
-  setProblems: React.Dispatch<React.SetStateAction<Problem[]>>;
-  problemCurrentIndex: number;
-  imageURL: string | null;
-};
-export default function AddViewAndPhoto({
-  isAdditiondalViewButtonClicked,
-  isImageButtonClicked,
-  additionalView,
-  setProblems,
-  imageURL,
-  problemCurrentIndex,
-  setImageURL,
-}: Props) {
-  const setCurrentProblem = (newCard: Partial<Problem>) => {
-    setProblems((prev) => {
-      const newProblems: Partial<Problem>[] = [...prev];
-      newProblems[problemCurrentIndex] = {
-        ...newProblems[problemCurrentIndex],
-        ...newCard,
-      };
-      return newProblems as NonNullable<Problem>[];
-    });
-  };
+export default function AddViewAndPhoto() {
+  const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
-  const setCurrentProblemImage = (newImage: File | null) => {
-    setProblems((prev) => {
-      const newProblems: Partial<Problem>[] = [...prev];
-      newProblems[problemCurrentIndex] = {
-        ...newProblems[problemCurrentIndex],
-        image: newImage,
+  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const {
+    additionalView,
+    isAdditiondalViewButtonClicked,
+    isImageButtonClicked,
+    image,
+  } = currentProblem ?? {};
+
+  // 이미지가 변경될 때마다 이미지 URL을 생성
+  useEffect(() => {
+    if (isImageFileObject(image)) {
+      const objectUrl = URL.createObjectURL(image);
+      setImageURL(objectUrl);
+
+      // 컴포넌트가 언마운트 될 때나 이미지가 변경될 때 이미지 URL revoke
+      return () => {
+        URL.revokeObjectURL(objectUrl);
       };
-      return newProblems as NonNullable<Problem>[];
-    });
-  };
+    } else if (isImageUrlObject(image)) {
+      // null 체크와 File 체크 후에 실행
+      setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
+    } else {
+      setImageURL(null);
+    }
+  }, [image]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,7 +53,7 @@ export default function AddViewAndPhoto({
         }
         const newURL = URL.createObjectURL(file);
         setImageURL(newURL); // 이미지 URL 상태를 업데이트
-        setCurrentProblemImage(file);
+        setCurrentProblem({ image: file });
       } else {
         alert("이미지 파일을 선택해주세요.");
       }
@@ -70,13 +63,12 @@ export default function AddViewAndPhoto({
   const getButtonsClassName = (type: "view" | "image") => {
     let value = "";
 
-    const BASIC_CLASS_NAME =
-      "rounded-lg border border-gray-300 px-5 py-3";
+    const BASIC_CLASS_NAME = "rounded-lg border border-gray-300 px-5 py-3";
     const condition =
       type === "view" ? isAdditiondalViewButtonClicked : isImageButtonClicked;
 
     if (condition) {
-      value = `${BASIC_CLASS_NAME} bg-secondary text-main`;
+      value = `${BASIC_CLASS_NAME} bg-secondary text-white`;
     } else {
       value = `${BASIC_CLASS_NAME}`;
     }
@@ -109,7 +101,6 @@ export default function AddViewAndPhoto({
         </Button>
 
         <Button
-          type="button"
           className={getButtonsClassName("image")}
           onClick={() => {
             if (isImageButtonClicked && imageURL) {
@@ -117,7 +108,7 @@ export default function AddViewAndPhoto({
 
               imageURL && URL.revokeObjectURL(imageURL);
               setImageURL(null);
-              setCurrentProblemImage(null);
+              setCurrentProblem({ image: null });
               setCurrentProblem({
                 isImageButtonClicked: !isImageButtonClicked,
               });

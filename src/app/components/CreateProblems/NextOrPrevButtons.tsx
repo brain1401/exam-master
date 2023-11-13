@@ -7,7 +7,9 @@ import {
 import { isCardOnBeingWrited } from "@/service/problems";
 import { candidate } from "@/types/problems";
 import { useAtom } from "jotai";
-import NextUIButton from "../ui/NextUIButton";
+import { Button } from "@nextui-org/react";
+
+const BUTTON_CLASSNAMES = "bg-secondary text-white px-3 py-1";
 
 export default function NextOrPrevButtons() {
   const [problems, setProblems] = useAtom(problemsAtom);
@@ -115,27 +117,24 @@ export default function NextOrPrevButtons() {
 
   return (
     <div className="mt-5 flex justify-center gap-5">
-      <NextUIButton
+      <Button
         onClick={() => {
           showPreviousCard();
         }}
         radius="sm"
-        className="bg-secondary text-white px-3 py-1"
-        color="default"
-
+        className={BUTTON_CLASSNAMES}
       >
         이전
-      </NextUIButton>
-      <NextUIButton
+      </Button>
+      <Button
         onClick={() => {
           showNextCard();
         }}
         radius="sm"
-        className="bg-secondary text-white px-3 py-1"
-        color="default"
+        className={BUTTON_CLASSNAMES}
       >
         다음
-      </NextUIButton>
+      </Button>
     </div>
   );
 }

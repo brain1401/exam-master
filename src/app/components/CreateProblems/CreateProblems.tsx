@@ -1,6 +1,6 @@
 "use client";
-import ProblemsEditor from "../ProblemsEditor";
-import EditProblemsOption from "./EditProblemsOption";
+import ProblemsEditor from "../ProblemsEditor/ProblemsEditor";
+import ProblemsOption from "../ProblemsEditor/ProblemsOption";
 import NextOrPrevButtons from "./NextOrPrevButtons";
 import CurrentProblemIndicator from "./CurrentCardIndicator";
 import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
@@ -19,7 +19,7 @@ export default function CreateProblems() {
 
   return (
     <section className="mx-auto mt-10 h-full max-w-[70rem]">
-      <EditProblemsOption />
+      <ProblemsOption />
 
       <CurrentProblemIndicator />
 

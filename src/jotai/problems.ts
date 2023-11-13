@@ -69,6 +69,8 @@ export const initCurrentProblemAtom = atom(null, (get, set) => {
 
 export const problemLengthAtom = atom("10");
 
+export const candidatesCountAtom = atom("4");
+
 export const resetProblemsAtom = atom(null, (get, set) => {
   set(problemsAtom, Array<Problem>(10).fill(null));
   set(currentProblemIndexAtom, 0);
