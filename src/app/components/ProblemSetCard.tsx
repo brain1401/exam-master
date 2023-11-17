@@ -16,8 +16,9 @@ export default function ProblemSetCard({ type, problemSet }: Props) {
           ? `/manage/${problemSet.UUID}`
           : `/exam/${problemSet.UUID}`
       }
+      className="w-full"
     >
-      <div className="my-2 flex w-[10rem] cursor-pointer flex-col items-center rounded-lg border border-gray-300 p-5 transition-shadow duration-200 ease-in hover:shadow-lg md:w-[12rem]">
+      <div className="my-2 flex w-full cursor-pointer flex-col items-center rounded-lg border border-gray-300 p-5 transition-shadow duration-200 ease-in hover:shadow-lg">
         <h1 className="w-full truncate text-center text-lg font-bold text-gray-700">
           {problemSet.name}
         </h1>

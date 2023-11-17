@@ -81,11 +81,11 @@ export default function ProblemSetGrid({ type }: Props) {
 
       {!loading ? (
         problemSets?.data.length && problemSets?.data.length > 0 ? (
-          <ul className="mx-auto grid w-full grid-cols-1 gap-4 xs:grid-cols-2 sm:grid-cols-4 xl:grid-cols-5">
+          <ul className="mx-auto grid w-full grid-cols-1 gap-8 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
             {problemSets?.data.map((problemSet: ProblemSetResponse) => (
               <li
                 key={problemSet.UUID}
-                className="flex items-center justify-center"
+                className="flex w-full items-center justify-center"
               >
                 <ProblemSetCard problemSet={problemSet} type={type} />
               </li>
