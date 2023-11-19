@@ -3,7 +3,7 @@ import { currentExamProblemAtom } from "@/jotai/examProblems";
 import { Problem } from "@/types/problems";
 import { useAtom } from "jotai";
 
-export default function SubExamProblem() {
+export default function SubjectiveAnswerTextarea() {
   const [currentExamProblem, setCurrentExamProblem] = useAtom(
     currentExamProblemAtom,
   );

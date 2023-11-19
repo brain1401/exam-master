@@ -72,38 +72,44 @@ export default function ProblemSetGrid({ type }: Props) {
     }
   }, [page, isSearching, debouncedSearchString]);
 
+  const mainContent = () => {
+    if (loading) {
+      return (
+        <div className="flex w-full items-center justify-center">
+          <ClipLoader size={100} />
+        </div>
+      );
+    } else if (!(problemSets?.data.length && problemSets?.data.length > 0)) {
+      return (
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-center text-lg">
+            해당하는 문제집을 찾을 수 없습니다!
+          </p>
+        </div>
+      );
+    } else {
+      return (
+        <ul className="mx-auto grid w-full grid-cols-1 gap-8 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+          {problemSets?.data.map((problemSet: ProblemSetResponse) => (
+            <li
+              key={problemSet.UUID}
+              className="mx-auto flex w-full max-w-[13rem] items-center justify-center"
+            >
+              <ProblemSetCard problemSet={problemSet} type={type} />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+  };
+
   return (
     <section className="p-4 md:p-8">
       <SearchBox
         searchString={searchString}
         setSearchString={setSearchString}
       />
-
-      {!loading ? (
-        problemSets?.data.length && problemSets?.data.length > 0 ? (
-          <ul className="mx-auto grid w-full grid-cols-1 gap-8 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
-            {problemSets?.data.map((problemSet: ProblemSetResponse) => (
-              <li
-                key={problemSet.UUID}
-                className="flex w-full items-center justify-center"
-              >
-                <ProblemSetCard problemSet={problemSet} type={type} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="flex h-64 items-center justify-center">
-            <p className="text-center text-lg">
-              해당하는 문제집을 찾을 수 없습니다!
-            </p>
-          </div>
-        )
-      ) : (
-        <div className="flex w-full items-center justify-center">
-          <ClipLoader size={100} />
-        </div>
-      )}
-
+      {mainContent()}
       <LeftRightButton page={page} setPage={setPage} maxPage={maxPage} />
     </section>
   );

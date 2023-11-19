@@ -12,7 +12,7 @@ import {
 } from "@/jotai/problems";
 import { useAtom, useSetAtom } from "jotai";
 
-const BUTTON_CLASSNAMES = "ml-2 px-[.5rem] text-[.9rem]";
+const BUTTON_CLASSNAMES = "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
 
 export default function ProblemsOption() {
   const setProblemSetsName = useSetAtom(problemSetsNameAtom);
@@ -149,7 +149,6 @@ export default function ProblemsOption() {
           <Button
             className={BUTTON_CLASSNAMES}
             size="sm"
-            color="primary"
             onClick={applyProblemLength}
           >
             확인
@@ -174,7 +173,6 @@ export default function ProblemsOption() {
             className={BUTTON_CLASSNAMES}
             onClick={applyProblemSetName}
             size="sm"
-            color="primary"
             isLoading={isLoading}
           >
             {isLoading ? "중복 확인 중..." : "확인"}

@@ -16,12 +16,10 @@ export default function CandidateCountSelector() {
 
   useLayoutEffect(() => {
     setCandidatesCount(currentProblem?.candidates?.length.toString() ?? "4");
-    console.log("setCandidatesCount ", currentProblem?.candidates?.length);
   }, [setCandidatesCount, currentProblem?.candidates?.length]);
 
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value: selectedValue } = event.target;
-    setCandidatesCount(selectedValue);
 
     if (!currentProblemCandidates) throw new Error("무언가가 잘못되었습니다.");
 
@@ -32,7 +30,7 @@ export default function CandidateCountSelector() {
     if (selectedIntValue < prevLength) {
       //선택지 수가 줄어들 때
       newValues = newValues.slice(0, selectedIntValue);
-    } else {
+    } else if (selectedIntValue > prevLength) {
       //선택지 수가 늘어날 때
       for (let i = prevLength; i < selectedIntValue; i++) {
         newValues[i] = {
@@ -41,7 +39,11 @@ export default function CandidateCountSelector() {
           isAnswer: false,
         };
       }
+    } else {
+      //선택지 수가 그대로일 때
+      return;
     }
+    setCandidatesCount(selectedValue);
     setCurrentProblemCandidates(newValues);
   };
 

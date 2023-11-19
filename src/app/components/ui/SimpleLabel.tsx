@@ -18,7 +18,8 @@ export default function SimpleLabel({
   return (
     <label
       className={twMerge(
-        `text-md ${margin ? "mb-2" : ""} font-semibold select-none ${className}`,
+        `text-md ${margin ? "mb-2" : ""} select-none font-semibold `,
+        className,
       )}
       onClick={(e) => {
         preventDefault ? e.preventDefault() : null;

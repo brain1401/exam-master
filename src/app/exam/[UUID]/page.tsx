@@ -58,7 +58,7 @@ export default function DetailedExamPage({ params: { UUID } }: Props) {
     );
 
   return (
-    <section className="mx-auto mt-10 max-w-[80rem] p-3">
+    <section className="mx-auto my-10 max-w-[80rem] p-3">
       {examProblems && <ExamProblems />}
     </section>
   );

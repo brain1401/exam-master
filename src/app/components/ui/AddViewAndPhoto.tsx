@@ -6,8 +6,12 @@ import { currentProblemAtom } from "@/jotai/problems";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { isImageFileObject, isImageUrlObject } from "@/service/problems";
+import { twMerge } from "tailwind-merge";
 
-export default function AddViewAndPhoto() {
+type Props = {
+  className?: string;
+};
+export default function AddViewAndPhoto({ className }: Props) {
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
@@ -78,7 +82,7 @@ export default function AddViewAndPhoto() {
 
   return (
     <>
-      <div className="mb-3 flex gap-2">
+      <div className={twMerge("flex gap-2", className)}>
         <Button
           className={getButtonsClassName("view")}
           onClick={() => {

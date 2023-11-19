@@ -1,10 +1,10 @@
-import { Checkbox } from "@nextui-org/react";
+import { Switch } from "@nextui-org/react";
 import SimpleLabel from "../ui/SimpleLabel";
 import { ChangeEvent } from "react";
 import { currentProblemAtom } from "@/jotai/problems";
 import { useAtom } from "jotai";
 
-export default function MultipleAnswerCheckbox() {
+export default function MultipleAnswerSwitch() {
   const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
 
   const handleMultipleAnswerCheckboxChange = (
@@ -34,11 +34,16 @@ export default function MultipleAnswerCheckbox() {
 
   return (
     <>
-      <SimpleLabel htmlFor="isAnswerMultiple">복수정답</SimpleLabel>
-      <Checkbox
-        type="checkbox"
+      <SimpleLabel
+        htmlFor="isAnswerMultiple"
+        className="mb-[.2rem]"
+        margin={false}
+      >
+        복수정답
+      </SimpleLabel>
+      <Switch
         classNames={{
-          wrapper: `ml-2 before:!border-nextUiBorder`,
+          wrapper: `ml-2 bg-nextUiBorder`,
         }}
         id="isAnswerMultiple"
         isSelected={currentProblem?.isAnswerMultiple ?? false}

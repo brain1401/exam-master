@@ -1,35 +1,21 @@
 "use client";
 import usePreventClose from "@/hooks/preventClose";
 import { useEffect } from "react";
-import candidateNumber from "@/utils/candidateNumber";
-import Image from "next/image";
-import checkImage from "/public/check.png";
-import { isImageUrlObject } from "@/service/problems";
 import {
   currentExamProblemAtom,
-  currentExamProblemIndexAtom,
   examProblemNameAtom,
-  examProblemsAtom,
 } from "../../../jotai/examProblems";
-import { Textarea } from "@nextui-org/react";
 
-import { useAtom, useAtomValue } from "jotai";
-import { Problem } from "@/types/problems";
+import { useAtomValue } from "jotai";
 import NextOrPrevButtons from "./ExamProblemsNextOrPrevButtons";
 import CurrentExamImage from "./CurrentExamImage";
 import CurrentQuestion from "./CurrentQuestion";
 import AdditionalView from "./AdditionalView";
-import ObjExamProblem from "./ObjExamProblem";
-import SubExamProblem from "./SubExamProblem";
+import Candidates from "./Candidates";
+import SubjectiveAnswerTextarea from "./SubjectiveAnswerTextarea";
 
 export default function ExamProblems() {
-  const [currentExamProblem, setCurrentExamProblem] = useAtom(
-    currentExamProblemAtom,
-  );
-  const [currentExamProblemIndex, setCurrentProblemIndex] = useAtom(
-    currentExamProblemIndexAtom,
-  );
-  const [examProblems] = useAtom(examProblemsAtom);
+  const currentExamProblem = useAtomValue(currentExamProblemAtom);
   const name = useAtomValue(examProblemNameAtom);
 
   usePreventClose();
@@ -51,9 +37,9 @@ export default function ExamProblems() {
 
         <AdditionalView />
 
-        {currentExamProblem.type === "obj" && <ObjExamProblem />}
+        {currentExamProblem.type === "obj" && <Candidates />}
 
-        {currentExamProblem.type === "sub" && <SubExamProblem />}
+        {currentExamProblem.type === "sub" && <SubjectiveAnswerTextarea />}
       </div>
 
       <NextOrPrevButtons />

@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import Image from "next/image";
 import checkImage from "/public/check.png";
 
-export default function ObjExamProblem() {
+export default function Candidates() {
   const [currentExamProblem, setCurrentExamProblem] = useAtom(
     currentExamProblemAtom,
   );

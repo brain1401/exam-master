@@ -12,7 +12,7 @@ export default function SubjectiveTab() {
   const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
   const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
 
-  const { question, subAnswer } = currentProblem || {};
+  const { question, subAnswer } = currentProblem ?? {};
 
   useEffect(() => {
     initCurrentProblem();
@@ -20,12 +20,12 @@ export default function SubjectiveTab() {
 
   return (
     <form
-      className="flex flex-col space-y-4 rounded-xl bg-gray-100 p-5"
+      className="flex flex-col rounded-xl bg-gray-100 p-5"
       onSubmit={(e) => {
         e.preventDefault();
       }}
     >
-      <div className="flex flex-col">
+      <div className="mb-4 flex flex-col">
         <Textarea
           id="question"
           classNames={{
@@ -42,7 +42,7 @@ export default function SubjectiveTab() {
           onChange={(e) => setCurrentProblem({ question: e.target.value })}
         />
       </div>
-      <AddViewAndPhoto />
+      <AddViewAndPhoto className="mb-4" />
 
       <div className="mb-3 flex flex-col">
         <Textarea
