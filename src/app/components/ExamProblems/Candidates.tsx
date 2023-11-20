@@ -1,3 +1,4 @@
+"use client";
 import { currentExamProblemAtom } from "@/jotai/examProblems";
 import { Problem } from "@/types/problems";
 import candidateNumber from "@/utils/candidateNumber";

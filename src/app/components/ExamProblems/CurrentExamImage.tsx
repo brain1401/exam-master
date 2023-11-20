@@ -1,3 +1,4 @@
+"use client";
 import { currentExamProblemAtom } from "@/jotai/examProblems";
 import { useAtomValue } from "jotai";
 import Image from "next/image";

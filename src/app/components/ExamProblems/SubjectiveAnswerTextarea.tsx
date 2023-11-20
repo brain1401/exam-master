@@ -1,3 +1,4 @@
+"use client";
 import { Textarea } from "@nextui-org/react";
 import { currentExamProblemAtom } from "@/jotai/examProblems";
 import { Problem } from "@/types/problems";
@@ -10,8 +11,9 @@ export default function SubjectiveAnswerTextarea() {
 
   const onTextAreaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newCurrentExamProblems = { ...currentExamProblem };
+
     if (!newCurrentExamProblems) {
-      throw new Error("무언가가 잘못되었습니다.");
+      throw new Error("문제가 없습니다.");
     }
     newCurrentExamProblems.subAnswer = e.target.value;
 
@@ -21,6 +23,11 @@ export default function SubjectiveAnswerTextarea() {
   return (
     <div>
       <Textarea
+        variant="bordered"
+        classNames={{
+          inputWrapper: "border-black"
+        }}
+        radius="sm"
         placeholder="답을 입력하세요."
         onChange={onTextAreaChange}
         value={currentExamProblem?.subAnswer ?? ""}

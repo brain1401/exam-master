@@ -1,14 +1,5 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { ClipLoader } from "react-spinners";
 import ExamProblems from "@/app/components/ExamProblems/ExamProblems";
-import {
-  examProblemsAtom,
-  resetExamProblemsAtom,
-} from "@/jotai/examProblems";
-import { useAtom, useSetAtom } from "jotai";
+import { getServerSession } from "next-auth";
 
 type Props = {
   params: {
@@ -16,50 +7,13 @@ type Props = {
   };
 };
 
-export default function DetailedExamPage({ params: { UUID } }: Props) {
-  const [examProblems, setExamProblems] = useAtom(examProblemsAtom);
-  const resetExamProblems = useSetAtom(resetExamProblemsAtom);
+export default async function DetailedExamPage({ params: { UUID } }: Props) {
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const session = await getServerSession();
 
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`/api/getExamProblemsByProblemSetUUID`, {
-        params: {
-          UUID,
-        },
-      })
-      .then((res) => {
-        setExamProblems({
-          name: res.data.name,
-          exam_problems: res.data.exam_problems,
-        });
-      })
-      .catch((err) => {
-        setError(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  if(!session) {
+    return <h1 className="text-2xl text-center mt-10">로그인이 필요합니다.</h1>
+  }
 
-    return () => {
-      resetExamProblems();
-    };
-  }, [UUID, setExamProblems, resetExamProblems]);
-
-  if (error) return <div>에러가 발생했습니다.</div>;
-  if (loading)
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <ClipLoader size={100} />
-      </div>
-    );
-
-  return (
-    <section className="mx-auto my-10 max-w-[80rem] p-3">
-      {examProblems && <ExamProblems />}
-    </section>
-  );
+  return <ExamProblems UUID={UUID} />
 }

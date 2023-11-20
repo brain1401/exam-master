@@ -17,7 +17,7 @@ export default function PCNavbar({ loginButton }: Props) {
   const [isMenuOpen, setIsMenuOpen] = useAtom(isNavbarMenuOpenAtom);
   return (
     <nav // navbar
-      className="transparent fixed left-0 top-0 z-30 flex w-full border-b border-gray-300 bg-main"
+      className="transparent z-30 flex w-full border-b border-gray-300 bg-main"
     >
       <div className="flex w-full items-center justify-between md:gap-3">
         <div className="flex">
