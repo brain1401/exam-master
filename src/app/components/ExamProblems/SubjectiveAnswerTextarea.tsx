@@ -23,9 +23,8 @@ export default function SubjectiveAnswerTextarea() {
   return (
     <div>
       <Textarea
-        variant="bordered"
         classNames={{
-          inputWrapper: "border-black"
+          inputWrapper: "bg-nextUiBorder"
         }}
         radius="sm"
         placeholder="답을 입력하세요."

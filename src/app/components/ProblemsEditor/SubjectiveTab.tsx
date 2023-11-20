@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import AddViewAndPhoto from "../ui/AddViewAndPhoto";
+import AddViewAndPhoto from "./AddViewAndPhoto";
 import {
   currentProblemAtom,
   initCurrentProblemAtom,

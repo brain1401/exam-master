@@ -6,7 +6,7 @@ import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons
 import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import { ClipLoader } from "react-spinners";
 import ProblemsOption from "@/app/components/ProblemsEditor/ProblemsOption";
-import ManageProblemSubmitButton from "@/app/components/ManageProblemSubmitButton";
+import ManageProblemSubmitButton from "@/app/components/ManageProblems/ManageProblemSubmitButton";
 import {
   problemsAtom,
   problemSetsNameAtom,

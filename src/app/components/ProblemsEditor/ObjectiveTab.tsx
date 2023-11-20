@@ -1,6 +1,6 @@
 "use client";
 import { useLayoutEffect } from "react";
-import AddViewAndPhoto from "../ui/AddViewAndPhoto";
+import AddViewAndPhoto from "./AddViewAndPhoto";
 import { initCurrentProblemAtom } from "@/jotai/problems";
 import { useSetAtom } from "jotai";
 import Candidates from "./Candidates";
@@ -22,13 +22,13 @@ export default function ObjectiveTab() {
         e.preventDefault();
       }}
     >
-      <div className="mb-4 flex flex-col">
+      <div className="flex flex-col">
         <QuestionTextArea />
       </div>
 
-      <AddViewAndPhoto className="mb-4" />
+      <AddViewAndPhoto className="mt-4" />
 
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center justify-center">
           <MultipleAnswerSwitch />
         </div>
@@ -37,7 +37,7 @@ export default function ObjectiveTab() {
         </div>
       </div>
 
-      <Candidates />
+      <Candidates className="mt-4" />
     </form>
   );
 }

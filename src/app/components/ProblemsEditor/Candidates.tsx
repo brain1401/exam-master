@@ -7,7 +7,7 @@ import { Checkbox, Input } from "@nextui-org/react";
 import SimpleLabel from "../ui/SimpleLabel";
 import { ChangeEvent } from "react";
 import { useAtom, useAtomValue } from "jotai";
-
+import { twMerge } from "tailwind-merge";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -16,7 +16,10 @@ const candidatePlaceholders = [
   "다른 데서 그런 식으로 말하면 너는 학교 폭력의 피해자가 될지도 몰라",
 ];
 
-export default function Candidates() {
+type Props = {
+  className?: string;
+};
+export default function Candidates({ className }: Props) {
   const candidatesCount = useAtomValue(candidatesCountAtom);
 
   const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
@@ -131,14 +134,14 @@ export default function Candidates() {
   ));
 
   return (
-    <div className="relative flex flex-col gap-y-1">
+    <div className={twMerge("relative flex flex-col gap-y-1", className)}>
       <SimpleLabel
         className="absolute mt-2 w-[4rem] self-end text-center"
         margin={false}
       >
         정답여부
       </SimpleLabel>
-      {candidates}
+      <div>{candidates}</div>
     </div>
   );
 }

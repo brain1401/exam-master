@@ -25,6 +25,7 @@ export default function AddViewAndPhoto({ className }: Props) {
   // 이미지가 변경될 때마다 이미지 URL을 생성
   useEffect(() => {
     if (isImageFileObject(image)) {
+      // image가 null이 아니고 File 객체인 경우
       const objectUrl = URL.createObjectURL(image);
       setImageURL(objectUrl);
 
@@ -33,8 +34,8 @@ export default function AddViewAndPhoto({ className }: Props) {
         URL.revokeObjectURL(objectUrl);
       };
     } else if (isImageUrlObject(image)) {
-      // null 체크와 File 체크 후에 실행
-      setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}` ?? "");
+      // image가 null이 아니고 URL프로퍼티를 포함한 객체인 경우
+      setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}`);
     } else {
       setImageURL(null);
     }
@@ -128,9 +129,9 @@ export default function AddViewAndPhoto({ className }: Props) {
       </div>
 
       {(isImageButtonClicked || imageURL) && (
-        <div>
+        <div className="mt-4">
           <p
-            className="text-lg font-semibold"
+            className="cursor-default text-lg font-semibold"
             onClick={(e) => {
               e.preventDefault();
             }}
@@ -164,10 +165,10 @@ export default function AddViewAndPhoto({ className }: Props) {
         </div>
       )}
       {(isAdditiondalViewButtonClicked || additionalView) && (
-        <div>
+        <div className="mt-4">
           <label
             htmlFor="additional-info"
-            className="mb-3 text-lg font-semibold"
+            className="mb-2 block text-lg font-semibold"
             onClick={(e) => {
               e.preventDefault();
             }}
