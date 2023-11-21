@@ -1,4 +1,9 @@
-import { RawProblemSetResponse, Problem, ProblemSetResponse } from "@/types/problems";
+import {
+  RawProblemSetResponse,
+  Problem,
+  ProblemSetResponse,
+  ProblemResponse,
+} from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
 
@@ -798,4 +803,42 @@ export async function linkProblemToProblemSet(
   );
   if (!response.ok)
     throw new Error("문제를 문제집에 연결하는 중 오류가 발생했습니다.");
+}
+
+export async function getAnswerByProblemId(problemId: number) {
+  const query = qs.stringify({
+    filters: {
+      id: {
+        $eq: problemId,
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+      },
+    );
+    if (!response.ok)
+      throw new Error("정답을 불러오는 중 오류가 발생했습니다.");
+
+    const data = await response.json();
+    const problem: ProblemResponse = data.data[0];
+
+    const answer =
+      problem.questionType === "obj"
+        ? problem.candidates
+            ?.filter((candidate) => candidate.isAnswer)
+            .map((candidate) => candidate.id)
+        : problem.subjectiveAnswer;
+    return answer;
+  } catch (err) {
+    console.log(err);
+    throw new Error("정답을 불러오는 중 오류가 발생했습니다.");
+  }
 }

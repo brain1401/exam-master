@@ -3,12 +3,11 @@ import usePreventClose from "@/hooks/preventClose";
 import { useEffect, useState } from "react";
 import {
   currentExamProblemAtom,
-  examProblemNameAtom,
   examProblemsAtom,
   resetExamProblemsAtom,
 } from "../../../jotai/examProblems";
 
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import NextOrPrevButtons from "./ExamProblemsNextOrPrevButtons";
 import CurrentExamImage from "./CurrentExamImage";
 import CurrentQuestion from "./CurrentQuestion";
@@ -17,14 +16,14 @@ import Candidates from "./Candidates";
 import SubjectiveAnswerTextarea from "./SubjectiveAnswerTextarea";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
+import SubmitButton from "./SubmitButton";
 
 type Props = {
   UUID: string;
 };
 export default function ExamProblems({ UUID }: Props) {
   const currentExamProblem = useAtomValue(currentExamProblemAtom);
-  const name = useAtomValue(examProblemNameAtom);
-  const setExamProblems = useSetAtom(examProblemsAtom);
+  const [examProblems, setExamProblems] = useAtom(examProblemsAtom);
   const resetExamProblems = useSetAtom(resetExamProblemsAtom);
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,8 +32,8 @@ export default function ExamProblems({ UUID }: Props) {
   usePreventClose();
 
   useEffect(() => {
-    console.log("currentExamProblem", currentExamProblem);
-  }, [currentExamProblem]);
+    console.log("examProblems", examProblems);
+  }, [examProblems]);
 
   useEffect(() => {
     setLoading(true);
@@ -74,7 +73,6 @@ export default function ExamProblems({ UUID }: Props) {
 
   return (
     <section className="mx-auto my-10 max-w-[80rem] p-3">
-      <div>문제집 이름 : {name}</div>
 
       <div className="rounded-lg bg-slate-200 p-3">
         <CurrentQuestion />
@@ -89,6 +87,8 @@ export default function ExamProblems({ UUID }: Props) {
       </div>
 
       <NextOrPrevButtons />
+
+      <SubmitButton/>
     </section>
   );
 }
