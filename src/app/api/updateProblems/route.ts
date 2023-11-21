@@ -5,6 +5,7 @@ import {
   updateProblems,
   validateProblemSetUUID,
 } from "@/service/problems";
+import { problemsSchema } from "@/types/problems";
 
 export async function PUT(req: NextRequest) {
   const session = await getServerSession();
@@ -41,6 +42,15 @@ export async function PUT(req: NextRequest) {
         status: 401,
       },
     );
+
+  console.log(problemsSchema.safeParse(problems).success);
+  console.log(problems);
+  if (!problemsSchema.safeParse(problems).success) {
+    return NextResponse.json(
+      { error: "문제 형식이 올바르지 않습니다." },
+      { status: 500 },
+    );
+  }
 
   const result = await updateProblems(
     problemSetsName,
