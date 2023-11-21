@@ -6,6 +6,7 @@ import {
 } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
+import { NextRequest } from "next/server";
 
 export const checkEnvVariables = () => {
   if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
@@ -632,13 +633,6 @@ export async function updateProblems(
   console.log("problems", problems);
   console.log("setName", setName);
 
-  const validatePrtoblemSetUUIDResult = await validateProblemSetUUID(
-    problemSetUUID,
-    userEmail,
-  );
-  if (validatePrtoblemSetUUIDResult === "NO")
-    throw new Error("다른 사용자의 문제집은 수정할 수 없습니다.");
-
   //문제집 이름 수정
   await updateProblemSetName(setName, problemSetUUID);
 
@@ -840,5 +834,67 @@ export async function getAnswerByProblemId(problemId: number) {
   } catch (err) {
     console.log(err);
     throw new Error("정답을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+type ProblemsAndSetsName = {
+  problemSetsName: string;
+  problems: Problem[];
+};
+
+type ProblemsAndSetsNameWithUUID = ProblemsAndSetsName & {
+  problemSetUUID: string;
+};
+
+export function getParsedProblems<T extends boolean>(
+  formData: FormData,
+  includeUuid: T,
+): T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetsName {
+
+  const entries = Array.from(formData.entries());
+
+  const problems: NonNullable<Problem>[] = [];
+  let problemSetsName: string | undefined;
+  let problemSetUUID: string | undefined;
+
+  for (const [name, value] of entries) {
+    if (name === "problemSetsName") {
+      problemSetsName = value as string;
+      continue;
+    }
+    if (includeUuid && name === "uuid") {
+      problemSetUUID = value as string;
+      continue;
+    }
+
+    const match = name.match(/(data|image)\[(\d+)\]/);
+    if (match) {
+      const [, prefix, indexStr] = match;
+      const index = parseInt(indexStr);
+
+      if (!problems[index]) {
+        problems[index] = {} as NonNullable<Problem>;
+      }
+
+      if (prefix === "data") {
+        const ProblemData = JSON.parse(value as string);
+        problems[index] = {
+          ...problems[index],
+          ...ProblemData,
+        };
+      } else if (prefix === "image" && value !== "null") {
+        problems[index].image = value as File;
+      }
+    }
+  }
+
+  if (includeUuid) {
+    return { problemSetsName, problems, problemSetUUID } as T extends true
+      ? ProblemsAndSetsNameWithUUID
+      : ProblemsAndSetsName;
+  } else {
+    return { problemSetsName, problems } as T extends true
+      ? ProblemsAndSetsNameWithUUID
+      : ProblemsAndSetsName;
   }
 }

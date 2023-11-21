@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { Problem } from "@/types/problems";
-import { postProblems } from "@/service/problems";
+import { getParsedProblems, postProblems } from "@/service/problems";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession();
@@ -20,39 +19,10 @@ export async function POST(req: NextRequest) {
     );
 
   const formData = await req.formData();
-  const entries = Array.from(formData.entries());
 
-  const intermediateResults: NonNullable<Problem>[] = [];
-  let problemSetsName: string | undefined;
+  const { problemSetsName, problems } = getParsedProblems(formData, false);
 
-  for (const [name, value] of entries) {
-    if (name === "problemSetsName") {
-      problemSetsName = value as string;
-      continue;
-    }
-
-    const match = name.match(/(data|image)\[(\d+)\]/);
-    if (match) {
-      const [, prefix, indexStr] = match;
-      const index = parseInt(indexStr);
-
-      if (!intermediateResults[index]) {
-        intermediateResults[index] = {} as NonNullable<Problem>;
-      }
-
-      if (prefix === "data") {
-        const cardData = JSON.parse(value as string);
-        intermediateResults[index] = {
-          ...intermediateResults[index],
-          ...cardData,
-        };
-      } else if (prefix === "image" && value !== "null") {
-        intermediateResults[index].image = value as File;
-      }
-    }
-  }
-
-  if (!problemSetsName || !intermediateResults) {
+  if (!problemSetsName || !problems) {
     return NextResponse.json(
       { error: "FormData가 정상적인지 확인하십시오." },
       { status: 500 },
@@ -62,7 +32,7 @@ export async function POST(req: NextRequest) {
   const response = await postProblems(
     problemSetsName,
     session?.user?.email,
-    intermediateResults,
+    problems,
   );
 
   return NextResponse.json(response);

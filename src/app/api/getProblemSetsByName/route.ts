@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
 
   const data = await getProblemSetsByName(
-    session?.user?.email,
+    session.user.email,
     name,
     page || "1"
   );

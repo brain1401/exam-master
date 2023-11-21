@@ -82,7 +82,3 @@ export type ExamProblemSet = {
   name: string;
   exam_problems: ExamProblem[];
 };
-
-export type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};

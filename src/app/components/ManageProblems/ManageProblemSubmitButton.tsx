@@ -38,18 +38,18 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
     formData.append("uuid", uuid);
     try {
       const response = await fetch("/api/updateProblems", {
-        method: "POST",
+        method: "PUT",
         body: formData,
       });
 
-      const data = await response.json();
-      if (data === "OK") {
+      const result = await response.json();
+      if (result === "OK") {
         alert("문제집이 성공적으로 등록되었습니다.");
       } else {
         alert("문제집 등록에 실패했습니다.");
       }
     } catch (err) {
-      alert("문제집 등록에 실패했습니다.");
+      alert(`문제집 등록에 실패했습니다. \n에러 : ${err}`);
     } finally {
       setIsLoading(false); // 로딩 완료
     }

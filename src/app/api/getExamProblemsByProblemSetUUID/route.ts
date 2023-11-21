@@ -1,4 +1,7 @@
-import { getProblemsSetByUUID } from "@/service/problems";
+import {
+  getProblemsSetByUUID,
+  validateProblemSetUUID,
+} from "@/service/problems";
 import { ExamProblemSet } from "@/types/problems";
 import { problemShuffle } from "@/utils/problemShuffle";
 import { getServerSession } from "next-auth";
@@ -18,6 +21,15 @@ export async function GET(req: NextRequest) {
       { error: "api 사용법을 확인해주세요" },
       { status: 400 },
     );
+
+  const validateResult = await validateProblemSetUUID(UUID, session.user.email);
+
+  if (validateResult === "NO") {
+    return NextResponse.json(
+      { error: "본인의 문제만 가져올 수 있습니다." },
+      { status: 403 },
+    );
+  }
 
   const data = await getProblemsSetByUUID(UUID, session?.user?.email);
 
