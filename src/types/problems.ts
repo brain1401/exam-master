@@ -25,19 +25,7 @@ export type Problem = {
   subAnswer: string | null;
 } | null;
 
-export type ExamProblem = {
-  id?: number;
-  type: "obj" | "sub";
-  question: string;
-  additionalView: string;
-  isAnswerMultiple: boolean | null;
-  image: {
-    id: string;
-    url: string;
-  } | null;
-  candidates: candidate[] | null;
-  subAnswer: string | null;
-};
+export type ExamProblem = z.infer<typeof examProblemSchema>;
 
 export type ProblemResponse = {
   id: number;
@@ -96,16 +84,16 @@ export const problemSchema = z
     id: z.number().optional(),
     type: z.union([z.literal("obj"), z.literal("sub")]),
     question: z.string(),
-    additionalView: z.string(),
-    isAnswerMultiple: z.boolean().nullable(),
+    additionalView: z.string().nullable(),
+    isAnswerMultiple: z.boolean(),
     image: z
       .union([
         z.instanceof(File),
         z.object({
           id: z.number(),
           name: z.string(),
-          alternativeText: z.null(),
-          caption: z.null(),
+          alternativeText: z.string().nullable(),
+          caption: z.string().nullable(),
           width: z.number(),
           height: z.number(),
           formats: z.object({
@@ -114,61 +102,61 @@ export const problemSchema = z
               hash: z.string(),
               ext: z.string(),
               mime: z.string(),
-              path: z.null(),
+              path: z.string().nullable(),
               width: z.number(),
               height: z.number(),
               size: z.number(),
               url: z.string(),
-            }),
+            }).optional(),
             medium: z.object({
               name: z.string(),
               hash: z.string(),
               ext: z.string(),
               mime: z.string(),
-              path: z.null(),
+              path: z.string().nullable(),
               width: z.number(),
               height: z.number(),
               size: z.number(),
               url: z.string(),
-            }),
+            }).optional(),
             small: z.object({
               name: z.string(),
               hash: z.string(),
               ext: z.string(),
               mime: z.string(),
-              path: z.null(),
+              path: z.string().nullable(),
               width: z.number(),
               height: z.number(),
               size: z.number(),
               url: z.string(),
-            }),
+            }).optional(),
             large: z.object({
               name: z.string(),
               hash: z.string(),
               ext: z.string(),
               mime: z.string(),
-              path: z.null(),
+              path: z.string().nullable(),
               width: z.number(),
               height: z.number(),
               size: z.number(),
               url: z.string(),
-            }),
-          }),
+            }).optional(),
+          }).nullable(),
           hash: z.string(),
           ext: z.string(),
           mime: z.string(),
           size: z.number(),
           url: z.string(),
-          previewUrl: z.null(),
+          previewUrl: z.string().nullable(),
           provider: z.string(),
-          provider_metadata: z.null(),
+          provider_metadata: z.string().nullable(),
           createdAt: z.string(),
           updatedAt: z.string(),
         }),
       ])
       .nullable(),
-    isAdditiondalViewButtonClicked: z.boolean(),
-    isImageButtonClicked: z.boolean(),
+    isAdditiondalViewButtonClicked: z.boolean().optional(),
+    isImageButtonClicked: z.boolean().optional(),
     candidates: z.array(candidateSchema).nullable(),
     subAnswer: z.string().nullable(),
   })

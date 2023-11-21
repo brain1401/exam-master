@@ -1,18 +1,23 @@
 "use server";
 
 import { getAnswerByProblemId } from "@/service/problems";
-import { Problem } from "@/types/problems";
+import { Problem, problemsSchema } from "@/types/problems";
 
-export async function evaluateProblems(problems: Problem[]) {
+export async function evaluateProblems(examProblems: Problem[]) {
   const finalResult = [];
 
-  for (const problem of problems) {
+  const validateResult = problemsSchema.safeParse(examProblems);
+
+  if(!validateResult.success) {
+    return validateResult.error.format();
+  }
+  for (const problem of examProblems) {
     if (!problem || !problem.id) throw new Error("something is null");
 
     const isAnswered =
       problem.type === "obj"
         ? problem.candidates?.some((candidate) => candidate.isAnswer)
-        : problem.subAnswer !== null;
+        : problem.subAnswer !== null && problem.subAnswer !== "";
 
     if (!isAnswered) {
       return "정답을 입력해주세요.";
@@ -50,8 +55,6 @@ export async function evaluateProblems(problems: Problem[]) {
       const isCorrect =
         isAnswerArray(answer) &&
         answer.every((id) => {
-          console.log("answeredId", answeredId);
-          console.log("id", id);
           return answeredId.includes(id);
         });
 

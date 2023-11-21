@@ -43,8 +43,6 @@ export async function PUT(req: NextRequest) {
       },
     );
 
-  console.log(problemsSchema.safeParse(problems).success);
-  console.log(problems);
   if (!problemsSchema.safeParse(problems).success) {
     return NextResponse.json(
       { error: "문제 형식이 올바르지 않습니다." },

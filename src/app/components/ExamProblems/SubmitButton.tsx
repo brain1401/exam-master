@@ -12,15 +12,16 @@ export default function SubmitButton() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<any>(null);
 
-  const examProblems = useAtomValue(examProblemsAtom);
+  const { exam_problems } = useAtomValue(examProblemsAtom);
 
   useEffect(() => {
     console.log(result);
   }, [result]);
 
   const onClick = () => {
+    // server actions
     startTransition(async () => {
-      const result = await evaluateProblems(examProblems.exam_problems);
+      const result = await evaluateProblems(exam_problems);
       setResult(result);
     });
   };
