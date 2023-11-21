@@ -94,8 +94,7 @@ export default function Candidates() {
               >
                 <Image src={checkImage} alt="체크" fill />
               </div>
-              <span>{candidateNumber(i + 1)}</span>
-              {` ${candidate.text}`}
+              <span>{`${candidateNumber(i + 1)} ${candidate.text}`}</span>
             </div>
           </li>
         ))}

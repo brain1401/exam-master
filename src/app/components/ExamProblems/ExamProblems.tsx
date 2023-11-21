@@ -62,6 +62,7 @@ export default function ExamProblems({ UUID }: Props) {
   }, [UUID, setExamProblems, resetExamProblems]);
 
   if (error) return <div>에러가 발생했습니다.</div>;
+  
   if (loading)
     return (
       <div className="flex h-screen items-center justify-center">
