@@ -850,7 +850,6 @@ export function getParsedProblems<T extends boolean>(
   formData: FormData,
   includeUuid: T,
 ): T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetsName {
-
   const entries = Array.from(formData.entries());
 
   const problems: NonNullable<Problem>[] = [];
@@ -897,4 +896,24 @@ export function getParsedProblems<T extends boolean>(
       ? ProblemsAndSetsNameWithUUID
       : ProblemsAndSetsName;
   }
+}
+
+export function isProblemAsnwered(problem: Problem) {
+  if (!problem || !problem.candidates) {
+    throw new Error("something is null");
+  }
+
+  return problem.type === "obj"
+    ? problem.candidates.some((candidate) => candidate.isAnswer)
+    : problem.subAnswer !== null && problem.subAnswer !== "";
+}
+
+export function isAnsweredMoreThanOne(problem: Problem) {
+  if (!problem || !problem.candidates) {
+    throw new Error("something is null");
+  }
+
+  return (
+    problem.candidates.filter((candidate) => candidate.isAnswer).length > 1
+  );
 }

@@ -4,7 +4,7 @@ import { Button } from "@nextui-org/react";
 import { examProblemsAtom } from "@/jotai/examProblems";
 import { useAtomValue } from "jotai";
 import { useTransition } from "react";
-import { evaluateProblems } from "@/action/action";
+import { evaluateProblems } from "@/action/evaluateProblems";
 import { useState } from "react";
 import { useEffect } from "react";
 
@@ -19,7 +19,7 @@ export default function SubmitButton() {
   }, [result]);
 
   const onClick = () => {
-    // server actions
+    // server actions 
     startTransition(async () => {
       const result = await evaluateProblems(exam_problems);
       setResult(result);

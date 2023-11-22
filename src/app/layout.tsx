@@ -44,6 +44,7 @@ const NotoSansKR = localFont({
       weight: "900",
     },
   ],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
