@@ -698,7 +698,7 @@ export async function updateProblems(
   return true;
 }
 
-export async function validateProblemSetUUID(
+export async function checkUserPermissionForProblemSet(
   problemSetUUID: string,
   userEmail: string,
 ) {

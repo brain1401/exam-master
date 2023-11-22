@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import ProblemsEditor from "@/app/components/ProblemsEditor/ProblemsEditor";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
@@ -47,8 +47,8 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
         setCurrentTab(res.data.exam_problems[0].type);
       })
       .catch((err) => {
-        setError(err.message);
-        console.log(err.message);
+        setError(err.response?.data.error);
+        console.log(err.response?.data?.error);
       })
       .finally(() => {
         setLoading(false);
@@ -68,7 +68,11 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   ]);
 
   if (error) {
-    return <div>존재하지 않는 문서</div>;
+    return (
+      <h1 className="text-2xl text-center mt-10">
+        {error}
+      </h1>
+    )
   }
 
   if (loading) {

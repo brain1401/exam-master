@@ -1,8 +1,8 @@
 import {
   getProblemsSetByUUID,
-  validateProblemSetUUID,
+  checkUserPermissionForProblemSet,
 } from "@/service/problems";
-import { ProblemSetWithName } from "@/types/problems";
+import { ProblemSetWithName, uuidSchema } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,14 +21,20 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
 
-  const validateResult = await validateProblemSetUUID(
-    UUID,
-    session.user.email,
-  );
+  const isUUIDValidated = uuidSchema.safeParse(UUID);
+
+  if (!isUUIDValidated.success) {
+    return NextResponse.json(
+      { error: "UUID가 올바르지 않습니다." },
+      { status: 400 },
+    );
+  }
+
+  const validateResult = await checkUserPermissionForProblemSet(UUID, session.user.email);
 
   if (validateResult === "NO") {
     return NextResponse.json(
-      { error: "본인의 문제만 가져올 수 있습니다." },
+      { error: "본인의 문제만 접근할 수 있습니다." },
       { status: 403 },
     );
   }

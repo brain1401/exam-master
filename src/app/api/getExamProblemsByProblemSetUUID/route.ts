@@ -1,8 +1,8 @@
 import {
   getProblemsSetByUUID,
-  validateProblemSetUUID,
+  checkUserPermissionForProblemSet,
 } from "@/service/problems";
-import { ExamProblemSet } from "@/types/problems";
+import { ExamProblemSet, uuidSchema } from "@/types/problems";
 import { problemShuffle } from "@/utils/problemShuffle";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -22,7 +22,18 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
 
-  const validateResult = await validateProblemSetUUID(UUID, session.user.email);
+  const isUUIDValidated = uuidSchema.safeParse(UUID);
+  if (!isUUIDValidated.success) {
+    return NextResponse.json(
+      { error: "문제 세트 UUID가 올바르지 않습니다." },
+      { status: 400 },
+    );
+  }
+
+  const validateResult = await checkUserPermissionForProblemSet(
+    UUID,
+    session.user.email,
+  );
 
   if (validateResult === "NO") {
     return NextResponse.json(

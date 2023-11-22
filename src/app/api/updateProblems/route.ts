@@ -3,9 +3,9 @@ import { getServerSession } from "next-auth";
 import {
   getParsedProblems,
   updateProblems,
-  validateProblemSetUUID,
+  checkUserPermissionForProblemSet,
 } from "@/service/problems";
-import { problemsSchema } from "@/types/problems";
+import { problemsSchema, uuidSchema } from "@/types/problems";
 
 export async function PUT(req: NextRequest) {
   const session = await getServerSession();
@@ -25,12 +25,20 @@ export async function PUT(req: NextRequest) {
 
   if (!problemSetsName || !problems || !problemSetUUID) {
     return NextResponse.json(
-      { error: "문제를 업데이트하는 중 오류가 발생했습니다." },
-      { status: 500 },
+      { error: "서버로 전송된 데이터가 올바르지 않습니다." },
+      { status: 400 },
     );
   }
 
-  const validateResult = await validateProblemSetUUID(
+  const isUUIDValidated = uuidSchema.safeParse(problemSetUUID);
+  if (!isUUIDValidated.success) {
+    return NextResponse.json(
+      { error: "UUID가 올바르지 않습니다." },
+      { status: 400 },
+    );
+  }
+
+  const validateResult = await checkUserPermissionForProblemSet(
     problemSetUUID,
     session.user.email,
   );
@@ -45,8 +53,8 @@ export async function PUT(req: NextRequest) {
 
   if (!problemsSchema.safeParse(problems).success) {
     return NextResponse.json(
-      { error: "문제 형식이 올바르지 않습니다." },
-      { status: 500 },
+      { error: "서버로 전송된 문제가 올바르지 않습니다." },
+      { status: 400 },
     );
   }
 

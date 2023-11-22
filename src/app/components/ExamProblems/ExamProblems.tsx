@@ -27,7 +27,7 @@ export default function ExamProblems({ UUID }: Props) {
   const resetExamProblems = useSetAtom(resetExamProblemsAtom);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   usePreventClose();
 
@@ -50,7 +50,7 @@ export default function ExamProblems({ UUID }: Props) {
         });
       })
       .catch((err) => {
-        setError(err);
+        setError(err.response?.data.error);
       })
       .finally(() => {
         setLoading(false);
@@ -61,7 +61,11 @@ export default function ExamProblems({ UUID }: Props) {
     };
   }, [UUID, setExamProblems, resetExamProblems]);
 
-  if (error) return <div>에러가 발생했습니다.</div>;
+  if (error) return (
+    <div className="flex h-screen items-center justify-center">
+      <div className="text-2xl text-center">{error}</div>
+    </div>
+  )
   
   if (loading)
     return (

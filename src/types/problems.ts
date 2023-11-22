@@ -228,3 +228,5 @@ export const examProblemSetSchema = z.object({
 });
 
 export const problemsSchema = z.array(problemSchema);
+
+export const uuidSchema = z.string().uuid();

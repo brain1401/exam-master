@@ -25,15 +25,15 @@ export async function POST(req: NextRequest) {
 
   if (!problemSetsName || !problems) {
     return NextResponse.json(
-      { error: "FormData가 정상적인지 확인하십시오." },
-      { status: 500 },
+      { error: "서버로 전송된 문제가 올바르지 않습니다." },
+      { status: 400 },
     );
   }
 
   if(!problemsSchema.safeParse(problems).success) {
     return NextResponse.json(
-      { error: "문제 형식이 올바르지 않습니다." },
-      { status: 500 },
+      { error: "서버로 전송된 문제 형식이 올바르지 않습니다." },
+      { status: 400 },
     );
   }
 
