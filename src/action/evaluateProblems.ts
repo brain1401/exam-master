@@ -56,8 +56,6 @@ export async function evaluateProblems(
 
     const evaluationResult = await validateExamProblem(problem);
 
-    console.log(evaluationResult);
-
     const postedId = await postExamProblemResult(
       problem.id,
       evaluationResult,
