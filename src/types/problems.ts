@@ -42,7 +42,7 @@ export type ProblemResponse = {
 };
 
 export type ProblemSetResponse = {
-  id: string;
+  id: number;
   name: string;
   createdAt: string;
   updatedAt: string;
@@ -64,11 +64,13 @@ export type RawProblemSetResponse = {
 };
 
 export type ProblemSetWithName = {
+  id: number | undefined;
   name: string;
   exam_problems: Problem[];
 };
 
 export type ExamProblemSet = {
+  id: number | undefined;
   name: string;
   exam_problems: ExamProblem[];
 };

@@ -12,16 +12,19 @@ export default function SubmitButton() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<any>(null);
 
-  const { exam_problems } = useAtomValue(examProblemsAtom);
+  const { exam_problems, id: problemSetId } = useAtomValue(examProblemsAtom);
 
   useEffect(() => {
     console.log(result);
   }, [result]);
 
   const onClick = () => {
-    // server actions 
+    // server actions
+    if (problemSetId === undefined) {
+      throw new Error("id is undefined");
+    }
     startTransition(async () => {
-      const result = await evaluateProblems(exam_problems);
+      const result = await evaluateProblems(exam_problems, problemSetId);
       setResult(result);
     });
   };

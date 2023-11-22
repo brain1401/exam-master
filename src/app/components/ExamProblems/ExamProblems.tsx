@@ -45,6 +45,7 @@ export default function ExamProblems({ UUID }: Props) {
       })
       .then((res) => {
         setExamProblems({
+          id: res.data.id,
           name: res.data.name,
           exam_problems: res.data.exam_problems,
         });

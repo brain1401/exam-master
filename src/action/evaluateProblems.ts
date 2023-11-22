@@ -1,14 +1,29 @@
 "use server";
 
 import {
+  createExamResult,
   getAnswerByProblemId,
   isAnsweredMoreThanOne,
   isProblemAsnwered,
+  postExamProblemResult,
+  validateExamProblem,
 } from "@/service/problems";
+import { getUser } from "@/service/user";
 import { Problem, problemsSchema } from "@/types/problems";
+import { getServerSession } from "next-auth";
 
-export async function evaluateProblems(examProblems: Problem[]) {
-  const finalResult = [];
+export async function evaluateProblems(
+  examProblems: Problem[],
+  problemSetId: number,
+) {
+  const session = await getServerSession();
+
+  if (!session || !session.user?.email)
+    return { error: "로그인이 필요합니다." };
+
+  const userId = (await getUser(session.user.email)).id;
+
+  const postedIds = [];
 
   const validateResult = problemsSchema.safeParse(examProblems);
 
@@ -35,37 +50,24 @@ export async function evaluateProblems(examProblems: Problem[]) {
 
     const answer = await getAnswerByProblemId(problem.id);
 
-    if (!answer) throw new Error("result is null");
-
-    if (problem.type === "obj") {
-      if (!problem.candidates) throw new Error("candidates is null");
-
-      const answeredId = problem.candidates
-        .filter((candidate) => candidate.isAnswer)
-        .map((candidate) => candidate.id);
-
-      const isCorrect =
-        isAnswerArray(answer) && answer.every((id) => answeredId.includes(id));
-
-      finalResult.push(isCorrect);
-    } else if (problem.type === "sub") {
-      if (!problem.subAnswer) throw new Error("subAnswer is null");
-
-      const isCorrect = problem.subAnswer === answer;
-
-      finalResult.push(isCorrect);
+    if (!answer) {
+      throw new Error("result is null");
     }
+
+    const evaluationResult = await validateExamProblem(problem);
+
+    console.log(evaluationResult);
+
+    const postedId = await postExamProblemResult(
+      problem.id,
+      evaluationResult,
+      userId,
+    );
+
+    postedIds.push(postedId);
   }
 
-  return finalResult;
-}
+  const createdExamResultId = await createExamResult(postedIds, problemSetId, userId);
 
-function isAnswerString(answer: string | (number | null)[]): answer is string {
-  return typeof answer === "string";
-}
-
-function isAnswerArray(
-  answer: string | (number | null)[],
-): answer is (number | null)[] {
-  return Array.isArray(answer);
+  return createdExamResultId;
 }

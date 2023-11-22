@@ -131,6 +131,7 @@ export async function createProblem(
             connect: [userId],
           },
         }),
+        cache: "no-store",
       },
     );
 
@@ -163,6 +164,7 @@ export async function uploadImageToProblem(image: File, problemId: string) {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
         body: newFormData,
+        cache: "no-store",
       },
     );
 
@@ -197,6 +199,7 @@ export async function createProblemSets(
             connect: [userId],
           },
         }),
+        cache: "no-store",
       },
     );
     if (!response.ok)
@@ -258,6 +261,7 @@ export async function checkProblemSetName(name: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
 
@@ -404,6 +408,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
 
@@ -434,6 +439,7 @@ export async function getProblemsSetIdByUUID(uuid: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
 
@@ -470,6 +476,7 @@ export async function getProblemByUUID(uuid: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
 
@@ -506,6 +513,7 @@ export async function getProblemById(id: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
 
@@ -543,6 +551,7 @@ export async function updateProblem(id: string, problem: Problem) {
         subjectiveAnswer: problem.subAnswer,
         isAnswerMultiple: problem.isAnswerMultiple,
       }),
+      cache: "no-store",
     },
   );
   if (!response.ok)
@@ -559,6 +568,7 @@ export async function deletePhoto(id: string) {
       headers: {
         Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
       },
+      cache: "no-store",
     },
   );
   if (!response.ok)
@@ -585,6 +595,7 @@ export async function getProblemPhotoIdByProblemId(id: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
     if (!response.ok)
@@ -614,6 +625,7 @@ export async function updateProblemSetName(
         Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         "Content-Type": "application/json",
       },
+      cache: "no-store",
       body: JSON.stringify({
         name: name,
       }),
@@ -723,6 +735,7 @@ export async function checkUserPermissionForProblemSet(
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
     if (!response.ok)
@@ -760,6 +773,7 @@ export async function validateProblemId(problemId: string, userEmail: string) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
     if (!response.ok)
@@ -788,6 +802,7 @@ export async function linkProblemToProblemSet(
         Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         "Content-Type": "application/json",
       },
+      cache: "no-store",
       body: JSON.stringify({
         exam_problem_sets: {
           connect: [problemSetId],
@@ -816,6 +831,7 @@ export async function getAnswerByProblemId(problemId: number) {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
         },
+        cache: "no-store",
       },
     );
     if (!response.ok)
@@ -899,13 +915,18 @@ export function getParsedProblems<T extends boolean>(
 }
 
 export function isProblemAsnwered(problem: Problem) {
-  if (!problem || !problem.candidates) {
+  if (!problem) {
     throw new Error("something is null");
   }
 
-  return problem.type === "obj"
-    ? problem.candidates.some((candidate) => candidate.isAnswer)
-    : problem.subAnswer !== null && problem.subAnswer !== "";
+  const result =
+    problem.type === "obj"
+      ? problem.candidates?.some((candidate) => candidate.isAnswer)
+      : problem.subAnswer !== null && problem.subAnswer !== "";
+
+  if (result === undefined) throw new Error("result is undefined");
+
+  return result;
 }
 
 export function isAnsweredMoreThanOne(problem: Problem) {
@@ -916,4 +937,107 @@ export function isAnsweredMoreThanOne(problem: Problem) {
   return (
     problem.candidates.filter((candidate) => candidate.isAnswer).length > 1
   );
+}
+
+export async function validateExamProblem(problem: Problem) {
+  let finalResult: boolean | undefined = undefined;
+
+  if (!problem || !problem.id) throw new Error("something is null");
+
+  const answer = await getAnswerByProblemId(problem.id);
+
+  if (!answer) throw new Error("result is null");
+
+  if (problem.type === "obj") {
+    if (!problem.candidates) throw new Error("candidates is null");
+
+    const answeredId = problem.candidates
+      .filter((candidate) => candidate.isAnswer)
+      .map((candidate) => candidate.id);
+
+    const isCorrect =
+      isAnswerArray(answer) && answer.every((id) => answeredId.includes(id));
+
+    finalResult = isCorrect;
+  } else if (problem.type === "sub") {
+    if (!problem.subAnswer) throw new Error("subAnswer is null");
+
+    const isCorrect = problem.subAnswer === answer;
+
+    finalResult = isCorrect;
+  }
+
+  if (finalResult === undefined) throw new Error("finalResult is undefined");
+
+  return finalResult;
+}
+
+function isAnswerString(answer: string | (number | null)[]): answer is string {
+  return typeof answer === "string";
+}
+
+function isAnswerArray(
+  answer: string | (number | null)[],
+): answer is (number | null)[] {
+  return Array.isArray(answer);
+}
+
+export async function postExamProblemResult(
+  problemId: number,
+  result: boolean,
+  userId: number,
+) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-results`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        exam_problem: problemId,
+        isCorrect: result,
+        exam_user: userId
+      }),
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok)
+    throw new Error(
+      "문제 결과를 생성하는 중 오류가 발생했습니다. (postExamProblemResult)",
+    );
+
+  return response.json().then((data) => data.data.id) as Promise<number>;
+}
+
+export async function createExamResult(
+  examProblemResultId: number[],
+  problemSetId: number,
+  userId: number,
+) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        exam_problem_results: examProblemResultId,
+        exam_problem_set: problemSetId,
+        exam_user: userId,
+      }),
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok)
+    throw new Error(
+      "시험 결과를 생성하는 중 오류가 발생했습니다. (createExamResult)",
+    );
+
+  return response.json().then((data) => data.data.id) as Promise<number>;
 }

@@ -70,6 +70,7 @@ export async function GET(req: NextRequest) {
   }));
 
   const result: ExamProblemSet = {
+    id: data.id,
     name: data.name,
     exam_problems: problemShuffle(examProblems),
   };

@@ -2,6 +2,7 @@ import { Problem, ProblemSetWithName } from "@/types/problems";
 import { atom } from "jotai";
 
 export const examProblemsAtom = atom<ProblemSetWithName>({
+  id: undefined,
   name: "",
   exam_problems: [],
 });
@@ -38,6 +39,6 @@ export const examProblemNameAtom = atom(
 );
 
 export const resetExamProblemsAtom = atom(null, (_, set) => {
-  set(examProblemsAtom, { name: "", exam_problems: [] });
+  set(examProblemsAtom, { id: undefined, name: "", exam_problems: [] });
   set(currentExamProblemIndexAtom, 0);
 });
