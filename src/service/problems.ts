@@ -6,7 +6,6 @@ import {
 } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
-import { NextRequest } from "next/server";
 
 export const checkEnvVariables = () => {
   if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
@@ -575,8 +574,6 @@ export async function deletePhoto(id: string) {
     throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
 }
 
-export async function updatePhoto(image: File) {}
-
 export async function getProblemPhotoIdByProblemId(id: string) {
   const query = qs.stringify({
     filters: {
@@ -939,14 +936,13 @@ export function isAnsweredMoreThanOne(problem: Problem) {
   );
 }
 
-export async function validateExamProblem(problem: Problem) {
-  let finalResult: boolean | undefined = undefined;
+export async function validateExamProblem(
+  problem: Problem,
+  answer: string | (number | null)[],
+) {
+  let finalResult: boolean | null = null;
 
   if (!problem || !problem.id) throw new Error("something is null");
-
-  const answer = await getAnswerByProblemId(problem.id);
-
-  if (!answer) throw new Error("result is null");
 
   if (problem.type === "obj") {
     if (!problem.candidates) throw new Error("candidates is null");
@@ -956,7 +952,7 @@ export async function validateExamProblem(problem: Problem) {
       .map((candidate) => candidate.id);
 
     const isCorrect =
-      isAnswerArray(answer) && answer.every((id) => answeredId.includes(id));
+      isAnswerArray(answer) ? answer.every((id) => answeredId.includes(id)) : null;
 
     finalResult = isCorrect;
   } else if (problem.type === "sub") {
@@ -967,7 +963,7 @@ export async function validateExamProblem(problem: Problem) {
     finalResult = isCorrect;
   }
 
-  if (finalResult === undefined) throw new Error("finalResult is undefined");
+  if (finalResult === null) throw new Error("finalResult is null");
 
   return finalResult;
 }
@@ -983,10 +979,13 @@ function isAnswerArray(
 }
 
 export async function postExamProblemResult(
-  problemId: number,
+  problem: Problem,
   result: boolean,
+  answer: string | (number | null)[],
   userId: number,
 ) {
+  if (!problem || !problem.id) throw new Error("something is null");
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-results`,
     {
@@ -996,9 +995,36 @@ export async function postExamProblemResult(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        exam_problem: problemId,
         isCorrect: result,
-        exam_user: userId
+        exam_user: userId,
+        candidates: problem.candidates
+          ? problem.candidates
+              .sort((a, b) => {
+                if (a.id === null) return -1;
+                if (b.id === null) return 1;
+                return a.id - b.id;
+              })
+              .map((candidate) => ({
+                id: candidate.id,
+                text: candidate.text,
+                isSelected: candidate.isAnswer,
+              }))
+          : null,
+        subjectiveAnswered: problem.subAnswer,
+        question: problem.question,
+        additionalView: problem.additionalView,
+        questionType: problem.type,
+        isAnswerMultiple: problem.isAnswerMultiple,
+        correctCandidate: isAnswerArray(answer)
+          ? answer.map((id) => ({
+              id,
+              text:
+                problem.candidates?.find((candidate) => candidate.id === id)
+                  ?.text ?? "",
+            }))
+          : null,
+        correctSubjectiveAnswer: isAnswerString(answer) ? answer : null,
+        image: isImageUrlObject(problem.image) ? problem.image.id : null,
       }),
       cache: "no-store",
     },
@@ -1014,7 +1040,7 @@ export async function postExamProblemResult(
 
 export async function createExamResult(
   examProblemResultId: number[],
-  problemSetId: number,
+  problemSetName: string,
   userId: number,
 ) {
   const response = await fetch(
@@ -1027,7 +1053,7 @@ export async function createExamResult(
       },
       body: JSON.stringify({
         exam_problem_results: examProblemResultId,
-        exam_problem_set: problemSetId,
+        problemSetName: problemSetName,
         exam_user: userId,
       }),
       cache: "no-store",
@@ -1039,5 +1065,10 @@ export async function createExamResult(
       "시험 결과를 생성하는 중 오류가 발생했습니다. (createExamResult)",
     );
 
-  return response.json().then((data) => data.data.id) as Promise<number>;
+  const data = await response.json();
+  const uuid = data.data.uuid;
+
+  if(!uuid) throw new Error("uuid is null");
+
+  return uuid;
 }

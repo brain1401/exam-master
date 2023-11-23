@@ -14,12 +14,12 @@ import { getServerSession } from "next-auth";
 
 export async function evaluateProblems(
   examProblems: Problem[],
-  problemSetId: number,
+  problemSetName: string,
 ) {
   const session = await getServerSession();
 
   if (!session || !session.user?.email)
-    return { error: "로그인이 필요합니다." };
+    throw new Error("로그인이 필요합니다.");
 
   const userId = (await getUser(session.user.email)).id;
 
@@ -28,16 +28,16 @@ export async function evaluateProblems(
   const validateResult = problemsSchema.safeParse(examProblems);
 
   if (!validateResult.success) {
-    return validateResult.error.format();
+    throw new Error("인수로 전달된 문제들이 유효하지 않습니다.");
   }
   for (const problem of examProblems) {
     if (!problem || !problem.id) throw new Error("something is null");
 
-    if (!isProblemAsnwered(problem)) return { error: "정답을 입력해주세요." };
+    if (!isProblemAsnwered(problem)) throw new Error("정답을 입력해주세요.");
 
     if (problem.type === "obj" && problem.isAnswerMultiple === false) {
       if (isAnsweredMoreThanOne(problem)) {
-        return { error: "단일 선택 문제입니다. 하나의 정답만 선택해주세요." };
+        throw new Error("단일 선택 문제입니다. 하나의 정답만 선택해주세요.");
       }
     }
 
@@ -45,7 +45,7 @@ export async function evaluateProblems(
       problem.type === "sub" &&
       (problem.subAnswer === "" || problem.subAnswer === null)
     ) {
-      return { error: "주관식 문제입니다. 정답을 입력해주세요." };
+      throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
     }
 
     const answer = await getAnswerByProblemId(problem.id);
@@ -54,18 +54,23 @@ export async function evaluateProblems(
       throw new Error("result is null");
     }
 
-    const evaluationResult = await validateExamProblem(problem);
+    const evaluationResult = await validateExamProblem(problem, answer);
 
     const postedId = await postExamProblemResult(
-      problem.id,
+      problem,
       evaluationResult,
+      answer,
       userId,
     );
 
     postedIds.push(postedId);
   }
 
-  const createdExamResultId = await createExamResult(postedIds, problemSetId, userId);
+  const createdExamResultId = await createExamResult(
+    postedIds,
+    problemSetName,
+    userId,
+  );
 
   return createdExamResultId;
 }

@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   const result: ProblemSetWithName = {
+    id: data.id,
     name: data.name,
     exam_problems: [
       ...data.exam_problems.map((problem) => ({
