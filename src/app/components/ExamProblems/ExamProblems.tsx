@@ -1,13 +1,6 @@
 "use client";
 import usePreventClose from "@/hooks/preventClose";
 import { useEffect, useState } from "react";
-import {
-  currentExamProblemAtom,
-  examProblemsAtom,
-  resetExamProblemsAtom,
-} from "../../../jotai/examProblems";
-
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import NextOrPrevButtons from "./ExamProblemsNextOrPrevButtons";
 import CurrentExamImage from "./CurrentExamImage";
 import CurrentQuestion from "./CurrentQuestion";
@@ -17,14 +10,19 @@ import SubjectiveAnswerTextarea from "./SubjectiveAnswerTextarea";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 import SubmitButton from "./SubmitButton";
+import ExamCard from "../ui/ExamCard";
+import useExamProblems from "@/hooks/useExamProblems";
 
 type Props = {
   UUID: string;
 };
 export default function ExamProblems({ UUID }: Props) {
-  const currentExamProblem = useAtomValue(currentExamProblemAtom);
-  const [examProblems, setExamProblems] = useAtom(examProblemsAtom);
-  const resetExamProblems = useSetAtom(resetExamProblemsAtom);
+  const {
+    examProblems,
+    setExamProblems,
+    resetExamProblems,
+    currentExamProblem,
+  } = useExamProblems();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,12 +60,13 @@ export default function ExamProblems({ UUID }: Props) {
     };
   }, [UUID, setExamProblems, resetExamProblems]);
 
-  if (error) return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="text-2xl text-center">{error}</div>
-    </div>
-  )
-  
+  if (error)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center text-2xl">{error}</div>
+      </div>
+    );
+
   if (loading)
     return (
       <div className="flex h-screen items-center justify-center">
@@ -79,22 +78,23 @@ export default function ExamProblems({ UUID }: Props) {
 
   return (
     <section className="mx-auto my-10 max-w-[80rem] p-3">
-
-      <div className="rounded-lg bg-slate-200 p-3">
+      <ExamCard>
         <CurrentQuestion />
 
         <CurrentExamImage />
 
         <AdditionalView />
 
-        {currentExamProblem.type === "obj" && <Candidates />}
+        {Boolean(currentExamProblem.type === "obj") && <Candidates />}
 
-        {currentExamProblem.type === "sub" && <SubjectiveAnswerTextarea />}
-      </div>
+        {Boolean(currentExamProblem.type === "sub") && (
+          <SubjectiveAnswerTextarea />
+        )}
+      </ExamCard>
 
       <NextOrPrevButtons />
 
-      <SubmitButton/>
+      <SubmitButton />
     </section>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
-import { currentExamProblemAtom } from "@/jotai/examProblems";
-import { useAtomValue } from "jotai";
+
+import useExamProblems from "@/hooks/useExamProblems";
 
 export default function AdditionalView() {
-  const currentExamProblem = useAtomValue(currentExamProblemAtom);
+  const { currentExamProblem } = useExamProblems();
+  
   return (
     <>
       {currentExamProblem?.additionalView && (

@@ -1,3 +1,4 @@
+import { Prettify } from "@/utils/type";
 import { z } from "zod";
 
 export type candidate = {
@@ -81,6 +82,81 @@ export const candidateSchema = z.object({
   isAnswer: z.boolean(),
 });
 
+export const ImageSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  alternativeText: z.string().nullable(),
+  caption: z.string().nullable(),
+  width: z.number(),
+  height: z.number(),
+  formats: z
+    .object({
+      thumbnail: z
+        .object({
+          name: z.string(),
+          hash: z.string(),
+          ext: z.string(),
+          mime: z.string(),
+          path: z.string().nullable(),
+          width: z.number(),
+          height: z.number(),
+          size: z.number(),
+          url: z.string(),
+        })
+        .optional(),
+      medium: z
+        .object({
+          name: z.string(),
+          hash: z.string(),
+          ext: z.string(),
+          mime: z.string(),
+          path: z.string().nullable(),
+          width: z.number(),
+          height: z.number(),
+          size: z.number(),
+          url: z.string(),
+        })
+        .optional(),
+      small: z
+        .object({
+          name: z.string(),
+          hash: z.string(),
+          ext: z.string(),
+          mime: z.string(),
+          path: z.string().nullable(),
+          width: z.number(),
+          height: z.number(),
+          size: z.number(),
+          url: z.string(),
+        })
+        .optional(),
+      large: z
+        .object({
+          name: z.string(),
+          hash: z.string(),
+          ext: z.string(),
+          mime: z.string(),
+          path: z.string().nullable(),
+          width: z.number(),
+          height: z.number(),
+          size: z.number(),
+          url: z.string(),
+        })
+        .optional(),
+    })
+    .nullable(),
+  hash: z.string(),
+  ext: z.string(),
+  mime: z.string(),
+  size: z.number(),
+  url: z.string(),
+  previewUrl: z.string().nullable(),
+  provider: z.string(),
+  provider_metadata: z.string().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
 export const problemSchema = z
   .object({
     id: z.number().optional(),
@@ -91,70 +167,8 @@ export const problemSchema = z
     image: z
       .union([
         z.instanceof(File),
-        z.object({
-          id: z.number(),
-          name: z.string(),
-          alternativeText: z.string().nullable(),
-          caption: z.string().nullable(),
-          width: z.number(),
-          height: z.number(),
-          formats: z.object({
-            thumbnail: z.object({
-              name: z.string(),
-              hash: z.string(),
-              ext: z.string(),
-              mime: z.string(),
-              path: z.string().nullable(),
-              width: z.number(),
-              height: z.number(),
-              size: z.number(),
-              url: z.string(),
-            }).optional(),
-            medium: z.object({
-              name: z.string(),
-              hash: z.string(),
-              ext: z.string(),
-              mime: z.string(),
-              path: z.string().nullable(),
-              width: z.number(),
-              height: z.number(),
-              size: z.number(),
-              url: z.string(),
-            }).optional(),
-            small: z.object({
-              name: z.string(),
-              hash: z.string(),
-              ext: z.string(),
-              mime: z.string(),
-              path: z.string().nullable(),
-              width: z.number(),
-              height: z.number(),
-              size: z.number(),
-              url: z.string(),
-            }).optional(),
-            large: z.object({
-              name: z.string(),
-              hash: z.string(),
-              ext: z.string(),
-              mime: z.string(),
-              path: z.string().nullable(),
-              width: z.number(),
-              height: z.number(),
-              size: z.number(),
-              url: z.string(),
-            }).optional(),
-          }).nullable(),
-          hash: z.string(),
-          ext: z.string(),
-          mime: z.string(),
-          size: z.number(),
-          url: z.string(),
-          previewUrl: z.string().nullable(),
-          provider: z.string(),
-          provider_metadata: z.string().nullable(),
-          createdAt: z.string(),
-          updatedAt: z.string(),
-        }),
+        z.array(ImageSchema).nullable(),
+        ImageSchema.nullable(),
       ])
       .nullable(),
     isAdditiondalViewButtonClicked: z.boolean().optional(),
@@ -232,3 +246,47 @@ export const examProblemSetSchema = z.object({
 export const problemsSchema = z.array(problemSchema);
 
 export const uuidSchema = z.string().uuid();
+
+export const CorrectCandidateSchema = z.object({
+  id: z.number(),
+  text: z.string(),
+});
+export type CorrectCandidate = z.infer<typeof CorrectCandidateSchema>;
+
+export const ExamResultCandidateSchema = z.object({
+  id: z.number(),
+  text: z.string(),
+  isSelected: z.boolean(),
+});
+export type ExamResultCandidate = z.infer<typeof ExamResultCandidateSchema>;
+
+export const ExamProblemResultSchema = z.object({
+  id: z.number(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  publishedAt: z.coerce.date(),
+  isCorrect: z.boolean(),
+  candidates: z.array(ExamResultCandidateSchema).nullable(),
+  question: z.string(),
+  questionType: z.union([z.literal("obj"), z.literal("sub")]),
+  additionalView: z.string().nullable(),
+  isAnswerMultiple: z.boolean(),
+  subjectiveAnswered: z.string().nullable(),
+  correctCandidates: z.array(CorrectCandidateSchema).nullable(),
+  correctSubjectiveAnswer: z.string().nullable(),
+  image: z.array(ImageSchema).nullable(),
+});
+export type ExamProblemResult = Prettify<
+  z.infer<typeof ExamProblemResultSchema>
+>;
+
+export const ExamResultSchema = z.object({
+  id: z.number(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  publishedAt: z.coerce.date(),
+  problemSetName: z.string(),
+  uuid: z.string(),
+  exam_problem_results: z.array(ExamProblemResultSchema),
+});
+export type ExamResult = z.infer<typeof ExamResultSchema>;

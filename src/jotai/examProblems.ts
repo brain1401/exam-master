@@ -1,7 +1,12 @@
-import { Problem, ProblemSetWithName } from "@/types/problems";
+import {
+  ExamProblem,
+  ExamProblemSet,
+  Problem,
+  ProblemSetWithName,
+} from "@/types/problems";
 import { atom } from "jotai";
 
-export const examProblemsAtom = atom<ProblemSetWithName>({
+export const examProblemsAtom = atom<ExamProblemSet>({
   id: undefined,
   name: "",
   exam_problems: [],
@@ -16,7 +21,7 @@ export const currentExamProblemAtom = atom(
 
     return examProblems.exam_problems[currentExamProblemIndex];
   },
-  (get, set, update: Problem) => {
+  (get, set, update: ExamProblem) => {
     const newExamProblems = { ...get(examProblemsAtom) };
     const currentExamProblemIndex = get(currentExamProblemIndexAtom);
 

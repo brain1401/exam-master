@@ -1,15 +1,14 @@
 "use client";
-import { currentExamProblemAtom } from "@/jotai/examProblems";
-import { Problem } from "@/types/problems";
+import { ExamProblem } from "@/types/problems";
 import candidateNumber from "@/utils/candidateNumber";
-import { useAtom } from "jotai";
 import Image from "next/image";
-import checkImage from "/public/check.png";
+import checkImage from "/public/checkBlack.png";
+import useExamProblems from "@/hooks/useExamProblems";
+import { twMerge } from "tailwind-merge";
+import { checkMarkClassName } from "@/classnames/checkMark";
 
 export default function Candidates() {
-  const [currentExamProblem, setCurrentExamProblem] = useAtom(
-    currentExamProblemAtom,
-  );
+  const { currentExamProblem, setCurrentExamProblem } = useExamProblems();
 
   const onClickCandidate = (i: number, isMultipleAnswer: boolean) => {
     const newCurrentExamProblems = { ...currentExamProblem };
@@ -17,6 +16,8 @@ export default function Candidates() {
     if (!newCurrentExamProblems || !newCurrentExamProblems.candidates) {
       throw new Error("무언가가 잘못되었습니다.");
     }
+
+    // 체크를 시도하는 선택지: currentCandidate
     const currentCandidate = [...newCurrentExamProblems.candidates]?.[i];
 
     if (
@@ -27,36 +28,35 @@ export default function Candidates() {
     ) {
       throw new Error("무언가가 잘못되었습니다.");
     }
-
+    // 현재 문제가 다중 선택지이면
     if (isMultipleAnswer) {
-      // 현재 문제가 다중 선택지이면
+      // 체크된 선택지의 값을 반전시킨다.
       currentCandidate.isAnswer = !currentCandidate.isAnswer;
     } else {
-      // 현재 문제가 단일 선택지이면
-
+      // 현재 문제가 단일 선택지이면서 이미 체크된 답이 있으면
       if (
         newCurrentExamProblems.candidates.some(
           (candidate) => candidate.isAnswer === true,
         )
       ) {
-        // 현재 문제가 단일 선택지이면서 이미 체크된 답이 있으면
+        // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 같으면
         if (
           currentCandidate.id ===
           newCurrentExamProblems.candidates.find(
             (candidate) => candidate.isAnswer === true,
           )?.id
         ) {
-          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 같으면
           currentCandidate.isAnswer = !currentCandidate.isAnswer;
-        } else {
-          // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 다르면
+        }
+        // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 다르면
+        else {
           newCurrentExamProblems.candidates.forEach((candidate) => {
             candidate.isAnswer = false;
           });
           currentCandidate.isAnswer = true;
         }
-      } else {
-        // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
+      } // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
+      else {
         currentCandidate.isAnswer = !currentCandidate.isAnswer;
       }
     }
@@ -71,34 +71,40 @@ export default function Candidates() {
       },
     );
 
-    setCurrentExamProblem(newCurrentExamProblems as NonNullable<Problem>);
+    setCurrentExamProblem(newCurrentExamProblems as NonNullable<ExamProblem>);
   };
+
   return (
-    <div>
-      <ul>
-        {currentExamProblem?.candidates?.map((candidate, i) => (
-          <li key={i} className="flex">
-            <div
-              className="relative cursor-pointer select-none md:hover:font-bold"
-              onClick={(e) => {
-                onClickCandidate(
-                  i,
-                  currentExamProblem.isAnswerMultiple ?? false,
-                );
-              }}
-            >
-              <div
-                className={`${
-                  candidate.isAnswer ? "" : "opacity-0"
-                } absolute left-1 top-[-.2rem] h-5 w-5`}
-              >
-                <Image src={checkImage} alt="체크" fill />
-              </div>
-              <span>{`${candidateNumber(i + 1)} ${candidate.text}`}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      {currentExamProblem?.candidates && (
+        <div>
+          <ul>
+            {currentExamProblem.candidates.map((candidate, i) => (
+              <li key={i} className="flex">
+                <div
+                  className="relative cursor-pointer select-none md:hover:font-bold"
+                  onClick={(e) => {
+                    onClickCandidate(
+                      i,
+                      currentExamProblem.isAnswerMultiple ?? false,
+                    );
+                  }}
+                >
+                  <div
+                    className={twMerge(
+                      `${candidate.isAnswer ? "" : "opacity-0"}`,
+                      checkMarkClassName,
+                    )}
+                  >
+                    <Image src={checkImage} alt="체크" fill />
+                  </div>
+                  <span>{`${candidateNumber(i + 1)} ${candidate.text}`}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
   );
 }

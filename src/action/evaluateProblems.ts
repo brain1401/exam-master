@@ -9,11 +9,11 @@ import {
   validateExamProblem,
 } from "@/service/problems";
 import { getUser } from "@/service/user";
-import { Problem, problemsSchema } from "@/types/problems";
+import { ExamProblem, Problem, problemsSchema } from "@/types/problems";
 import { getServerSession } from "next-auth";
 
 export async function evaluateProblems(
-  examProblems: Problem[],
+  examProblems: ExamProblem[],
   problemSetName: string,
 ) {
   const session = await getServerSession();
@@ -28,6 +28,7 @@ export async function evaluateProblems(
   const validateResult = problemsSchema.safeParse(examProblems);
 
   if (!validateResult.success) {
+    console.log(validateResult.error.format());
     throw new Error("인수로 전달된 문제들이 유효하지 않습니다.");
   }
   for (const problem of examProblems) {

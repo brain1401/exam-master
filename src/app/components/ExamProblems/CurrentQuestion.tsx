@@ -1,20 +1,15 @@
 "use client";
 
-import {
-  currentExamProblemAtom,
-  currentExamProblemIndexAtom,
-} from "@/jotai/examProblems";
-import { useAtomValue } from "jotai";
+import useExamProblems from "@/hooks/useExamProblems";
 
 export default function CurrentQuestion() {
-  const currentExamProblem = useAtomValue(currentExamProblemAtom);
-  const currentExamProblemIndex = useAtomValue(currentExamProblemIndexAtom);
-
+  const {
+    currentExamProblemIndex,
+    currentExamProblem: { question },
+  } = useExamProblems();
   return (
-    <p className="mb-5 text-2xl whitespace-pre-line">
-      {`${currentExamProblemIndex + 1}. ${
-        currentExamProblem?.question ?? "문제가 없습니다."
-      }`}
-    </p>
+    <h1 className="whitesh1ace-pre-line mb-5 text-2xl">
+      {`${currentExamProblemIndex + 1}. ${question}`}
+    </h1>
   );
 }

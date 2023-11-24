@@ -3,6 +3,8 @@ import {
   Problem,
   ProblemSetResponse,
   ProblemResponse,
+  ExamResult,
+  ExamProblem,
 } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
@@ -911,7 +913,7 @@ export function getParsedProblems<T extends boolean>(
   }
 }
 
-export function isProblemAsnwered(problem: Problem) {
+export function isProblemAsnwered(problem: ExamProblem) {
   if (!problem) {
     throw new Error("something is null");
   }
@@ -926,7 +928,7 @@ export function isProblemAsnwered(problem: Problem) {
   return result;
 }
 
-export function isAnsweredMoreThanOne(problem: Problem) {
+export function isAnsweredMoreThanOne(problem: ExamProblem) {
   if (!problem || !problem.candidates) {
     throw new Error("something is null");
   }
@@ -937,7 +939,7 @@ export function isAnsweredMoreThanOne(problem: Problem) {
 }
 
 export async function validateExamProblem(
-  problem: Problem,
+  problem: ExamProblem,
   answer: string | (number | null)[],
 ) {
   let finalResult: boolean | null = null;
@@ -979,7 +981,7 @@ function isAnswerArray(
 }
 
 export async function postExamProblemResult(
-  problem: Problem,
+  problem: ExamProblem,
   result: boolean,
   answer: string | (number | null)[],
   userId: number,
@@ -999,11 +1001,6 @@ export async function postExamProblemResult(
         exam_user: userId,
         candidates: problem.candidates
           ? problem.candidates
-              .sort((a, b) => {
-                if (a.id === null) return -1;
-                if (b.id === null) return 1;
-                return a.id - b.id;
-              })
               .map((candidate) => ({
                 id: candidate.id,
                 text: candidate.text,
@@ -1012,10 +1009,10 @@ export async function postExamProblemResult(
           : null,
         subjectiveAnswered: problem.subAnswer,
         question: problem.question,
-        additionalView: problem.additionalView,
+        additionalView: problem.additionalView || null,
         questionType: problem.type,
         isAnswerMultiple: problem.isAnswerMultiple,
-        correctCandidate: isAnswerArray(answer)
+        correctCandidates: isAnswerArray(answer)
           ? answer.map((id) => ({
               id,
               text:
@@ -1071,4 +1068,47 @@ export async function createExamResult(
   if(!uuid) throw new Error("uuid is null");
 
   return uuid;
+}
+
+export async function getExamResultByUUID(uuid: string, userEmail: string) {
+  const query = qs.stringify({
+    filters: {
+      uuid: {
+        $eq: uuid,
+      },
+      exam_user: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+    populate: {
+      exam_problem_results: {
+        populate: ["image"],
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+        cache: "no-store",
+      },
+    );
+    if (!response.ok)
+      throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+
+    const data = await response.json();
+    const examResult:ExamResult = data.data[0];
+
+    return examResult.exam_problem_results;
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+  }
 }

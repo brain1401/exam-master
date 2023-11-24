@@ -72,7 +72,7 @@ export default function ProblemSetGrid({ type }: Props) {
     }
   }, [page, isSearching, debouncedSearchString]);
 
-  const mainContent = () => {
+  const MainContent = () => {
     if (loading) {
       return (
         <div className="flex w-full items-center justify-center">
@@ -109,7 +109,7 @@ export default function ProblemSetGrid({ type }: Props) {
         searchString={searchString}
         setSearchString={setSearchString}
       />
-      {mainContent()}
+      <MainContent />
       <LeftRightButton page={page} setPage={setPage} maxPage={maxPage} />
     </section>
   );

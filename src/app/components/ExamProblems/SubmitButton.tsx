@@ -1,28 +1,28 @@
 "use client";
 
 import { Button } from "@nextui-org/react";
-import { examProblemsAtom } from "@/jotai/examProblems";
-import { useAtomValue } from "jotai";
 import { useTransition } from "react";
 import { evaluateProblems } from "@/action/evaluateProblems";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import useExamProblems from "@/hooks/useExamProblems";
 
 export default function SubmitButton() {
   const [isPending, startTransition] = useTransition();
   const [uuid, setUuid] = useState<any>(null);
   const [error, setError] = useState<any>(null);
 
-  const { exam_problems, name: problemSetName } =
-    useAtomValue(examProblemsAtom);
+  const {
+    examProblems: { exam_problems, name: problemSetName },
+  } = useExamProblems();
 
   useEffect(() => {
-    console.log(uuid);
+    console.log("uuid:", uuid);
   }, [uuid]);
 
   useEffect(() => {
-    console.log(error);
+    console.log("error:", error);
   });
 
   const router = useRouter();

@@ -1,30 +1,24 @@
 "use client";
 
-import {
-  currentExamProblemIndexAtom,
-  examProblemsAtom,
-} from "@/jotai/examProblems";
+import useExamProblems from "@/hooks/useExamProblems";
 import { Button } from "@nextui-org/react";
-import { useAtomValue, useAtom } from "jotai";
 export default function ExamProblemsNextOrPrevButtons() {
-  const [currentProblemIndex, setCurrentProblemIndex] = useAtom(
-    currentExamProblemIndexAtom,
-  );
-  const examProblems = useAtomValue(examProblemsAtom);
+  const { examProblems, currentExamProblemIndex, setCurrentExamProblemIndex } =
+    useExamProblems();
   return (
     <div className="mt-2 flex gap-4">
       <Button
         onClick={() => {
-          currentProblemIndex > 0 &&
-            setCurrentProblemIndex(currentProblemIndex - 1);
+          currentExamProblemIndex > 0 &&
+            setCurrentExamProblemIndex(currentExamProblemIndex - 1);
         }}
       >
         이전
       </Button>
       <Button
         onClick={() => {
-          currentProblemIndex < examProblems.exam_problems.length - 1 &&
-            setCurrentProblemIndex(currentProblemIndex + 1);
+          currentExamProblemIndex < examProblems.exam_problems.length - 1 &&
+            setCurrentExamProblemIndex(currentExamProblemIndex + 1);
         }}
       >
         다음
