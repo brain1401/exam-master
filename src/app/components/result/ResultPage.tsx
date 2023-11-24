@@ -20,14 +20,9 @@ export default function ResultPage({ UUID }: Props) {
     setExamProblemResults,
     resetExamProblemResults,
     examProblemResults,
-    currentExamProblemResult,
   } = useExamProblemResults();
 
   const [loading, setLoading] = useState(true);
-
-  const isCorrect = currentExamProblemResult
-    ? currentExamProblemResult.isCorrect
-    : undefined;
 
   useEffect(() => {
     setLoading(true);
@@ -66,7 +61,7 @@ export default function ResultPage({ UUID }: Props) {
   return (
     <>
       <section className="mx-auto my-10 max-w-[80rem] p-3">
-        <ExamCard correct={isCorrect}>
+        <ExamCard>
           <CurrentQuestion />
 
           <CurrentImage />
