@@ -21,17 +21,28 @@ export default function CorrectAnswer() {
   return (
     <>
       {correctCandidates && (
-        <ul className="mt-3">
-          {correctCandidates.map((correctCandidate) => (
-            <li
-              key={correctCandidate.id}
-              className="text-lg"
-            >{`정답 : ${candidateNumber(answerNumber(correctCandidate.id))} ${
-              correctCandidate.text
-            }`}</li>
-          ))}
-        </ul>
+        <div className="mt-3 text-lg">
+          {correctCandidates.length > 1 ? (
+            <>
+              <span>정답 : </span>
+              {correctCandidates.map((correctCandidate, index) => (
+                <>
+                  <span key={correctCandidate.id}>
+                    {`${candidateNumber(answerNumber(correctCandidate.id))} ${
+                      correctCandidate.text
+                    }${index === correctCandidates.length - 1 ? "" : ", "}`}
+                  </span>
+                </>
+              ))}
+            </>
+          ) : (
+            <p className="text-lg">{`정답 : ${candidateNumber(
+              answerNumber(correctCandidates[0].id),
+            )} ${correctCandidates[0].text} `}</p>
+          )}
+        </div>
       )}
+
       {correctSubjectiveAnswer && (
         <p className="text-lg">{`정답 : ${correctSubjectiveAnswer}`}</p>
       )}

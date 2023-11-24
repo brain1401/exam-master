@@ -953,8 +953,9 @@ export async function validateExamProblem(
       .filter((candidate) => candidate.isAnswer)
       .map((candidate) => candidate.id);
 
-    const isCorrect =
-      isAnswerArray(answer) ? answer.every((id) => answeredId.includes(id)) : null;
+    const isCorrect = isAnswerArray(answer)
+      ? answer.every((id) => answeredId.includes(id))
+      : null;
 
     finalResult = isCorrect;
   } else if (problem.type === "sub") {
@@ -1000,12 +1001,11 @@ export async function postExamProblemResult(
         isCorrect: result,
         exam_user: userId,
         candidates: problem.candidates
-          ? problem.candidates
-              .map((candidate) => ({
-                id: candidate.id,
-                text: candidate.text,
-                isSelected: candidate.isAnswer,
-              }))
+          ? problem.candidates.map((candidate) => ({
+              id: candidate.id,
+              text: candidate.text,
+              isSelected: candidate.isAnswer,
+            }))
           : null,
         subjectiveAnswered: problem.subAnswer,
         question: problem.question,
@@ -1013,12 +1013,36 @@ export async function postExamProblemResult(
         questionType: problem.type,
         isAnswerMultiple: problem.isAnswerMultiple,
         correctCandidates: isAnswerArray(answer)
-          ? answer.map((id) => ({
-              id,
-              text:
-                problem.candidates?.find((candidate) => candidate.id === id)
-                  ?.text ?? "",
-            }))
+          ? answer
+              .map((id) => ({
+                id,
+                text:
+                  problem.candidates?.find((candidate) => candidate.id === id)
+                    ?.text ?? "",
+              }))
+              .toSorted((a, b) => {
+                if (!problem.candidates)
+                  throw new Error("problem.candidates is null");
+                if (
+                  problem.candidates.findIndex(
+                    (candidate) => candidate.id === a.id,
+                  ) >
+                  problem.candidates.findIndex(
+                    (candidate) => candidate.id === b.id,
+                  )
+                )
+                  return 1;
+                if (
+                  problem.candidates.findIndex(
+                    (candidate) => candidate.id === a.id,
+                  ) <
+                  problem.candidates.findIndex(
+                    (candidate) => candidate.id === b.id,
+                  )
+                )
+                  return -1;
+                return 0;
+              })
           : null,
         correctSubjectiveAnswer: isAnswerString(answer) ? answer : null,
         image: isImageUrlObject(problem.image) ? problem.image.id : null,
@@ -1065,7 +1089,7 @@ export async function createExamResult(
   const data = await response.json();
   const uuid = data.data.uuid;
 
-  if(!uuid) throw new Error("uuid is null");
+  if (!uuid) throw new Error("uuid is null");
 
   return uuid;
 }
@@ -1104,7 +1128,7 @@ export async function getExamResultByUUID(uuid: string, userEmail: string) {
       throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
 
     const data = await response.json();
-    const examResult:ExamResult = data.data[0];
+    const examResult: ExamResult = data.data[0];
 
     return examResult.exam_problem_results;
   } catch (err) {

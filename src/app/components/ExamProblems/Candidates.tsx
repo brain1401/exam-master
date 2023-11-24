@@ -2,7 +2,7 @@
 import { ExamProblem } from "@/types/problems";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
-import checkImage from "/public/checkBlack.png";
+import checkImage from "/public/images/checkBlack.png";
 import useExamProblems from "@/hooks/useExamProblems";
 import { twMerge } from "tailwind-merge";
 import { checkMarkClassName } from "@/classnames/checkMark";

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import Logo from "../../../../public/Exam Master.svg";
+import Logo from "/public/images/Exam Master.svg";
 import { useRef, useEffect } from "react";
 import { isNavbarMenuOpenAtom } from "@/jotai/navbar";
 import { useAtom } from "jotai";
