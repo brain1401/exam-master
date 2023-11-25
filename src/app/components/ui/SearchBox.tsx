@@ -1,3 +1,4 @@
+import { Input } from "@nextui-org/react";
 import { BsSearch } from "react-icons/bs";
 
 type Props = {
@@ -7,20 +8,24 @@ type Props = {
 export default function SearchBox({ searchString, setSearchString }: Props) {
   return (
     <div className="mb-4 flex items-center justify-end">
-      <div className="flex items-center rounded-full border pl-3 pr-2">
-        <input
-          type="text"
-          className="flex-grow rounded-full py-2 pl-4 focus:border-indigo-500 focus:outline-none"
-          name="search"
-          id="search"
-          placeholder="검색어를 입력하세요."
-          value={searchString}
-          onChange={(e) => setSearchString(e.target.value)}
-        />
-        <button className="p-3">
-          <BsSearch className="text-gray-400" />
-        </button>
-      </div>
+      <Input
+        type="text"
+        name="search"
+        variant="bordered"
+        classNames={{
+          base: "w-fit",
+          inputWrapper: "w-[13rem] md:w-[20rem] h-[2.3rem]",
+          input: "pr-2 pl-3 text-sm",
+          innerWrapper: "pr-2"
+        }}
+        id="search"
+        radius="full"
+        size="sm"
+        placeholder="검색어를 입력하세요."
+        value={searchString}
+        endContent={<BsSearch/>}
+        onChange={(e) => setSearchString(e.target.value)}
+      />
     </div>
   );
 }
