@@ -1,4 +1,5 @@
 import ResultPage from "@/app/components/result/ResultPage";
+import LoginRequired from "@/app/components/ui/LoginRequired";
 import { getServerSession } from "next-auth";
 
 
@@ -13,7 +14,7 @@ export default async function page({ params: { UUID } }: Props) {
 
 
   if (!session) {
-    return <h1 className="mt-10 text-center text-2xl">로그인이 필요합니다.</h1>;
+    return <LoginRequired />
   }
 
   return <ResultPage UUID={UUID} />;

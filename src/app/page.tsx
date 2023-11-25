@@ -1,14 +1,15 @@
 import { getServerSession } from "next-auth/next";
+import LoginRequired from "./components/ui/LoginRequired";
 
 export default async function Home() {
   const session = await getServerSession();
+
+  if (!session) {
+    return <LoginRequired />;
+  }
   return (
     <>
-      {session ? (
-        <h1>환영합니다. {`${session.user?.name}님!`}</h1>
-      ) : (
-        <h1>로그인이 필요합니다.</h1>
-      )}
+      <h1 className="mt-10 text-center text-2xl">{`환영합니다! ${session.user?.name}님!`}</h1>
     </>
   );
 }
