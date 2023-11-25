@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Viewport } from "next";
 import Navbar from "./components/Navbar/Navbar";
 import AuthContext from "@/context/AuthContext";
 import JotaiProvider from "@/context/JotaiContext";
@@ -52,6 +53,10 @@ export const metadata: Metadata = {
   description:
     "실제 시험을 보듯이 시험 문제를 외우는 것을 도와주는 서비스입니다.",
 };
+
+export const viewport: Viewport = {
+  userScalable: false,
+}
 
 export default function RootLayout({
   children,
