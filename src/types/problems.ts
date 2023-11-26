@@ -290,3 +290,38 @@ export const ExamResultSchema = z.object({
   exam_problem_results: z.array(ExamProblemResultSchema),
 });
 export type ExamResult = z.infer<typeof ExamResultSchema>;
+
+export const QuestionTypeSchema = z.enum(["obj", "sub"]);
+
+export type QuestionType = z.infer<typeof QuestionTypeSchema>;
+
+export const PaginationSchema = z.object({
+  page: z.number(),
+  pageSize: z.number(),
+  pageCount: z.number(),
+  total: z.number(),
+});
+export type Pagination = z.infer<typeof PaginationSchema>;
+
+export const MetaSchema = z.object({
+  pagination: PaginationSchema,
+});
+export type Meta = z.infer<typeof MetaSchema>;
+
+
+
+export const DatumSchema = z.object({
+  id: z.number(),
+  updatedAt: z.coerce.date(),
+  createdAt: z.coerce.date(),
+  publishedAt: z.coerce.date(),
+  problemSetName: z.string(),
+  uuid: z.string(),
+});
+export type Datum = z.infer<typeof DatumSchema>;
+
+export const ExamResultsResponseSchema = z.object({
+  data: z.array(DatumSchema),
+  meta: MetaSchema,
+});
+export type ExamResultsResponse = z.infer<typeof ExamResultsResponseSchema>;

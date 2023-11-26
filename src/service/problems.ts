@@ -1132,3 +1132,41 @@ export async function getExamResultByUUID(uuid: string, userEmail: string) {
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
   }
 }
+
+export async function getExamResults(userEmail: string, page: string) {
+  const query = qs.stringify({
+    filters: {
+      exam_user: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+    pagination: {
+      page,
+      pageSize: 10,
+    },
+    sort: "updatedAt:desc",
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok)
+      throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+
+      return await response.json();
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+  }
+}

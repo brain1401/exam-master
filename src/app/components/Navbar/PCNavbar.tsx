@@ -36,6 +36,9 @@ export default function PCNavbar({ loginButton }: Props) {
             <li className={LIST_ITEM}>
               <Link href="/create">문제 생성</Link>
             </li>
+            <li className={LIST_ITEM}>
+              <Link href="/results">시험 결과</Link>
+            </li>
           </ul>
         </div>
 

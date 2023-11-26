@@ -61,6 +61,11 @@ export default function NavMobile({ loginButton }: Props) {
             문제 생성
           </Link>
         </li>
+        <li className={MOBILE_LIST_ITEM}>
+          <Link href="/results" onClick={() => setIsMenuOpen(false)}>
+            시험 결과
+          </Link>
+        </li>
         <li className="py-2" onClick={() => setIsMenuOpen(false)}>
           {loginButton}
         </li>
