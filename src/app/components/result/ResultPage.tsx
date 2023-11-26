@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+import axios, { AxiosError, isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import CurrentQuestion from "./CurrentQuestion";
@@ -16,11 +16,8 @@ type Props = {
   UUID: string;
 };
 export default function ResultPage({ UUID }: Props) {
-  const {
-    setExamProblemResults,
-    resetExamProblemResults,
-    examProblemResults,
-  } = useExamProblemResults();
+  const { setExamProblemResults, resetExamProblemResults, examProblemResults } =
+    useExamProblemResults();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +33,9 @@ export default function ResultPage({ UUID }: Props) {
         });
         setExamProblemResults(res.data);
       } catch (err) {
-        setError(err.response?.data.error);
+        if (isAxiosError(err)) {
+          setError(err.response?.data);
+        }
       } finally {
         setLoading(false);
       }
@@ -55,6 +54,9 @@ export default function ResultPage({ UUID }: Props) {
       </div>
     );
 
+  if (error)
+    return <h1 className="mt-10 text-center text-2xl">에러가 발생했습니다.</h1>;
+    
   return (
     <>
       <section className="mx-auto my-10 max-w-[80rem] p-3">
