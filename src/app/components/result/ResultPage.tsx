@@ -20,7 +20,7 @@ export default function ResultPage({ UUID }: Props) {
     useExamProblemResults();
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{error: string} | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -55,8 +55,8 @@ export default function ResultPage({ UUID }: Props) {
     );
 
   if (error)
-    return <h1 className="mt-10 text-center text-2xl">에러가 발생했습니다.</h1>;
-    
+    return <h1 className="mt-10 text-center text-2xl">{error.error}</h1>;
+
   return (
     <>
       <section className="mx-auto my-10 max-w-[80rem] p-3">
