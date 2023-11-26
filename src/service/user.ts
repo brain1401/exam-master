@@ -28,9 +28,6 @@ export async function createUserIfNotExists(
           },
         }
       );
-
-      console.log(response.data);
-
       result = true;
     } catch (err) {
       console.log(err);

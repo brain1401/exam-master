@@ -17,13 +17,6 @@ export default function SubmitButton() {
     examProblems: { exam_problems, name: problemSetName },
   } = useExamProblems();
 
-  useEffect(() => {
-    console.log("uuid:", uuid);
-  }, [uuid]);
-
-  useEffect(() => {
-    console.log("error:", error);
-  });
 
   const router = useRouter();
 

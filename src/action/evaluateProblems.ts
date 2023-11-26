@@ -28,7 +28,6 @@ export async function evaluateProblems(
   const validateResult = problemsSchema.safeParse(examProblems);
 
   if (!validateResult.success) {
-    console.log(validateResult.error.format());
     throw new Error("인수로 전달된 문제들이 유효하지 않습니다.");
   }
   for (const problem of examProblems) {

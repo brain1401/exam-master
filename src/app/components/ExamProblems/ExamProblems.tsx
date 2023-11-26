@@ -30,10 +30,6 @@ export default function ExamProblems({ UUID }: Props) {
   usePreventClose();
 
   useEffect(() => {
-    console.log("examProblems", examProblems);
-  }, [examProblems]);
-
-  useEffect(() => {
     setLoading(true);
     axios
       .get(`/api/getExamProblemsByProblemSetUUID`, {

@@ -270,7 +270,6 @@ export async function checkProblemSetName(name: string, userEmail: string) {
       throw new Error("문제집 이름을 확인하는 중 오류가 발생했습니다.");
 
     const data = await response.json();
-    console.log(data.data);
 
     return data.data.length === 0 ? false : true;
   } catch (err) {
@@ -640,9 +639,6 @@ export async function updateProblems(
   userEmail: string,
 ) {
   checkEnvVariables();
-
-  console.log("problems", problems);
-  console.log("setName", setName);
 
   //문제집 이름 수정
   await updateProblemSetName(setName, problemSetUUID);

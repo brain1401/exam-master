@@ -64,10 +64,6 @@ export default function ProblemsEditor() {
 
     return value;
   };
-  useEffect(() => {
-    console.log(problems);
-  }, [problems]);
-
   return (
     <section className="flex items-center justify-center">
       <Tabs.Root

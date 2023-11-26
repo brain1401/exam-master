@@ -48,7 +48,6 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
       })
       .catch((err) => {
         setError(err.response?.data.error);
-        console.log(err.response?.data?.error);
       })
       .finally(() => {
         setLoading(false);

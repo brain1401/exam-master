@@ -23,6 +23,7 @@ export default function ResultPage({ UUID }: Props) {
   } = useExamProblemResults();
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -35,7 +36,7 @@ export default function ResultPage({ UUID }: Props) {
         });
         setExamProblemResults(res.data);
       } catch (err) {
-        console.log(err);
+        setError(err.response?.data.error);
       } finally {
         setLoading(false);
       }
@@ -46,10 +47,6 @@ export default function ResultPage({ UUID }: Props) {
       resetExamProblemResults();
     };
   }, [UUID, setExamProblemResults, resetExamProblemResults]);
-
-  useEffect(() => {
-    console.log(examProblemResults);
-  }, [examProblemResults]);
 
   if (loading)
     return (
