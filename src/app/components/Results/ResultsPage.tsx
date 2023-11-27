@@ -53,8 +53,10 @@ export default function ResultsPage() {
 
   return (
     <>
-      <h1 className="text-center text-2xl">시험 기록</h1>
-      <MainContent />
+      <section className="mx-auto mt-10 max-w-[80rem]">
+        <h1 className="text-center text-3xl font-semibold">시험 기록</h1>
+        <MainContent />
+      </section>
     </>
   );
 }

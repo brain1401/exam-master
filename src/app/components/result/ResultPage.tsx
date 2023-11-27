@@ -50,7 +50,7 @@ export default function ResultPage({ UUID }: Props) {
 
   if (loading)
     return (
-      <CustomLoading className="mt-10"/>
+      <CustomLoading className="mt-20"/>
     );
 
   if (error)

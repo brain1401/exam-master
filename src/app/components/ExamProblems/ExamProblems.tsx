@@ -60,7 +60,7 @@ export default function ExamProblems({ UUID }: Props) {
       </div>
     );
 
-  if (loading) return <CustomLoading />;
+  if (loading) return <CustomLoading className="mt-20"/>;
 
   if (!currentExamProblem) return <div>문제가 없습니다.</div>;
 

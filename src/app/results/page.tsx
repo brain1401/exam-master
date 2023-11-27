@@ -11,10 +11,7 @@ export default async function Results() {
 
   return (
     <>
-      <section className="mt-10">
-        <ResultsPage />;
-      </section>
+      <ResultsPage />;
     </>
   );
- 
 }

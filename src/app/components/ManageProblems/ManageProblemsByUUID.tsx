@@ -73,7 +73,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   }
 
   if (loading) {
-    return <CustomLoading />;
+    return <CustomLoading className="mt-20"/>;
   }
 
   return (
