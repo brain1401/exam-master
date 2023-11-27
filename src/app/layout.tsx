@@ -1,4 +1,5 @@
 import "./globals.css";
+import GoogleAnalytics from "./components/GoogleAnalytics";
 import type { Metadata } from "next";
 import { Viewport } from "next";
 import Navbar from "./components/Navbar/Navbar";
@@ -77,6 +78,7 @@ export default function RootLayout({
               <main>{children}</main>
             </NextUIContext>
             <Analytics />
+            <GoogleAnalytics />
           </JotaiProvider>
         </AuthContext>
       </body>
