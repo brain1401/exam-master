@@ -13,7 +13,7 @@ export default function ResultsPage() {
   const [page, setPage] = useState(1);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{error: string} | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,7 +49,7 @@ export default function ResultsPage() {
   };
 
   if (error) {
-    return <div>{error}</div>;
+    return <div>{error.error}</div>;
   }
 
   return (
