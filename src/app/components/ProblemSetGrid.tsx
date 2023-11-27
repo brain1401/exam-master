@@ -7,6 +7,7 @@ import { ClipLoader } from "react-spinners";
 import SearchBox from "./ui/SearchBox";
 import LeftRightButton from "./ui/LeftRightButton";
 import useDebounce from "@/hooks/debounce";
+import CustomLoading from "./ui/CustomLoading";
 
 type Props = {
   type: "manage" | "exam";
@@ -75,9 +76,7 @@ export default function ProblemSetGrid({ type }: Props) {
   const MainContent = () => {
     if (loading) {
       return (
-        <div className="flex w-full items-center justify-center">
-          <ClipLoader size={100} />
-        </div>
+        <CustomLoading />
       );
     } else if (!(problemSets?.data.length && problemSets?.data.length > 0)) {
       return (

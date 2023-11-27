@@ -16,6 +16,7 @@ import {
   resetProblemsAtom,
 } from "@/jotai/problems";
 import { useSetAtom } from "jotai";
+import CustomLoading from "../ui/CustomLoading";
 type Props = {
   UUID: string;
 };
@@ -76,9 +77,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <ClipLoader size={100} />
-      </div>
+      <CustomLoading />
     );
   }
 

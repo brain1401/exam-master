@@ -12,6 +12,7 @@ import SubjectiveAnswered from "./SubjectiveAnswered";
 import ExamCard from "../ui/ExamCard";
 import useExamProblemResults from "@/hooks/useExamProblemResults";
 import CorrectAnswer from "./CorrectAnswer";
+import CustomLoading from "../ui/CustomLoading";
 type Props = {
   UUID: string;
 };
@@ -49,9 +50,7 @@ export default function ResultPage({ UUID }: Props) {
 
   if (loading)
     return (
-      <div className="flex h-screen items-center justify-center">
-        <ClipLoader size={100} />
-      </div>
+      <CustomLoading className="mt-10"/>
     );
 
   if (error)

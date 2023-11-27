@@ -12,6 +12,7 @@ import axios from "axios";
 import SubmitButton from "./SubmitButton";
 import ExamCard from "../ui/ExamCard";
 import useExamProblems from "@/hooks/useExamProblems";
+import CustomLoading from "../ui/CustomLoading";
 
 type Props = {
   UUID: string;
@@ -65,9 +66,7 @@ export default function ExamProblems({ UUID }: Props) {
 
   if (loading)
     return (
-      <div className="flex h-screen items-center justify-center">
-        <ClipLoader size={100} />
-      </div>
+      <CustomLoading/>
     );
 
   if (!currentExamProblem) return <div>문제가 없습니다.</div>;
