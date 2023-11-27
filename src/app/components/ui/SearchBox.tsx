@@ -1,13 +1,15 @@
 import { Input } from "@nextui-org/react";
 import { BsSearch } from "react-icons/bs";
+import { twMerge } from "tailwind-merge";
 
 type Props = {
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
+  className?: string;
 };
-export default function SearchBox({ searchString, setSearchString }: Props) {
+export default function SearchBox({ searchString, setSearchString, className }: Props) {
   return (
-    <div className="mb-4 flex items-center justify-end">
+    <div className={twMerge("mb-4 flex items-center justify-end",className)}>
       <Input
         type="text"
         name="search"

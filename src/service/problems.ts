@@ -1126,6 +1126,7 @@ export async function getExamResultByUUID(uuid: string, userEmail: string) {
     const data = await response.json();
     const examResult: ExamResult = data.data[0];
 
+
     return examResult.exam_problem_results;
   } catch (err) {
     console.log(err);
@@ -1164,7 +1165,7 @@ export async function getExamResults(userEmail: string, page: string) {
     if (!response.ok)
       throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
 
-      return await response.json();
+    return await response.json();
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");

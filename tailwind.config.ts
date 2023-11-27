@@ -22,7 +22,7 @@ const config: Config = {
         nextUiBorder: "#D3D4DB",
       },
       screens: {
-        xs: "360px",
+        xs: "368px",
       },
     },
   },

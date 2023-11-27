@@ -74,9 +74,7 @@ export default function ProblemSetGrid({ type }: Props) {
 
   const MainContent = () => {
     if (loading) {
-      return (
-        <CustomLoading />
-      );
+      return <CustomLoading />;
     } else if (!(problemSets?.data.length && problemSets?.data.length > 0)) {
       return (
         <div className="flex h-64 items-center justify-center">
@@ -87,7 +85,7 @@ export default function ProblemSetGrid({ type }: Props) {
       );
     } else {
       return (
-        <ul className="mx-auto grid w-full grid-cols-1 gap-8 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+        <ul className="mx-auto mt-10 grid w-full grid-cols-1 gap-x-2 gap-y-5 px-0 xs:grid-cols-2 min-[500px]:w-[80vw] sm:grid-cols-2 sm:p-0 min-[669px]:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {problemSets?.data.map((problemSet: ProblemSetResponse) => (
             <li
               key={problemSet.UUID}
@@ -102,8 +100,9 @@ export default function ProblemSetGrid({ type }: Props) {
   };
 
   return (
-    <section className="p-4 md:p-8">
+    <section className="">
       <SearchBox
+        className="mt-8"
         searchString={searchString}
         setSearchString={setSearchString}
       />

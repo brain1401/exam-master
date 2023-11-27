@@ -1,13 +1,20 @@
 import { getServerSession } from "next-auth";
 import LoginRequired from "../components/ui/LoginRequired";
-import Results from "../components/Results/ResultsPage";
+import ResultsPage from "../components/Results/ResultsPage";
 
-export default async function ResultsPage() {
+export default async function Results() {
   const session = await getServerSession();
 
   if (!session) {
     return <LoginRequired />;
   }
 
-  return <Results />;
+  return (
+    <>
+      <section className="mt-10">
+        <ResultsPage />;
+      </section>
+    </>
+  );
+ 
 }

@@ -4,18 +4,23 @@ import { useEffect, useState } from "react";
 import axios, { isAxiosError } from "axios";
 import { ExamResultsResponse } from "@/types/problems";
 import CustomLoading from "../ui/CustomLoading";
-import { resolve } from "path";
-import Link from "next/link";
-export default function Results() {
+import ResultsGrid from "./ResultsGrid";
+export default function ResultsPage() {
   const [results, setResults] = useState<ExamResultsResponse | undefined>(
     undefined,
   );
+  const [page, setPage] = useState(1);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get("/api/getExamResults");
+      const res = await axios.get("/api/getExamResults", {
+        params: {
+          page,
+        },
+      });
       setResults(res.data);
     };
 
@@ -30,15 +35,19 @@ export default function Results() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     console.log(results);
   }, [results]);
 
-  if (loading) {
-    return <CustomLoading className="mt-10" />;
-  }
+  const MainContent = () => {
+    if (loading) {
+      return <CustomLoading className="mt-10" />;
+    } else {
+      return <ResultsGrid results={results?.data} />;
+    }
+  };
 
   if (error) {
     return <div>{error}</div>;
@@ -46,22 +55,8 @@ export default function Results() {
 
   return (
     <>
-      {results && (
-        <ul className="mx-auto mt-10 flex w-[70%] flex-wrap justify-center gap-x-2 gap-y-5">
-          {results.data.map((result) => (
-            <li key={result.uuid}>
-              <Link href={`/result/${result.uuid}`}>
-                <div className="rounded-lg border border-black p-5">
-                  <h2 className="mb-5 text-center">{result.problemSetName}</h2>
-                  <p className="text-center">
-                    {result.createdAt.toLocaleString()}
-                  </p>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <h1 className="text-center text-2xl">시험 기록</h1>
+      <MainContent />
     </>
   );
 }

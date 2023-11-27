@@ -1,4 +1,5 @@
 import { Prettify } from "@/utils/type";
+import { type } from "os";
 import { z } from "zod";
 
 export type candidate = {
@@ -287,7 +288,7 @@ export const ExamResultSchema = z.object({
   publishedAt: z.coerce.date(),
   problemSetName: z.string(),
   uuid: z.string(),
-  exam_problem_results: z.array(ExamProblemResultSchema),
+  exam_problem_results: z.array(ExamProblemResultSchema).optional(),
 });
 export type ExamResult = z.infer<typeof ExamResultSchema>;
 
@@ -309,19 +310,12 @@ export const MetaSchema = z.object({
 export type Meta = z.infer<typeof MetaSchema>;
 
 
-
-export const DatumSchema = z.object({
-  id: z.number(),
-  updatedAt: z.coerce.date(),
-  createdAt: z.coerce.date(),
-  publishedAt: z.coerce.date(),
-  problemSetName: z.string(),
-  uuid: z.string(),
-});
-export type Datum = z.infer<typeof DatumSchema>;
-
 export const ExamResultsResponseSchema = z.object({
-  data: z.array(DatumSchema),
+  data: z.array(ExamResultSchema),
   meta: MetaSchema,
 });
 export type ExamResultsResponse = z.infer<typeof ExamResultsResponseSchema>;
+
+export const ExamResultsSchema = z.array(ExamResultSchema);
+
+export type ExamResults = z.infer<typeof ExamResultsSchema>;
