@@ -3,7 +3,6 @@ import ProblemSetCard from "./ProblemSetCard";
 import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ClipLoader } from "react-spinners";
 import SearchBox from "./ui/SearchBox";
 import LeftRightButton from "./ui/LeftRightButton";
 import useDebounce from "@/hooks/debounce";
