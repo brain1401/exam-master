@@ -9,6 +9,7 @@ export default function ResultsPage() {
   const [results, setResults] = useState<ExamResultsResponse | undefined>(
     undefined,
   );
+
   const [page, setPage] = useState(1);
 
   const [loading, setLoading] = useState(true);
@@ -35,13 +36,13 @@ export default function ResultsPage() {
     fetchData();
   }, [page]);
 
-  useEffect(() => {
-    console.log(results);
-  }, [results]);
-
   const MainContent = () => {
     if (loading) {
       return <CustomLoading className="mt-10" />;
+    } else if (results?.data.length === 0) {
+      return (
+        <p className="text-xl font-semibold text-center mt-10">아직 시험을 치루지 않았습니다!</p>
+      );
     } else {
       return <ResultsGrid results={results?.data} />;
     }
