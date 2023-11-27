@@ -16,25 +16,23 @@ export default function ResultsPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get("/api/getExamResults", {
-        params: {
-          page,
-        },
-      });
-      setResults(res.data);
-    };
-
-    setLoading(true);
-
-    try {
-      fetchData();
-    } catch (e) {
-      if (isAxiosError(e)) {
-        setError(e?.response?.data);
+      try {
+        setLoading(true);
+        const res = await axios.get("/api/getExamResults", {
+          params: {
+            page,
+          },
+        });
+        setResults(res.data);
+      } catch (e) {
+        if (isAxiosError(e)) {
+          setError(e.response?.data.message);
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
+    };
+    fetchData();
   }, [page]);
 
   useEffect(() => {
