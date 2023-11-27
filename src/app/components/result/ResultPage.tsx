@@ -17,7 +17,7 @@ type Props = {
   UUID: string;
 };
 export default function ResultPage({ UUID }: Props) {
-  const { setExamProblemResults, resetExamProblemResults, examProblemResults } =
+  const { setExamProblemResults, resetExamProblemResults } =
     useExamProblemResults();
 
   const [loading, setLoading] = useState(true);

@@ -1,9 +1,9 @@
+import useProblems from "@/hooks/useProblems";
 import { Textarea } from "@nextui-org/react";
-import { currentProblemAtom } from "@/jotai/problems";
-import { useAtom } from "jotai";
 
 export default function QuestionTextArea() {
-  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const { currentProblem, setCurrentProblem } = useProblems();
+  
   const { question } = currentProblem ?? {};
 
   return (

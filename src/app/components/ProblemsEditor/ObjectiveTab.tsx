@@ -1,15 +1,14 @@
 "use client";
 import { useLayoutEffect } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
-import { initCurrentProblemAtom } from "@/jotai/problems";
-import { useSetAtom } from "jotai";
 import Candidates from "./Candidates";
 import CandidateCountSelector from "./CandidateCountSelector";
 import MultipleAnswerSwitch from "./MultipleAnswerSwitch";
 import QuestionTextArea from "./QuestionTextArea";
+import useProblems from "@/hooks/useProblems";
 
 export default function ObjectiveTab() {
-  const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
+  const { initCurrentProblem } = useProblems();
 
   useLayoutEffect(() => {
     initCurrentProblem();

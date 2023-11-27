@@ -1,15 +1,13 @@
 "use client";
 
-import { currentProblemIndexAtom, problemsAtom } from "@/jotai/problems";
-import { useAtomValue } from "jotai";
+import useProblems from "@/hooks/useProblems";
 
 export default function CurrentProblemIndicator() {
-  const problems = useAtomValue(problemsAtom);
-  const problemCurrentIndex = useAtomValue(currentProblemIndexAtom);
+  const { problems, currentProblemIndex } = useProblems();
 
   return (
     <p className="mb-2 text-center text-2xl md:text-3xl">
-      {problemCurrentIndex + 1}번째 문제 / 총 {problems.length}개
+      {currentProblemIndex + 1}번째 문제 / 총 {problems.length}개
     </p>
   );
 }

@@ -1,16 +1,12 @@
 "use client";
 import { useEffect } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
-import {
-  currentProblemAtom,
-  initCurrentProblemAtom,
-} from "../../../jotai/problems";
-import { useAtom, useSetAtom } from "jotai";
 import { Textarea } from "@nextui-org/react";
+import useProblems from "@/hooks/useProblems";
 
 export default function SubjectiveTab() {
-  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
-  const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
+  const { currentProblem, setCurrentProblem, initCurrentProblem } =
+    useProblems();
 
   const { question, subAnswer } = currentProblem ?? {};
 

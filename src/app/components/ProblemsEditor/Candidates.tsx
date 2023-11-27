@@ -1,13 +1,8 @@
-import {
-  currentProblemCandidatesAtom,
-  currentProblemAtom,
-  candidatesCountAtom,
-} from "@/jotai/problems";
 import { Checkbox, Input } from "@nextui-org/react";
 import SimpleLabel from "../ui/SimpleLabel";
 import { ChangeEvent } from "react";
-import { useAtom, useAtomValue } from "jotai";
 import { twMerge } from "tailwind-merge";
+import useProblems from "@/hooks/useProblems";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -20,12 +15,12 @@ type Props = {
   className?: string;
 };
 export default function Candidates({ className }: Props) {
-  const candidatesCount = useAtomValue(candidatesCountAtom);
-
-  const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
-    currentProblemCandidatesAtom,
-  );
-  const currentProblem = useAtomValue(currentProblemAtom);
+  const {
+    candidatesCount,
+    currentProblemCandidates,
+    setCurrentProblemCandidates,
+    currentProblem,
+  } = useProblems();
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;

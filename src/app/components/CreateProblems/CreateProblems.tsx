@@ -5,12 +5,11 @@ import NextOrPrevButtons from "./NextOrPrevButtons";
 import CurrentProblemIndicator from "./CurrentCardIndicator";
 import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
 import { useEffect } from "react";
-import { resetProblemsAtom } from "@/jotai/problems";
-import { useSetAtom } from "jotai";
 import ProblemEditorLayout from "../ui/ProblemEditorLayout";
+import useProblems from "@/hooks/useProblems";
 
 export default function CreateProblems() {
-  const resetProblems = useSetAtom(resetProblemsAtom);
+  const {resetProblems} = useProblems();
 
   useEffect(() => {
     return () => {

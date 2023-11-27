@@ -1,11 +1,10 @@
 import { Switch } from "@nextui-org/react";
 import SimpleLabel from "../ui/SimpleLabel";
 import { ChangeEvent } from "react";
-import { currentProblemAtom } from "@/jotai/problems";
-import { useAtom } from "jotai";
+import useProblems from "@/hooks/useProblems";
 
 export default function MultipleAnswerSwitch() {
-  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const {currentProblem, setCurrentProblem} = useProblems();
 
   const handleMultipleAnswerCheckboxChange = (
     event: ChangeEvent<HTMLInputElement>,

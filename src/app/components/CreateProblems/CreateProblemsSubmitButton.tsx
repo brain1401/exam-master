@@ -8,11 +8,10 @@ import {
 } from "@/jotai/problems";
 import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@nextui-org/react";
+import useProblems from "@/hooks/useProblems";
 
 export default function CreateProblemsSubmitButton() {
-  const [problems, setProblems] = useAtom(problemsAtom);
-  const [problemSetsName, setProblemSetsName] = useAtom(problemSetsNameAtom);
-  const resetProblems = useSetAtom(resetProblemsAtom);
+  const {problems, problemSetsName, setProblemSetsName, resetProblems} = useProblems();
 
   const [isLoading, setIsLoading] = useState(false);
 

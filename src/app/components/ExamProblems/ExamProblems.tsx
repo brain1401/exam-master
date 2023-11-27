@@ -18,12 +18,8 @@ type Props = {
   UUID: string;
 };
 export default function ExamProblems({ UUID }: Props) {
-  const {
-    examProblems,
-    setExamProblems,
-    resetExamProblems,
-    currentExamProblem,
-  } = useExamProblems();
+  const { setExamProblems, resetExamProblems, currentExamProblem } =
+    useExamProblems();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,10 +60,7 @@ export default function ExamProblems({ UUID }: Props) {
       </div>
     );
 
-  if (loading)
-    return (
-      <CustomLoading/>
-    );
+  if (loading) return <CustomLoading />;
 
   if (!currentExamProblem) return <div>문제가 없습니다.</div>;
 

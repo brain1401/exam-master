@@ -1,22 +1,21 @@
 "use client";
-import {
-  currentProblemIndexAtom,
-  problemsAtom,
-  currentTabAtom,
-} from "@/jotai/problems";
+
+import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { candidate } from "@/types/problems";
-import { useAtom } from "jotai";
 import { Button } from "@nextui-org/react";
 
 const BUTTON_CLASSNAMES = "bg-secondary text-white px-3 py-1";
 
 export default function NextOrPrevButtons() {
-  const [problems, setProblems] = useAtom(problemsAtom);
-  const [currentProblemIndex, setCurrentProblemIndex] = useAtom(
-    currentProblemIndexAtom,
-  );
-  const [currentTab, setCurrentTab] = useAtom(currentTabAtom);
+  const {
+    problems,
+    setProblems,
+    currentProblemIndex,
+    setCurrentProblemIndex,
+    currentTab,
+    setCurrentTab,
+  } = useProblems();
 
   const changeCurrentTab = (direction: "f" | "b") => {
     const baseIndex =

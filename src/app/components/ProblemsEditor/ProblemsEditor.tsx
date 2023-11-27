@@ -1,23 +1,19 @@
 "use client";
-import { useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited } from "@/service/problems";
 import usePreventClose from "@/hooks/preventClose";
-import {
-  currentProblemAtom,
-  currentTabAtom,
-  problemsAtom,
-  currentProblemIndexAtom,
-} from "../../../jotai/problems";
-import { useAtom, useAtomValue } from "jotai";
+import useProblems from "@/hooks/useProblems";
 
 export default function ProblemsEditor() {
-  const [problems, setProblems] = useAtom(problemsAtom);
-  const currentProblem = useAtomValue(currentProblemAtom);
-  const [currentTab, setCurrentTab] = useAtom(currentTabAtom);
-  const problemCurrentIndex = useAtomValue(currentProblemIndexAtom);
+  const {
+    setProblems,
+    currentProblem,
+    currentTab,
+    setCurrentTab,
+    currentProblemIndex,
+  } = useProblems();
 
   usePreventClose();
 
@@ -31,8 +27,8 @@ export default function ProblemsEditor() {
     setCurrentTab(tab);
     setProblems((prev) => {
       const newProblems = [...prev];
-      newProblems[problemCurrentIndex] = {
-        id: prev[problemCurrentIndex]?.id,
+      newProblems[currentProblemIndex] = {
+        id: prev[currentProblemIndex]?.id,
         type: tab,
         question: "",
         additionalView: "",

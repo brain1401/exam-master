@@ -3,25 +3,22 @@ import { useState } from "react";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
 import { Button, Input } from "@nextui-org/react";
-import {
-  problemSetsNameAtom,
-  localProblemSetsNameAtom,
-  problemsAtom,
-  currentProblemIndexAtom,
-  problemLengthAtom,
-} from "@/jotai/problems";
-import { useAtom, useSetAtom } from "jotai";
+import useProblems from "@/hooks/useProblems";
 
-const BUTTON_CLASSNAMES = "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
+const BUTTON_CLASSNAMES =
+  "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
 
 export default function ProblemsOption() {
-  const setProblemSetsName = useSetAtom(problemSetsNameAtom);
-  const [localProblemSetsName, setLocalProblemSetsName] = useAtom(
-    localProblemSetsNameAtom,
-  );
-  const [problems, setProblems] = useAtom(problemsAtom);
-  const setCurrentProblemIndex = useSetAtom(currentProblemIndexAtom);
-  const [problemLength, setProblemLength] = useAtom(problemLengthAtom);
+  const {
+    setProblemSetsName,
+    localProblemSetsName,
+    setLocalProblemSetsName,
+    problems,
+    setProblems,
+    setCurrentProblemIndex,
+    problemLength,
+    setProblemLength,
+  } = useProblems();
 
   const [isLoading, setIsLoading] = useState(false);
 

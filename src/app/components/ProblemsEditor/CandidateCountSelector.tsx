@@ -1,18 +1,14 @@
 import { Select, SelectItem } from "@nextui-org/react";
 import { ChangeEvent, useLayoutEffect } from "react";
-import {
-  currentProblemCandidatesAtom,
-  candidatesCountAtom,
-  currentProblemAtom,
-} from "@/jotai/problems";
-import { useAtom, useAtomValue } from "jotai";
+import useProblems from "@/hooks/useProblems";
 export default function CandidateCountSelector() {
-  const [candidatesCount, setCandidatesCount] = useAtom(candidatesCountAtom);
-  const currentProblem = useAtomValue(currentProblemAtom);
-
-  const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
-    currentProblemCandidatesAtom,
-  );
+  const {
+    candidatesCount,
+    setCandidatesCount,
+    currentProblem,
+    currentProblemCandidates,
+    setCurrentProblemCandidates,
+  } = useProblems();
 
   useLayoutEffect(() => {
     setCandidatesCount(currentProblem?.candidates?.length.toString() ?? "4");
