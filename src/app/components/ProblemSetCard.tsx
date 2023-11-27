@@ -7,7 +7,14 @@ type Props = {
 };
 
 export default function ProblemSetCard({ type, problemSet }: Props) {
-  const formattedDate = new Date(problemSet.updatedAt).toLocaleDateString();
+  const formattedDate = new Date(problemSet.updatedAt).toLocaleDateString(
+    "ko-KR",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    },
+  );
 
   return (
     <Link
@@ -16,7 +23,7 @@ export default function ProblemSetCard({ type, problemSet }: Props) {
           ? `/manage/${problemSet.UUID}`
           : `/exam/${problemSet.UUID}`
       }
-      className="flex justify-center w-full"
+      className="flex w-full justify-center"
     >
       <div className="my-2 flex w-full cursor-pointer flex-col items-center rounded-lg border border-gray-300 p-5 transition-shadow duration-200 ease-in hover:shadow-lg">
         <p className="w-full truncate text-center text-lg font-bold text-gray-700">
