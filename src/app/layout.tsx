@@ -6,6 +6,8 @@ import AuthContext from "@/context/AuthContext";
 import JotaiProvider from "@/context/JotaiContext";
 import localFont from "next/font/local";
 import NextUIContext from "@/context/NextUIContext";
+import { Analytics } from "@vercel/analytics/react";
+
 const NotoSansKR = localFont({
   src: [
     {
@@ -56,7 +58,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   userScalable: false,
-}
+};
 
 export default function RootLayout({
   children,
@@ -74,6 +76,7 @@ export default function RootLayout({
               <Navbar />
               <main>{children}</main>
             </NextUIContext>
+            <Analytics />
           </JotaiProvider>
         </AuthContext>
       </body>
