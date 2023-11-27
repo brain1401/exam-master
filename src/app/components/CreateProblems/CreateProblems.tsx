@@ -7,6 +7,7 @@ import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
 import { useEffect } from "react";
 import { resetProblemsAtom } from "@/jotai/problems";
 import { useSetAtom } from "jotai";
+import ProblemEditorLayout from "../ui/ProblemEditorLayout";
 
 export default function CreateProblems() {
   const resetProblems = useSetAtom(resetProblemsAtom);
@@ -18,7 +19,7 @@ export default function CreateProblems() {
   }, [resetProblems]);
 
   return (
-    <section className="mx-auto mt-10 h-full max-w-[70rem]">
+    <ProblemEditorLayout>
       <ProblemsOption />
 
       <CurrentProblemIndicator />
@@ -28,6 +29,6 @@ export default function CreateProblems() {
       <NextOrPrevButtons />
 
       <CreateProblemsSubmitButton />
-    </section>
+    </ProblemEditorLayout>
   );
 }

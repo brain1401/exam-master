@@ -17,6 +17,7 @@ import {
 } from "@/jotai/problems";
 import { useSetAtom } from "jotai";
 import CustomLoading from "../ui/CustomLoading";
+import ProblemEditorLayout from "../ui/ProblemEditorLayout";
 type Props = {
   UUID: string;
 };
@@ -68,21 +69,15 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   ]);
 
   if (error) {
-    return (
-      <h1 className="text-2xl text-center mt-10">
-        {error}
-      </h1>
-    )
+    return <h1 className="mt-10 text-center text-2xl">{error}</h1>;
   }
 
   if (loading) {
-    return (
-      <CustomLoading />
-    );
+    return <CustomLoading />;
   }
 
   return (
-    <section className="mx-auto my-10 max-w-[80rem] p-3">
+    <ProblemEditorLayout>
       <ProblemsOption />
 
       <CurrentProblemIndicator />
@@ -92,6 +87,6 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
       <NextOrPrevButtons />
 
       <ManageProblemSubmitButton uuid={UUID} />
-    </section>
+    </ProblemEditorLayout>
   );
 }
