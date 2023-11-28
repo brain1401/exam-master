@@ -87,10 +87,7 @@ export type Problem = {
   question: string;
   additionalView: string;
   isAnswerMultiple: boolean | null;
-  image:
-    | File
-    | z.infer<typeof ImageSchema>
-    | null;
+  image: File | z.infer<typeof ImageSchema> | null;
   isAdditiondalViewButtonClicked: boolean;
   isImageButtonClicked: boolean;
   candidates: candidate[] | null;
@@ -153,8 +150,6 @@ export const candidateSchema = z.object({
   isAnswer: z.boolean(),
 });
 
-
-
 export type StrapiImage = z.infer<typeof ImageSchema>;
 
 export const problemSchema = z
@@ -184,12 +179,7 @@ export const examProblemSchema = z.object({
   question: z.string(),
   additionalView: z.string(),
   isAnswerMultiple: z.boolean().nullable(),
-  image: z
-    .object({
-      id: z.string(),
-      url: z.string(),
-    })
-    .nullable(),
+  image: ImageSchema.nullable(),
   candidates: z.array(candidateSchema).nullable(),
   subAnswer: z.string().nullable(),
 });
@@ -307,7 +297,6 @@ export const MetaSchema = z.object({
   pagination: PaginationSchema,
 });
 export type Meta = z.infer<typeof MetaSchema>;
-
 
 export const ExamResultsResponseSchema = z.object({
   data: z.array(ExamResultSchema),
