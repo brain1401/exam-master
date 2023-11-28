@@ -13,6 +13,7 @@ import SubmitButton from "./SubmitButton";
 import ExamCard from "../ui/ExamCard";
 import useExamProblems from "@/hooks/useExamProblems";
 import CustomLoading from "../ui/CustomLoading";
+import CurrentProblemIndicator from "./CurrentProblemIndicator";
 
 type Props = {
   UUID: string;
@@ -66,6 +67,7 @@ export default function ExamProblems({ UUID }: Props) {
 
   return (
     <section className="mx-auto my-10 max-w-[80rem] p-3">
+      <CurrentProblemIndicator />
       <ExamCard>
         <CurrentQuestion />
 
