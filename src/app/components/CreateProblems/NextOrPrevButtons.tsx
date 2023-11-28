@@ -82,7 +82,7 @@ export default function NextOrPrevButtons() {
     let flag = false;
     setCurrentProblemIndex((prevIndex) => {
       if (prevIndex < problems.length - 1) {
-        window.scrollTo(0, 0);
+        window.scroll(0, 0);
         flag = true;
         return prevIndex + 1;
       } else {
@@ -100,7 +100,7 @@ export default function NextOrPrevButtons() {
     let flag = false;
     setCurrentProblemIndex((prevIndex) => {
       if (prevIndex > 0) {
-        window.scrollTo(0, 0);
+        window.scroll(0, 0);
         flag = true;
         return prevIndex - 1;
       } else {

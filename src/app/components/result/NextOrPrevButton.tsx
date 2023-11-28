@@ -12,14 +12,14 @@ export default function NextOrPrevButton() {
   const onClickPrev = () => {
     if (examProblemResultsIndex > 0) {
       setExamProblemResultsIndex(examProblemResultsIndex - 1);
-      window.scrollTo(0, 0);
+      window.scroll(0, 0);
     }
   };
 
   const onClickNext = () => {
     if (examProblemResults.length - 1 > examProblemResultsIndex) {
       setExamProblemResultsIndex(examProblemResultsIndex + 1);
-      window.scrollTo(0, 0);
+      window.scroll(0, 0);
     }
   };
 

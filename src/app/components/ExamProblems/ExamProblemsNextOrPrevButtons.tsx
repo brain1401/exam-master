@@ -11,7 +11,7 @@ export default function ExamProblemsNextOrPrevButtons() {
         onClick={() => {
           if (currentExamProblemIndex > 0) {
             setCurrentExamProblemIndex(currentExamProblemIndex - 1);
-            window.scrollTo(0, 0);
+            window.scroll(0, 0);
           }
         }}
       >
@@ -21,7 +21,7 @@ export default function ExamProblemsNextOrPrevButtons() {
         onClick={() => {
           if (currentExamProblemIndex < examProblems.exam_problems.length - 1) {
             setCurrentExamProblemIndex(currentExamProblemIndex + 1);
-            window.scrollTo(0, 0);
+            window.scroll(0, 0);
           }
         }}
       >
