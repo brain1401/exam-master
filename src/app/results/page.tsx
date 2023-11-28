@@ -11,7 +11,7 @@ export default async function Results() {
 
   return (
     <>
-      <ResultsPage />;
+      <ResultsPage />
     </>
   );
 }
