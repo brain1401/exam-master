@@ -13,6 +13,7 @@ import ExamCard from "../ui/ExamCard";
 import useExamProblemResults from "@/hooks/useExamProblemResults";
 import CorrectAnswer from "./CorrectAnswer";
 import CustomLoading from "../ui/CustomLoading";
+import CurrentProblemIndicator from "./CurrentProblemIndicator";
 type Props = {
   UUID: string;
 };
@@ -59,6 +60,7 @@ export default function ResultPage({ UUID }: Props) {
   return (
     <>
       <section className="mx-auto my-10 max-w-[80rem] p-3">
+        <CurrentProblemIndicator />
         <ExamCard>
           <CurrentQuestion />
 
