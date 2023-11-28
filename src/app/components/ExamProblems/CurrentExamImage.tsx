@@ -14,8 +14,8 @@ export default function CurrentExamImage() {
         <div className="mb-5">
           <Image
             src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
-            width={400}
-            height={400}
+            width={image.width}
+            height={image.height}
             alt="이미지"
           />
         </div>

@@ -158,6 +158,8 @@ export const ImageSchema = z.object({
   updatedAt: z.string(),
 });
 
+export type StrapiImage = z.infer<typeof ImageSchema>;
+
 export const problemSchema = z
   .object({
     id: z.number().optional(),

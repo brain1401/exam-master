@@ -5,6 +5,8 @@ import {
   ProblemResponse,
   ExamResult,
   ExamProblem,
+  StrapiImage,
+  ImageSchema,
 } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
@@ -28,12 +30,9 @@ export function isImageFileObject(image: any): image is File {
 
 export function isImageUrlObject(
   image: any,
-): image is { url: string; id: number } {
+): image is StrapiImage {
   return (
-    image &&
-    typeof image === "object" &&
-    typeof image.url === "string" &&
-    typeof image.id === "number"
+    ImageSchema.safeParse(image).success
   );
 }
 

@@ -14,8 +14,8 @@ export default function CurrentImage() {
         <div className="mb-5">
           <Image
             src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image[0].url}`}
-            width={400}
-            height={400}
+            width={image[0].width}
+            height={image[0].height}
             priority
             alt="이미지"
           />
