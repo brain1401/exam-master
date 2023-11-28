@@ -1,5 +1,4 @@
 import { Prettify } from "@/utils/type";
-import { type } from "os";
 import { z } from "zod";
 export const ImageSchema = z.object({
   id: z.number(),
@@ -107,7 +106,7 @@ export type ProblemResponse = {
   updatedAt: string;
   questionType: string;
   uuid: string;
-  image: { id: string; url: string };
+  image: z.infer<typeof ImageSchema>;
   candidates: candidate[] | null;
   additionalView: string;
   subjectiveAnswer: string | null;
