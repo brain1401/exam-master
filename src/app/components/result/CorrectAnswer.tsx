@@ -2,6 +2,7 @@
 
 import useExamProblemResults from "@/hooks/useExamProblemResults";
 import candidateNumber from "@/utils/candidateNumber";
+import { useEffect } from "react";
 
 export default function CorrectAnswer() {
   const {
@@ -26,13 +27,11 @@ export default function CorrectAnswer() {
             <>
               <span>정답 : </span>
               {correctCandidates.map((correctCandidate, index) => (
-                <>
-                  <span key={correctCandidate.id}>
-                    {`${candidateNumber(answerNumber(correctCandidate.id))} ${
-                      correctCandidate.text
-                    }${index === correctCandidates.length - 1 ? "" : ", "}`}
-                  </span>
-                </>
+                <span key={correctCandidate.id + "correntCandidates" + index}>
+                  {`${candidateNumber(answerNumber(correctCandidate.id))} ${
+                    correctCandidate.text
+                  }${index === correctCandidates.length - 1 ? "" : ", "}`}
+                </span>
               ))}
             </>
           ) : (

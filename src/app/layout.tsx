@@ -49,6 +49,7 @@ const NotoSansKR = localFont({
     },
   ],
   display: "swap",
+  preload: true
 });
 
 export const metadata: Metadata = {

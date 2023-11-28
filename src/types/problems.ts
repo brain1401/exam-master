@@ -1,88 +1,6 @@
 import { Prettify } from "@/utils/type";
 import { type } from "os";
 import { z } from "zod";
-
-export type candidate = {
-  id: number | null;
-  text: string;
-  isAnswer: boolean;
-};
-
-export type Problem = {
-  id?: number;
-  type: "obj" | "sub";
-  question: string;
-  additionalView: string;
-  isAnswerMultiple: boolean | null;
-  image:
-    | File
-    | {
-        id: string;
-        url: string;
-      }
-    | null;
-  isAdditiondalViewButtonClicked: boolean;
-  isImageButtonClicked: boolean;
-  candidates: candidate[] | null;
-  subAnswer: string | null;
-} | null;
-
-export type ExamProblem = z.infer<typeof examProblemSchema>;
-
-export type ProblemResponse = {
-  id: number;
-  question: string;
-  createdAt: string;
-  updatedAt: string;
-  questionType: string;
-  uuid: string;
-  image: { id: string; url: string };
-  candidates: candidate[] | null;
-  additionalView: string;
-  subjectiveAnswer: string | null;
-  isAnswerMultiple: boolean | null;
-};
-
-export type ProblemSetResponse = {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  UUID: string;
-  exam_problems?: ProblemResponse[];
-  examProblemsCount?: number;
-};
-
-export type RawProblemSetResponse = {
-  data: ProblemSetResponse[];
-  meta: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
-};
-
-export type ProblemSetWithName = {
-  id: number | undefined;
-  name: string;
-  exam_problems: Problem[];
-};
-
-export type ExamProblemSet = {
-  id: number | undefined;
-  name: string;
-  exam_problems: ExamProblem[];
-};
-
-export const candidateSchema = z.object({
-  id: z.number().nullable(),
-  text: z.string(),
-  isAnswer: z.boolean(),
-});
-
 export const ImageSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -157,6 +75,86 @@ export const ImageSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
 });
+
+export type candidate = {
+  id: number | null;
+  text: string;
+  isAnswer: boolean;
+};
+
+export type Problem = {
+  id?: number;
+  type: "obj" | "sub";
+  question: string;
+  additionalView: string;
+  isAnswerMultiple: boolean | null;
+  image:
+    | File
+    | z.infer<typeof ImageSchema>
+    | null;
+  isAdditiondalViewButtonClicked: boolean;
+  isImageButtonClicked: boolean;
+  candidates: candidate[] | null;
+  subAnswer: string | null;
+} | null;
+
+export type ExamProblem = z.infer<typeof examProblemSchema>;
+
+export type ProblemResponse = {
+  id: number;
+  question: string;
+  createdAt: string;
+  updatedAt: string;
+  questionType: string;
+  uuid: string;
+  image: { id: string; url: string };
+  candidates: candidate[] | null;
+  additionalView: string;
+  subjectiveAnswer: string | null;
+  isAnswerMultiple: boolean | null;
+};
+
+export type ProblemSetResponse = {
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  UUID: string;
+  exam_problems?: ProblemResponse[];
+  examProblemsCount?: number;
+};
+
+export type RawProblemSetResponse = {
+  data: ProblemSetResponse[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+};
+
+export type ProblemSetWithName = {
+  id: number | undefined;
+  name: string;
+  exam_problems: Problem[];
+};
+
+export type ExamProblemSet = {
+  id: number | undefined;
+  name: string;
+  exam_problems: ExamProblem[];
+};
+
+export const candidateSchema = z.object({
+  id: z.number().nullable(),
+  text: z.string(),
+  isAnswer: z.boolean(),
+});
+
+
 
 export type StrapiImage = z.infer<typeof ImageSchema>;
 

@@ -2,15 +2,17 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
-import { isCardOnBeingWrited } from "@/service/problems";
+import { isCardOnBeingWrited, isImageUrlObject } from "@/service/problems";
 import usePreventClose from "@/hooks/preventClose";
 import useProblems from "@/hooks/useProblems";
+import Image from "next/image";
 
 export default function ProblemsEditor() {
   const {
     setProblems,
     currentProblem,
     currentTab,
+    problems,
     setCurrentTab,
     currentProblemIndex,
   } = useProblems();
@@ -62,6 +64,23 @@ export default function ProblemsEditor() {
   };
   return (
     <section className="flex items-center justify-center">
+      {problems &&
+        problems.map((problem) => {
+          if (problem && problem.image && isImageUrlObject(problem.image)) {
+            const image = problem.image;
+            return (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                alt="preload image"
+                className="hidden"
+                height={400}
+                width={400}
+                priority
+                key={problem?.id + "preload"}
+              />
+            );
+          }
+        })}
       <Tabs.Root
         className="flex w-11/12 flex-col md:w-[60rem]"
         activationMode="manual"

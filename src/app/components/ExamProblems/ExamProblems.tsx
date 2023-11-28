@@ -7,20 +7,26 @@ import CurrentQuestion from "./CurrentQuestion";
 import AdditionalView from "./AdditionalView";
 import Candidates from "./Candidates";
 import SubjectiveAnswerTextarea from "./SubjectiveAnswerTextarea";
-import { ClipLoader } from "react-spinners";
 import axios from "axios";
 import SubmitButton from "./SubmitButton";
 import ExamCard from "../ui/ExamCard";
 import useExamProblems from "@/hooks/useExamProblems";
 import CustomLoading from "../ui/CustomLoading";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
+import { isImageUrlObject } from "@/service/problems";
+import Image from "next/image";
+import checkImage from "/public/images/checkBlack.png";
 
 type Props = {
   UUID: string;
 };
 export default function ExamProblems({ UUID }: Props) {
-  const { setExamProblems, resetExamProblems, currentExamProblem } =
-    useExamProblems();
+  const {
+    setExamProblems,
+    resetExamProblems,
+    currentExamProblem,
+    examProblems: { exam_problems },
+  } = useExamProblems();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,30 +67,57 @@ export default function ExamProblems({ UUID }: Props) {
       </div>
     );
 
-  if (loading) return <CustomLoading className="mt-20"/>;
+  if (loading) return <CustomLoading className="mt-20" />;
 
   if (!currentExamProblem) return <div>문제가 없습니다.</div>;
 
   return (
-    <section className="mx-auto my-10 max-w-[80rem] p-3">
-      <CurrentProblemIndicator />
-      <ExamCard>
-        <CurrentQuestion />
-
-        <CurrentExamImage />
-
-        <AdditionalView />
-
-        {Boolean(currentExamProblem.type === "obj") && <Candidates />}
-
-        {Boolean(currentExamProblem.type === "sub") && (
-          <SubjectiveAnswerTextarea />
+    <>
+      <section className="mx-auto my-10 max-w-[80rem] p-3">
+        {exam_problems &&
+          exam_problems.map((examProblem) => {
+            const image = examProblem.image;
+            if (image && isImageUrlObject(image)) {
+              return (
+                <Image
+                  key={examProblem.id + "preload"}
+                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                  alt="preload image"
+                  width={400}
+                  height={400}
+                  className="hidden"
+                  priority
+                />
+              );
+            }
+          })}
+        {Boolean(checkImage) && (
+          <Image
+            src={checkImage}
+            alt="check image preload"
+            priority
+            className="hidden"
+          />
         )}
-      </ExamCard>
+        <CurrentProblemIndicator />
+        <ExamCard>
+          <CurrentQuestion />
 
-      <NextOrPrevButtons />
+          <CurrentExamImage />
 
-      <SubmitButton />
-    </section>
+          <AdditionalView />
+
+          {Boolean(currentExamProblem.type === "obj") && <Candidates />}
+
+          {Boolean(currentExamProblem.type === "sub") && (
+            <SubjectiveAnswerTextarea />
+          )}
+        </ExamCard>
+
+        <NextOrPrevButtons />
+
+        <SubmitButton />
+      </section>
+    </>
   );
 }

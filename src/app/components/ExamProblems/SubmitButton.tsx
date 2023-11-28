@@ -4,7 +4,6 @@ import { Button } from "@nextui-org/react";
 import { useTransition } from "react";
 import { evaluateProblems } from "@/action/evaluateProblems";
 import { useState } from "react";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useExamProblems from "@/hooks/useExamProblems";
 
