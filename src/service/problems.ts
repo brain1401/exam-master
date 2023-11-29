@@ -1181,3 +1181,54 @@ export async function getExamResults(userEmail: string, page: string) {
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
   }
 }
+
+export async function getExamResultsByName(userEmail:string, name:string, page:string){
+  const query = qs.stringify({
+    filters: {
+      problemSetName: {
+        $contains: name,
+      },
+      exam_user: {
+        email: {
+          $eq: userEmail,
+        },
+      },
+    },
+    pagination: {
+      page,
+      pageSize: 10,
+    },
+    populate: ["exam_problem_results"],
+    sort: "updatedAt:desc",
+  });
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok)
+    throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+
+  const data = await response.json();
+
+   const result = {
+     ...data,
+     data: data.data.map((examProblemResult: any) => {
+       const newExamProblemResult: any = examProblemResult;
+       newExamProblemResult["examProblemResultsCount"] =
+         examProblemResult.exam_problem_results?.length;
+       delete newExamProblemResult.exam_problem_results;
+
+       return newExamProblemResult;
+     }),
+   };
+
+  return result as ExamResultsWithCount;
+}
