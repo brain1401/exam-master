@@ -66,7 +66,7 @@ export async function PUT(req: NextRequest) {
   );
 
   return NextResponse.json(
-    result ? "OK" : "NO",
+    result ? true : false,
     result ? { status: 200 } : { status: 500 },
   );
 }
