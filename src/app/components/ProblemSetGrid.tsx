@@ -4,7 +4,6 @@ import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import SearchBox from "./ui/SearchBox";
-import LeftRightButton from "./ui/LeftRightButton";
 import useDebounce from "@/hooks/debounce";
 import CustomLoading from "./ui/CustomLoading";
 import PaginationButton from "./ui/PaginationButton";
