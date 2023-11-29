@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 export default function useCustomMediaQuery() {
@@ -27,7 +27,7 @@ export default function useCustomMediaQuery() {
   });
   const xl = useMediaQuery({ query: "(min-width: 1280px)" }); // xl 이상의 경우는 max-width가 필요 없음
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setIsXxs(xxs);
     setIsXs(xs);
     setIsSm(sm);
