@@ -28,12 +28,25 @@ export default function ProblemSetGrid({ type }: Props) {
   const { isXxs, isXs, isSm, isMd, isLg, isXl } = useCustomMediaQuery();
 
   useEffect(() => {
-    if (isXxs) setPageSize(2);
-    else if (isXs) setPageSize(4);
-    else if (isSm) setPageSize(4);
-    else if (isMd) setPageSize(6);
-    else if (isLg) setPageSize(8);
-    else if (isXl) setPageSize(10);
+    if (isXxs) {
+      setPageSize(2);
+      setPage(1);
+    } else if (isXs) {
+      setPageSize(4);
+      setPage(1);
+    } else if (isSm) {
+      setPageSize(4);
+      setPage(1);
+    } else if (isMd) {
+      setPageSize(6);
+      setPage(1);
+    } else if (isLg) {
+      setPageSize(8);
+      setPage(1);
+    } else if (isXl) {
+      setPageSize(10);
+      setPage(1);
+    }
   }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
 
   useEffect(() => {
