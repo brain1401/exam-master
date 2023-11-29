@@ -42,7 +42,7 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
         body: formData,
       });
 
-      const result = await response.json();
+      const result = await response.text();
       if (result === "OK") {
         alert("문제집이 성공적으로 등록되었습니다.");
       } else {
