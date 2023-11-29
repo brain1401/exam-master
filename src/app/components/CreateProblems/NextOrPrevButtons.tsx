@@ -4,6 +4,7 @@ import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { candidate } from "@/types/problems";
 import { Button } from "@nextui-org/react";
+import { useLayoutEffect } from "react";
 
 const BUTTON_CLASSNAMES = "bg-secondary text-white px-3 py-1";
 
@@ -78,11 +79,14 @@ export default function NextOrPrevButtons() {
     });
   };
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentProblemIndex]);
+  
   const showNextCard = () => {
     let flag = false;
     setCurrentProblemIndex((prevIndex) => {
       if (prevIndex < problems.length - 1) {
-        window.scroll(0, 0);
         flag = true;
         return prevIndex + 1;
       } else {
@@ -100,7 +104,6 @@ export default function NextOrPrevButtons() {
     let flag = false;
     setCurrentProblemIndex((prevIndex) => {
       if (prevIndex > 0) {
-        window.scroll(0, 0);
         flag = true;
         return prevIndex - 1;
       } else {
