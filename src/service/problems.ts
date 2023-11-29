@@ -275,7 +275,11 @@ export async function checkProblemSetName(name: string, userEmail: string) {
   }
 }
 
-export async function getProblemSets(userEmail: string, page: string) {
+export async function getProblemSets(
+  userEmail: string,
+  page: string,
+  pageSize: string,
+) {
   const query = qs.stringify({
     filters: {
       exam_user: {
@@ -287,7 +291,7 @@ export async function getProblemSets(userEmail: string, page: string) {
     populate: ["exam_problems"],
     pagination: {
       page,
-      pageSize: 10,
+      pageSize,
     },
     sort: "updatedAt:desc",
   });
@@ -326,6 +330,7 @@ export async function getProblemSetsByName(
   userEmail: string,
   name: string,
   page: string,
+  pageSize: string,
 ) {
   const query = qs.stringify({
     filters: {
@@ -341,7 +346,7 @@ export async function getProblemSetsByName(
     populate: ["exam_problems"],
     pagination: {
       page,
-      pageSize: 10,
+      pageSize,
     },
     sort: "updatedAt:desc",
   });
@@ -1130,7 +1135,7 @@ export async function getExamResultByUUID(uuid: string, userEmail: string) {
   }
 }
 
-export async function getExamResults(userEmail: string, page: string) {
+export async function getExamResults(userEmail: string, page: string, pageSize: string) {
   const query = qs.stringify({
     filters: {
       exam_user: {
@@ -1141,7 +1146,7 @@ export async function getExamResults(userEmail: string, page: string) {
     },
     pagination: {
       page,
-      pageSize: 10,
+      pageSize,
     },
     populate: ["exam_problem_results"],
     sort: "updatedAt:desc",
@@ -1182,7 +1187,12 @@ export async function getExamResults(userEmail: string, page: string) {
   }
 }
 
-export async function getExamResultsByName(userEmail:string, name:string, page:string){
+export async function getExamResultsByName(
+  userEmail: string,
+  name: string,
+  page: string,
+  pageSize: string,
+) {
   const query = qs.stringify({
     filters: {
       problemSetName: {
@@ -1196,7 +1206,7 @@ export async function getExamResultsByName(userEmail:string, name:string, page:s
     },
     pagination: {
       page,
-      pageSize: 10,
+      pageSize,
     },
     populate: ["exam_problem_results"],
     sort: "updatedAt:desc",
@@ -1218,17 +1228,17 @@ export async function getExamResultsByName(userEmail:string, name:string, page:s
 
   const data = await response.json();
 
-   const result = {
-     ...data,
-     data: data.data.map((examProblemResult: any) => {
-       const newExamProblemResult: any = examProblemResult;
-       newExamProblemResult["examProblemResultsCount"] =
-         examProblemResult.exam_problem_results?.length;
-       delete newExamProblemResult.exam_problem_results;
+  const result = {
+    ...data,
+    data: data.data.map((examProblemResult: any) => {
+      const newExamProblemResult: any = examProblemResult;
+      newExamProblemResult["examProblemResultsCount"] =
+        examProblemResult.exam_problem_results?.length;
+      delete newExamProblemResult.exam_problem_results;
 
-       return newExamProblemResult;
-     }),
-   };
+      return newExamProblemResult;
+    }),
+  };
 
   return result as ExamResultsWithCount;
 }

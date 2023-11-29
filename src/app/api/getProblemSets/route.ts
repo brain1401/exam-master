@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
 
   const param = req.nextUrl.searchParams;
   const page = param.get("page");
+  const pageSize = param.get("pageSize");
 
-  const data = await getProblemSets(session?.user?.email, page || "1");
+  const data = await getProblemSets(session?.user?.email, page || "1", pageSize || "10");
   return NextResponse.json(data);
 }

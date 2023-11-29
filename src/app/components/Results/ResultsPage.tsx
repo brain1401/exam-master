@@ -8,6 +8,7 @@ import ResultsGrid from "./ResultsGrid";
 import useDebounce from "@/hooks/debounce";
 import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
+import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 export default function ResultsPage() {
   const [results, setResults] = useState<
     ExamResultsWithCountResponse | undefined
@@ -15,6 +16,7 @@ export default function ResultsPage() {
 
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
@@ -23,6 +25,17 @@ export default function ResultsPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ error: string } | null>(null);
+
+  const { isXxs, isXs, isSm, isMd, isLg, isXl } = useCustomMediaQuery();
+
+  useEffect(() => {
+    if (isXxs) setPageSize(2);
+    else if (isXs) setPageSize(4);
+    else if (isSm) setPageSize(4);
+    else if (isMd) setPageSize(6);
+    else if (isLg) setPageSize(8);
+    else if (isXl) setPageSize(10);
+  }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
 
   useEffect(() => {
     if (debouncedSearchString.length > 0) {
@@ -44,6 +57,7 @@ export default function ResultsPage() {
             params: {
               name: debouncedSearchString.trim(),
               page,
+              pageSize,
             },
           });
           setMaxPage(res.data.meta.pagination.pageCount || 1);
@@ -60,6 +74,7 @@ export default function ResultsPage() {
           const res = await axios.get("/api/getExamResults", {
             params: {
               page,
+              pageSize,
             },
           });
           setResults(res.data);
@@ -75,7 +90,7 @@ export default function ResultsPage() {
       }
     };
     fetchData();
-  }, [page, isSearching, debouncedSearchString]);
+  }, [page, isSearching, debouncedSearchString, pageSize]);
 
   const MainContent = () => {
     if (loading) {

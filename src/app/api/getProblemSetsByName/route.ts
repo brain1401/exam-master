@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
 
   const name = param.get("name");
   const page = param.get("page");
+  const pageSize = param.get("pageSize");
 
   if (!name)
     return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
@@ -23,7 +24,8 @@ export async function GET(req: NextRequest) {
   const data = await getProblemSetsByName(
     session.user.email,
     name,
-    page || "1"
+    page || "1",
+    pageSize || "10"
   );
   
   return NextResponse.json(data);

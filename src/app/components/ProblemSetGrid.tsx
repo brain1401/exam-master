@@ -2,6 +2,8 @@
 import ProblemSetCard from "./ProblemSetCard";
 import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
 import { useEffect, useState } from "react";
+import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
+
 import axios from "axios";
 import SearchBox from "./ui/SearchBox";
 import useDebounce from "@/hooks/debounce";
@@ -16,11 +18,23 @@ export default function ProblemSetGrid({ type }: Props) {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
+
+  const { isXxs, isXs, isSm, isMd, isLg, isXl } = useCustomMediaQuery();
+
+  useEffect(() => {
+    if (isXxs) setPageSize(2);
+    else if (isXs) setPageSize(4);
+    else if (isSm) setPageSize(4);
+    else if (isMd) setPageSize(6);
+    else if (isLg) setPageSize(8);
+    else if (isXl) setPageSize(10);
+  }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
 
   useEffect(() => {
     if (debouncedSearchString.length > 0) {
@@ -42,6 +56,7 @@ export default function ProblemSetGrid({ type }: Props) {
           params: {
             name: debouncedSearchString.trim(),
             page,
+            pageSize,
           },
         })
         .then((res) => {
@@ -58,6 +73,7 @@ export default function ProblemSetGrid({ type }: Props) {
         .get("/api/getProblemSets", {
           params: {
             page,
+            pageSize,
           },
         })
         .then((res) => {
@@ -70,7 +86,7 @@ export default function ProblemSetGrid({ type }: Props) {
           setLoading(false);
         });
     }
-  }, [page, isSearching, debouncedSearchString]);
+  }, [page, isSearching, debouncedSearchString, pageSize]);
 
   const MainContent = () => {
     if (loading) {
