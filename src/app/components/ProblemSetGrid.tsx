@@ -9,6 +9,7 @@ import SearchBox from "./ui/SearchBox";
 import useDebounce from "@/hooks/debounce";
 import CustomLoading from "./ui/CustomLoading";
 import PaginationButton from "./ui/PaginationButton";
+import getPageSizeByObj from "@/utils/getPageSizeByObj";
 
 type Props = {
   type: "manage" | "exam";
@@ -18,15 +19,20 @@ export default function ProblemSetGrid({ type }: Props) {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
 
-  const { isXxs, isXs, isSm, isMd, isLg, isXl } = useCustomMediaQuery();
+  const {
+    mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
+  } = useCustomMediaQuery();
 
+  const [pageSize, setPageSize] = useState(
+    getPageSizeByObj({ isXxs, isXs, isSm, isMd, isLg, isXl }),
+  );
+  
   useLayoutEffect(() => {
     if (isXxs) {
       setPageSize(2);
@@ -47,6 +53,15 @@ export default function ProblemSetGrid({ type }: Props) {
       setPageSize(10);
       setPage(1);
     }
+  }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
+
+  useEffect(() => {
+    console.log("isXxs :", isXxs);
+    console.log("isXs :", isXs);
+    console.log("isSm :", isSm);
+    console.log("isMd :", isMd);
+    console.log("isLg :", isLg);
+    console.log("isXl :", isXl);
   }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
 
   useEffect(() => {

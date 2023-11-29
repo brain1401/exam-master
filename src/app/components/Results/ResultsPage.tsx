@@ -9,6 +9,7 @@ import useDebounce from "@/hooks/debounce";
 import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
+import getPageSizeByObj from "@/utils/getPageSizeByObj";
 export default function ResultsPage() {
   const [results, setResults] = useState<
     ExamResultsWithCountResponse | undefined
@@ -16,7 +17,6 @@ export default function ResultsPage() {
 
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
@@ -26,7 +26,13 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ error: string } | null>(null);
 
-  const { isXxs, isXs, isSm, isMd, isLg, isXl } = useCustomMediaQuery();
+  const {
+    mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
+  } = useCustomMediaQuery();
+
+  const [pageSize, setPageSize] = useState(
+    getPageSizeByObj({ isXxs, isXs, isSm, isMd, isLg, isXl }),
+  );
 
   useLayoutEffect(() => {
     if (isXxs) {
