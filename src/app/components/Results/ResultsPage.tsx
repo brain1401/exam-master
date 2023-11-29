@@ -76,6 +76,7 @@ export default function ResultsPage() {
       if (isSearching) {
         if (debouncedSearchString.trim().length === 0) return;
         try {
+          if (pageSize === 0) return;
           const res = await axios.get("/api/getExamResultsByName", {
             params: {
               name: debouncedSearchString.trim(),
@@ -94,6 +95,7 @@ export default function ResultsPage() {
         }
       } else {
         try {
+          if (pageSize === 0) return;
           const res = await axios.get("/api/getExamResults", {
             params: {
               page,
@@ -102,13 +104,12 @@ export default function ResultsPage() {
           });
           setResults(res.data);
           setMaxPage(res.data.meta.pagination.pageCount || 1);
-          console.log(res.data);
         } catch (e) {
           if (isAxiosError(e)) {
             setError(e.response?.data.message);
           }
         } finally {
-          setLoading(false);
+          pageSize !== 0 && setLoading(false);
         }
       }
     };

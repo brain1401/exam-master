@@ -4,7 +4,7 @@ import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
 import { useEffect, useLayoutEffect, useState } from "react";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import SearchBox from "./ui/SearchBox";
 import useDebounce from "@/hooks/debounce";
 import CustomLoading from "./ui/CustomLoading";
@@ -32,7 +32,7 @@ export default function ProblemSetGrid({ type }: Props) {
   const [pageSize, setPageSize] = useState(
     getPageSizeByObj({ isXxs, isXs, isSm, isMd, isLg, isXl }),
   );
-  
+
   useLayoutEffect(() => {
     if (isXxs) {
       setPageSize(2);
@@ -56,15 +56,6 @@ export default function ProblemSetGrid({ type }: Props) {
   }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
 
   useEffect(() => {
-    console.log("isXxs :", isXxs);
-    console.log("isXs :", isXs);
-    console.log("isSm :", isSm);
-    console.log("isMd :", isMd);
-    console.log("isLg :", isLg);
-    console.log("isXl :", isXl);
-  }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
-
-  useEffect(() => {
     if (debouncedSearchString.length > 0) {
       setPage(1);
       setIsSearching(true);
@@ -75,45 +66,44 @@ export default function ProblemSetGrid({ type }: Props) {
   }, [debouncedSearchString]);
 
   useEffect(() => {
-    setLoading(true);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        if (isSearching) {
+          if (debouncedSearchString.trim().length === 0) return;
+          if (pageSize === 0) return;
 
-    if (isSearching) {
-      if (debouncedSearchString.trim().length === 0) return;
-      axios
-        .get("/api/getProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page,
-            pageSize,
-          },
-        })
-        .then((res) => {
+          const res = await axios.get("/api/getProblemSetsByName", {
+            params: {
+              name: debouncedSearchString.trim(),
+              page,
+              pageSize,
+            },
+          });
           const data: RawProblemSetResponse = res.data;
           setMaxPage(data.meta.pagination.pageCount || 1);
           setProblemSets(data);
-        })
-        .catch((err) => console.error(err))
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      axios
-        .get("/api/getProblemSets", {
-          params: {
-            page,
-            pageSize,
-          },
-        })
-        .then((res) => {
+        } else {
+          if (pageSize === 0) return;
+          const res = await axios.get("/api/getProblemSets", {
+            params: {
+              page,
+              pageSize,
+            },
+          });
           const data: RawProblemSetResponse = res.data;
           setMaxPage(data.meta.pagination.pageCount);
           setProblemSets(data);
-        })
-        .catch((err) => console.error(err))
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+        }
+      } catch (e) {
+        if (isAxiosError(e)) {
+          alert(e.response?.data.message);
+        }
+      } finally {
+        pageSize !== 0 && setLoading(false);
+      }
+    };
+    fetchData();
   }, [page, isSearching, debouncedSearchString, pageSize]);
 
   const MainContent = () => {
