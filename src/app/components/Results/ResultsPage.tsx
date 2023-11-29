@@ -7,7 +7,7 @@ import CustomLoading from "../ui/CustomLoading";
 import ResultsGrid from "./ResultsGrid";
 import useDebounce from "@/hooks/debounce";
 import SearchBox from "../ui/SearchBox";
-import NextOrPrevButton from "./NextOrPrevButton";
+import PaginationButton from "../ui/PaginationButton";
 export default function ResultsPage() {
   const [results, setResults] = useState<
     ExamResultsWithCountResponse | undefined
@@ -63,6 +63,7 @@ export default function ResultsPage() {
             },
           });
           setResults(res.data);
+          setMaxPage(res.data.meta.pagination.pageCount || 1);
           console.log(res.data);
         } catch (e) {
           if (isAxiosError(e)) {
@@ -110,7 +111,12 @@ export default function ResultsPage() {
           setSearchString={setSearchString}
         />
         <MainContent />
-        <NextOrPrevButton maxPage={maxPage} setPage={setPage}/>
+        <PaginationButton
+          maxPage={maxPage}
+          page={page}
+          setPage={setPage}
+          className="mt-5 flex justify-center"
+        />
       </section>
     </>
   );

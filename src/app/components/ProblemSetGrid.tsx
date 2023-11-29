@@ -7,6 +7,7 @@ import SearchBox from "./ui/SearchBox";
 import LeftRightButton from "./ui/LeftRightButton";
 import useDebounce from "@/hooks/debounce";
 import CustomLoading from "./ui/CustomLoading";
+import PaginationButton from "./ui/PaginationButton";
 
 type Props = {
   type: "manage" | "exam";
@@ -107,7 +108,12 @@ export default function ProblemSetGrid({ type }: Props) {
         setSearchString={setSearchString}
       />
       <MainContent />
-      <LeftRightButton page={page} setPage={setPage} maxPage={maxPage} />
+      <PaginationButton
+        page={page}
+        setPage={setPage}
+        maxPage={maxPage}
+        className="mt-5 flex justify-center"
+      />
     </section>
   );
 }
