@@ -1,7 +1,7 @@
 "use client";
 import ProblemSetCard from "./ProblemSetCard";
 import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 
 import axios from "axios";
@@ -27,7 +27,7 @@ export default function ProblemSetGrid({ type }: Props) {
 
   const { isXxs, isXs, isSm, isMd, isLg, isXl } = useCustomMediaQuery();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isXxs) {
       setPageSize(2);
       setPage(1);

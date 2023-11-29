@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import axios, { isAxiosError } from "axios";
 import { ExamResultsWithCountResponse } from "@/types/problems";
 import CustomLoading from "../ui/CustomLoading";
@@ -28,7 +28,7 @@ export default function ResultsPage() {
 
   const { isXxs, isXs, isSm, isMd, isLg, isXl } = useCustomMediaQuery();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isXxs) {
       setPageSize(2);
       setPage(1);
