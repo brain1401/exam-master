@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import axios, { isAxiosError } from "axios";
-import { ExamResultsResponse } from "@/types/problems";
+import { ExamResultsWithCountResponse } from "@/types/problems";
 import CustomLoading from "../ui/CustomLoading";
 import ResultsGrid from "./ResultsGrid";
 export default function ResultsPage() {
-  const [results, setResults] = useState<ExamResultsResponse | undefined>(
-    undefined,
-  );
+  const [results, setResults] = useState<
+    ExamResultsWithCountResponse | undefined
+  >(undefined);
 
   const [page, setPage] = useState(1);
 
@@ -25,6 +25,7 @@ export default function ResultsPage() {
           },
         });
         setResults(res.data);
+        console.log(res.data);
       } catch (e) {
         if (isAxiosError(e)) {
           setError(e.response?.data.message);

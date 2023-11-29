@@ -7,6 +7,8 @@ import {
   ExamProblem,
   StrapiImage,
   ImageSchema,
+  ExamProblemResult,
+  ExamResultsWithCount,
 } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
@@ -28,12 +30,8 @@ export function isImageFileObject(image: any): image is File {
   );
 }
 
-export function isImageUrlObject(
-  image: any,
-): image is StrapiImage {
-  return (
-    ImageSchema.safeParse(image).success
-  );
+export function isImageUrlObject(image: any): image is StrapiImage {
+  return ImageSchema.safeParse(image).success;
 }
 
 export const isProblemEmpty = (problem: Problem) => {
@@ -1125,7 +1123,6 @@ export async function getExamResultByUUID(uuid: string, userEmail: string) {
     const data = await response.json();
     const examResult: ExamResult = data.data[0];
 
-
     return examResult.exam_problem_results;
   } catch (err) {
     console.log(err);
@@ -1146,6 +1143,7 @@ export async function getExamResults(userEmail: string, page: string) {
       page,
       pageSize: 10,
     },
+    populate: ["exam_problem_results"],
     sort: "updatedAt:desc",
   });
 
@@ -1164,7 +1162,20 @@ export async function getExamResults(userEmail: string, page: string) {
     if (!response.ok)
       throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
 
-    return await response.json();
+    const data = await response.json();
+    const result = {
+      ...data,
+      data: data.data.map((examProblemResult: any) => {
+        const newExamProblemResult: any = examProblemResult;
+        newExamProblemResult["examProblemResultsCount"] =
+          examProblemResult.exam_problem_results?.length;
+        delete newExamProblemResult.exam_problem_results;
+
+        return newExamProblemResult;
+      }),
+    };
+
+    return result;
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");

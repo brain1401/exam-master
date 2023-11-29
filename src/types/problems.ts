@@ -276,9 +276,22 @@ export const ExamResultSchema = z.object({
   updatedAt: z.coerce.date(),
   publishedAt: z.coerce.date(),
   problemSetName: z.string(),
-  uuid: z.string(),
+  uuid: z.string().uuid(),
   exam_problem_results: z.array(ExamProblemResultSchema).optional(),
 });
+
+export const ExamResultsWithCountSchema = z.object({
+  id: z.number(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  publishedAt: z.coerce.date(),
+  problemSetName: z.string(),
+  uuid: z.string().uuid(),
+  examProblemResultsCount: z.number(),
+});
+
+export type ExamResultsWithCount = z.infer<typeof ExamResultsWithCountSchema>;
+
 export type ExamResult = z.infer<typeof ExamResultSchema>;
 
 export const QuestionTypeSchema = z.enum(["obj", "sub"]);
@@ -303,6 +316,15 @@ export const ExamResultsResponseSchema = z.object({
   meta: MetaSchema,
 });
 export type ExamResultsResponse = z.infer<typeof ExamResultsResponseSchema>;
+
+export const ExamResultsWithCountResponseSchema = z.object({
+  data: z.array(ExamResultsWithCountSchema),
+  meta: MetaSchema,
+});
+
+export type ExamResultsWithCountResponse = z.infer<
+  typeof ExamResultsWithCountResponseSchema
+>;
 
 export const ExamResultsSchema = z.array(ExamResultSchema);
 

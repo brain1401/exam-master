@@ -1,8 +1,8 @@
-import { ExamResults } from "@/types/problems";
+import { ExamResults, ExamResultsWithCount } from "@/types/problems";
 import ResultsCard from "./ResultsCard";
 
 type Props = {
-  results: ExamResults | undefined;
+  results: ExamResultsWithCount[] | undefined;
 };
 
 export default function ResultsGrid({ results }: Props) {
