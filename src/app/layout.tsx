@@ -76,7 +76,7 @@ export default function RootLayout({
           <JotaiProvider>
             <NextUIContext>
               <Navbar />
-              <main className="min-h-screen">{children}</main>
+              <main>{children}</main>
             </NextUIContext>
             <Analytics />
             <GoogleAnalytics />
