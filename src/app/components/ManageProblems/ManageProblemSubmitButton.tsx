@@ -46,7 +46,7 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
       if (result === "OK") {
         alert("문제집이 성공적으로 등록되었습니다.");
       } else {
-        alert("문제집 등록에 실패했습니다.");
+        alert(`문제집 등록에 실패했습니다. \n에러 : ${result}`);
       }
     } catch (err) {
       alert(`문제집 등록에 실패했습니다. \n에러 : ${err}`);
