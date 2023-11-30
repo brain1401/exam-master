@@ -1135,7 +1135,11 @@ export async function getExamResultByUUID(uuid: string, userEmail: string) {
   }
 }
 
-export async function getExamResults(userEmail: string, page: string, pageSize: string) {
+export async function getExamResults(
+  userEmail: string,
+  page: string,
+  pageSize: string,
+) {
   const query = qs.stringify({
     filters: {
       exam_user: {
