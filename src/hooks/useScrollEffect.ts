@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 export default function useScrollEffect(dependencies: any[]) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
   }, [dependencies]);
 
