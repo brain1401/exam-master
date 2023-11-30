@@ -17,6 +17,7 @@ import CorrectMark from "/public/images/correctCircle.png";
 import WrongMark from "/public/images/wrong.png";
 import checkImage from "/public/images/checkBlack.png";
 import Image from "next/image";
+import ProblemLayout from "../ui/ProblemLayout";
 
 type Props = {
   UUID: string;
@@ -56,58 +57,55 @@ export default function ResultPage({ UUID }: Props) {
     };
   }, [UUID, setExamProblemResults, resetExamProblemResults]);
 
-
   if (loading) return <CustomLoading className="mt-20" />;
 
   if (error)
     return <h1 className="mt-10 text-center text-2xl">{error.error}</h1>;
 
   return (
-    <>
-      <section className="mx-auto mt-10 max-w-[80rem] p-3">
-        {examProblemResults &&
-          examProblemResults.map((examProblem) => {
-            const image = examProblem?.image?.[0];
-            if (image && isImageUrlObject(image)) {
-              return (
-                <Image
-                  key={examProblem.id + "preload"}
-                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
-                  alt="preload image"
-                  width={400}
-                  height={400}
-                  className="hidden"
-                  priority
-                />
-              );
-            }
-          })}
-          {imagesRef.current.map((image, index) => (
-            <Image
-              key={index + "etc preload"}
-              src={image}
-              alt="preload image"
-              priority
-              className="hidden"
+    <ProblemLayout>
+      {examProblemResults &&
+        examProblemResults.map((examProblem) => {
+          const image = examProblem?.image?.[0];
+          if (image && isImageUrlObject(image)) {
+            return (
+              <Image
+                key={examProblem.id + "preload"}
+                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                alt="preload image"
+                width={400}
+                height={400}
+                className="hidden"
+                priority
               />
-          ))}
-        <CurrentProblemIndicator />
-        <ExamCard>
-          <CurrentQuestion />
+            );
+          }
+        })}
+      {imagesRef.current.map((image, index) => (
+        <Image
+          key={index + "etc preload"}
+          src={image}
+          alt="preload image"
+          priority
+          className="hidden"
+        />
+      ))}
+      <CurrentProblemIndicator />
+      <ExamCard>
+        <CurrentQuestion />
 
-          <CurrentImage />
+        <CurrentImage />
 
-          <AdditionalView />
+        <AdditionalView />
 
-          <CurrentCandidates />
+        <CurrentCandidates />
 
-          <SubjectiveAnswered />
+        <SubjectiveAnswered />
 
-          <CorrectAnswer />
-        </ExamCard>
+        <CorrectAnswer />
+      </ExamCard>
 
-        <NextOrPrevButton />
-      </section>
-    </>
+      <NextOrPrevButton />
+    </ProblemLayout>
   );
 }

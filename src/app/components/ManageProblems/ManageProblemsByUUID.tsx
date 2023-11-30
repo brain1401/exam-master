@@ -17,7 +17,7 @@ import {
 } from "@/jotai/problems";
 import { useSetAtom } from "jotai";
 import CustomLoading from "../ui/CustomLoading";
-import ProblemEditorLayout from "../ui/ProblemEditorLayout";
+import ProblemLayout from "../ui/ProblemLayout";
 type Props = {
   UUID: string;
 };
@@ -77,7 +77,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   }
 
   return (
-    <ProblemEditorLayout>
+    <ProblemLayout>
       <ProblemsOption />
 
       <CurrentProblemIndicator />
@@ -87,6 +87,6 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
       <NextOrPrevButtons />
 
       <ManageProblemSubmitButton uuid={UUID} />
-    </ProblemEditorLayout>
+    </ProblemLayout>
   );
 }
