@@ -60,6 +60,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   userScalable: false,
+  width: "device-width",
+  initialScale: 1,
+
 };
 
 export default function RootLayout({
@@ -82,7 +85,7 @@ export default function RootLayout({
         `}
       </Script>
       <body
-        className={`${NotoSansKR.className} min-h-screen overflow-y-scroll bg-main`}
+        className={`${NotoSansKR.className} min-h-[calc(var(--vh,1vh)*100)] overflow-y-scroll bg-main`}
       >
         <AuthContext>
           <JotaiProvider>
