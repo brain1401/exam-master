@@ -136,7 +136,7 @@ export default function ProblemSetGrid({ type }: Props) {
   };
 
   return (
-    <section className="">
+    <section className="p-3">
       <SearchBox
         className="mt-8"
         searchString={searchString}

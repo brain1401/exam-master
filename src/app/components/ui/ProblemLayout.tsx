@@ -4,6 +4,6 @@ type Props = {
 
 export default function ProblemLayout({ children }: Props) {
   return (
-    <section className="mx-auto pt-10 pb-5 max-w-[70rem]">{children}</section>
+    <section className="mx-auto pt-10 pb-8 max-w-[70rem] p-3">{children}</section>
   );
 }

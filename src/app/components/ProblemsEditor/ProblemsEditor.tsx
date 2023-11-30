@@ -82,7 +82,7 @@ export default function ProblemsEditor() {
           }
         })}
       <Tabs.Root
-        className="flex w-11/12 flex-col md:w-[60rem]"
+        className="flex w-full flex-col md:w-[60rem]"
         activationMode="manual"
         value={currentTab}
       >
