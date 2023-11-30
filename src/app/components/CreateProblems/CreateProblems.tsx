@@ -9,7 +9,7 @@ import ProblemEditorLayout from "../ui/ProblemEditorLayout";
 import useProblems from "@/hooks/useProblems";
 
 export default function CreateProblems() {
-  const {resetProblems} = useProblems();
+  const { resetProblems } = useProblems();
 
   useEffect(() => {
     return () => {
