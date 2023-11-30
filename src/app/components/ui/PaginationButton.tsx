@@ -1,4 +1,5 @@
 "use client";
+import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 import { Pagination } from "@nextui-org/react";
 
 type Props = {
@@ -14,6 +15,7 @@ export default function PaginationButton({
   page,
   className,
 }: Props) {
+  
   return (
     <>
       <Pagination
@@ -27,6 +29,7 @@ export default function PaginationButton({
         page={page}
         onChange={setPage}
         showControls
+        size="sm"
       />
     </>
   );
