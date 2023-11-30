@@ -84,8 +84,7 @@ export default function RootLayout({
         `}
       </Script>
       <body
-        className={`${NotoSansKR.className} m-0 min-h-[100svh] bg-main bg-cover p-0`}
-        id="root"
+        className={`${NotoSansKR.className} m-0 min-h-[100dvh] overflow-y-scroll bg-main bg-cover p-0`}
       >
         <AuthContext>
           <JotaiProvider>
