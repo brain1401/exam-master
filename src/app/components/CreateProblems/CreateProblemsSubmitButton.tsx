@@ -58,7 +58,7 @@ export default function CreateProblemsSubmitButton() {
   };
 
   return (
-    <div className="mb-3 mt-3 flex justify-center">
+    <div className="mt-3 flex justify-center">
       <Button
         radius="sm"
         onClick={handleSubmit}
