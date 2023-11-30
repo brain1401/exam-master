@@ -1,5 +1,4 @@
 "use client";
-import { useLayoutEffect } from "react";
 import useExamProblems from "@/hooks/useExamProblems";
 import { Button } from "@nextui-org/react";
 import useScrollEffect from "@/hooks/useScrollEffect";

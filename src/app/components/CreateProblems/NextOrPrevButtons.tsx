@@ -5,7 +5,6 @@ import useScrollEffect from "@/hooks/useScrollEffect";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { candidate } from "@/types/problems";
 import { Button } from "@nextui-org/react";
-import { useLayoutEffect } from "react";
 
 const BUTTON_CLASSNAMES = "bg-secondary text-white px-3 py-1";
 
