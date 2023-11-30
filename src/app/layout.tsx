@@ -1,5 +1,4 @@
 import "./globals.css";
-import GoogleAnalytics from "./components/GoogleAnalytics";
 import type { Metadata } from "next";
 import { Viewport } from "next";
 import Navbar from "./components/Navbar/Navbar";
@@ -8,6 +7,7 @@ import JotaiProvider from "@/context/JotaiContext";
 import localFont from "next/font/local";
 import NextUIContext from "@/context/NextUIContext";
 import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
 
 const NotoSansKR = localFont({
   src: [
@@ -69,6 +69,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className="light">
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
+      />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+ 
+          gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
+        `}
+      </Script>
       <body
         className={`${NotoSansKR.className} min-h-screen overflow-y-scroll bg-main`}
       >
@@ -79,7 +91,6 @@ export default function RootLayout({
               <main>{children}</main>
             </NextUIContext>
             <Analytics />
-            <GoogleAnalytics />
           </JotaiProvider>
         </AuthContext>
       </body>
