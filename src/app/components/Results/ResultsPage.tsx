@@ -95,6 +95,7 @@ export default function ResultsPage() {
         }
       } else {
         try {
+          if (debouncedSearchString.trim().length > 0) return;
           if (pageSize === 0) return;
           const res = await axios.get("/api/getExamResults", {
             params: {
