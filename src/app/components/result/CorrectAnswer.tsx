@@ -2,7 +2,6 @@
 
 import useExamProblemResults from "@/hooks/useExamProblemResults";
 import candidateNumber from "@/utils/candidateNumber";
-import { useEffect } from "react";
 
 export default function CorrectAnswer() {
   const {
