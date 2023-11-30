@@ -1,6 +1,7 @@
 "use client";
 
 import useProblems from "@/hooks/useProblems";
+import useScrollEffect from "@/hooks/useScrollEffect";
 import { isCardOnBeingWrited } from "@/service/problems";
 import { candidate } from "@/types/problems";
 import { Button } from "@nextui-org/react";
@@ -79,9 +80,7 @@ export default function NextOrPrevButtons() {
     });
   };
 
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-  }, [currentProblemIndex]);
+  useScrollEffect([currentProblemIndex]);
   
   const showNextCard = () => {
     let flag = false;

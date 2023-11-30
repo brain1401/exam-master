@@ -2,13 +2,12 @@
 import { useLayoutEffect } from "react";
 import useExamProblems from "@/hooks/useExamProblems";
 import { Button } from "@nextui-org/react";
+import useScrollEffect from "@/hooks/useScrollEffect";
 export default function ExamProblemsNextOrPrevButtons() {
   const { examProblems, currentExamProblemIndex, setCurrentExamProblemIndex } =
     useExamProblems();
 
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-  }, [currentExamProblemIndex]);
+  useScrollEffect([currentExamProblemIndex]);
 
   return (
     <div className="mt-2 flex gap-4">

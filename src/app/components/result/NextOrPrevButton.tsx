@@ -1,7 +1,7 @@
 "use client";
-import { useLayoutEffect } from "react";
 import useExamProblemResults from "@/hooks/useExamProblemResults";
 import { Button } from "@nextui-org/react";
+import useScrollEffect from "@/hooks/useScrollEffect";
 
 export default function NextOrPrevButton() {
   const {
@@ -10,9 +10,7 @@ export default function NextOrPrevButton() {
     examProblemResults,
   } = useExamProblemResults();
 
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-  }, [examProblemResultsIndex]);
+  useScrollEffect([examProblemResultsIndex]);
 
   const onClickPrev = () => {
     if (examProblemResultsIndex > 0) {
