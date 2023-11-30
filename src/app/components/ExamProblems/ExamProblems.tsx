@@ -16,6 +16,7 @@ import CurrentProblemIndicator from "./CurrentProblemIndicator";
 import { isImageUrlObject } from "@/service/problems";
 import Image from "next/image";
 import checkImage from "/public/images/checkBlack.png";
+import ProblemLayout from "../ui/ProblemLayout";
 
 type Props = {
   UUID: string;
@@ -72,52 +73,50 @@ export default function ExamProblems({ UUID }: Props) {
   if (!currentExamProblem) return <div>문제가 없습니다.</div>;
 
   return (
-    <>
-      <section className="mx-auto my-10 max-w-[80rem] p-3">
-        {exam_problems &&
-          exam_problems.map((examProblem) => {
-            const image = examProblem.image;
-            if (image && isImageUrlObject(image)) {
-              return (
-                <Image
-                  key={examProblem.id + "preload"}
-                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
-                  alt="preload image"
-                  width={400}
-                  height={400}
-                  className="hidden"
-                  priority
-                />
-              );
-            }
-          })}
-        {Boolean(checkImage) && (
-          <Image
-            src={checkImage}
-            alt="check image preload"
-            priority
-            className="hidden"
-          />
+    <ProblemLayout>
+      {exam_problems &&
+        exam_problems.map((examProblem) => {
+          const image = examProblem.image;
+          if (image && isImageUrlObject(image)) {
+            return (
+              <Image
+                key={examProblem.id + "preload"}
+                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                alt="preload image"
+                width={400}
+                height={400}
+                className="hidden"
+                priority
+              />
+            );
+          }
+        })}
+      {Boolean(checkImage) && (
+        <Image
+          src={checkImage}
+          alt="check image preload"
+          priority
+          className="hidden"
+        />
+      )}
+      <CurrentProblemIndicator />
+      <ExamCard>
+        <CurrentQuestion />
+
+        <CurrentExamImage />
+
+        <AdditionalView />
+
+        {Boolean(currentExamProblem.type === "obj") && <Candidates />}
+
+        {Boolean(currentExamProblem.type === "sub") && (
+          <SubjectiveAnswerTextarea />
         )}
-        <CurrentProblemIndicator />
-        <ExamCard>
-          <CurrentQuestion />
+      </ExamCard>
 
-          <CurrentExamImage />
+      <NextOrPrevButtons />
 
-          <AdditionalView />
-
-          {Boolean(currentExamProblem.type === "obj") && <Candidates />}
-
-          {Boolean(currentExamProblem.type === "sub") && (
-            <SubjectiveAnswerTextarea />
-          )}
-        </ExamCard>
-
-        <NextOrPrevButtons />
-
-        <SubmitButton />
-      </section>
-    </>
+      <SubmitButton />
+    </ProblemLayout>
   );
 }
