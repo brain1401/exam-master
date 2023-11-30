@@ -1,7 +1,7 @@
 "use client";
 import ProblemSetCard from "./ProblemSetCard";
 import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 
 import axios, { isAxiosError } from "axios";
@@ -55,6 +55,45 @@ export default function ProblemSetGrid({ type }: Props) {
     }
   }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
 
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (isSearching) {
+        if (debouncedSearchString.trim().length === 0) return;
+        if (pageSize === 0) return;
+
+        const res = await axios.get("/api/getProblemSetsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page,
+            pageSize,
+          },
+        });
+        const data: RawProblemSetResponse = res.data;
+        setMaxPage(data.meta.pagination.pageCount || 1);
+        setProblemSets(data);
+      } else {
+        if (debouncedSearchString.trim().length > 0) return;
+        if (pageSize === 0) return;
+        const res = await axios.get("/api/getProblemSets", {
+          params: {
+            page,
+            pageSize,
+          },
+        });
+        const data: RawProblemSetResponse = res.data;
+        setMaxPage(data.meta.pagination.pageCount);
+        setProblemSets(data);
+      }
+    } catch (e) {
+      if (isAxiosError(e)) {
+        alert(e.response?.data.message);
+      }
+    } finally {
+      pageSize !== 0 && setLoading(false);
+    }
+  }, [page, isSearching, debouncedSearchString, pageSize]);
+
   useEffect(() => {
     if (debouncedSearchString.length > 0) {
       setPage(1);
@@ -66,45 +105,8 @@ export default function ProblemSetGrid({ type }: Props) {
   }, [debouncedSearchString]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        if (isSearching) {
-          if (debouncedSearchString.trim().length === 0) return;
-          if (pageSize === 0) return;
-
-          const res = await axios.get("/api/getProblemSetsByName", {
-            params: {
-              name: debouncedSearchString.trim(),
-              page,
-              pageSize,
-            },
-          });
-          const data: RawProblemSetResponse = res.data;
-          setMaxPage(data.meta.pagination.pageCount || 1);
-          setProblemSets(data);
-        } else {
-          if (pageSize === 0) return;
-          const res = await axios.get("/api/getProblemSets", {
-            params: {
-              page,
-              pageSize,
-            },
-          });
-          const data: RawProblemSetResponse = res.data;
-          setMaxPage(data.meta.pagination.pageCount);
-          setProblemSets(data);
-        }
-      } catch (e) {
-        if (isAxiosError(e)) {
-          alert(e.response?.data.message);
-        }
-      } finally {
-        pageSize !== 0 && setLoading(false);
-      }
-    };
     fetchData();
-  }, [page, isSearching, debouncedSearchString, pageSize]);
+  }, [page, isSearching, debouncedSearchString, pageSize, fetchData]);
 
   const MainContent = () => {
     if (loading) {
