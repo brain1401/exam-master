@@ -9,12 +9,5 @@ export default async function ManagePage() {
     return <LoginRequired />;
   }
 
-  return (
-    <>
-      <section className="mx-auto max-w-[80rem]">
-        <h1 className="mt-10 text-center text-3xl">관리할 문제 선택</h1>
-        <ProblemSetGrid type="manage" />
-      </section>
-    </>
-  );
+  return <ProblemSetGrid type="manage" />;
 }

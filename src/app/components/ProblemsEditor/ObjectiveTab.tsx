@@ -6,6 +6,7 @@ import CandidateCountSelector from "./CandidateCountSelector";
 import MultipleAnswerSwitch from "./MultipleAnswerSwitch";
 import QuestionTextArea from "./QuestionTextArea";
 import useProblems from "@/hooks/useProblems";
+import ProblemEditorTabLayout from "../layouts/ProblemEditorTabLayout";
 
 export default function ObjectiveTab() {
   const { initCurrentProblem } = useProblems();
@@ -15,12 +16,7 @@ export default function ObjectiveTab() {
   }, [initCurrentProblem]);
 
   return (
-    <form
-      className="flex flex-col rounded-xl bg-gray-100 p-5"
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
-    >
+    <ProblemEditorTabLayout>
       <div className="flex flex-col">
         <QuestionTextArea />
       </div>
@@ -37,6 +33,6 @@ export default function ObjectiveTab() {
       </div>
 
       <Candidates className="mt-4" />
-    </form>
+    </ProblemEditorTabLayout>
   );
 }

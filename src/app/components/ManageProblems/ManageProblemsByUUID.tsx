@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import ProblemsEditor from "@/app/components/ProblemsEditor/ProblemsEditor";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
-import { ClipLoader } from "react-spinners";
 import ProblemsOption from "@/app/components/ProblemsEditor/ProblemsOption";
 import ManageProblemSubmitButton from "@/app/components/ManageProblems/ManageProblemSubmitButton";
 import {
@@ -17,7 +16,7 @@ import {
 } from "@/jotai/problems";
 import { useSetAtom } from "jotai";
 import CustomLoading from "../ui/CustomLoading";
-import ProblemLayout from "../ui/ProblemLayout";
+import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 type Props = {
   UUID: string;
 };
@@ -77,7 +76,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   }
 
   return (
-    <ProblemLayout>
+    <ProblemEditorLayout>
       <ProblemsOption />
 
       <CurrentProblemIndicator />
@@ -87,6 +86,6 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
       <NextOrPrevButtons />
 
       <ManageProblemSubmitButton uuid={UUID} />
-    </ProblemLayout>
+    </ProblemEditorLayout>
   );
 }

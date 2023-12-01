@@ -1,4 +1,4 @@
-import { ExamResults, ExamResultsWithCount } from "@/types/problems";
+import { ExamResultsWithCount } from "@/types/problems";
 import ResultsCard from "./ResultsCard";
 
 type Props = {

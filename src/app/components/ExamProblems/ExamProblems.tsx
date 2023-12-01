@@ -9,14 +9,14 @@ import Candidates from "./Candidates";
 import SubjectiveAnswerTextarea from "./SubjectiveAnswerTextarea";
 import axios from "axios";
 import SubmitButton from "./SubmitButton";
-import ExamCard from "../ui/ExamCard";
+import ExamCardLayout from "../layouts/ExamCardLayout";
 import useExamProblems from "@/hooks/useExamProblems";
 import CustomLoading from "../ui/CustomLoading";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
 import { isImageUrlObject } from "@/service/problems";
 import Image from "next/image";
 import checkImage from "/public/images/checkBlack.png";
-import ProblemLayout from "../ui/ProblemLayout";
+import ProblemGridLayout from "../layouts/ProblemGridLayout";
 
 type Props = {
   UUID: string;
@@ -73,7 +73,7 @@ export default function ExamProblems({ UUID }: Props) {
   if (!currentExamProblem) return <div>문제가 없습니다.</div>;
 
   return (
-    <ProblemLayout>
+    <ProblemGridLayout>
       {exam_problems &&
         exam_problems.map((examProblem) => {
           const image = examProblem.image;
@@ -100,7 +100,7 @@ export default function ExamProblems({ UUID }: Props) {
         />
       )}
       <CurrentProblemIndicator />
-      <ExamCard>
+      <ExamCardLayout>
         <CurrentQuestion />
 
         <CurrentExamImage />
@@ -112,11 +112,11 @@ export default function ExamProblems({ UUID }: Props) {
         {Boolean(currentExamProblem.type === "sub") && (
           <SubjectiveAnswerTextarea />
         )}
-      </ExamCard>
+      </ExamCardLayout>
 
       <NextOrPrevButtons />
 
       <SubmitButton />
-    </ProblemLayout>
+    </ProblemGridLayout>
   );
 }

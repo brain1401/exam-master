@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import AddViewAndPhoto from "./AddViewAndPhoto";
 import { Textarea } from "@nextui-org/react";
 import useProblems from "@/hooks/useProblems";
+import ProblemEditorTabLayout from "../layouts/ProblemEditorTabLayout";
 
 export default function SubjectiveTab() {
   const { currentProblem, setCurrentProblem, initCurrentProblem } =
@@ -15,12 +16,7 @@ export default function SubjectiveTab() {
   }, [initCurrentProblem]);
 
   return (
-    <form
-      className="flex flex-col rounded-xl bg-gray-100 p-5"
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
-    >
+    <ProblemEditorTabLayout>
       <div className="mb-4 flex flex-col">
         <Textarea
           id="question"
@@ -57,6 +53,6 @@ export default function SubjectiveTab() {
           onChange={(e) => setCurrentProblem({ subAnswer: e.target.value })}
         />
       </div>
-    </form>
+    </ProblemEditorTabLayout>
   );
 }

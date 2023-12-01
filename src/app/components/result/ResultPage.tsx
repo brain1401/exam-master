@@ -7,7 +7,7 @@ import AdditionalView from "./AdditionalView";
 import NextOrPrevButton from "./NextOrPrevButton";
 import CurrentImage from "./CurrentImage";
 import SubjectiveAnswered from "./SubjectiveAnswered";
-import ExamCard from "../ui/ExamCard";
+import ExamCardLayout from "../layouts/ExamCardLayout";
 import useExamProblemResults from "@/hooks/useExamProblemResults";
 import CorrectAnswer from "./CorrectAnswer";
 import CustomLoading from "../ui/CustomLoading";
@@ -17,8 +17,7 @@ import CorrectMark from "/public/images/correctCircle.png";
 import WrongMark from "/public/images/wrong.png";
 import checkImage from "/public/images/checkBlack.png";
 import Image from "next/image";
-import ProblemLayout from "../ui/ProblemLayout";
-
+import ProblemGridLayout from "../layouts/ProblemGridLayout";
 type Props = {
   UUID: string;
 };
@@ -63,7 +62,7 @@ export default function ResultPage({ UUID }: Props) {
     return <h1 className="mt-10 text-center text-2xl">{error.error}</h1>;
 
   return (
-    <ProblemLayout>
+    <ProblemGridLayout>
       {examProblemResults &&
         examProblemResults.map((examProblem) => {
           const image = examProblem?.image?.[0];
@@ -91,7 +90,7 @@ export default function ResultPage({ UUID }: Props) {
         />
       ))}
       <CurrentProblemIndicator />
-      <ExamCard>
+      <ExamCardLayout>
         <CurrentQuestion />
 
         <CurrentImage />
@@ -103,9 +102,9 @@ export default function ResultPage({ UUID }: Props) {
         <SubjectiveAnswered />
 
         <CorrectAnswer />
-      </ExamCard>
+      </ExamCardLayout>
 
       <NextOrPrevButton />
-    </ProblemLayout>
+    </ProblemGridLayout>
   );
 }

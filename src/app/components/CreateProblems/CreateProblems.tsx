@@ -5,8 +5,8 @@ import NextOrPrevButtons from "./NextOrPrevButtons";
 import CurrentProblemIndicator from "./CurrentCardIndicator";
 import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
 import { useEffect } from "react";
-import ProblemLayout from "../ui/ProblemLayout";
 import useProblems from "@/hooks/useProblems";
+import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 
 export default function CreateProblems() {
   const { resetProblems } = useProblems();
@@ -18,7 +18,7 @@ export default function CreateProblems() {
   }, [resetProblems]);
 
   return (
-    <ProblemLayout>
+    <ProblemEditorLayout>
       <ProblemsOption />
 
       <CurrentProblemIndicator />
@@ -28,6 +28,6 @@ export default function CreateProblems() {
       <NextOrPrevButtons />
 
       <CreateProblemsSubmitButton />
-    </ProblemLayout>
+    </ProblemEditorLayout>
   );
 }
