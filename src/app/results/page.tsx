@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import LoginRequired from "../components/ui/LoginRequired";
-import ResultsPage from "../components/results/ResultsPage";
+import ResultsPage from "@/app/components/results/ResultsPage";
 
 export default async function Results() {
   const session = await getServerSession();

@@ -10,6 +10,8 @@ import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 import getPageSizeByObj from "@/utils/getPageSizeByObj";
+
+
 export default function ResultsPage() {
   const [results, setResults] = useState<
     ExamResultsWithCountResponse | undefined
