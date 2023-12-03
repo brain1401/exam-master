@@ -74,31 +74,33 @@ export default function ExamProblems({ UUID }: Props) {
 
   return (
     <ProblemGridLayout>
-      {exam_problems &&
-        exam_problems.map((examProblem) => {
-          const image = examProblem.image;
-          if (image && isImageUrlObject(image)) {
-            return (
-              <Image
-                key={examProblem.id + "preload"}
-                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
-                alt="preload image"
-                width={400}
-                height={400}
-                className="hidden"
-                priority
-              />
-            );
-          }
-        })}
-      {Boolean(checkImage) && (
-        <Image
-          src={checkImage}
-          alt="check image preload"
-          priority
-          className="hidden"
-        />
-      )}
+      <div>
+        {exam_problems &&
+          exam_problems.map((examProblem) => {
+            const image = examProblem.image;
+            if (image && isImageUrlObject(image)) {
+              return (
+                <Image
+                  key={examProblem.id + "preload"}
+                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                  alt="preload image"
+                  width={400}
+                  height={400}
+                  className="hidden"
+                  priority
+                />
+              );
+            }
+          })}
+        {Boolean(checkImage) && (
+          <Image
+            src={checkImage}
+            alt="check image preload"
+            priority
+            className="hidden"
+          />
+        )}
+      </div>
       <CurrentProblemIndicator />
       <ExamCardLayout>
         <CurrentQuestion />
@@ -114,9 +116,13 @@ export default function ExamProblems({ UUID }: Props) {
         )}
       </ExamCardLayout>
 
-      <NextOrPrevButtons />
+      <div className="flex items-center justify-center">
+        <NextOrPrevButtons />
+      </div>
 
-      <SubmitButton />
+      <div className="flex items-center justify-center">
+        <SubmitButton />
+      </div>
     </ProblemGridLayout>
   );
 }

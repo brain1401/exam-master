@@ -63,24 +63,26 @@ export default function ProblemsEditor() {
     return value;
   };
   return (
-    <section className="flex flex-1 overflow-y-hidden flex-col items-center justify-center">
-      {problems &&
-        problems.map((problem) => {
-          if (problem && problem.image && isImageUrlObject(problem.image)) {
-            const image = problem.image;
-            return (
-              <Image
-                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
-                alt="preload image"
-                className="hidden"
-                height={400}
-                width={400}
-                priority
-                key={problem?.id + "preload"}
-              />
-            );
-          }
-        })}
+    <section className="flex flex-1 flex-col items-center justify-center overflow-y-hidden">
+      <div>
+        {problems &&
+          problems.map((problem) => {
+            if (problem && problem.image && isImageUrlObject(problem.image)) {
+              const image = problem.image;
+              return (
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                  alt="preload image"
+                  className="hidden"
+                  height={400}
+                  width={400}
+                  priority
+                  key={problem?.id + "preload"}
+                />
+              );
+            }
+          })}
+      </div>
       <Tabs.Root
         className="flex w-full flex-1 flex-col overflow-y-hidden md:max-w-[60rem]"
         activationMode="manual"

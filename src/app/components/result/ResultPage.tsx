@@ -63,32 +63,35 @@ export default function ResultPage({ UUID }: Props) {
 
   return (
     <ProblemGridLayout>
-      {examProblemResults &&
-        examProblemResults.map((examProblem) => {
-          const image = examProblem?.image?.[0];
-          if (image && isImageUrlObject(image)) {
-            return (
-              <Image
-                key={examProblem.id + "preload"}
-                src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
-                alt="preload image"
-                width={400}
-                height={400}
-                className="hidden"
-                priority
-              />
-            );
-          }
-        })}
-      {imagesRef.current.map((image, index) => (
-        <Image
-          key={index + "etc preload"}
-          src={image}
-          alt="preload image"
-          priority
-          className="hidden"
-        />
-      ))}
+      {/* 이미지 preload */}
+      <div>
+        {examProblemResults &&
+          examProblemResults.map((examProblem) => {
+            const image = examProblem?.image?.[0];
+            if (image && isImageUrlObject(image)) {
+              return (
+                <Image
+                  key={examProblem.id + "preload"}
+                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                  alt="preload image"
+                  width={400}
+                  height={400}
+                  className="hidden"
+                  priority
+                />
+              );
+            }
+          })}
+        {imagesRef.current.map((image, index) => (
+          <Image
+            key={index + "etc preload"}
+            src={image}
+            alt="preload image"
+            priority
+            className="hidden"
+          />
+        ))}
+      </div>
       <CurrentProblemIndicator />
       <ExamCardLayout>
         <CurrentQuestion />

@@ -9,7 +9,6 @@ import useExamProblems from "@/hooks/useExamProblems";
 
 export default function SubmitButton() {
   const [isPending, startTransition] = useTransition();
-  const [uuid, setUuid] = useState<any>(null);
   const [error, setError] = useState<any>(null);
 
   const {
@@ -24,7 +23,6 @@ export default function SubmitButton() {
     startTransition(async () => {
       try {
         const uuid = await evaluateProblems(exam_problems, problemSetName);
-        setUuid(uuid);
         router.push(`/result/${uuid}`);
       } catch (e) {
         setError(e);

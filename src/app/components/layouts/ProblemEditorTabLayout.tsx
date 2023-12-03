@@ -5,8 +5,7 @@ type Props = {
 export default function ProblemEditorTabLayout({ children }: Props) {
   return (
     <form
-      className="flex flex-col overflow-y-auto rounded-xl bg-gray-100 p-5"
-      id="problemEditorTabLayout"
+      className="flex flex-col overflow-y-auto rounded-xl bg-gray-100 p-5 custom-scroll"
       onSubmit={(e) => {
         e.preventDefault();
       }}

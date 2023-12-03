@@ -12,6 +12,7 @@ export default function CurrentCandidates() {
     currentExamProblemResult: { candidates },
   } = useExamProblemResults();
 
+
   return (
     <>
       {candidates && (
