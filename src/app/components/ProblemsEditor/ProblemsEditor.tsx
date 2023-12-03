@@ -63,7 +63,7 @@ export default function ProblemsEditor() {
     return value;
   };
   return (
-    <section className="flex items-center justify-center">
+    <section className="flex flex-1 overflow-y-hidden flex-col items-center justify-center">
       {problems &&
         problems.map((problem) => {
           if (problem && problem.image && isImageUrlObject(problem.image)) {
@@ -82,7 +82,7 @@ export default function ProblemsEditor() {
           }
         })}
       <Tabs.Root
-        className="flex w-full flex-col md:w-[60rem]"
+        className="flex w-full flex-1 flex-col overflow-y-hidden md:max-w-[60rem]"
         activationMode="manual"
         value={currentTab}
       >

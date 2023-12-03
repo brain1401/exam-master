@@ -136,7 +136,7 @@ export default function Candidates({ className }: Props) {
       >
         정답여부
       </SimpleLabel>
-      <div>{candidates}</div>
+      <div className="flex flex-col">{candidates}</div>
     </div>
   );
 }

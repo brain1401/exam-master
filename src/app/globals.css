@@ -2,11 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-#problemEditorLayout::-webkit-scrollbar {
+div[data-overlay-container=true] {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+}
+
+#problemEditorTabLayout::-webkit-scrollbar {
   width: .5rem;
 }
 
-#problemEditorLayout::-webkit-scrollbar-thumb {
+#problemEditorTabLayout::-webkit-scrollbar-thumb {
   background-color: #4B5563;
   border-radius: 2rem;
 }

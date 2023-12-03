@@ -70,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className="light">
+    <html lang="ko" className="light h-full">
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
       />
@@ -84,13 +84,13 @@ export default function RootLayout({
         `}
       </Script>
       <body
-        className={`${NotoSansKR.className} m-0 min-h-[100dvh] bg-main bg-cover p-0 antialiased`}
+        className={`${NotoSansKR.className} h-full bg-main antialiased`}
       >
         <AuthContext>
           <JotaiProvider>
             <NextUIContext>
               <Navbar />
-              <main>{children}</main>
+              <main className="flex flex-col flex-1 overflow-y-hidden">{children}</main>
             </NextUIContext>
             <Analytics />
           </JotaiProvider>
