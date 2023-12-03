@@ -4,7 +4,7 @@ type Props = {
 
 export default function ProblemGridLayout({ children }: Props) {
   return (
-    <section className="mx-auto max-w-[70rem] p-3 pb-8 pt-10">
+    <section className="mx-auto w-full max-w-[70rem] p-3 pb-8 pt-10">
       {children}
     </section>
   );
