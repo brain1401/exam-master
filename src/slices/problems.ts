@@ -1,0 +1,142 @@
+import { RootState } from "@/lib/store";
+import { Problem, candidate } from "@/types/problems";
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
+
+type StateType = {
+  problems: Problem[];
+  currentProblemIndex: number;
+  problemSetsName: string;
+  localProblemSetsName: string;
+  problemLength: string;
+  candidatesCount: string;
+  currentTab: "obj" | "sub";
+};
+const initialState: StateType = {
+  problems: Array.from(Array<Problem>(10), (_, i) =>
+    i === 0
+      ? {
+          id: undefined,
+          type: "obj",
+          question: "",
+          additionalView: "",
+          isAdditiondalViewButtonClicked: false,
+          isImageButtonClicked: false,
+          image: null,
+          isAnswerMultiple: false,
+          candidates: Array.from(Array<candidate>(4), (_, i) => ({
+            id: i,
+            text: "",
+            isAnswer: false,
+          })),
+
+          subAnswer: null,
+        }
+      : null,
+  ),
+  currentProblemIndex: 0,
+  currentTab: "obj",
+  problemSetsName: "",
+  localProblemSetsName: "",
+  problemLength: "10",
+  candidatesCount: "4",
+};
+
+export const selectCurrentProblem = createSelector(
+  (state: RootState) => state.problemsReducer.problems,
+  (state: RootState) => state.problemsReducer.currentProblemIndex,
+  (problems, currentProblemIndex) => problems[currentProblemIndex],
+);
+
+export const selectCurrentProblemCandidates = createSelector(
+  selectCurrentProblem,
+  (problem) => problem?.candidates,
+);
+
+export const problemsSlice = createSlice({
+  name: "problems",
+  initialState,
+  reducers: {
+    reset: () => initialState,
+    setProblems: (state, action: PayloadAction<Problem[]>) => {
+      state.problems = action.payload;
+    },
+    setCurrentProblemIndex: (state, action: PayloadAction<number>) => {
+      state.currentProblemIndex = action.payload;
+    },
+    setProblemSetsName: (state, action: PayloadAction<string>) => {
+      state.problemSetsName = action.payload;
+    },
+    setCurrentTab: (state, action: PayloadAction<"obj" | "sub">) => {
+      state.currentTab = action.payload;
+    },
+    setCandidateCount: (state, action: PayloadAction<string>) => {
+      state.candidatesCount = action.payload;
+    },
+    setProblemLength: (state, action: PayloadAction<string>) => {
+      state.problemLength = action.payload;
+    },
+    initCurrentProblem: (state) => {
+      const { currentTab, currentProblemIndex, problems } = state;
+      if (problems[currentProblemIndex] === null) {
+        problems[currentProblemIndex] = {
+          id: undefined,
+          type: currentTab === "obj" ? "obj" : "sub",
+          question: "",
+          additionalView: "",
+          isAdditiondalViewButtonClicked: false,
+          isImageButtonClicked: false,
+          image: null,
+          isAnswerMultiple: false,
+          candidates:
+            currentTab === "obj"
+              ? Array.from(Array<candidate>(4), (_, i) => ({
+                  id: i,
+                  text: "",
+                  isAnswer: false,
+                }))
+              : null,
+          subAnswer: currentTab === "obj" ? null : "",
+        };
+      }
+    },
+    setCurrentProblem: (state, action: PayloadAction<Partial<Problem>>) => {
+      const { currentProblemIndex } = state;
+      state.problems[currentProblemIndex] = {
+        ...state.problems[currentProblemIndex],
+        ...action.payload,
+      } as Problem;
+    },
+    setCurrentProblemCandidates: (
+      state,
+      action: PayloadAction<candidate[]>,
+    ) => {
+      const { currentProblemIndex, problems } = state;
+      const currentProblem = problems[currentProblemIndex];
+      if (currentProblem) {
+        currentProblem.candidates = action.payload;
+      }
+    },
+    setLocalProblemSetsName: (state, action: PayloadAction<string>) => {
+      state.localProblemSetsName = action.payload;
+    },
+  },
+});
+
+export const {
+  initCurrentProblem: initCurrentProblemAction,
+  reset: resetProblemsAction,
+  setCandidateCount: setCandidateCountAction,
+  setProblemLength: setProblemLengthAction,
+  setCurrentProblem: setCurrentProblemAction,
+  setCurrentProblemCandidates: setCurrentProblemCandidatesAction,
+  setCurrentProblemIndex: setCurrentProblemIndexAction,
+  setCurrentTab: setCurrentTabAction,
+  setProblemSetsName: setProblemSetsNameAction,
+  setProblems: setProblemsAction,
+  setLocalProblemSetsName: setLocalProblemSetsNameAction,
+} = problemsSlice.actions;
+
+export const selectProblems = (state: RootState) =>
+  state.problemsReducer.problems;
+
+export default problemsSlice.reducer;

@@ -3,9 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Logo from "/public/images/Exam Master.svg";
 import { useRef, useEffect } from "react";
-import { isNavbarMenuOpenAtom } from "@/jotai/navbar";
-import { useAtom } from "jotai";
-
+import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
 const MOBILE_LIST_ITEM = "py-2 w-full border-b border-gray-300 text-center";
 
 type Props = {
@@ -13,16 +11,16 @@ type Props = {
 };
 export default function NavMobile({ loginButton }: Props) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isNavbarMenuOpenAtom);
+  const { isMobileMenuOpen, setMobileMenuOpen } = useIsMobileNavMenuOpen();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
+        setMobileMenuOpen(false);
       }
     }
 
-    if (isMenuOpen) {
+    if (isMobileMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -31,13 +29,13 @@ export default function NavMobile({ loginButton }: Props) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isMenuOpen, setIsMenuOpen]);
+  }, [isMobileMenuOpen, setMobileMenuOpen]);
 
   return (
     <div // mobile menu
       ref={menuRef}
       className={`${
-        isMenuOpen
+        isMobileMenuOpen
           ? "pointer-events-auto translate-x-0 opacity-100 md:hidden"
           : "pointer-events-none max-h-0 translate-x-full overflow-hidden opacity-0"
       } absolute right-0 top-0 z-50 h-screen w-3/4 bg-neutral-100 transition-all duration-300 ease-in-out`}
@@ -47,26 +45,26 @@ export default function NavMobile({ loginButton }: Props) {
           <Image src={Logo} alt="logo" className="h-[2rem] w-[8rem]" />
         </li>
         <li className={MOBILE_LIST_ITEM}>
-          <Link href="/exam" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/exam" onClick={() => setMobileMenuOpen(false)}>
             문제 풀기
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
-          <Link href="/manage" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/manage" onClick={() => setMobileMenuOpen(false)}>
             문제 관리
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
-          <Link href="/create" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/create" onClick={() => setMobileMenuOpen(false)}>
             문제 생성
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
-          <Link href="/results" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/results" onClick={() => setMobileMenuOpen(false)}>
             시험 결과
           </Link>
         </li>
-        <li className="py-2" onClick={() => setIsMenuOpen(false)}>
+        <li className="py-2" onClick={() => setMobileMenuOpen(false)}>
           {loginButton}
         </li>
       </ul>

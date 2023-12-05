@@ -9,12 +9,11 @@ import Image from "next/image";
 
 export default function ProblemsEditor() {
   const {
-    setProblems,
+    setCurrentProblem,
     currentProblem,
     currentTab,
     problems,
     setCurrentTab,
-    currentProblemIndex,
   } = useProblems();
 
   usePreventClose();
@@ -27,22 +26,18 @@ export default function ProblemsEditor() {
       if (value === false) return;
     }
     setCurrentTab(tab);
-    setProblems((prev) => {
-      const newProblems = [...prev];
-      newProblems[currentProblemIndex] = {
-        id: prev[currentProblemIndex]?.id,
-        type: tab,
-        question: "",
-        additionalView: "",
-        isAdditiondalViewButtonClicked: false,
-        isImageButtonClicked: false,
-        isAnswerMultiple: false,
-        image: null,
-        candidates:
-          tab === "obj" ? Array(4).fill({ text: "", isAnswer: false }) : null,
-        subAnswer: tab === "obj" ? null : "",
-      };
-      return newProblems;
+    setCurrentProblem({
+      id: currentProblem?.id,
+      type: tab,
+      question: "",
+      additionalView: "",
+      isAdditiondalViewButtonClicked: false,
+      isImageButtonClicked: false,
+      isAnswerMultiple: false,
+      image: null,
+      candidates:
+        tab === "obj" ? Array(4).fill({ text: "", isAnswer: false }) : null,
+      subAnswer: tab === "obj" ? null : "",
     });
   };
 

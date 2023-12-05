@@ -1,15 +1,14 @@
 "use client";
-import { useAtom } from "jotai";
-import { isNavbarMenuOpenAtom } from "@/jotai/navbar";
+import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
 
 export default function NavBackDrop() {
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isNavbarMenuOpenAtom);
+  const { isMobileMenuOpen, setMobileMenuOpen } = useIsMobileNavMenuOpen();
   return (
     <div // backdrop
       className={`${
-        isMenuOpen ? "block md:hidden" : "hidden"
-      } z-40 fixed left-0 top-0 h-full w-full bg-black opacity-50 backdrop-blur-md`}
-      onClick={() => setIsMenuOpen(false)}
+        isMobileMenuOpen ? "block md:hidden" : "hidden"
+      } fixed left-0 top-0 z-40 h-full w-full bg-black opacity-50 backdrop-blur-md`}
+      onClick={() => setMobileMenuOpen(false)}
     ></div>
   );
 }

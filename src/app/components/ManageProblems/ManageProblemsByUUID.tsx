@@ -6,17 +6,9 @@ import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons
 import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import ProblemsOption from "@/app/components/ProblemsEditor/ProblemsOption";
 import ManageProblemSubmitButton from "@/app/components/ManageProblems/ManageProblemSubmitButton";
-import {
-  problemsAtom,
-  problemSetsNameAtom,
-  currentTabAtom,
-  localProblemSetsNameAtom,
-  problemLengthAtom,
-  resetProblemsAtom,
-} from "@/jotai/problems";
-import { useSetAtom } from "jotai";
 import CustomLoading from "../ui/CustomLoading";
 import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
+import useProblems from "@/hooks/useProblems";
 type Props = {
   UUID: string;
 };
@@ -25,12 +17,14 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const setProblems = useSetAtom(problemsAtom);
-  const setProblemSetsName = useSetAtom(problemSetsNameAtom);
-  const resetProblems = useSetAtom(resetProblemsAtom);
-  const setLocalProblemSetsName = useSetAtom(localProblemSetsNameAtom);
-  const setCurrentTab = useSetAtom(currentTabAtom);
-  const setProblemLength = useSetAtom(problemLengthAtom);
+  const {
+    resetProblems,
+    setProblems,
+    setProblemSetsName,
+    setProblemLength,
+    setLocalProblemSetsName,
+    setCurrentTab,
+  } = useProblems();
 
   useEffect(() => {
     setLoading(true);
@@ -72,7 +66,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   }
 
   if (loading) {
-    return <CustomLoading className="mt-20"/>;
+    return <CustomLoading className="mt-20" />;
   }
 
   return (

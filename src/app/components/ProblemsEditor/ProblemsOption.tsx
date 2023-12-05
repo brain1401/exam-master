@@ -15,6 +15,7 @@ export default function ProblemsOption() {
     setLocalProblemSetsName,
     problems,
     setProblems,
+    currentProblemIndex,
     setCurrentProblemIndex,
     problemLength,
     setProblemLength,
@@ -36,9 +37,9 @@ export default function ProblemsOption() {
 
     if (maxProblemLength > problems.length) {
       // 입력한 최대 문제 수가 cards 배열의 현재 길이보다 큰 경우, 나머지 값 만큼 null을 추가.
-      setProblems((prevCards) => [
-        ...prevCards,
-        ...Array<Problem>(maxProblemLength - prevCards.length).fill(null),
+      setProblems([
+        ...problems,
+        ...Array<Problem>(maxProblemLength - problems.length).fill(null),
       ]);
     } else if (maxProblemLength < problems.length) {
       // 입력한 최재 문제 수가 cards 배열의 현재 길이보다 작은 경우, 배열의 마지막 항목을 삭제.
@@ -53,26 +54,30 @@ export default function ProblemsOption() {
           `${maxProblemLength}번 문제에서 ${problems.length}번 문제까지의 입력된 데이터가 삭제됩니다. 계속하시겠습니까?`,
         );
         if (value) {
-          setProblems((prevCards) => prevCards.slice(0, maxProblemLength));
-          setCurrentProblemIndex((prev) => {
-            if (prev >= maxProblemLength) {
-              return maxProblemLength - 1;
-            } else {
-              return prev;
-            }
-          });
+          setProblems(problems.slice(0, maxProblemLength));
+          let index = 0;
+
+          if (currentProblemIndex >= maxProblemLength) {
+            index = maxProblemLength - 1;
+          } else {
+            index = currentProblemIndex;
+          }
+
+          setCurrentProblemIndex(index);
         } else {
           setProblemLength(problems.length.toString());
         }
       } else {
-        setProblems((prevCards) => prevCards.slice(0, maxProblemLength));
-        setCurrentProblemIndex((prev) => {
-          if (prev >= maxProblemLength) {
-            return maxProblemLength - 1;
-          } else {
-            return prev;
-          }
-        });
+        setProblems(problems.slice(0, maxProblemLength));
+        let index = 0;
+
+        if (currentProblemIndex >= maxProblemLength) {
+          index = maxProblemLength - 1;
+        } else {
+          index = currentProblemIndex;
+        }
+
+        setCurrentProblemIndex(index);
       }
     }
   };

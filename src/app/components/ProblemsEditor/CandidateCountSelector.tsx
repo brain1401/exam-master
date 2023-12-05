@@ -4,6 +4,7 @@ import useProblems from "@/hooks/useProblems";
 export default function CandidateCountSelector() {
   const {
     candidatesCount,
+    problems,
     setCandidatesCount,
     currentProblem,
     currentProblemCandidates,
@@ -11,8 +12,9 @@ export default function CandidateCountSelector() {
   } = useProblems();
 
   useLayoutEffect(() => {
-    setCandidatesCount(currentProblem?.candidates?.length.toString() ?? "4");
-  }, [setCandidatesCount, currentProblem?.candidates?.length]);
+    setCandidatesCount(currentProblem?.candidates?.length.toString() || "4");
+  }, [currentProblem?.candidates?.length, setCandidatesCount, candidatesCount]);
+
 
   const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value: selectedValue } = event.target;

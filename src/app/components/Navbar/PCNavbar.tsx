@@ -2,9 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "/public/images/Exam Master.svg";
-import { useAtom } from "jotai";
-import { isNavbarMenuOpenAtom } from "@/jotai/navbar";
 import { HiMenu } from "react-icons/hi";
+import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
 
 const LIST_ITEM =
   "hidden md:flex text-md font-bold items-center justify-center list-none";
@@ -14,7 +13,8 @@ type Props = {
 };
 
 export default function PCNavbar({ loginButton }: Props) {
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isNavbarMenuOpenAtom);
+  const { toggleMobileMenu } = useIsMobileNavMenuOpen();
+  
   return (
     <nav // navbar
       className="transparent z-30 flex w-full border-b border-gray-300 bg-main"
@@ -48,7 +48,7 @@ export default function PCNavbar({ loginButton }: Props) {
           </div>
         </div>
         <div className="md:hidden">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button onClick={() => toggleMobileMenu()}>
             <HiMenu className="absolute right-5 top-[0.5rem] text-[1.9rem]" />
           </button>
         </div>

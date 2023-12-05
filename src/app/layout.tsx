@@ -8,6 +8,7 @@ import localFont from "next/font/local";
 import NextUIContext from "@/context/NextUIContext";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
+import ReduxProvider from "@/context/ReduxContext";
 
 const NotoSansKR = localFont({
   src: [
@@ -70,7 +71,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className="light h-full">
+    <html lang="ko" className="h-full light">
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
       />
@@ -83,15 +84,17 @@ export default function RootLayout({
           gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
         `}
       </Script>
-      <body
-        className={`${NotoSansKR.className} h-full bg-main antialiased`}
-      >
+      <body className={`${NotoSansKR.className} h-full bg-main antialiased`}>
         <AuthContext>
           <JotaiProvider>
-            <NextUIContext>
-              <Navbar />
-              <main className="flex flex-col flex-1 overflow-y-hidden">{children}</main>
-            </NextUIContext>
+            <ReduxProvider >
+              <NextUIContext>
+                <Navbar />
+                <main className="flex flex-1 flex-col overflow-y-hidden">
+                  {children}
+                </main>
+              </NextUIContext>
+            </ReduxProvider>
             <Analytics />
           </JotaiProvider>
         </AuthContext>

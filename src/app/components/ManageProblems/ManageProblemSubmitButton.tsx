@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
 import { isProblemEmpty } from "@/service/problems";
-import { problemsAtom, problemSetsNameAtom } from "@/jotai/problems";
-import { useAtomValue } from "jotai";
 import { Button } from "@nextui-org/react";
+import useProblems from "@/hooks/useProblems";
 
 type Props = {
   uuid: string;
@@ -11,8 +10,7 @@ type Props = {
 export default function ManageProblemSubmitButton({ uuid }: Props) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const problems = useAtomValue(problemsAtom);
-  const problemSetsName = useAtomValue(problemSetsNameAtom);
+  const { problems, problemSetsName } = useProblems();
 
   const handleSubmit = async () => {
     if (problems.some((problem) => isProblemEmpty(problem))) {
