@@ -50,6 +50,7 @@ export default function Candidates({ className }: Props) {
 
     const changedCandidateCheck = (check: boolean) => {
       const candidate = {
+        ...newCandidates[index],
         id: newCandidates[index]?.id ?? index,
         text: newCandidates[index]?.text ?? "",
         isAnswer: check,
@@ -74,8 +75,8 @@ export default function Candidates({ className }: Props) {
         ) {
           newCandidates[index] = changedCandidateCheck(checked);
         } else {
-          newCandidates.forEach((candidate) => {
-            candidate.isAnswer = false;
+          newCandidates.forEach((candidate, index) => {
+            newCandidates[index] = { ...candidate, isAnswer: false };
           });
           newCandidates[index] = changedCandidateCheck(checked);
         }
