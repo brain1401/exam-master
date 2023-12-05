@@ -1,17 +1,12 @@
 "use client";
 import { useState } from "react";
 import { isProblemEmpty } from "@/service/problems";
-import {
-  problemsAtom,
-  problemSetsNameAtom,
-  resetProblemsAtom,
-} from "@/jotai/problems";
-import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@nextui-org/react";
 import useProblems from "@/hooks/useProblems";
 
 export default function CreateProblemsSubmitButton() {
-  const {problems, problemSetsName, setProblemSetsName, resetProblems} = useProblems();
+  const { problems, problemSetsName, setProblemSetsName, resetProblems } =
+    useProblems();
 
   const [isLoading, setIsLoading] = useState(false);
 
