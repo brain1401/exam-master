@@ -40,42 +40,30 @@ const initialState: StateType = {
   problemLength: "10",
   candidatesCount: "4",
 };
-
-export const selectCurrentProblem = createSelector(
-  (state: RootState) => state.problemsReducer.problems,
-  (state: RootState) => state.problemsReducer.currentProblemIndex,
-  (problems, currentProblemIndex) => problems[currentProblemIndex],
-);
-
-export const selectCurrentProblemCandidates = createSelector(
-  selectCurrentProblem,
-  (problem) => problem?.candidates,
-);
-
 export const problemsSlice = createSlice({
   name: "problems",
   initialState,
   reducers: {
-    reset: () => initialState,
-    setProblems: (state, action: PayloadAction<Problem[]>) => {
+    resetProblemsAction: () => initialState,
+    setProblemsAction: (state, action: PayloadAction<Problem[]>) => {
       state.problems = action.payload;
     },
-    setCurrentProblemIndex: (state, action: PayloadAction<number>) => {
+    setCurrentProblemIndexAction: (state, action: PayloadAction<number>) => {
       state.currentProblemIndex = action.payload;
     },
-    setProblemSetsName: (state, action: PayloadAction<string>) => {
+    setProblemSetsNameAction: (state, action: PayloadAction<string>) => {
       state.problemSetsName = action.payload;
     },
-    setCurrentTab: (state, action: PayloadAction<"obj" | "sub">) => {
+    setCurrentTabAction: (state, action: PayloadAction<"obj" | "sub">) => {
       state.currentTab = action.payload;
     },
-    setCandidateCount: (state, action: PayloadAction<string>) => {
+    setCandidateCountAction: (state, action: PayloadAction<string>) => {
       state.candidatesCount = action.payload;
     },
-    setProblemLength: (state, action: PayloadAction<string>) => {
+    setProblemLengthAction: (state, action: PayloadAction<string>) => {
       state.problemLength = action.payload;
     },
-    initCurrentProblem: (state) => {
+    initCurrentProblemAction: (state) => {
       const { currentTab, currentProblemIndex, problems } = state;
       if (problems[currentProblemIndex] === null) {
         problems[currentProblemIndex] = {
@@ -99,14 +87,17 @@ export const problemsSlice = createSlice({
         };
       }
     },
-    setCurrentProblem: (state, action: PayloadAction<Partial<Problem>>) => {
+    setCurrentProblemAction: (
+      state,
+      action: PayloadAction<Partial<Problem>>,
+    ) => {
       const { currentProblemIndex } = state;
       state.problems[currentProblemIndex] = {
         ...state.problems[currentProblemIndex],
         ...action.payload,
       } as Problem;
     },
-    setCurrentProblemCandidates: (
+    setCurrentProblemCandidatesAction: (
       state,
       action: PayloadAction<candidate[]>,
     ) => {
@@ -116,25 +107,36 @@ export const problemsSlice = createSlice({
         currentProblem.candidates = action.payload;
       }
     },
-    setLocalProblemSetsName: (state, action: PayloadAction<string>) => {
+    setLocalProblemSetsNameAction: (state, action: PayloadAction<string>) => {
       state.localProblemSetsName = action.payload;
     },
   },
 });
 
 export const {
-  initCurrentProblem: initCurrentProblemAction,
-  reset: resetProblemsAction,
-  setCandidateCount: setCandidateCountAction,
-  setProblemLength: setProblemLengthAction,
-  setCurrentProblem: setCurrentProblemAction,
-  setCurrentProblemCandidates: setCurrentProblemCandidatesAction,
-  setCurrentProblemIndex: setCurrentProblemIndexAction,
-  setCurrentTab: setCurrentTabAction,
-  setProblemSetsName: setProblemSetsNameAction,
-  setProblems: setProblemsAction,
-  setLocalProblemSetsName: setLocalProblemSetsNameAction,
+  initCurrentProblemAction,
+  resetProblemsAction,
+  setCandidateCountAction,
+  setProblemLengthAction,
+  setCurrentProblemAction,
+  setCurrentProblemCandidatesAction,
+  setCurrentProblemIndexAction,
+  setCurrentTabAction,
+  setProblemSetsNameAction,
+  setProblemsAction,
+  setLocalProblemSetsNameAction,
 } = problemsSlice.actions;
+
+export const selectCurrentProblem = createSelector(
+  (state: RootState) => state.problemsReducer.problems,
+  (state: RootState) => state.problemsReducer.currentProblemIndex,
+  (problems, currentProblemIndex) => problems[currentProblemIndex],
+);
+
+export const selectCurrentProblemCandidates = createSelector(
+  selectCurrentProblem,
+  (problem) => problem?.candidates,
+);
 
 export const selectProblems = (state: RootState) =>
   state.problemsReducer.problems;
