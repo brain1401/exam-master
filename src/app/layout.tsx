@@ -71,6 +71,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className="h-full light">
+      <head>
+        <meta
+          name="naver-site-verification"
+          content="77c26513c5fcaa303637253fbda40b051f2bd91d"
+        />
+      </head>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
       />
