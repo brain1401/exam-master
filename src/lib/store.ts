@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import navbarReducer from "@/slices/navbar";
 import problemsReducer from "@/slices/problems";
+import examProblemReducer from "@/slices/examProblems";
 export const makeStore = () => {
   const store = configureStore({
     reducer: {
       navbarReducer,
       problemsReducer,
+      examProblemReducer,
     },
   });
 

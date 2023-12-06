@@ -11,14 +11,21 @@ export default function Candidates() {
   const { currentExamProblem, setCurrentExamProblem } = useExamProblems();
 
   const onClickCandidate = (i: number, isMultipleAnswer: boolean) => {
-    const newCurrentExamProblems = { ...currentExamProblem };
+    if (!currentExamProblem || !currentExamProblem.candidates) {
+      throw new Error("무언가가 잘못되었습니다.");
+    }
+
+    const newCurrentExamProblems = {
+      ...currentExamProblem,
+      candidates: [...currentExamProblem.candidates],
+    };
 
     if (!newCurrentExamProblems || !newCurrentExamProblems.candidates) {
       throw new Error("무언가가 잘못되었습니다.");
     }
 
     // 체크를 시도하는 선택지: currentCandidate
-    const currentCandidate = [...newCurrentExamProblems.candidates]?.[i];
+    let currentCandidate = { ...[...newCurrentExamProblems.candidates]?.[i] };
 
     if (
       currentCandidate?.isAnswer === undefined ||
@@ -31,7 +38,10 @@ export default function Candidates() {
     // 현재 문제가 다중 선택지이면
     if (isMultipleAnswer) {
       // 체크된 선택지의 값을 반전시킨다.
-      currentCandidate.isAnswer = !currentCandidate.isAnswer;
+      currentCandidate = {
+        ...currentCandidate,
+        isAnswer: !currentCandidate.isAnswer,
+      };
     } else {
       // 현재 문제가 단일 선택지이면서 이미 체크된 답이 있으면
       if (
@@ -46,18 +56,24 @@ export default function Candidates() {
             (candidate) => candidate.isAnswer === true,
           )?.id
         ) {
-          currentCandidate.isAnswer = !currentCandidate.isAnswer;
+          currentCandidate = { ...currentCandidate, isAnswer: false };
         }
         // 현재 문제가 단일 선택지이면서 이미 체크된 답이 현재 클릭한 답과 다르면
         else {
-          newCurrentExamProblems.candidates.forEach((candidate) => {
-            candidate.isAnswer = false;
-          });
-          currentCandidate.isAnswer = true;
+          newCurrentExamProblems.candidates =
+            newCurrentExamProblems.candidates.map((candidate) => ({
+              ...candidate,
+              isAnswer: false,
+            }));
+
+          currentCandidate = { ...currentCandidate, isAnswer: true };
         }
       } // 현재 문제가 단일 선택지이면서 이미 체크된 답이 없으면
       else {
-        currentCandidate.isAnswer = !currentCandidate.isAnswer;
+        currentCandidate = {
+          ...currentCandidate,
+          isAnswer: !currentCandidate.isAnswer,
+        };
       }
     }
 
@@ -96,7 +112,7 @@ export default function Candidates() {
                       checkMarkClassName,
                     )}
                   >
-                    <Image src={checkImage} alt="체크" fill/>
+                    <Image src={checkImage} alt="체크" fill />
                   </div>
                   <span>{`${candidateNumber(i + 1)} ${candidate.text}`}</span>
                 </div>
