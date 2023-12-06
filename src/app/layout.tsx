@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Viewport } from "next";
 import Navbar from "./components/Navbar/Navbar";
 import AuthContext from "@/context/AuthContext";
-import JotaiProvider from "@/context/JotaiContext";
 import localFont from "next/font/local";
 import NextUIContext from "@/context/NextUIContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -86,17 +85,15 @@ export default function RootLayout({
       </Script>
       <body className={`${NotoSansKR.className} h-full bg-main antialiased`}>
         <AuthContext>
-          <JotaiProvider>
-            <ReduxProvider >
-              <NextUIContext>
-                <Navbar />
-                <main className="flex flex-1 flex-col overflow-y-hidden">
-                  {children}
-                </main>
-              </NextUIContext>
-            </ReduxProvider>
-            <Analytics />
-          </JotaiProvider>
+          <ReduxProvider>
+            <NextUIContext>
+              <Navbar />
+              <main className="flex flex-1 flex-col overflow-y-hidden">
+                {children}
+              </main>
+            </NextUIContext>
+          </ReduxProvider>
+          <Analytics />
         </AuthContext>
       </body>
     </html>
