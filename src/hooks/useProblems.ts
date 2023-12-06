@@ -44,7 +44,7 @@ export default function useProblems() {
     (state) => state.problemsReducer.localProblemSetsName,
   );
 
-  //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 사용할 때 제대로 작동하지 않는다.
+  //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 useEffect등에서 사용할 때 제대로 작동하지 않는다.
   const setLocalProblemSetsName = useCallback(
     (name: string) => {
       dispatch(setLocalProblemSetsNameAction(name));
