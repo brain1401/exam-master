@@ -9,6 +9,7 @@ export const makeStore = () => {
       problemsReducer,
       examProblemReducer,
     },
+    devTools: process.env.NODE_ENV !== "production",
   });
 
   return store;
