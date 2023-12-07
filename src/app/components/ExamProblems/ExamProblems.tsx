@@ -74,7 +74,8 @@ export default function ExamProblems({ UUID }: Props) {
 
   return (
     <ProblemGridLayout>
-      {/* <div>
+      <div>
+        {/* preload images */}
         {exam_problems &&
           exam_problems.map((examProblem) => {
             const image = examProblem.image;
@@ -100,7 +101,7 @@ export default function ExamProblems({ UUID }: Props) {
             className="hidden"
           />
         )}
-      </div> */}
+      </div>
       <CurrentProblemIndicator />
       <ExamCardLayout>
         <CurrentQuestion />
