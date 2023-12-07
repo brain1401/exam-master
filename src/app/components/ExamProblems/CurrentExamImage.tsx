@@ -16,6 +16,7 @@ export default function CurrentExamImage() {
             src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
             width={400}
             height={400}
+            priority
             alt="이미지"
           />
         </div>

@@ -159,6 +159,7 @@ export default function AddViewAndPhoto({ className }: Props) {
               alt="image"
               width={400}
               height={200}
+              priority
               className="mb-3"
             />
           )}

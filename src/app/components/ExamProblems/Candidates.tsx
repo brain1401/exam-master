@@ -112,9 +112,9 @@ export default function Candidates() {
                       checkMarkClassName,
                     )}
                   >
-                    <Image src={checkImage} alt="체크" fill />
+                    <Image src={checkImage} alt="체크" fill priority />
                   </div>
-                  <span>{`${candidateNumber(i + 1)} ${candidate.text}`}</span>
+                  <p>{`${candidateNumber(i + 1)} ${candidate.text}`}</p>
                 </div>
               </li>
             ))}

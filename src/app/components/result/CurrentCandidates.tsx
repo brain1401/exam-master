@@ -25,7 +25,7 @@ export default function CurrentCandidates() {
                   checkMarkClassName,
                 )}
               >
-                <Image className="" src={checkImage} alt="체크" fill />
+                <Image className="" priority src={checkImage} alt="체크" fill />
               </div>
               <div>{`${candidateNumber(index + 1)} ${candidate.text}`}</div>
             </li>
