@@ -11,7 +11,6 @@ import PaginationButton from "../ui/PaginationButton";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 import getPageSizeByObj from "@/utils/getPageSizeByObj";
 
-
 export default function ResultsPage() {
   const [results, setResults] = useState<
     ExamResultsWithCountResponse | undefined
@@ -145,7 +144,7 @@ export default function ResultsPage() {
 
   return (
     <>
-      <section className="mx-auto mt-10 max-w-[80rem] p-3">
+      <section className="mx-auto mt-10 w-full max-w-[80rem] p-3">
         <h1 className="text-center text-3xl font-semibold">시험 기록</h1>
         <SearchBox
           className="mt-5"

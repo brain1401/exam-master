@@ -137,7 +137,7 @@ export default function ProblemSetGrid({ type }: Props) {
   };
 
   return (
-    <section className="mx-auto max-w-[80rem] p-3">
+    <section className="mx-auto w-full max-w-[80rem] p-3">
       <h1 className="mt-10 text-center text-[2rem]">{title}</h1>
       <SearchBox
         className="mt-8"
