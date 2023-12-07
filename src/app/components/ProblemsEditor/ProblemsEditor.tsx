@@ -60,6 +60,7 @@ export default function ProblemsEditor() {
   return (
     <section className="flex flex-1 flex-col items-center justify-center overflow-y-hidden">
       <div>
+        {/* preload images */}
         {problems &&
           problems.map((problem) => {
             if (problem && problem.image && isImageUrlObject(problem.image)) {
@@ -79,7 +80,7 @@ export default function ProblemsEditor() {
           })}
       </div>
       <Tabs.Root
-        className="flex w-full flex-1 flex-col overflow-y-hidden md:max-w-[60rem]"
+        className="flex w-full flex-1 flex-col overflow-y-hidden"
         activationMode="manual"
         value={currentTab}
       >
