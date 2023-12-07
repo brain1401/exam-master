@@ -33,7 +33,7 @@ export async function evaluateProblems(
   for (const problem of examProblems) {
     if (!problem || !problem.id) throw new Error("something is null");
 
-    if (!isProblemAsnwered(problem)) throw new Error("정답을 입력해주세요.");
+    if (!isProblemAsnwered(problem)) throw new Error("모든 정답을 입력해주세요.");
 
     if (problem.type === "obj" && problem.isAnswerMultiple === false) {
       if (isAnsweredMoreThanOne(problem)) {
