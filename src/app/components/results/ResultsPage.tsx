@@ -5,7 +5,7 @@ import axios, { isAxiosError } from "axios";
 import { ExamResultsWithCountResponse } from "@/types/problems";
 import CustomLoading from "../ui/CustomLoading";
 import ResultsGrid from "./ResultsGrid";
-import useDebounce from "@/hooks/debounce";
+import useDebounce from "@/hooks/useDebounce";
 import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";

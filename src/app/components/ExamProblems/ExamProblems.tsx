@@ -1,5 +1,5 @@
 "use client";
-import usePreventClose from "@/hooks/preventClose";
+import usePreventClose from "@/hooks/usePreventClose";
 import { useEffect, useState } from "react";
 import NextOrPrevButtons from "./ExamProblemsNextOrPrevButtons";
 import CurrentExamImage from "./CurrentExamImage";

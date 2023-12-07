@@ -6,7 +6,7 @@ import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 
 import axios, { isAxiosError } from "axios";
 import SearchBox from "./ui/SearchBox";
-import useDebounce from "@/hooks/debounce";
+import useDebounce from "@/hooks/useDebounce";
 import CustomLoading from "./ui/CustomLoading";
 import PaginationButton from "./ui/PaginationButton";
 import getPageSizeByObj from "@/utils/getPageSizeByObj";

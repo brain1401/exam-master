@@ -3,7 +3,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import { isCardOnBeingWrited, isImageUrlObject } from "@/service/problems";
-import usePreventClose from "@/hooks/preventClose";
+import usePreventClose from "@/hooks/usePreventClose";
 import useProblems from "@/hooks/useProblems";
 import Image from "next/image";
 
