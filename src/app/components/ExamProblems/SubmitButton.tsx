@@ -3,18 +3,16 @@
 import { Button } from "@nextui-org/react";
 import { useTransition } from "react";
 import { evaluateProblems } from "@/action/evaluateProblems";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useExamProblems from "@/hooks/useExamProblems";
+import { isProblemAsnwered } from "@/service/problems";
 
 export default function SubmitButton() {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<any>(null);
 
   const {
     examProblems: { exam_problems, name: problemSetName },
   } = useExamProblems();
-
 
   const router = useRouter();
 
@@ -22,10 +20,14 @@ export default function SubmitButton() {
     // server actions
     startTransition(async () => {
       try {
+        if (exam_problems.some((problem) => !isProblemAsnwered(problem)))
+          return alert("모든 문제에 답을 입력해주세요.");
         const uuid = await evaluateProblems(exam_problems, problemSetName);
         router.push(`/result/${uuid}`);
       } catch (e) {
-        setError(e);
+        if (e instanceof Error) {
+          console.error(e.message);
+        }
       }
     });
   };
