@@ -62,7 +62,7 @@ export default function ResultPage({ UUID }: Props) {
     return <h1 className="mt-10 text-center text-2xl">{error.error}</h1>;
 
   return (
-    <ProblemGridLayout>
+    <section className="mx-auto flex w-full max-w-[70rem] flex-col p-3 pb-8 pt-10">
       <div>
         {/* preload images */}
         {examProblemResults &&
@@ -108,6 +108,6 @@ export default function ResultPage({ UUID }: Props) {
       </ExamCardLayout>
 
       <NextOrPrevButton />
-    </ProblemGridLayout>
+    </section>
   );
 }

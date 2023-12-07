@@ -70,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className="h-full light">
+    <html lang="ko" className="light">
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
       />
@@ -83,14 +83,14 @@ export default function RootLayout({
           gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
         `}
       </Script>
-      <body className={`${NotoSansKR.className} h-full bg-main antialiased`}>
+      <body
+        className={`${NotoSansKR.className} min-h-[100dvh] bg-main bg-cover bg-repeat antialiased`}
+      >
         <AuthContext>
           <ReduxProvider>
             <NextUIContext>
               <Navbar />
-              <main className="flex flex-1 flex-col overflow-y-hidden">
-                {children}
-              </main>
+              <main>{children}</main>
             </NextUIContext>
           </ReduxProvider>
           <Analytics />

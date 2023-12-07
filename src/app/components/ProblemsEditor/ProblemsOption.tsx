@@ -127,68 +127,55 @@ export default function ProblemsOption() {
   };
 
   return (
-    <div className="flex justify-end">
-      <Modal
-        className="h-[2.2rem] w-[5.3rem] bg-blue-500 text-[.85rem] text-white"
-        buttonName="문제집 옵션"
-        width="md:w-[28rem]"
-        Header={
-          <div className="mb-3 text-center text-xl font-semibold">
-            문제집 옵션
-          </div>
-        }
-      >
-        <div className="mb-5 flex w-full flex-col gap-2">
-          <div className="flex items-center">
-            <Input
-              id="maxIndex"
-              className="w-fit text-center"
-              classNames={{
-                inputWrapper: "px-[.5rem] w-[3rem]",
-                input: "text-center",
-                label: "text-sm md:text-md z-0",
-              }}
-              label="최대 문제 수"
-              labelPlacement="outside-left"
-              value={problemLength}
-              variant="bordered"
-              size="sm"
-              onChange={handleProblemLengthChange}
-            />
-            <Button
-              className={BUTTON_CLASSNAMES}
-              size="sm"
-              onClick={applyProblemLength}
-            >
-              확인
-            </Button>
-          </div>
-          <div className="flex items-center">
-            <Input
-              id="problemSetName"
-              className="w-fit text-center"
-              classNames={{
-                inputWrapper: "px-[.5rem] w-[10rem]",
-                label: " text-sm md:text-md z-0",
-              }}
-              label="문제집 이름"
-              labelPlacement="outside-left"
-              variant="bordered"
-              size="sm"
-              value={localProblemSetsName}
-              onChange={(e) => setLocalProblemSetsName(e.target.value)}
-            />
-            <Button
-              className={BUTTON_CLASSNAMES}
-              onClick={applyProblemSetName}
-              size="sm"
-              isLoading={isLoading}
-            >
-              {isLoading ? "" : "확인"}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+    <div className="mb-5 flex w-full flex-col gap-2">
+      <div className="flex items-center">
+        <Input
+          id="maxIndex"
+          className="w-fit text-center"
+          classNames={{
+            inputWrapper: "px-[.5rem] w-[3rem]",
+            input: "text-center",
+            label: "text-sm md:text-md z-0",
+          }}
+          label="최대 문제 수"
+          labelPlacement="outside-left"
+          value={problemLength}
+          variant="bordered"
+          size="sm"
+          onChange={handleProblemLengthChange}
+        />
+        <Button
+          className={BUTTON_CLASSNAMES}
+          size="sm"
+          onClick={applyProblemLength}
+        >
+          확인
+        </Button>
+      </div>
+      <div className="flex items-center">
+        <Input
+          id="problemSetName"
+          className="w-fit text-center"
+          classNames={{
+            inputWrapper: "px-[.5rem] w-[10rem]",
+            label: " text-sm md:text-md z-0",
+          }}
+          label="문제집 이름"
+          labelPlacement="outside-left"
+          variant="bordered"
+          size="sm"
+          value={localProblemSetsName}
+          onChange={(e) => setLocalProblemSetsName(e.target.value)}
+        />
+        <Button
+          className={BUTTON_CLASSNAMES}
+          onClick={applyProblemSetName}
+          size="sm"
+          isLoading={isLoading}
+        >
+          {isLoading ? "" : "확인"}
+        </Button>
+      </div>
     </div>
   );
 }

@@ -58,7 +58,7 @@ export default function ProblemsEditor() {
     return value;
   };
   return (
-    <section className="flex flex-1 flex-col items-center justify-center overflow-y-hidden">
+    <section className="flex flex-col mx-auto items-center max-w-[60rem] justify-center">
       <div>
         {/* preload image */}
         {problems &&
@@ -80,7 +80,7 @@ export default function ProblemsEditor() {
           })}
       </div>
       <Tabs.Root
-        className="flex w-full flex-1 flex-col overflow-y-hidden"
+        className="flex w-full flex-col overflow-y-hidden"
         activationMode="manual"
         value={currentTab}
       >
