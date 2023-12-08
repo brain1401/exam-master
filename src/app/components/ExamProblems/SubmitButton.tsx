@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@nextui-org/react";
 import { useTransition } from "react";
 import { evaluateProblems } from "@/action/evaluateProblems";
@@ -17,11 +16,11 @@ export default function SubmitButton() {
   const router = useRouter();
 
   const onClick = () => {
+    if (exam_problems.some((problem) => !isProblemAsnwered(problem)))
+      return alert("모든 문제에 답을 입력해주세요.");
     // server actions
     startTransition(async () => {
       try {
-        if (exam_problems.some((problem) => !isProblemAsnwered(problem)))
-          return alert("모든 문제에 답을 입력해주세요.");
         const uuid = await evaluateProblems(exam_problems, problemSetName);
         router.push(`/result/${uuid}`);
       } catch (e) {
