@@ -10,15 +10,22 @@ import useDebounce from "@/hooks/useDebounce";
 import CustomLoading from "./ui/CustomLoading";
 import PaginationButton from "./ui/PaginationButton";
 import getPageSizeByObj from "@/utils/getPageSizeByObj";
+import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   type: "manage" | "exam";
 };
 export default function ProblemSetGrid({ type }: Props) {
-  const [problemSets, setProblemSets] = useState<RawProblemSetResponse>();
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
+
+  const {
+    mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
+  } = useCustomMediaQuery();
+
+  const [pageSize, setPageSize] = useState(
+    getPageSizeByObj({ isXxs, isXs, isSm, isMd, isLg, isXl }),
+  );
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
@@ -26,14 +33,46 @@ export default function ProblemSetGrid({ type }: Props) {
   const [isSearching, setIsSearching] = useState(false);
 
   const {
-    mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
-  } = useCustomMediaQuery();
+    data: problemSets,
+    isError,
+    isLoading,
+  } = useQuery<RawProblemSetResponse>({
+    queryKey: [
+      "problemSets",
+      page,
+      pageSize,
+      isSearching,
+      debouncedSearchString,
+    ],
+    queryFn: async () => {
+      let res;
+      if (isSearching) {
+        if (debouncedSearchString.trim().length === 0) return;
+        if (pageSize === 0) return;
+        res = await axios.get("/api/getProblemSetsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page,
+            pageSize,
+          },
+        });
+      } else {
+        if (debouncedSearchString.trim().length > 0) return;
+        if (pageSize === 0) return;
+        res = await axios.get("/api/getProblemSets", {
+          params: {
+            page,
+            pageSize,
+          },
+        });
+      }
+      const data = res.data;
+      setMaxPage(data.meta.pagination.pageCount || 1);
+      return res.data;
+    },
+  });
 
   const title = type === "manage" ? "문제집 관리" : "풀 문제 선택";
-
-  const [pageSize, setPageSize] = useState(
-    getPageSizeByObj({ isXxs, isXs, isSm, isMd, isLg, isXl }),
-  );
 
   useLayoutEffect(() => {
     if (isXxs) {
@@ -67,50 +106,8 @@ export default function ProblemSetGrid({ type }: Props) {
     }
   }, [debouncedSearchString]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        if (isSearching) {
-          if (debouncedSearchString.trim().length === 0) return;
-          if (pageSize === 0) return;
-
-          const res = await axios.get("/api/getProblemSetsByName", {
-            params: {
-              name: debouncedSearchString.trim(),
-              page,
-              pageSize,
-            },
-          });
-          const data: RawProblemSetResponse = res.data;
-          setMaxPage(data.meta.pagination.pageCount || 1);
-          setProblemSets(data);
-        } else {
-          if (debouncedSearchString.trim().length > 0) return;
-          if (pageSize === 0) return;
-          const res = await axios.get("/api/getProblemSets", {
-            params: {
-              page,
-              pageSize,
-            },
-          });
-          const data: RawProblemSetResponse = res.data;
-          setMaxPage(data.meta.pagination.pageCount);
-          setProblemSets(data);
-        }
-      } catch (e) {
-        if (isAxiosError(e)) {
-          alert(e.response?.data.message);
-        }
-      } finally {
-        pageSize !== 0 && setLoading(false);
-      }
-    };
-    fetchData();
-  }, [page, isSearching, debouncedSearchString, pageSize]);
-
   const MainContent = () => {
-    if (loading) {
+    if (isLoading) {
       return <CustomLoading />;
     } else if (!(problemSets?.data.length && problemSets?.data.length > 0)) {
       return (

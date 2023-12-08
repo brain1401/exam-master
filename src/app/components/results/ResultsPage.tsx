@@ -10,12 +10,9 @@ import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 import getPageSizeByObj from "@/utils/getPageSizeByObj";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ResultsPage() {
-  const [results, setResults] = useState<
-    ExamResultsWithCountResponse | undefined
-  >(undefined);
-
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
 
@@ -23,9 +20,6 @@ export default function ResultsPage() {
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{ error: string } | null>(null);
 
   const {
     mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
@@ -67,59 +61,43 @@ export default function ResultsPage() {
     }
   }, [debouncedSearchString]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [pageSize]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const {
+    data: results,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<ExamResultsWithCountResponse>({
+    queryKey: ["results", isSearching, page, pageSize],
+    queryFn: async () => {
+      let res;
       if (isSearching) {
         if (debouncedSearchString.trim().length === 0) return;
-        try {
-          if (pageSize === 0) return;
-          const res = await axios.get("/api/getExamResultsByName", {
-            params: {
-              name: debouncedSearchString.trim(),
-              page,
-              pageSize,
-            },
-          });
-          setMaxPage(res.data.meta.pagination.pageCount || 1);
-          setResults(res.data);
-        } catch (e) {
-          if (isAxiosError(e)) {
-            setError(e.response?.data.message);
-          }
-        } finally {
-          setLoading(false);
-        }
+        if (pageSize === 0) return;
+        res = await axios.get("/api/getExamResultsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page,
+            pageSize,
+          },
+        });
       } else {
-        try {
-          if (debouncedSearchString.trim().length > 0) return;
-          if (pageSize === 0) return;
-          const res = await axios.get("/api/getExamResults", {
-            params: {
-              page,
-              pageSize,
-            },
-          });
-          setResults(res.data);
-          setMaxPage(res.data.meta.pagination.pageCount || 1);
-        } catch (e) {
-          if (isAxiosError(e)) {
-            setError(e.response?.data.message);
-          }
-        } finally {
-          pageSize !== 0 && setLoading(false);
-        }
+        if (debouncedSearchString.trim().length > 0) return;
+        if (pageSize === 0) return;
+        res = await axios.get("/api/getExamResults", {
+          params: {
+            page,
+            pageSize,
+          },
+        });
       }
-    };
-    fetchData();
-  }, [page, isSearching, debouncedSearchString, pageSize]);
+      const data = res.data;
+      setMaxPage(data.meta.pagination.pageCount || 1);
+      return res.data;
+    },
+  });
 
   const MainContent = () => {
-    if (loading) {
+    if (isLoading) {
       return <CustomLoading className="mt-10" />;
     } else if (results?.data.length === 0 && !isSearching) {
       return (
@@ -138,8 +116,8 @@ export default function ResultsPage() {
     }
   };
 
-  if (error) {
-    return <div>{error.error}</div>;
+  if (isError) {
+    return <div>{error.message}</div>;
   }
 
   return (

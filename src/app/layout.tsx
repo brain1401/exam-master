@@ -8,6 +8,7 @@ import NextUIContext from "@/context/NextUIContext";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import ReduxProvider from "@/context/ReduxContext";
+import ReactQueryContext from "@/context/ReactQueryContext";
 
 const NotoSansKR = localFont({
   src: [
@@ -89,8 +90,10 @@ export default function RootLayout({
         <AuthContext>
           <ReduxProvider>
             <NextUIContext>
-              <Navbar />
-              <main>{children}</main>
+              <ReactQueryContext>
+                <Navbar />
+                <main>{children}</main>
+              </ReactQueryContext>
             </NextUIContext>
           </ReduxProvider>
           <Analytics />
