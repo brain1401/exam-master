@@ -67,7 +67,7 @@ export default function ResultsPage() {
     isError,
     error,
   } = useQuery<ExamResultsWithCountResponse>({
-    queryKey: ["results", isSearching, page, pageSize],
+    queryKey: ["results", isSearching, page, pageSize, debouncedSearchString],
     queryFn: async () => {
       let res;
       if (isSearching) {
