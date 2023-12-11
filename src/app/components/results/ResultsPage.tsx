@@ -92,7 +92,7 @@ export default function ResultsPage() {
       }
       const data = res.data;
       setMaxPage(data.meta.pagination.pageCount || 1);
-      return res.data;
+      return data;
     },
   });
 
