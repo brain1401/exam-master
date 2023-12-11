@@ -3,7 +3,7 @@ import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 import { Pagination } from "@nextui-org/react";
 
 type Props = {
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setPage: (page: number) => void;
   maxPage: number;
   page: number;
   className?: string;

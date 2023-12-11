@@ -11,10 +11,15 @@ import PaginationButton from "../ui/PaginationButton";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 import getPageSizeByObj from "@/utils/getPageSizeByObj";
 import { useQuery } from "@tanstack/react-query";
-
+import usePagenationState from "@/hooks/usePagenationState";
 export default function ResultsPage() {
-  const [page, setPage] = useState(1);
-  const [maxPage, setMaxPage] = useState(1);
+  const {
+    resultsPage,
+    resultsMaxPage,
+    setResultsMaxPage,
+    setResultsPage,
+    reset,
+  } = usePagenationState();
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
@@ -29,37 +34,46 @@ export default function ResultsPage() {
     getPageSizeByObj({ isXxs, isXs, isSm, isMd, isLg, isXl }),
   );
 
+  // 화면 크기에 따라 페이지 사이즈 변경
   useLayoutEffect(() => {
     if (isXxs) {
       setPageSize(2);
-      setPage(1);
+      setResultsPage(1);
     } else if (isXs) {
       setPageSize(4);
-      setPage(1);
+      setResultsPage(1);
     } else if (isSm) {
       setPageSize(4);
-      setPage(1);
+      setResultsPage(1);
     } else if (isMd) {
       setPageSize(6);
-      setPage(1);
+      setResultsPage(1);
     } else if (isLg) {
       setPageSize(8);
-      setPage(1);
+      setResultsPage(1);
     } else if (isXl) {
       setPageSize(10);
-      setPage(1);
+      setResultsPage(1);
     }
-  }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
+  }, [isXxs, isXs, isSm, isMd, isLg, isXl, setResultsPage]);
 
+  //검색 시 페이지 초기화
   useEffect(() => {
     if (debouncedSearchString.length > 0) {
-      setPage(1);
+      setResultsPage(1);
       setIsSearching(true);
     } else {
-      setPage(1);
+      setResultsPage(1);
       setIsSearching(false);
     }
-  }, [debouncedSearchString]);
+  }, [debouncedSearchString, setResultsPage]);
+
+  //언마운트 시 페이지 초기화
+  useEffect(() => {
+    return () => {
+      setResultsPage(1);
+    };
+  }, [setResultsPage]);
 
   const {
     data: results,
@@ -67,7 +81,13 @@ export default function ResultsPage() {
     isError,
     error,
   } = useQuery<ExamResultsWithCountResponse>({
-    queryKey: ["results", isSearching, page, pageSize, debouncedSearchString],
+    queryKey: [
+      "results",
+      isSearching,
+      resultsPage,
+      pageSize,
+      debouncedSearchString,
+    ],
     queryFn: async () => {
       let res;
       if (isSearching) {
@@ -76,7 +96,7 @@ export default function ResultsPage() {
         res = await axios.get("/api/getExamResultsByName", {
           params: {
             name: debouncedSearchString.trim(),
-            page,
+            resultsPage,
             pageSize,
           },
         });
@@ -85,13 +105,13 @@ export default function ResultsPage() {
         if (pageSize === 0) return;
         res = await axios.get("/api/getExamResults", {
           params: {
-            page,
+            resultsPage,
             pageSize,
           },
         });
       }
       const data = res.data;
-      setMaxPage(data.meta.pagination.pageCount || 1);
+      setResultsMaxPage(data.meta.pagination.pageCount || 1);
       return data;
     },
   });
@@ -131,9 +151,9 @@ export default function ResultsPage() {
         />
         <MainContent />
         <PaginationButton
-          maxPage={maxPage}
-          page={page}
-          setPage={setPage}
+          maxPage={resultsMaxPage}
+          page={resultsPage}
+          setPage={setResultsPage}
           className="mt-5 flex justify-center"
         />
       </section>

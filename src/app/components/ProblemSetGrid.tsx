@@ -11,13 +11,22 @@ import CustomLoading from "./ui/CustomLoading";
 import PaginationButton from "./ui/PaginationButton";
 import getPageSizeByObj from "@/utils/getPageSizeByObj";
 import { useQuery } from "@tanstack/react-query";
+import usePagenationState from "@/hooks/usePagenationState";
 
 type Props = {
   type: "manage" | "exam";
 };
 export default function ProblemSetGrid({ type }: Props) {
-  const [page, setPage] = useState(1);
-  const [maxPage, setMaxPage] = useState(1);
+  const {
+    managePage,
+    manageMaxPage,
+    examPage,
+    examMaxPage,
+    setManagePage,
+    setManageMaxPage,
+    setExamPage,
+    setExamMaxPage,
+  } = usePagenationState();
 
   const {
     mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
@@ -31,6 +40,11 @@ export default function ProblemSetGrid({ type }: Props) {
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
+
+  const page = type === "manage" ? managePage : examPage;
+  const setPage = type === "manage" ? setManagePage : setExamPage;
+  const maxPage = type === "manage" ? manageMaxPage : examMaxPage;
+  const setMaxPage = type === "manage" ? setManageMaxPage : setExamMaxPage;
 
   const {
     data: problemSets,
@@ -74,6 +88,7 @@ export default function ProblemSetGrid({ type }: Props) {
 
   const title = type === "manage" ? "문제집 관리" : "풀 문제 선택";
 
+  // 화면 크기에 따라 페이지 사이즈 변경
   useLayoutEffect(() => {
     if (isXxs) {
       setPageSize(2);
@@ -94,8 +109,9 @@ export default function ProblemSetGrid({ type }: Props) {
       setPageSize(10);
       setPage(1);
     }
-  }, [isXxs, isXs, isSm, isMd, isLg, isXl]);
+  }, [isXxs, isXs, isSm, isMd, isLg, isXl, setPage]);
 
+  // 검색 시 페이지 초기화
   useEffect(() => {
     if (debouncedSearchString.length > 0) {
       setPage(1);
@@ -104,11 +120,26 @@ export default function ProblemSetGrid({ type }: Props) {
       setPage(1);
       setIsSearching(false);
     }
-  }, [debouncedSearchString]);
+  }, [debouncedSearchString, setPage]);
+
+  // 언마운트 시 페이지 초기화
+  useEffect(() => {
+    return () => {
+      setPage(1);
+    };
+  }, [setPage]);
 
   const MainContent = () => {
     if (isLoading) {
       return <CustomLoading />;
+    } else if (isError) {
+      return (
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-center text-lg">
+            문제집을 불러오는 중 오류가 발생했습니다.
+          </p>
+        </div>
+      );
     } else if (!(problemSets?.data.length && problemSets?.data.length > 0)) {
       return (
         <div className="flex h-64 items-center justify-center">
