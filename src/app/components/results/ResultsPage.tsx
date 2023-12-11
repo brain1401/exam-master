@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useState } from "react";
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { ExamResultsWithCountResponse } from "@/types/problems";
 import CustomLoading from "../ui/CustomLoading";
 import ResultsGrid from "./ResultsGrid";
