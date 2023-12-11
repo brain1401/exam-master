@@ -15,8 +15,9 @@ Exam Master는 사용자가 시험 문제를 직접 생성하고 풀어보는 �
   - **TypeScript**: 타입 안정성을 제공하여 코드 품질을 높이는 JavaScript의 슈퍼셋
   - **Tailwind CSS**: 유틸리티-퍼스트 CSS 프레임워크로 빠르고 효율적인 스타일링
   
-- **상태 관리** 
+- **상태 관리**
   - **Redux**: React 앱의 복잡한 상태 관리를 위한 라이브러리
+  - **Redux Toolkit**: Redux를 사용하기 쉽게 만들어주는 라이브러리
   
 - **백엔드**
   - **Strapi**: 헤드리스 CMS, RESTful 또는 GraphQL API를 쉽게 생성
@@ -50,7 +51,7 @@ Exam Master는 사용자가 시험 문제를 직접 생성하고 풀어보는 �
 
 ## 🌐 서비스 링크
 
-<!-[서비스 링크](https://exammaster.co.kr)->
+[서비스 링크](https://exammaster.co.kr)
 
 ## 📝 라이센스
 
