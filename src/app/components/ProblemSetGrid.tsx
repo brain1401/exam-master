@@ -18,14 +18,10 @@ type Props = {
 };
 export default function ProblemSetGrid({ type }: Props) {
   const {
-    managePage,
-    manageMaxPage,
-    examPage,
-    examMaxPage,
-    setManagePage,
-    setManageMaxPage,
-    setExamPage,
-    setExamMaxPage,
+    setProblemSetsPage,
+    setProblemSetsMaxPage,
+    problemSetsMaxPage,
+    problemSetsPage,
   } = usePagenationState();
 
   const {
@@ -41,11 +37,6 @@ export default function ProblemSetGrid({ type }: Props) {
 
   const [isSearching, setIsSearching] = useState(false);
 
-  const page = type === "manage" ? managePage : examPage;
-  const setPage = type === "manage" ? setManagePage : setExamPage;
-  const maxPage = type === "manage" ? manageMaxPage : examMaxPage;
-  const setMaxPage = type === "manage" ? setManageMaxPage : setExamMaxPage;
-
   const {
     data: problemSets,
     isError,
@@ -53,7 +44,7 @@ export default function ProblemSetGrid({ type }: Props) {
   } = useQuery<RawProblemSetResponse>({
     queryKey: [
       "problemSets",
-      page,
+      problemSetsPage,
       pageSize,
       isSearching,
       debouncedSearchString,
@@ -66,7 +57,7 @@ export default function ProblemSetGrid({ type }: Props) {
         res = await axios.get("/api/getProblemSetsByName", {
           params: {
             name: debouncedSearchString.trim(),
-            page,
+            page: problemSetsPage,
             pageSize,
           },
         });
@@ -75,13 +66,13 @@ export default function ProblemSetGrid({ type }: Props) {
         if (pageSize === 0) return;
         res = await axios.get("/api/getProblemSets", {
           params: {
-            page,
+            page: problemSetsPage,
             pageSize,
           },
         });
       }
       const data = res.data;
-      setMaxPage(data.meta.pagination.pageCount || 1);
+      setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
       return res.data;
     },
   });
@@ -92,42 +83,42 @@ export default function ProblemSetGrid({ type }: Props) {
   useLayoutEffect(() => {
     if (isXxs) {
       setPageSize(2);
-      setPage(1);
+      setProblemSetsPage(1);
     } else if (isXs) {
       setPageSize(4);
-      setPage(1);
+      setProblemSetsPage(1);
     } else if (isSm) {
       setPageSize(4);
-      setPage(1);
+      setProblemSetsPage(1);
     } else if (isMd) {
       setPageSize(6);
-      setPage(1);
+      setProblemSetsPage(1);
     } else if (isLg) {
       setPageSize(8);
-      setPage(1);
+      setProblemSetsPage(1);
     } else if (isXl) {
       setPageSize(10);
-      setPage(1);
+      setProblemSetsPage(1);
     }
-  }, [isXxs, isXs, isSm, isMd, isLg, isXl, setPage]);
+  }, [isXxs, isXs, isSm, isMd, isLg, isXl, setProblemSetsPage]);
 
   // 검색 시 페이지 초기화
   useEffect(() => {
     if (debouncedSearchString.length > 0) {
-      setPage(1);
+      setProblemSetsPage(1);
       setIsSearching(true);
     } else {
-      setPage(1);
+      setProblemSetsPage(1);
       setIsSearching(false);
     }
-  }, [debouncedSearchString, setPage]);
+  }, [debouncedSearchString, setProblemSetsPage]);
 
   // 언마운트 시 페이지 초기화
   useEffect(() => {
     return () => {
-      setPage(1);
+      setProblemSetsPage(1);
     };
-  }, [setPage]);
+  }, [setProblemSetsPage]);
 
   const MainContent = () => {
     if (isLoading) {
@@ -174,9 +165,9 @@ export default function ProblemSetGrid({ type }: Props) {
       />
       <MainContent />
       <PaginationButton
-        page={page}
-        setPage={setPage}
-        maxPage={maxPage}
+        page={problemSetsPage}
+        setPage={setProblemSetsPage}
+        maxPage={problemSetsMaxPage}
         className="mt-5 flex justify-center"
       />
     </section>

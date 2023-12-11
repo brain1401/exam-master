@@ -1,18 +1,14 @@
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   resetAction,
-  setExamPageAction,
-  setExamMaxPageAction,
-  selectExamMaxPage,
-  selectExamPage,
-  selectManageMaxPage,
-  selectManagePage,
   selectResultMaxPage,
   selectResultPage,
-  setManageMaxPageAction,
-  setManagePageAction,
   setResultMaxPageAction,
   setResultPageAction,
+  selectProblemSetsMaxPage,
+  selectProblemSetsPage,
+  setProblemSetsMaxPageAction,
+  setProblemSetsPageAction
 } from "@/slices/pagenation";
 import { useCallback } from "react";
 export default function usePagenationState() {
@@ -20,11 +16,10 @@ export default function usePagenationState() {
 
   const resultsPage = useAppSelector(selectResultPage);
   const resultsMaxPage = useAppSelector(selectResultMaxPage);
-  const managePage = useAppSelector(selectManagePage);
-  const manageMaxPage = useAppSelector(selectManageMaxPage);
-  const examPage = useAppSelector(selectExamPage);
-  const examMaxPage = useAppSelector(selectExamMaxPage);
+  const problemSetsPage = useAppSelector(selectProblemSetsPage);
+  const problemSetsMaxPage = useAppSelector(selectProblemSetsMaxPage);
 
+  //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 useEffect등에서 사용할 때 제대로 작동하지 않는다.
   const setResultsPage = useCallback(
     (page: number) => {
       dispatch(setResultPageAction(page));
@@ -39,30 +34,16 @@ export default function usePagenationState() {
     [dispatch],
   );
 
-  const setManagePage = useCallback(
+  const setProblemSetsPage = useCallback(
     (page: number) => {
-      dispatch(setManagePageAction(page));
+      dispatch(setProblemSetsPageAction(page));
     },
     [dispatch],
   );
 
-  const setManageMaxPage = useCallback(
+  const setProblemSetsMaxPage = useCallback(
     (page: number) => {
-      dispatch(setManageMaxPageAction(page));
-    },
-    [dispatch],
-  );
-
-  const setExamPage = useCallback(
-    (page: number) => {
-      dispatch(setExamPageAction(page));
-    },
-    [dispatch],
-  );
-
-  const setExamMaxPage = useCallback(
-    (page: number) => {
-      dispatch(setExamMaxPageAction(page));
+      dispatch(setProblemSetsMaxPageAction(page));
     },
     [dispatch],
   );
@@ -74,16 +55,12 @@ export default function usePagenationState() {
   return {
     resultsPage,
     resultsMaxPage,
-    managePage,
-    manageMaxPage,
-    examPage,
-    examMaxPage,
+    problemSetsPage,
+    problemSetsMaxPage,
+    setProblemSetsPage,
+    setProblemSetsMaxPage,
     setResultsPage,
     setResultsMaxPage,
-    setManagePage,
-    setManageMaxPage,
-    setExamPage,
-    setExamMaxPage,
     reset,
   };
 }

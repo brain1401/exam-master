@@ -4,19 +4,15 @@ import { RootState } from "@/lib/store";
 type StateType = {
   resultPage: number;
   resultMaxPage: number;
-  managePage: number;
-  manageMaxPage: number;
-  examPage: number;
-  examMaxPage: number;
+  problemSetsPage: number;
+  problemSetsMaxPage: number;
 };
 
 const initialState: StateType = {
   resultPage: 1,
   resultMaxPage: 1,
-  managePage: 1,
-  manageMaxPage: 1,
-  examPage: 1,
-  examMaxPage: 1,
+  problemSetsPage: 1,
+  problemSetsMaxPage: 1,
 };
 
 const pagenationSlice = createSlice({
@@ -30,26 +26,18 @@ const pagenationSlice = createSlice({
     setResultMaxPageAction: (state, action) => {
       state.resultMaxPage = action.payload;
     },
-    setManagePageAction: (state, action) => {
-      state.managePage = action.payload;
+    setProblemSetsPageAction: (state, action) => {
+      state.problemSetsPage = action.payload;
     },
-    setManageMaxPageAction: (state, action) => {
-      state.manageMaxPage = action.payload;
-    },
-    setExamPageAction: (state, action) => {
-      state.examPage = action.payload;
-    },
-    setExamMaxPageAction: (state, action) => {
-      state.examMaxPage = action.payload;
-    },
+    setProblemSetsMaxPageAction: (state, action) => {
+      state.problemSetsMaxPage = action.payload;
+    }
   },
 });
 
 export const {
-  setExamMaxPageAction,
-  setExamPageAction,
-  setManageMaxPageAction,
-  setManagePageAction,
+  setProblemSetsPageAction,
+  setProblemSetsMaxPageAction,
   setResultMaxPageAction,
   setResultPageAction,
   resetAction,
@@ -59,13 +47,9 @@ export const selectResultPage = (state: RootState) =>
   state.pagenationReducer.resultPage;
 export const selectResultMaxPage = (state: RootState) =>
   state.pagenationReducer.resultMaxPage;
-export const selectManagePage = (state: RootState) =>
-  state.pagenationReducer.managePage;
-export const selectManageMaxPage = (state: RootState) =>
-  state.pagenationReducer.manageMaxPage;
-export const selectExamPage = (state: RootState) =>
-  state.pagenationReducer.examPage;
-export const selectExamMaxPage = (state: RootState) =>
-  state.pagenationReducer.examMaxPage;
+export const selectProblemSetsPage = (state: RootState) =>
+  state.pagenationReducer.problemSetsPage;
+export const selectProblemSetsMaxPage = (state: RootState) =>
+  state.pagenationReducer.problemSetsMaxPage;
 
 export default pagenationSlice.reducer;
