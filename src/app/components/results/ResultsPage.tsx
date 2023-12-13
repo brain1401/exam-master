@@ -96,7 +96,7 @@ export default function ResultsPage() {
         res = await axios.get("/api/getExamResultsByName", {
           params: {
             name: debouncedSearchString.trim(),
-            resultsPage,
+            page: resultsPage,
             pageSize,
           },
         });
@@ -105,7 +105,7 @@ export default function ResultsPage() {
         if (pageSize === 0) return;
         res = await axios.get("/api/getExamResults", {
           params: {
-            resultsPage,
+            page: resultsPage,
             pageSize,
           },
         });
