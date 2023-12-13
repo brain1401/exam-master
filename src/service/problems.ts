@@ -1356,7 +1356,7 @@ export async function getExamResultsMaxPage(
     }
     const data: ExamResultsResponse = res?.data;
 
-    return data.meta.pagination.pageCount;
+    return data.meta.pagination.pageCount || 1;
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
@@ -1392,7 +1392,7 @@ export async function getProblemSetsMaxPage(
     }
     const data: RawProblemSetResponse = res?.data;
 
-    return data.meta.pagination.pageCount;
+    return data.meta.pagination.pageCount || 1;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
