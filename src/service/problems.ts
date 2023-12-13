@@ -9,9 +9,13 @@ import {
   ImageSchema,
   ExamProblemResult,
   ExamResultsWithCount,
+  ExamResultsWithCountResponse,
+  ExamResultsResponse,
 } from "@/types/problems";
 import qs from "qs";
 import { getUser } from "./user";
+import axios from "axios";
+import { QueryFunctionContext } from "@tanstack/react-query";
 
 export const checkEnvVariables = () => {
   if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
@@ -1245,4 +1249,132 @@ export async function getExamResultsByName(
   };
 
   return result as ExamResultsWithCount;
+}
+
+export async function fetchExamResults(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  resultsPage: number,
+  pageSize: number,
+  setResultsMaxPage: (maxPage: number) => void,
+) {
+  let res;
+  if (isSearching) {
+    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      res = await axios.get("/api/getExamResultsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: resultsPage,
+          pageSize,
+        },
+      });
+    }
+  } else {
+    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      res = await axios.get("/api/getExamResults", {
+        params: {
+          page: resultsPage,
+          pageSize,
+        },
+      });
+    }
+  }
+  const data = res?.data;
+  setResultsMaxPage(data.meta.pagination.pageCount || 1);
+  return data;
+}
+
+export async function fetchProblemSets(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  problemSetsPage: number,
+  pageSize: number,
+  setProblemSetsMaxPage: (maxPage: number) => void,
+) {
+  let res;
+  if (isSearching) {
+    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      res = await axios.get("/api/getProblemSetsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: problemSetsPage,
+          pageSize,
+        },
+      });
+    }
+  } else {
+    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      res = await axios.get("/api/getProblemSets", {
+        params: {
+          page: problemSetsPage,
+          pageSize,
+        },
+      });
+    }
+  }
+  const data = res?.data;
+  setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
+  return data;
+}
+
+export async function getExamResultsMaxPage(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  pageSize: number,
+) {
+  let res;
+  if (isSearching) {
+    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      res = await axios.get("/api/getExamResultsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: 1,
+          pageSize,
+        },
+      });
+    }
+  } else {
+    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      res = await axios.get("/api/getExamResults", {
+        params: {
+          page: 1,
+          pageSize,
+        },
+      });
+    }
+  }
+  const data: ExamResultsResponse = res?.data;
+
+  return data.meta.pagination.pageCount;
+}
+
+export async function getProblemSetsMaxPage(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  pageSize: number,
+) {
+  let res;
+  if (isSearching) {
+    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      res = await axios.get("/api/getProblemSetsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: 1,
+          pageSize,
+        },
+      });
+    }
+  } else {
+    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      res = await axios.get("/api/getProblemSets", {
+        params: {
+          page: 1,
+          pageSize,
+        },
+      });
+    }
+  }
+  const data: RawProblemSetResponse = res?.data;
+
+  return data.meta.pagination.pageCount;
 }

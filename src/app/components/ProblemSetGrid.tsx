@@ -4,19 +4,19 @@ import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
 import { useEffect, useLayoutEffect, useState } from "react";
 import useCustomMediaQuery from "@/hooks/useCustomMediaQuery";
 
-import axios, { isAxiosError } from "axios";
 import SearchBox from "./ui/SearchBox";
 import useDebounce from "@/hooks/useDebounce";
 import CustomLoading from "./ui/CustomLoading";
 import PaginationButton from "./ui/PaginationButton";
-import getPageSizeByObj from "@/utils/getPageSizeByObj";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import usePagenationState from "@/hooks/usePagenationState";
+import { fetchProblemSets, getProblemSetsMaxPage } from "@/service/problems";
 
 type Props = {
   type: "manage" | "exam";
 };
 export default function ProblemSetGrid({ type }: Props) {
+  // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const {
     setProblemSetsPage,
     setProblemSetsMaxPage,
@@ -24,18 +24,19 @@ export default function ProblemSetGrid({ type }: Props) {
     problemSetsPage,
   } = usePagenationState();
 
-  const {
-    mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
-  } = useCustomMediaQuery();
-
-  const [pageSize, setPageSize] = useState(
-    getPageSizeByObj({ isXxs, isXs, isSm, isMd, isLg, isXl }),
-  );
-
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  //화면 너비에 따라 pagination 사이즈 변경하기 위한 media query
+  const {
+    mediaQuery: { isXxs, isXs, isSm, isMd, isLg, isXl },
+  } = useCustomMediaQuery();
+
+  const [pageSize, setPageSize] = useState(0);
 
   const {
     data: problemSets,
@@ -48,34 +49,66 @@ export default function ProblemSetGrid({ type }: Props) {
       pageSize,
       isSearching,
       debouncedSearchString,
+      setProblemSetsMaxPage,
     ],
-    queryFn: async () => {
-      let res;
-      if (isSearching) {
-        if (debouncedSearchString.trim().length === 0) return;
-        if (pageSize === 0) return;
-        res = await axios.get("/api/getProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: problemSetsPage,
+    queryFn: () =>
+      fetchProblemSets(
+        isSearching,
+        debouncedSearchString,
+        problemSetsPage,
+        pageSize,
+        setProblemSetsMaxPage,
+      ),
+  });
+
+  // 페이지네이션 데이터 prefetch
+  useEffect(() => {
+    const prefetch = async () => {
+      if (pageSize === 0) return;
+
+      const fetchs: Promise<any>[] = [];
+
+      let maxPage =
+        (await getProblemSetsMaxPage(
+          isSearching,
+          debouncedSearchString,
+          pageSize,
+        )) || 1;
+
+      console.log("maxPage", maxPage);
+
+      for (let i = 1; i <= maxPage; i++) {
+        queryClient.prefetchQuery({
+          queryKey: [
+            "problemSets",
+            i,
             pageSize,
-          },
-        });
-      } else {
-        if (debouncedSearchString.trim().length > 0) return;
-        if (pageSize === 0) return;
-        res = await axios.get("/api/getProblemSets", {
-          params: {
-            page: problemSetsPage,
-            pageSize,
-          },
+            isSearching,
+            debouncedSearchString,
+            setProblemSetsMaxPage,
+          ],
+          queryFn: () =>
+            fetchProblemSets(
+              isSearching,
+              debouncedSearchString,
+              i,
+              pageSize,
+              setProblemSetsMaxPage,
+            ),
         });
       }
-      const data = res.data;
-      setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
-      return res.data;
-    },
-  });
+
+      Promise.all(fetchs);
+    };
+
+    prefetch();
+  }, [
+    pageSize,
+    debouncedSearchString,
+    queryClient,
+    setProblemSetsMaxPage,
+    isSearching,
+  ]);
 
   const title = type === "manage" ? "문제집 관리" : "풀 문제 선택";
 
