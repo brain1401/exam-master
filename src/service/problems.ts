@@ -1281,8 +1281,11 @@ export async function fetchExamResults(
       }
     }
     const data = res?.data;
-    setResultsMaxPage(data.meta.pagination.pageCount || 1);
-    return data;
+
+    if (data) {
+      setResultsMaxPage(data.meta.pagination.pageCount || 1);
+      return data;
+    }
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
@@ -1319,8 +1322,10 @@ export async function fetchProblemSets(
       }
     }
     const data = res?.data;
-    setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
-    return data;
+    if (data) {
+      setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
+      return data;
+    }
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
