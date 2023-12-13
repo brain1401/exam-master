@@ -1258,30 +1258,35 @@ export async function fetchExamResults(
   pageSize: number,
   setResultsMaxPage: (maxPage: number) => void,
 ) {
-  let res;
-  if (isSearching) {
-    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
-      res = await axios.get("/api/getExamResultsByName", {
-        params: {
-          name: debouncedSearchString.trim(),
-          page: resultsPage,
-          pageSize,
-        },
-      });
+  try {
+    let res;
+    if (isSearching) {
+      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+        res = await axios.get("/api/getExamResultsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page: resultsPage,
+            pageSize,
+          },
+        });
+      }
+    } else {
+      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+        res = await axios.get("/api/getExamResults", {
+          params: {
+            page: resultsPage,
+            pageSize,
+          },
+        });
+      }
     }
-  } else {
-    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
-      res = await axios.get("/api/getExamResults", {
-        params: {
-          page: resultsPage,
-          pageSize,
-        },
-      });
-    }
+    const data = res?.data;
+    setResultsMaxPage(data.meta.pagination.pageCount || 1);
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
   }
-  const data = res?.data;
-  setResultsMaxPage(data.meta.pagination.pageCount || 1);
-  return data;
 }
 
 export async function fetchProblemSets(
@@ -1291,30 +1296,35 @@ export async function fetchProblemSets(
   pageSize: number,
   setProblemSetsMaxPage: (maxPage: number) => void,
 ) {
-  let res;
-  if (isSearching) {
-    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
-      res = await axios.get("/api/getProblemSetsByName", {
-        params: {
-          name: debouncedSearchString.trim(),
-          page: problemSetsPage,
-          pageSize,
-        },
-      });
+  try {
+    let res;
+    if (isSearching) {
+      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+        res = await axios.get("/api/getProblemSetsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page: problemSetsPage,
+            pageSize,
+          },
+        });
+      }
+    } else {
+      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+        res = await axios.get("/api/getProblemSets", {
+          params: {
+            page: problemSetsPage,
+            pageSize,
+          },
+        });
+      }
     }
-  } else {
-    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
-      res = await axios.get("/api/getProblemSets", {
-        params: {
-          page: problemSetsPage,
-          pageSize,
-        },
-      });
-    }
+    const data = res?.data;
+    setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
-  const data = res?.data;
-  setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
-  return data;
 }
 
 export async function getExamResultsMaxPage(
@@ -1322,30 +1332,35 @@ export async function getExamResultsMaxPage(
   debouncedSearchString: string,
   pageSize: number,
 ) {
-  let res;
-  if (isSearching) {
-    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
-      res = await axios.get("/api/getExamResultsByName", {
-        params: {
-          name: debouncedSearchString.trim(),
-          page: 1,
-          pageSize,
-        },
-      });
+  try {
+    let res;
+    if (isSearching) {
+      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+        res = await axios.get("/api/getExamResultsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page: 1,
+            pageSize,
+          },
+        });
+      }
+    } else {
+      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+        res = await axios.get("/api/getExamResults", {
+          params: {
+            page: 1,
+            pageSize,
+          },
+        });
+      }
     }
-  } else {
-    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
-      res = await axios.get("/api/getExamResults", {
-        params: {
-          page: 1,
-          pageSize,
-        },
-      });
-    }
-  }
-  const data: ExamResultsResponse = res?.data;
+    const data: ExamResultsResponse = res?.data;
 
-  return data.meta.pagination.pageCount;
+    return data.meta.pagination.pageCount;
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
+  }
 }
 
 export async function getProblemSetsMaxPage(
@@ -1353,28 +1368,33 @@ export async function getProblemSetsMaxPage(
   debouncedSearchString: string,
   pageSize: number,
 ) {
-  let res;
-  if (isSearching) {
-    if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
-      res = await axios.get("/api/getProblemSetsByName", {
-        params: {
-          name: debouncedSearchString.trim(),
-          page: 1,
-          pageSize,
-        },
-      });
+  try {
+    let res;
+    if (isSearching) {
+      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+        res = await axios.get("/api/getProblemSetsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page: 1,
+            pageSize,
+          },
+        });
+      }
+    } else {
+      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+        res = await axios.get("/api/getProblemSets", {
+          params: {
+            page: 1,
+            pageSize,
+          },
+        });
+      }
     }
-  } else {
-    if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
-      res = await axios.get("/api/getProblemSets", {
-        params: {
-          page: 1,
-          pageSize,
-        },
-      });
-    }
-  }
-  const data: RawProblemSetResponse = res?.data;
+    const data: RawProblemSetResponse = res?.data;
 
-  return data.meta.pagination.pageCount;
+    return data.meta.pagination.pageCount;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
 }
