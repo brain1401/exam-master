@@ -72,24 +72,26 @@ export default function ResultsPage() {
       console.log("maxPage", maxPage);
 
       for (let i = 1; i <= maxPage; i++) {
-        queryClient.prefetchQuery({
-          queryKey: [
-            "results",
-            i,
-            pageSize,
-            isSearching,
-            debouncedSearchString,
-            setResultsMaxPage,
-          ],
-          queryFn: () =>
-            fetchExamResults(
-              isSearching,
-              debouncedSearchString,
+        fetchs.push(
+          queryClient.prefetchQuery({
+            queryKey: [
+              "results",
               i,
               pageSize,
+              isSearching,
+              debouncedSearchString,
               setResultsMaxPage,
-            ),
-        });
+            ],
+            queryFn: () =>
+              fetchExamResults(
+                isSearching,
+                debouncedSearchString,
+                i,
+                pageSize,
+                setResultsMaxPage,
+              ),
+          }),
+        );
       }
 
       Promise.all(fetchs);

@@ -78,24 +78,26 @@ export default function ProblemSetGrid({ type }: Props) {
       console.log("maxPage", maxPage);
 
       for (let i = 1; i <= maxPage; i++) {
-        queryClient.prefetchQuery({
-          queryKey: [
-            "problemSets",
-            i,
-            pageSize,
-            isSearching,
-            debouncedSearchString,
-            setProblemSetsMaxPage,
-          ],
-          queryFn: () =>
-            fetchProblemSets(
-              isSearching,
-              debouncedSearchString,
+        fetchs.push(
+          queryClient.prefetchQuery({
+            queryKey: [
+              "problemSets",
               i,
               pageSize,
+              isSearching,
+              debouncedSearchString,
               setProblemSetsMaxPage,
-            ),
-        });
+            ],
+            queryFn: () =>
+              fetchProblemSets(
+                isSearching,
+                debouncedSearchString,
+                i,
+                pageSize,
+                setProblemSetsMaxPage,
+              ),
+          }),
+        );
       }
 
       Promise.all(fetchs);
