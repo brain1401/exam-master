@@ -50,7 +50,7 @@ export default function ProblemSetsGrid({
   }, [problemSets]);
 
   const MainContent = () => {
-    if (problemSets?.data.length && problemSets?.data.length === 0) {
+    if (problemSets?.data.length === 0) {
       return (
         <div className="flex h-64 items-center justify-center">
           <p className="text-center text-lg">
