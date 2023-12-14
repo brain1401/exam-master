@@ -27,9 +27,9 @@ export default function ResultsGrid({
   } = useQuery<ExamResultsWithCountResponse>({
     queryKey: [
       "results",
-      isSearching,
       resultsPage,
       pageSize,
+      isSearching,
       debouncedSearchString,
       setResultsMaxPage,
     ],
