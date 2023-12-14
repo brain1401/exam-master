@@ -32,7 +32,8 @@ export default function usePrefetchPagination(
         type === "manage" || type === "exam"
           ? setProblemSetsMaxPage
           : setResultsMaxPage;
-
+      const queryKey = type === "manage" || type === "exam" ? "problemSets" : "results";
+      
       const fetchs: Promise<any>[] = [];
 
       let maxPage =
@@ -44,7 +45,7 @@ export default function usePrefetchPagination(
         fetchs.push(
           queryClient.prefetchQuery({
             queryKey: [
-              "problemSets",
+              queryKey,
               i,
               pageSize,
               isSearching,
