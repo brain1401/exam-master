@@ -12,17 +12,16 @@ import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 
 export default function ResultsPage() {
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
-  const { resultsPage, resultsMaxPage, setResultsPage } = usePagenationState();
+  const { resultsPage, resultsMaxPage, pageSize, setResultsPage } =
+    usePagenationState();
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
 
-  const [pageSize, setPageSize] = useState(0);
-
   // 화면 크기에 따라 페이지 사이즈 변경
-  useResponsivePageSize(setPageSize, setResultsPage);
+  useResponsivePageSize("results");
 
   //모든 페이지네이션 list prefetch
   usePrefetchPagination(

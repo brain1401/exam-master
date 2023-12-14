@@ -20,6 +20,7 @@ export default function ProblemSetsPage({ type }: Props) {
     setProblemSetsPage,
     problemSetsMaxPage,
     problemSetsPage,
+    pageSize,
   } = usePagenationState();
 
   const [searchString, setSearchString] = useState("");
@@ -27,13 +28,12 @@ export default function ProblemSetsPage({ type }: Props) {
 
   const [isSearching, setIsSearching] = useState(false);
 
-  const [pageSize, setPageSize] = useState(0);
 
   //모든 페이지네이션 list prefetch
   usePrefetchPagination(pageSize, type, isSearching, debouncedSearchString);
 
   // 화면 크기에 따라 페이지 사이즈 변경
-  useResponsivePageSize(setPageSize, setProblemSetsPage);
+  useResponsivePageSize("problemSets");
 
   // 검색 시 페이지 초기화
   useEffect(() => {

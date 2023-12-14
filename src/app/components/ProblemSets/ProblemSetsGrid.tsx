@@ -20,7 +20,7 @@ export default function ProblemSetsGrid({
   pageSize,
 }: Props) {
   const { setProblemSetsMaxPage, problemSetsPage } = usePagenationState();
-  
+
   const { data: problemSets } = useSuspenseQuery<RawProblemSetResponse>({
     queryKey: [
       "problemSets",
@@ -42,10 +42,10 @@ export default function ProblemSetsGrid({
 
   useEffect(() => {
     console.log("problemSets", problemSets);
-  })
+  }, [problemSets]);
 
   const MainContent = () => {
-    if ((problemSets?.data.length && problemSets?.data.length === 0)) {
+    if (problemSets?.data.length && problemSets?.data.length === 0) {
       return (
         <div className="flex h-64 items-center justify-center">
           <p className="text-center text-lg">
@@ -55,16 +55,20 @@ export default function ProblemSetsGrid({
       );
     } else {
       return (
-        <ul className="mx-auto mt-10 grid w-full grid-cols-1 gap-x-2 gap-y-5 px-0 xs:grid-cols-2 sm:grid-cols-2 sm:p-0 min-[669px]:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {problemSets?.data.map((problemSet: ProblemSetResponse) => (
-            <li
-              key={problemSet.UUID}
-              className="mx-auto flex w-full max-w-[13rem] items-center justify-center"
-            >
-              <ProblemSetsCard problemSet={problemSet} type={type} />
-            </li>
-          ))}
-        </ul>
+        <>
+          {problemSets?.data && (
+            <ul className="mx-auto mt-10 grid w-full grid-cols-1 gap-x-2 gap-y-5 px-0 xs:grid-cols-2 sm:grid-cols-2 sm:p-0 min-[669px]:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {problemSets?.data.map((problemSet: ProblemSetResponse) => (
+                <li
+                  key={problemSet.UUID}
+                  className="mx-auto flex w-full max-w-[13rem] items-center justify-center"
+                >
+                  <ProblemSetsCard problemSet={problemSet} type={type} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       );
     }
   };

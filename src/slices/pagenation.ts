@@ -6,6 +6,7 @@ type StateType = {
   resultMaxPage: number;
   problemSetsPage: number;
   problemSetsMaxPage: number;
+  pageSize: number;
 };
 
 const initialState: StateType = {
@@ -13,6 +14,7 @@ const initialState: StateType = {
   resultMaxPage: 1,
   problemSetsPage: 1,
   problemSetsMaxPage: 1,
+  pageSize: 0,
 };
 
 const pagenationSlice = createSlice({
@@ -31,7 +33,10 @@ const pagenationSlice = createSlice({
     },
     setProblemSetsMaxPageAction: (state, action) => {
       state.problemSetsMaxPage = action.payload;
-    }
+    },
+    setPageSizeAction: (state, action) => {
+      state.pageSize = action.payload;
+    },
   },
 });
 
@@ -40,6 +45,7 @@ export const {
   setProblemSetsMaxPageAction,
   setResultMaxPageAction,
   setResultPageAction,
+  setPageSizeAction,
   resetAction,
 } = pagenationSlice.actions;
 
@@ -51,5 +57,8 @@ export const selectProblemSetsPage = (state: RootState) =>
   state.pagenationReducer.problemSetsPage;
 export const selectProblemSetsMaxPage = (state: RootState) =>
   state.pagenationReducer.problemSetsMaxPage;
+export const selectPageSize = (state: RootState) =>
+  state.pagenationReducer.pageSize;
+
 
 export default pagenationSlice.reducer;

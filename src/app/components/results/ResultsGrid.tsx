@@ -4,6 +4,7 @@ import usePagenationState from "@/hooks/usePagenationState";
 import { fetchExamResults } from "@/service/problems";
 import { ExamResultsWithCountResponse } from "@/types/problems";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 type Props = {
   pageSize: number;
@@ -37,6 +38,10 @@ export default function ResultsGrid({
       ),
   });
 
+  useEffect(() => {
+    console.log("results", results);
+  }, [results]);
+  
   const MainContent = () => {
     if (results?.data.length === 0 && !isSearching) {
       return (
