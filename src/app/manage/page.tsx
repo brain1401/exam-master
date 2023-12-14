@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
-import ProblemSetGrid from "../components/ProblemSetGrid";
 import LoginRequired from "../components/ui/LoginRequired";
+import ProblemSetsPage from "../components/ProblemSets/ProblemSetsPage";
 
 export default async function ManagePage() {
   const session = await getServerSession();
@@ -9,5 +9,5 @@ export default async function ManagePage() {
     return <LoginRequired />;
   }
 
-  return <ProblemSetGrid type="manage" />;
+  return <ProblemSetsPage type="manage" />;
 }

@@ -6,7 +6,7 @@ type Props = {
   problemSet: ProblemSetResponse;
 };
 
-export default function ProblemSetCard({ type, problemSet }: Props) {
+export default function ProblemSetsCard({ type, problemSet }: Props) {
   const formattedDate = new Date(problemSet.updatedAt).toLocaleDateString(
     "ko-KR",
     {

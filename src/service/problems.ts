@@ -1259,6 +1259,7 @@ export async function fetchExamResults(
   setResultsMaxPage: (maxPage: number) => void,
 ) {
   try {
+    if(pageSize === 0) return null;
     let res;
     if (isSearching) {
       if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
@@ -1299,6 +1300,7 @@ export async function fetchProblemSets(
   pageSize: number,
   setProblemSetsMaxPage: (maxPage: number) => void,
 ) {
+  if (pageSize === 0) return null;
   try {
     let res;
     if (isSearching) {
@@ -1337,6 +1339,7 @@ export async function getExamResultsMaxPage(
   debouncedSearchString: string,
   pageSize: number,
 ) {
+  if (pageSize === 0) return null;
   try {
     let res;
     if (isSearching) {
@@ -1375,6 +1378,7 @@ export async function getProblemSetsMaxPage(
   debouncedSearchString: string,
   pageSize: number,
 ) {
+  if (pageSize === 0) return null;
   try {
     let res;
     if (isSearching) {
