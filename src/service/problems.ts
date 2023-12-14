@@ -1259,10 +1259,10 @@ export async function fetchExamResults(
   setResultsMaxPage: (maxPage: number) => void,
 ) {
   try {
-    if(pageSize === 0) return null;
+    if (pageSize === 0) return null;
     let res;
     if (isSearching) {
-      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length > 0) {
         res = await axios.get("/api/getExamResultsByName", {
           params: {
             name: debouncedSearchString.trim(),
@@ -1272,7 +1272,7 @@ export async function fetchExamResults(
         });
       }
     } else {
-      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length === 0) {
         res = await axios.get("/api/getExamResults", {
           params: {
             page: resultsPage,
@@ -1300,11 +1300,11 @@ export async function fetchProblemSets(
   pageSize: number,
   setProblemSetsMaxPage: (maxPage: number) => void,
 ) {
-  if (pageSize === 0) return null;
   try {
+    if (pageSize === 0) return null;
     let res;
     if (isSearching) {
-      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length > 0) {
         res = await axios.get("/api/getProblemSetsByName", {
           params: {
             name: debouncedSearchString.trim(),
@@ -1314,7 +1314,7 @@ export async function fetchProblemSets(
         });
       }
     } else {
-      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length === 0) {
         res = await axios.get("/api/getProblemSets", {
           params: {
             page: problemSetsPage,
@@ -1329,7 +1329,9 @@ export async function fetchProblemSets(
       return data;
     }
   } catch (err) {
-    console.log(err);
+    if (err instanceof Error) {
+      console.log(err);
+    }
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
@@ -1339,11 +1341,11 @@ export async function getExamResultsMaxPage(
   debouncedSearchString: string,
   pageSize: number,
 ) {
-  if (pageSize === 0) return null;
   try {
+    if (pageSize === 0) return null;
     let res;
     if (isSearching) {
-      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length > 0) {
         res = await axios.get("/api/getExamResultsByName", {
           params: {
             name: debouncedSearchString.trim(),
@@ -1353,7 +1355,7 @@ export async function getExamResultsMaxPage(
         });
       }
     } else {
-      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length === 0) {
         res = await axios.get("/api/getExamResults", {
           params: {
             page: 1,
@@ -1378,11 +1380,11 @@ export async function getProblemSetsMaxPage(
   debouncedSearchString: string,
   pageSize: number,
 ) {
-  if (pageSize === 0) return null;
   try {
+    if (pageSize === 0) return null;
     let res;
     if (isSearching) {
-      if (debouncedSearchString.trim().length > 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length > 0) {
         res = await axios.get("/api/getProblemSetsByName", {
           params: {
             name: debouncedSearchString.trim(),
@@ -1392,7 +1394,7 @@ export async function getProblemSetsMaxPage(
         });
       }
     } else {
-      if (debouncedSearchString.trim().length === 0 && pageSize > 0) {
+      if (debouncedSearchString.trim().length === 0) {
         res = await axios.get("/api/getProblemSets", {
           params: {
             page: 1,

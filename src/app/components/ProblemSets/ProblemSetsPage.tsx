@@ -1,12 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PaginationButton from "../ui/PaginationButton";
 import SearchBox from "../ui/SearchBox";
 import useDebounce from "@/hooks/useDebounce";
-import usePagenationState from "@/hooks/usePagenationState";;
+import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsGrid from "./ProblemSetsGrid";
-import CustomLoading from "../ui/CustomLoading";
 import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 
@@ -16,21 +15,16 @@ type Props = {
 
 export default function ProblemSetsPage({ type }: Props) {
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
-  const {
-    setProblemSetsPage,
-    problemSetsMaxPage,
-    problemSetsPage,
-    pageSize,
-  } = usePagenationState();
+  const { setProblemSetsPage, problemSetsMaxPage, problemSetsPage, pageSize } =
+    usePagenationState();
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
 
-
   //모든 페이지네이션 list prefetch
-  usePrefetchPagination(pageSize, type, isSearching, debouncedSearchString);
+  usePrefetchPagination(type, isSearching, debouncedSearchString);
 
   // 화면 크기에 따라 페이지 사이즈 변경
   useResponsivePageSize("problemSets");
@@ -63,14 +57,12 @@ export default function ProblemSetsPage({ type }: Props) {
         searchString={searchString}
         setSearchString={setSearchString}
       />
-      <Suspense fallback={<CustomLoading />}>
-        <ProblemSetsGrid
-          debouncedSearchString={debouncedSearchString}
-          isSearching={isSearching}
-          pageSize={pageSize}
-          type={type}
-        />
-      </Suspense>
+      <ProblemSetsGrid
+        debouncedSearchString={debouncedSearchString}
+        isSearching={isSearching}
+        pageSize={pageSize}
+        type={type}
+      />
       <PaginationButton
         page={problemSetsPage}
         setPage={setProblemSetsPage}

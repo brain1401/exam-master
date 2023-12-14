@@ -9,13 +9,12 @@ import { useEffect } from "react";
 import usePagenationState from "./usePagenationState";
 
 export default function usePrefetchPagination(
-  pageSize: number,
   type: "manage" | "exam" | "results",
   isSearching: boolean,
   debouncedSearchString: string,
 ) {
   const queryClient = useQueryClient();
-  const { setProblemSetsMaxPage, setResultsMaxPage } = usePagenationState();
+  const { setProblemSetsMaxPage, setResultsMaxPage, pageSize } = usePagenationState();
   // 페이지네이션 데이터 prefetch
   useEffect(() => {
     const prefetch = async () => {

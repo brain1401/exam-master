@@ -1,10 +1,11 @@
 "use client";
 import ProblemSetsCard from "./ProblemSetsCard";
 import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchProblemSets } from "@/service/problems";
 import { useEffect } from "react";
 import usePagenationState from "@/hooks/usePagenationState";
+import CustomLoading from "../ui/CustomLoading";
 
 type Props = {
   type: "manage" | "exam";
@@ -21,7 +22,11 @@ export default function ProblemSetsGrid({
 }: Props) {
   const { setProblemSetsMaxPage, problemSetsPage } = usePagenationState();
 
-  const { data: problemSets } = useSuspenseQuery<RawProblemSetResponse>({
+  const {
+    data: problemSets,
+    isLoading,
+    error,
+  } = useQuery<RawProblemSetResponse>({
     queryKey: [
       "problemSets",
       problemSetsPage,
@@ -72,6 +77,8 @@ export default function ProblemSetsGrid({
       );
     }
   };
+
+  if (isLoading) return <CustomLoading />;
 
   return <MainContent />;
 }

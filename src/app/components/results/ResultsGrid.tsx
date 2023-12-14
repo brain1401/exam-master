@@ -3,8 +3,9 @@ import ResultsCard from "./ResultsCard";
 import usePagenationState from "@/hooks/usePagenationState";
 import { fetchExamResults } from "@/service/problems";
 import { ExamResultsWithCountResponse } from "@/types/problems";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import CustomLoading from "../ui/CustomLoading";
 
 type Props = {
   pageSize: number;
@@ -19,7 +20,11 @@ export default function ResultsGrid({
 }: Props) {
   const { setResultsMaxPage, resultsPage } = usePagenationState();
 
-  const { data: results } = useSuspenseQuery<ExamResultsWithCountResponse>({
+  const {
+    data: results,
+    isLoading,
+    error,
+  } = useQuery<ExamResultsWithCountResponse>({
     queryKey: [
       "results",
       isSearching,
@@ -41,7 +46,7 @@ export default function ResultsGrid({
   useEffect(() => {
     console.log("results", results);
   }, [results]);
-  
+
   const MainContent = () => {
     if (results?.data.length === 0 && !isSearching) {
       return (
@@ -72,5 +77,7 @@ export default function ResultsGrid({
     }
   };
 
+  if (isLoading) return <CustomLoading />;
+  
   return <MainContent />;
 }

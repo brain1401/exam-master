@@ -1,12 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useDebounce from "@/hooks/useDebounce";
 import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
 import usePagenationState from "@/hooks/usePagenationState";
 import ResultsGrid from "./ResultsGrid";
-import CustomLoading from "../ui/CustomLoading";
 import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 
@@ -24,12 +23,7 @@ export default function ResultsPage() {
   useResponsivePageSize("results");
 
   //모든 페이지네이션 list prefetch
-  usePrefetchPagination(
-    pageSize,
-    "results",
-    isSearching,
-    debouncedSearchString,
-  );
+  usePrefetchPagination("results", isSearching, debouncedSearchString);
 
   //검색 시 페이지 초기화
   useEffect(() => {
@@ -58,14 +52,11 @@ export default function ResultsPage() {
           searchString={searchString}
           setSearchString={setSearchString}
         />
-        <Suspense fallback={<CustomLoading />}>
-          <ResultsGrid
-            debouncedSearchString={debouncedSearchString}
-            isSearching={isSearching}
-            pageSize={pageSize}
-          />
-        </Suspense>
-
+        <ResultsGrid
+          debouncedSearchString={debouncedSearchString}
+          isSearching={isSearching}
+          pageSize={pageSize}
+        />
         <PaginationButton
           maxPage={resultsMaxPage}
           page={resultsPage}
