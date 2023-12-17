@@ -5,7 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchProblemSets } from "@/service/problems";
 import { useEffect } from "react";
 import usePagenationState from "@/hooks/usePagenationState";
-import CustomLoading from "../ui/CustomLoading";
+import ProblemSetsCardSkeleton from "./ProblemSetsCardSkeleton";
+import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 
 type Props = {
   type: "manage" | "exam";
@@ -25,6 +26,7 @@ export default function ProblemSetsGrid({
   const {
     data: problemSets,
     isLoading,
+    isPending,
     error,
   } = useQuery<RawProblemSetResponse>({
     queryKey: [
@@ -49,6 +51,7 @@ export default function ProblemSetsGrid({
     console.log("problemSets", problemSets);
   }, [problemSets]);
 
+
   const MainContent = () => {
     if (problemSets?.data.length === 0) {
       return (
@@ -62,7 +65,7 @@ export default function ProblemSetsGrid({
       return (
         <>
           {problemSets?.data && (
-            <ul className="mx-auto mt-10 grid w-full grid-cols-1 gap-x-2 gap-y-5 px-0 xs:grid-cols-2 sm:grid-cols-2 sm:p-0 min-[669px]:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <ProblemSetsGridLayout>
               {problemSets?.data.map((problemSet: ProblemSetResponse) => (
                 <li
                   key={problemSet.UUID}
@@ -71,14 +74,14 @@ export default function ProblemSetsGrid({
                   <ProblemSetsCard problemSet={problemSet} type={type} />
                 </li>
               ))}
-            </ul>
+            </ProblemSetsGridLayout>
           )}
         </>
       );
     }
   };
 
-  if (isLoading) return <CustomLoading />;
+  if (isLoading) return <ProblemSetsCardSkeleton pageSize={pageSize} />;
 
   return <MainContent />;
 }

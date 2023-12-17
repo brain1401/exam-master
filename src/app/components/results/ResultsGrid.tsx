@@ -6,6 +6,8 @@ import { ExamResultsWithCountResponse } from "@/types/problems";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import CustomLoading from "../ui/CustomLoading";
+import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
+import ResultsCardSkeleton from "./ResultsCardSkeleton";
 
 type Props = {
   pageSize: number;
@@ -64,20 +66,20 @@ export default function ResultsGrid({
       return (
         <>
           {results?.data && (
-            <ul className="mx-auto mt-10 grid w-full grid-cols-1 gap-x-2 gap-y-5 xs:grid-cols-2 sm:grid-cols-2 sm:p-0 min-[669px]:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <ProblemSetsGridLayout>
               {results.data.map((result) => (
                 <li key={result.uuid} className="">
                   <ResultsCard result={result} />
                 </li>
               ))}
-            </ul>
+            </ProblemSetsGridLayout>
           )}
         </>
       );
     }
   };
 
-  if (isLoading) return <CustomLoading />;
-  
+  if (isLoading) return <ResultsCardSkeleton pageSize={pageSize} />;
+
   return <MainContent />;
 }
