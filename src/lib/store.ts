@@ -5,6 +5,7 @@ import examProblemReducer from "@/slices/examProblems";
 import examProblemResultsReducer from "@/slices/examProblemResults";
 import mediaQueryReducer from "@/slices/mediaQuery";
 import pagenationReducer from "@/slices/pagenation";
+import uiReducer from "@/slices/ui";
 
 export const makeStore = () => {
   const store = configureStore({
@@ -15,6 +16,7 @@ export const makeStore = () => {
       examProblemResultsReducer,
       mediaQueryReducer,
       pagenationReducer,
+      uiReducer,
     },
     devTools: process.env.NODE_ENV !== "production",
   });

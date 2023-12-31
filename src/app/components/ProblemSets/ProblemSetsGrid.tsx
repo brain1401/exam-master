@@ -3,7 +3,7 @@ import ProblemSetsCard from "./ProblemSetsCard";
 import { RawProblemSetResponse, ProblemSetResponse } from "@/types/problems";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProblemSets } from "@/service/problems";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsCardSkeleton from "./ProblemSetsCardSkeleton";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
@@ -14,6 +14,8 @@ type Props = {
   pageSize: number;
   isSearching: boolean;
 };
+
+export type IsSelected = { uuid: string; isSelected: boolean };
 
 export default function ProblemSetsGrid({
   type,
@@ -26,7 +28,6 @@ export default function ProblemSetsGrid({
   const {
     data: problemSets,
     isLoading,
-    isPending,
     error,
   } = useQuery<RawProblemSetResponse>({
     queryKey: [
@@ -50,7 +51,6 @@ export default function ProblemSetsGrid({
   useEffect(() => {
     console.log("problemSets", problemSets);
   }, [problemSets]);
-
 
   const MainContent = () => {
     if (problemSets?.data.length === 0) {

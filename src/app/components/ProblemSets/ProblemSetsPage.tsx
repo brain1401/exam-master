@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import PaginationButton from "../ui/PaginationButton";
-import SearchBox from "../ui/SearchBox";
 import useDebounce from "@/hooks/useDebounce";
 import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsGrid from "./ProblemSetsGrid";
 import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
+import DeleteAndSearchBox from "../ui/DeleteAndSearchBox";
+import SearchBox from "../ui/SearchBox";
 
 type Props = {
   type: "manage" | "exam";
@@ -52,11 +53,21 @@ export default function ProblemSetsPage({ type }: Props) {
   return (
     <section className="mx-auto w-full max-w-[80rem] p-3">
       <h1 className="mt-10 text-center text-[2rem]">{title}</h1>
-      <SearchBox
-        className="mt-8"
-        searchString={searchString}
-        setSearchString={setSearchString}
-      />
+
+      {type === "manage" ? (
+        <DeleteAndSearchBox
+          searchString={searchString}
+          setSearchString={setSearchString}
+        />
+      ) : (
+        <div className="flex justify-end">
+          <SearchBox
+            searchString={searchString}
+            setSearchString={setSearchString}
+          />
+        </div>
+      )}
+
       <ProblemSetsGrid
         debouncedSearchString={debouncedSearchString}
         isSearching={isSearching}

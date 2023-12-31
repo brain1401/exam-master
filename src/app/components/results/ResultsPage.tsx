@@ -48,7 +48,6 @@ export default function ResultsPage() {
       <section className="mx-auto mt-10 w-full max-w-[80rem] p-3">
         <h1 className="text-center text-3xl font-semibold">시험 기록</h1>
         <SearchBox
-          className="mt-5"
           searchString={searchString}
           setSearchString={setSearchString}
         />

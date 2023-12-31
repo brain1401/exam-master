@@ -1413,3 +1413,21 @@ export async function getProblemSetsMaxPage(
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
+
+export async function deleteProblemSet(problemSetUUID: string) {
+  const problemSetId = await getProblemsSetIdByUUID(problemSetUUID);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets/${problemSetId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+      },
+      cache: "no-store",
+    },
+  );
+  if (!response.ok)
+    throw new Error("문제집을 삭제하는 중 오류가 발생했습니다.");
+
+  return response.statusText;
+}
