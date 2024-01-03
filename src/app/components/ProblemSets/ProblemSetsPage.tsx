@@ -10,6 +10,7 @@ import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import DeleteAndSearchBox from "../ui/DeleteAndSearchBox";
 import SearchBox from "../ui/SearchBox";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
+import useUiState from "@/hooks/useUiState";
 
 type Props = {
   type: "manage" | "exam";
@@ -19,6 +20,8 @@ export default function ProblemSetsPage({ type }: Props) {
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const { setProblemSetsPage, problemSetsMaxPage, problemSetsPage, pageSize } =
     usePagenationState();
+
+  const { resetToDeletedUuid } = useUiState();
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
@@ -48,6 +51,13 @@ export default function ProblemSetsPage({ type }: Props) {
       setProblemSetsPage(1);
     };
   }, [setProblemSetsPage]);
+
+  // 언마운트 시 선택된 삭제할 문제집 초기화
+  useEffect(() => {
+    return () => {
+      resetToDeletedUuid();
+    };
+  }, [resetToDeletedUuid]);
 
   const title = type === "manage" ? "문제집 관리" : "풀 문제 선택";
 
