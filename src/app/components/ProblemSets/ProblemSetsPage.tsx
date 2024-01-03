@@ -9,6 +9,7 @@ import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import DeleteAndSearchBox from "../ui/DeleteAndSearchBox";
 import SearchBox from "../ui/SearchBox";
+import DynamicSearchBox from "../ui/DynamicSearchBox";
 
 type Props = {
   type: "manage" | "exam";
@@ -52,21 +53,13 @@ export default function ProblemSetsPage({ type }: Props) {
 
   return (
     <section className="mx-auto w-full max-w-[80rem] p-3">
-      <h1 className="mt-10 text-center text-[2rem] mb-3">{title}</h1>
+      <h1 className="mb-3 mt-10 text-center text-[2rem]">{title}</h1>
 
-      {type === "manage" ? (
-        <DeleteAndSearchBox
-          searchString={searchString}
-          setSearchString={setSearchString}
-        />
-      ) : (
-        <div className="flex justify-end">
-          <SearchBox
-            searchString={searchString}
-            setSearchString={setSearchString}
-          />
-        </div>
-      )}
+      <DynamicSearchBox
+        searchString={searchString}
+        setSearchString={setSearchString}
+        type={type}
+      />
 
       <ProblemSetsGrid
         debouncedSearchString={debouncedSearchString}
