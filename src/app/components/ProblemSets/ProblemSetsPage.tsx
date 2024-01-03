@@ -52,7 +52,7 @@ export default function ProblemSetsPage({ type }: Props) {
 
   return (
     <section className="mx-auto w-full max-w-[80rem] p-3">
-      <h1 className="mt-10 text-center text-[2rem]">{title}</h1>
+      <h1 className="mt-10 text-center text-[2rem] mb-3">{title}</h1>
 
       {type === "manage" ? (
         <DeleteAndSearchBox

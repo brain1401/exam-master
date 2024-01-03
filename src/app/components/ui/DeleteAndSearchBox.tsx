@@ -71,8 +71,11 @@ export default function DeleteAndSearchBox({
           <MdOutlineDeleteForever size={24} />
         </Button>
         {isDeleteButtonClicked && (
-          <Button onClick={() => deleteProblemSets(toDeletedUuid)}>
-            선택된 문제집 삭제
+          <Button
+            className="w-[2rem]"
+            onClick={() => deleteProblemSets(toDeletedUuid)}
+          >
+            삭제
           </Button>
         )}
       </div>
