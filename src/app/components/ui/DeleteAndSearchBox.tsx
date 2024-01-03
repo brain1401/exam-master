@@ -59,11 +59,11 @@ export default function DeleteAndSearchBox({
 
   return (
     <div className="flex justify-between">
-      <div className="flex items-center justify-center gap-x-[1rem]">
+      <div className="flex items-center justify-center gap-x-[.2rem] md:gap-x-[1rem]">
         <Button
           isIconOnly
           className={twMerge(
-            `ml-[10vw]`,
+            `ml-[1rem] md:ml-[8vw]`,
             `${isDeleteButtonClicked && "brightness-[80%]"}`,
           )}
           onClick={onClick}
@@ -71,10 +71,7 @@ export default function DeleteAndSearchBox({
           <MdOutlineDeleteForever size={24} />
         </Button>
         {isDeleteButtonClicked && (
-          <Button
-            className="w-[2rem]"
-            onClick={() => deleteProblemSets(toDeletedUuid)}
-          >
+          <Button className="" onClick={() => deleteProblemSets(toDeletedUuid)}>
             삭제
           </Button>
         )}
