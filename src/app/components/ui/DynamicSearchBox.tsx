@@ -4,7 +4,7 @@ import SearchBox from "./SearchBox";
 type Props = {
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
-  type: "manage" | "exam";
+  type: "manage" | "exam" | "result";
 };
 
 export default function DynamicSearchBox({
