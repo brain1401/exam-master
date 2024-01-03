@@ -9,11 +9,14 @@ import ResultsGrid from "./ResultsGrid";
 import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
+import useUiState from "@/hooks/useUiState";
 
 export default function ResultsPage() {
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const { resultsPage, resultsMaxPage, pageSize, setResultsPage } =
     usePagenationState();
+
+  const { resetToDeletedUuid } = useUiState();
 
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
@@ -44,10 +47,17 @@ export default function ResultsPage() {
     };
   }, [setResultsPage]);
 
+  //언마운트 시 선택된 삭제할 문제집 초기화
+  useEffect(() => {
+    return () => {
+      resetToDeletedUuid();
+    };
+  }, [resetToDeletedUuid]);
+
   return (
     <>
       <section className="mx-auto mt-10 w-full max-w-[80rem] p-3">
-        <h1 className="text-center text-3xl font-semibold mb-3">시험 기록</h1>
+        <h1 className="mb-3 text-center text-3xl font-semibold">시험 기록</h1>
 
         <DynamicSearchBox
           searchString={searchString}

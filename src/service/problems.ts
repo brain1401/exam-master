@@ -460,6 +460,39 @@ export async function getProblemsSetIdByUUID(uuid: string) {
   }
 }
 
+export async function getExamResultIdByUUID(uuid: string) {
+  const query = qs.stringify({
+    filters: {
+      uuid: {
+        $eq: uuid,
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok)
+      throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+
+    let data = await response.json();
+
+    return data.data[0].id;
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
 export async function getProblemByUUID(uuid: string, userEmail: string) {
   const query = qs.stringify({
     filters: {
@@ -1428,6 +1461,25 @@ export async function deleteProblemSet(problemSetUUID: string) {
   );
   if (!response.ok)
     throw new Error("문제집을 삭제하는 중 오류가 발생했습니다.");
+
+  return response.statusText;
+}
+
+export async function deleteProblemResult(resultUUID: string) {
+  const resultId = await getExamResultIdByUUID(resultUUID);
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results/${resultId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+      },
+      cache: "no-store",
+    },
+  );
+  if (!response.ok)
+    throw new Error("시험 결과를 삭제하는 중 오류가 발생했습니다.");
 
   return response.statusText;
 }

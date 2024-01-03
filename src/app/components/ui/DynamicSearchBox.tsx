@@ -18,6 +18,7 @@ export default function DynamicSearchBox({
         <DeleteAndSearchBox
           searchString={searchString}
           setSearchString={setSearchString}
+          type={type}
         />
       ) : (
         <div className="flex justify-end">
