@@ -14,7 +14,7 @@ export default function DynamicSearchBox({
 }: Props) {
   return (
     <>
-      {type === "manage" ? (
+      {type === "manage" || type === "result" ? (
         <DeleteAndSearchBox
           searchString={searchString}
           setSearchString={setSearchString}
