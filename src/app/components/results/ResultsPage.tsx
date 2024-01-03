@@ -8,6 +8,7 @@ import usePagenationState from "@/hooks/usePagenationState";
 import ResultsGrid from "./ResultsGrid";
 import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
+import DynamicSearchBox from "../ui/DynamicSearchBox";
 
 export default function ResultsPage() {
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
@@ -46,16 +47,20 @@ export default function ResultsPage() {
   return (
     <>
       <section className="mx-auto mt-10 w-full max-w-[80rem] p-3">
-        <h1 className="text-center text-3xl font-semibold">시험 기록</h1>
-        <SearchBox
+        <h1 className="text-center text-3xl font-semibold mb-3">시험 기록</h1>
+
+        <DynamicSearchBox
           searchString={searchString}
           setSearchString={setSearchString}
+          type="result"
         />
+
         <ResultsGrid
           debouncedSearchString={debouncedSearchString}
           isSearching={isSearching}
           pageSize={pageSize}
         />
+
         <PaginationButton
           maxPage={resultsMaxPage}
           page={resultsPage}
