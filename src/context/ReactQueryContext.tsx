@@ -15,8 +15,10 @@ export default function ReactQueryContext({ children }: Props) {
           // stale-while-revalidate 전략을 사용합니다.
           staleTime: 0,
           gcTime: Infinity,
+          retry: 3,
         },
       },
+
     }),
   );
   return (

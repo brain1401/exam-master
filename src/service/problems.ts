@@ -1302,6 +1302,7 @@ export async function fetchExamResults(
             page: resultsPage,
             pageSize,
           },
+          timeout: 3000,
         });
       }
     } else {
@@ -1311,6 +1312,7 @@ export async function fetchExamResults(
             page: resultsPage,
             pageSize,
           },
+          timeout: 3000,
         });
       }
     }
@@ -1344,6 +1346,7 @@ export async function fetchProblemSets(
             page: problemSetsPage,
             pageSize,
           },
+          timeout: 3000,
         });
       }
     } else {
@@ -1353,6 +1356,7 @@ export async function fetchProblemSets(
             page: problemSetsPage,
             pageSize,
           },
+          timeout: 3000,
         });
       }
     }
@@ -1385,6 +1389,7 @@ export async function getExamResultsMaxPage(
             page: 1,
             pageSize,
           },
+          timeout: 3000,
         });
       }
     } else {
@@ -1424,6 +1429,7 @@ export async function getProblemSetsMaxPage(
             page: 1,
             pageSize,
           },
+          timeout: 3000,
         });
       }
     } else {

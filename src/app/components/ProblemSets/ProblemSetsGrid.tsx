@@ -83,5 +83,14 @@ export default function ProblemSetsGrid({
 
   if (isLoading) return <ProblemSetsCardSkeleton pageSize={pageSize} />;
 
+  if (error)
+    return (
+      <div className="flex flex-col h-full justify-center items-center">
+        <h1 className="text-center text-3xl">
+          서버가 응답하지 않습니다 다시 시도해주시거나 나중에 다시 시도해주세요.
+        </h1>
+      </div>
+    );
+
   return <MainContent />;
 }
