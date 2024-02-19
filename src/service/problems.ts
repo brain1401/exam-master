@@ -15,7 +15,7 @@ import {
 import qs from "qs";
 import { getUser } from "./user";
 import axios from "axios";
-import { QueryFunctionContext } from "@tanstack/react-query";
+import { connectDB } from "@/utils/mongodb";
 
 export const checkEnvVariables = () => {
   if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
