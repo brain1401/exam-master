@@ -149,29 +149,48 @@ export async function createProblem(
   }
 }
 
-export async function uploadImageToProblem(image: File, problemId: string) {
+export async function uploadImageToProblem(image: any, problemId: string) {
   if (!image) throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
   try {
-    const newFormData = new FormData();
-    newFormData.append("files", image as Blob);
-    newFormData.append("ref", "api::exam-problem.exam-problem");
-    newFormData.append("refId", problemId);
-    newFormData.append("field", "image");
+    if (image && isImageFileObject(image)) {
+      const newFormData = new FormData();
+      newFormData.append("files", image as Blob);
+      newFormData.append("ref", "api::exam-problem.exam-problem");
+      newFormData.append("refId", problemId);
+      newFormData.append("field", "image");
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+          },
+          body: newFormData,
+          cache: "no-store",
         },
-        body: newFormData,
-        cache: "no-store",
-      },
-    );
+      );
 
-    if (!response.ok)
-      throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
+      if (!response.ok)
+        throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
+    } else if (image && isImageUrlObject(image)) {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems/${problemId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            image: image.id,
+          }),
+          cache: "no-store",
+        },
+      );
+      if (!response.ok)
+        throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
+    }
   } catch (err) {
     console.log(err);
     throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
@@ -182,6 +201,7 @@ export async function createProblemSets(
   userId: string,
   setName: string,
   postIdArray: string[],
+  isShareLinkPurposeSet: boolean,
 ) {
   try {
     const response = await fetch(
@@ -200,6 +220,7 @@ export async function createProblemSets(
           exam_user: {
             connect: [userId],
           },
+          isShareLinkPurposeSet,
         }),
         cache: "no-store",
       },
@@ -207,7 +228,9 @@ export async function createProblemSets(
     if (!response.ok)
       throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
 
-    return response.statusText;
+    const data = await response.json();
+
+    return data.data.UUID;
   } catch (err) {
     console.log(err);
     throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
@@ -218,6 +241,7 @@ export async function postProblems(
   setName: string,
   userEmail: string,
   problems: Problem[],
+  isShareLinkPurposeSet: boolean,
 ) {
   checkEnvVariables();
   const userId = (await getUser(userEmail)).id;
@@ -229,16 +253,20 @@ export async function postProblems(
 
       // 문제와 이미지 생성은 순차적으로 처리
       const postId = await createProblem(problem, userId);
-      if (problem?.image && isImageFileObject(problem?.image)) {
-        await uploadImageToProblem(problem.image, postId);
-      }
+
+      await uploadImageToProblem(problem?.image, postId);
 
       return postId;
     }),
   );
 
-  const response = await createProblemSets(userId, setName, postIdArray);
-  return response;
+  const createdUUID = await createProblemSets(
+    userId,
+    setName,
+    postIdArray,
+    isShareLinkPurposeSet,
+  );
+  return createdUUID;
 }
 
 export async function checkProblemSetName(name: string, userEmail: string) {
@@ -291,6 +319,9 @@ export async function getProblemSets(
           $eq: userEmail,
         },
       },
+      isShareLinkPurposeSet: {
+        $eq: false,
+      },
     },
     populate: ["exam_problems"],
     pagination: {
@@ -340,6 +371,9 @@ export async function getProblemSetsByName(
     filters: {
       name: {
         $contains: name,
+      },
+      isShareLinkPurposeSet: {
+        $eq: false,
       },
       exam_user: {
         email: {
@@ -428,6 +462,45 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
+
+export async function getProblemSetByUUIDUnsecure(uuid: string) {
+  const query = qs.stringify({
+    filters: {
+      UUID: {
+        $eq: uuid,
+      },
+    },
+    populate: {
+      exam_problems: {
+        populate: ["image"],
+      },
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok)
+      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+
+    let data = await response.json();
+
+    return data.data[0] as ProblemSetResponse;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
 export async function getProblemsSetIdByUUID(uuid: string) {
   const query = qs.stringify({
     filters: {
@@ -1488,4 +1561,42 @@ export async function deleteProblemResult(resultUUID: string) {
     throw new Error("시험 결과를 삭제하는 중 오류가 발생했습니다.");
 
   return response.statusText;
+}
+
+export async function createProblemSetShareLink(
+  uuid: string,
+  userEmail: string,
+) {
+  //이 함수는 서버에서 실행되기 때문에 안전함
+  const { exam_problems: problemResponse } =
+    await getProblemSetByUUIDUnsecure(uuid);
+
+  if (!problemResponse)
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+
+  const problems = problemResponse.map((problem) => {
+    const newProblem: Problem = {
+      additionalView: problem.additionalView,
+      candidates: problem.candidates,
+      image: problem.image,
+      isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
+      isAnswerMultiple: problem.isAnswerMultiple,
+      isImageButtonClicked: problem.image ? true : false,
+      question: problem.question,
+      subAnswer: problem.subjectiveAnswer,
+      type: problem.questionType as "obj" | "sub",
+      id: problem.id,
+    };
+    return newProblem;
+  });
+
+  const createdShareLinkProblemSetUUID = await postProblems(
+    `share-link-of-${uuid}-${new Date().toISOString()}`,
+    userEmail,
+    problems,
+    true,
+  );
+
+  return createdShareLinkProblemSetUUID;
+
 }

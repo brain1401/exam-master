@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
     problemSetsName,
     session?.user?.email,
     problems,
+    false,
   );
 
   return NextResponse.json(response);

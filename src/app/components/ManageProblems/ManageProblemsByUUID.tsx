@@ -9,6 +9,11 @@ import ManageProblemSubmitButton from "@/app/components/ManageProblems/ManagePro
 import CustomLoading from "../ui/CustomLoading";
 import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 import useProblems from "@/hooks/useProblems";
+import { Button } from "@nextui-org/react";
+import { FiShare } from "react-icons/fi";
+import Modal from "../ui/Modal";
+import ShareLinkWindow from "../ui/ShareLinkWindow";
+
 type Props = {
   UUID: string;
 };
@@ -16,6 +21,8 @@ type Props = {
 export default function ManageProblemsByUUID({ UUID }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     resetProblems,
@@ -71,15 +78,33 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
 
   return (
     <ProblemEditorLayout>
-      <ProblemsOption />
+      <div className="relative">
+        <ProblemsOption />
 
-      <CurrentProblemIndicator />
+        <Modal
+          Header={<h2 className="text-2xl">링크 공유</h2>}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          className="p-5"
+          kind="none"
+        >
+          <ShareLinkWindow setIsModalOpen={setIsModalOpen} UUID={UUID} />
+        </Modal>
 
-      <ProblemsEditor />
+        <div className="absolute right-0 top-0">
+          <Button isIconOnly onClick={() => setIsModalOpen((value) => !value)}>
+            <FiShare size={20} />
+          </Button>
+        </div>
 
-      <NextOrPrevButtons />
+        <CurrentProblemIndicator />
 
-      <ManageProblemSubmitButton uuid={UUID} />
+        <ProblemsEditor />
+
+        <NextOrPrevButtons />
+
+        <ManageProblemSubmitButton uuid={UUID} />
+      </div>
     </ProblemEditorLayout>
   );
 }
