@@ -21,7 +21,7 @@ export default function ExamProblemsNextOrPrevButtons() {
       </Button>
       <Button
         onClick={() => {
-          if (currentExamProblemIndex < examProblems.exam_problems.length - 1) {
+          if (currentExamProblemIndex < examProblems.problems.length - 1) {
             setCurrentExamProblemIndex(currentExamProblemIndex + 1);
           }
         }}

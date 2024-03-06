@@ -1,4 +1,5 @@
-import { getExamResultByUUID } from "@/service/problems";
+import { getExamResultsByUUID } from "@/service/problems";
+import { CorrectCandidate, ExamResultCandidate, ProblemResult } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
@@ -24,9 +25,26 @@ export async function GET(req: NextRequest) {
   const userEmail = session.user.email;
 
   try {
-    const result = await getExamResultByUUID(uuid, userEmail);
+    const result = await getExamResultsByUUID(uuid, userEmail);
 
-    return NextResponse.json(result);
+    const finalResult: ProblemResult[] = result.problem_results.map((r) => {
+      return {
+        uuid: r.uuid,
+        question: r.question,
+        questionType: r.questionType as "obj" | "sub",
+        additionalView: r.additionalView,
+        isCorrect: r.isCorrect,
+        candidates: r.candidates as ExamResultCandidate[],
+        isAnswerMultiple: r.isAnswerMultiple,
+        correctSubjectiveAnswer: r.correctSubjectiveAnswer,
+        correctCandidates: r.correctCandidates as CorrectCandidate[],
+        subjectiveAnswered: r.subjectiveAnswered,
+        image: r.image,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+      };
+    });
+    return NextResponse.json(finalResult);
   } catch (e) {
     if (e instanceof Error) {
       return NextResponse.json({ error: e.message }, { status: 500 });

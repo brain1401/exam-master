@@ -2,8 +2,8 @@
 
 import useProblems from "@/hooks/useProblems";
 import useScrollEffect from "@/hooks/useScrollEffect";
-import { isCardOnBeingWrited } from "@/service/problems";
-import { candidate } from "@/types/problems";
+import { Candidate } from "@/types/problems";
+import { isCardOnBeingWrited } from "@/utils/problems";
 import { Button } from "@nextui-org/react";
 
 const BUTTON_CLASSNAMES = "bg-secondary text-white px-3 py-1";
@@ -37,7 +37,7 @@ export default function NextOrPrevButtons() {
     //바뀔 문제 객체 초기화
     if (isCardOnBeingWrited(currentProblem)) return;
     newProblems[baseIndex] = {
-      id: problems[baseIndex]?.id,
+      uuid: problems[baseIndex]?.uuid,
       type: currentTab === "obj" ? "obj" : "sub",
       question: "",
       additionalView: "",
@@ -47,7 +47,7 @@ export default function NextOrPrevButtons() {
       isAnswerMultiple: false,
       candidates:
         currentTab === "obj"
-          ? Array.from(Array<candidate>(4), (_, i) => ({
+          ? Array.from(Array<Candidate>(4), (_, i) => ({
               id: i,
               text: "",
               isAnswer: false,

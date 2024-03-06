@@ -13,6 +13,7 @@ import { Button } from "@nextui-org/react";
 import { FiShare } from "react-icons/fi";
 import Modal from "../ui/Modal";
 import ShareLinkWindow from "../ui/ShareLinkWindow";
+import { ProblemSetWithName } from "@/types/problems";
 
 type Props = {
   UUID: string;
@@ -36,17 +37,19 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`/api/getProblemsByUUID`, {
+      .get<ProblemSetWithName>(`/api/getProblemsByUUID`, {
         params: {
           UUID,
         },
       })
       .then((res) => {
-        setProblems(res.data.exam_problems);
+        setProblems(res.data.problems);
         setProblemSetsName(res.data.name);
-        setProblemLength(res.data.exam_problems.length);
+        setProblemLength(res.data.problems.length.toString());
         setLocalProblemSetsName(res.data.name);
-        setCurrentTab(res.data.exam_problems[0].type);
+        setCurrentTab(
+          (res.data.problems[0] && res.data.problems[0].type) || "obj",
+        );
       })
       .catch((err) => {
         setError(err.response?.data.error);

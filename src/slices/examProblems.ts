@@ -9,9 +9,9 @@ type StateType = {
 
 const initialState: StateType = {
   examProblems: {
-    id: undefined,
+    uuid: undefined,
     name: "",
-    exam_problems: [],
+    problems: [],
   },
   currentExamProblemIndex: 0,
 };
@@ -34,7 +34,7 @@ export const examProblemSlice = createSlice({
       state,
       action: PayloadAction<ExamProblem>,
     ) => {
-      state.examProblems.exam_problems[state.currentExamProblemIndex] =
+      state.examProblems.problems[state.currentExamProblemIndex] =
         action.payload;
     },
     setExamProblemNameAction: (state, action: PayloadAction<string>) => {
@@ -55,7 +55,7 @@ export const selectCurrentExamProblem = createSelector(
   (state: RootState) => state.examProblemReducer.examProblems,
   (state: RootState) => state.examProblemReducer.currentExamProblemIndex,
   (examProblems, currentExamProblemIndex) =>
-    examProblems.exam_problems[currentExamProblemIndex],
+    examProblems.problems?.[currentExamProblemIndex],
 );
 
 export const selectCurrentExamProblemIndex = (state: RootState) =>

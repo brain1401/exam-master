@@ -1,6 +1,6 @@
 "use client";
 
-import useExamProblemResults from "@/hooks/useExamProblemResults";
+import useProblemResults from "@/hooks/useProblemResults";
 import candidateNumber from "@/utils/candidateNumber";
 
 export default function CorrectAnswer() {
@@ -10,7 +10,7 @@ export default function CorrectAnswer() {
       correctCandidates,
       correctSubjectiveAnswer,
     },
-  } = useExamProblemResults();
+  } = useProblemResults();
 
   const answerNumber = (id: number) => {
     const index = candidates?.findIndex((candidate) => candidate.id === id);

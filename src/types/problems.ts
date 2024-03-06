@@ -1,88 +1,24 @@
 import { Prettify } from "@/utils/type";
+import type { Prisma, PrismaClient } from "@prisma/client";
+import type { DefaultArgs } from "@prisma/client/runtime/library";
 import { z } from "zod";
+
 export const ImageSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  alternativeText: z.string().nullable(),
-  caption: z.string().nullable(),
-  width: z.number(),
-  height: z.number(),
-  formats: z
-    .object({
-      thumbnail: z
-        .object({
-          name: z.string(),
-          hash: z.string(),
-          ext: z.string(),
-          mime: z.string(),
-          path: z.string().nullable(),
-          width: z.number(),
-          height: z.number(),
-          size: z.number(),
-          url: z.string(),
-        })
-        .optional(),
-      medium: z
-        .object({
-          name: z.string(),
-          hash: z.string(),
-          ext: z.string(),
-          mime: z.string(),
-          path: z.string().nullable(),
-          width: z.number(),
-          height: z.number(),
-          size: z.number(),
-          url: z.string(),
-        })
-        .optional(),
-      small: z
-        .object({
-          name: z.string(),
-          hash: z.string(),
-          ext: z.string(),
-          mime: z.string(),
-          path: z.string().nullable(),
-          width: z.number(),
-          height: z.number(),
-          size: z.number(),
-          url: z.string(),
-        })
-        .optional(),
-      large: z
-        .object({
-          name: z.string(),
-          hash: z.string(),
-          ext: z.string(),
-          mime: z.string(),
-          path: z.string().nullable(),
-          width: z.number(),
-          height: z.number(),
-          size: z.number(),
-          url: z.string(),
-        })
-        .optional(),
-    })
-    .nullable(),
-  hash: z.string(),
-  ext: z.string(),
-  mime: z.string(),
-  size: z.number(),
+  uuid: z.string(),
+  key: z.string(),
+  filename: z.string(),
   url: z.string(),
-  previewUrl: z.string().nullable(),
-  provider: z.string(),
-  provider_metadata: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  hash: z.string(),
 });
 
-export type candidate = {
+export type Candidate = {
   id: number | null;
   text: string;
   isAnswer: boolean;
 };
 
 export type Problem = {
-  id?: number;
+  uuid?: string;
   type: "obj" | "sub";
   question: string;
   additionalView: string;
@@ -90,58 +26,43 @@ export type Problem = {
   image: File | z.infer<typeof ImageSchema> | null;
   isAdditiondalViewButtonClicked: boolean;
   isImageButtonClicked: boolean;
-  candidates: candidate[] | null;
+  candidates: Candidate[] | null;
   subAnswer: string | null;
 } | null;
 
 export type ExamProblem = z.infer<typeof examProblemSchema>;
 
-export type ProblemResponse = {
-  id: number;
-  question: string;
-  createdAt: string;
-  updatedAt: string;
-  questionType: string;
+export type ProblemSet = {
   uuid: string;
-  image: z.infer<typeof ImageSchema>;
-  candidates: candidate[] | null;
-  additionalView: string;
-  subjectiveAnswer: string | null;
-  isAnswerMultiple: boolean | null;
-};
-
-export type ProblemSetResponse = {
-  id: number;
   name: string;
-  createdAt: string;
-  updatedAt: string;
-  UUID: string;
-  exam_problems?: ProblemResponse[];
+  createdAt: Date;
+  updatedAt: Date;
+  isShareLinkPurposeSet: boolean;
+  problems?: Problem[];
   examProblemsCount?: number;
 };
 
-export type RawProblemSetResponse = {
-  data: ProblemSetResponse[];
-  meta: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
+export type ProblemSetWithPagination = {
+  data: ProblemSet[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
   };
 };
 
+
 export type ProblemSetWithName = {
-  id: number | undefined;
+  id: string | undefined;
   name: string;
-  exam_problems: Problem[];
+  problems: Problem[];
 };
 
 export type ExamProblemSet = {
-  id: number | undefined;
+  uuid: string | undefined;
   name: string;
-  exam_problems: ExamProblem[];
+  problems: ExamProblem[];
 };
 
 export const candidateSchema = z.object({
@@ -150,11 +71,11 @@ export const candidateSchema = z.object({
   isAnswer: z.boolean(),
 });
 
-export type StrapiImage = z.infer<typeof ImageSchema>;
+export type MongoDBImageType = z.infer<typeof ImageSchema>;
 
 export const problemSchema = z
   .object({
-    id: z.number().optional(),
+    id: z.string().optional(),
     type: z.union([z.literal("obj"), z.literal("sub")]),
     question: z.string(),
     additionalView: z.string().nullable(),
@@ -174,7 +95,7 @@ export const problemSchema = z
   .nullable();
 
 export const examProblemSchema = z.object({
-  id: z.number().optional(),
+  uuid: z.string().optional(),
   type: z.union([z.literal("obj"), z.literal("sub")]),
   question: z.string(),
   additionalView: z.string(),
@@ -182,55 +103,6 @@ export const examProblemSchema = z.object({
   image: ImageSchema.nullable(),
   candidates: z.array(candidateSchema).nullable(),
   subAnswer: z.string().nullable(),
-});
-
-export const problemResponseSchema = z.object({
-  id: z.number(),
-  question: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  questionType: z.string(),
-  uuid: z.string(),
-  image: z.object({
-    id: z.string(),
-    url: z.string(),
-  }),
-  candidates: z.array(candidateSchema).nullable(),
-  additionalView: z.string(),
-  subjectiveAnswer: z.string().nullable(),
-  isAnswerMultiple: z.boolean().nullable(),
-});
-
-export const problemSetResponseSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  UUID: z.string(),
-  exam_problems: z.array(problemResponseSchema).optional(),
-  examProblemsCount: z.number().optional(),
-});
-
-export const rawProblemSetResponseSchema = z.object({
-  data: z.array(problemSetResponseSchema),
-  meta: z.object({
-    pagination: z.object({
-      page: z.number(),
-      pageSize: z.number(),
-      pageCount: z.number(),
-      total: z.number(),
-    }),
-  }),
-});
-
-export const problemSetWithNameSchema = z.object({
-  name: z.string(),
-  exam_problems: z.array(problemSchema),
-});
-
-export const examProblemSetSchema = z.object({
-  name: z.string(),
-  exam_problems: z.array(examProblemSchema),
 });
 
 export const problemsSchema = z.array(problemSchema);
@@ -250,11 +122,10 @@ export const ExamResultCandidateSchema = z.object({
 });
 export type ExamResultCandidate = z.infer<typeof ExamResultCandidateSchema>;
 
-export const ExamProblemResultSchema = z.object({
-  id: z.number(),
+export const ProblemResultSchema = z.object({
+  uuid: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  publishedAt: z.coerce.date(),
   isCorrect: z.boolean(),
   candidates: z.array(ExamResultCandidateSchema).nullable(),
   question: z.string(),
@@ -264,33 +135,34 @@ export const ExamProblemResultSchema = z.object({
   subjectiveAnswered: z.string().nullable(),
   correctCandidates: z.array(CorrectCandidateSchema).nullable(),
   correctSubjectiveAnswer: z.string().nullable(),
-  image: z.array(ImageSchema).nullable(),
+  image: ImageSchema.nullable(),
 });
-export type ExamProblemResult = Prettify<
-  z.infer<typeof ExamProblemResultSchema>
->;
+export type ProblemResult = Prettify<z.infer<typeof ProblemResultSchema>>;
 
 export const ExamResultSchema = z.object({
-  id: z.number(),
+  uuid: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   publishedAt: z.coerce.date(),
   problemSetName: z.string(),
-  uuid: z.string().uuid(),
-  exam_problem_results: z.array(ExamProblemResultSchema).optional(),
+  user: z.string(),
+  problem_results: z.array(ProblemResultSchema).optional(),
 });
 
-export const ExamResultsWithCountSchema = z.object({
-  id: z.number(),
+export const ResultWithCountSchema = z.object({
+  uuid: z.string().uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  publishedAt: z.coerce.date(),
   problemSetName: z.string(),
-  uuid: z.string().uuid(),
-  examProblemResultsCount: z.number(),
+  problemResultsCount: z.number(),
 });
 
-export type ExamResultsWithCount = z.infer<typeof ExamResultsWithCountSchema>;
+export type ResultWithCount = z.infer<typeof ResultWithCountSchema>;
+
+export type ResultsWithPagination = {
+  data: ResultWithCount[];
+  pagination: Pagination;
+};
 
 export type ExamResult = z.infer<typeof ExamResultSchema>;
 
@@ -311,14 +183,8 @@ export const MetaSchema = z.object({
 });
 export type Meta = z.infer<typeof MetaSchema>;
 
-export const ExamResultsResponseSchema = z.object({
-  data: z.array(ExamResultSchema),
-  meta: MetaSchema,
-});
-export type ExamResultsResponse = z.infer<typeof ExamResultsResponseSchema>;
-
 export const ExamResultsWithCountResponseSchema = z.object({
-  data: z.array(ExamResultsWithCountSchema),
+  data: z.array(ResultWithCountSchema),
   meta: MetaSchema,
 });
 
@@ -329,3 +195,8 @@ export type ExamResultsWithCountResponse = z.infer<
 export const ExamResultsSchema = z.array(ExamResultSchema);
 
 export type ExamResults = z.infer<typeof ExamResultsSchema>;
+
+export type PrismaTransaction = Omit<
+  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>;

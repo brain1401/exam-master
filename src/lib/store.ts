@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import navbarReducer from "@/slices/navbar";
 import problemsReducer from "@/slices/problems";
 import examProblemReducer from "@/slices/examProblems";
-import examProblemResultsReducer from "@/slices/examProblemResults";
+import problemResultsReducer from "@/slices/problemResults";
 import mediaQueryReducer from "@/slices/mediaQuery";
 import pagenationReducer from "@/slices/pagenation";
 import uiReducer from "@/slices/ui";
@@ -13,7 +13,7 @@ export const makeStore = () => {
       navbarReducer,
       problemsReducer,
       examProblemReducer,
-      examProblemResultsReducer,
+      problemResultsReducer,
       mediaQueryReducer,
       pagenationReducer,
       uiReducer,

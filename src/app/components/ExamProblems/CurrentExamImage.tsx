@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
-import { isImageUrlObject } from "@/service/problems";
 import useExamProblems from "@/hooks/useExamProblems";
+import { isImageUrlObject } from "@/utils/problems";
 
 export default function CurrentExamImage() {
   const {
@@ -13,7 +13,7 @@ export default function CurrentExamImage() {
       {image && isImageUrlObject(image) && (
         <div className="mb-5">
           <Image
-            src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+            src={image.url}
             width={400}
             height={400}
             priority

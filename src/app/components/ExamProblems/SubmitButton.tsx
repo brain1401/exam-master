@@ -4,24 +4,24 @@ import { useTransition } from "react";
 import { evaluateProblems } from "@/action/evaluateProblems";
 import { useRouter } from "next/navigation";
 import useExamProblems from "@/hooks/useExamProblems";
-import { isProblemAsnwered } from "@/service/problems";
+import { isProblemAsnwered } from "@/utils/problems";
 
 export default function SubmitButton() {
   const [isPending, startTransition] = useTransition();
 
   const {
-    examProblems: { exam_problems, name: problemSetName },
+    examProblems: { problems, name: problemSetName },
   } = useExamProblems();
 
   const router = useRouter();
 
   const onClick = () => {
-    if (exam_problems.some((problem) => !isProblemAsnwered(problem)))
+    if (problems.some((problem) => !isProblemAsnwered(problem)))
       return alert("모든 문제에 답을 입력해주세요.");
     // server actions
     startTransition(async () => {
       try {
-        const uuid = await evaluateProblems(exam_problems, problemSetName);
+        const uuid = await evaluateProblems(problems, problemSetName);
         router.push(`/result/${uuid}`);
       } catch (e) {
         if (e instanceof Error) {

@@ -1,241 +1,30 @@
 import {
-  RawProblemSetResponse,
   Problem,
-  ProblemSetResponse,
-  ProblemResponse,
-  ExamResult,
   ExamProblem,
-  StrapiImage,
-  ImageSchema,
-  ExamProblemResult,
-  ExamResultsWithCount,
-  ExamResultsWithCountResponse,
-  ExamResultsResponse,
+  ProblemSetWithPagination,
+  Candidate,
+  PrismaTransaction,
+  ResultsWithPagination,
 } from "@/types/problems";
-import qs from "qs";
-import { getUser } from "./user";
-import axios from "axios";
-import { connectDB } from "@/utils/mongodb";
+import {
+  getUserByEmail,
+} from "./user";
+import {
+  isAnswerArray,
+  isAnswerString,
+  isImageFileObject,
+  isImageUrlObject,
+} from "@/utils/problems";
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 
-export const checkEnvVariables = () => {
-  if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
-    throw new Error("환경 변수가 설정되지 않았습니다.");
-  }
-};
+import prisma from "@/lib/prisma";
+import { s3Client } from "@/utils/AWSs3Client";
 
-export function isImageFileObject(image: any): image is File {
-  return (
-    image &&
-    typeof image === "object" &&
-    typeof image.name === "string" &&
-    typeof image.size === "number" &&
-    typeof image.type === "string" &&
-    typeof image.lastModified === "number"
-  );
-}
-
-export function isImageUrlObject(image: any): image is StrapiImage {
-  return ImageSchema.safeParse(image).success;
-}
-
-export const isProblemEmpty = (problem: Problem) => {
-  if (!problem) {
-    return true;
-  }
-  if (problem.question === "") {
-    return true;
-  }
-
-  if (
-    problem.candidates &&
-    problem.candidates.some((candidate) => candidate.text === "")
-  ) {
-    return true;
-  }
-  if (problem.isAdditiondalViewButtonClicked && problem.additionalView === "") {
-    return true;
-  }
-
-  if (problem.isImageButtonClicked && problem.image === null) {
-    return true;
-  }
-
-  if (
-    problem.candidates &&
-    !problem.candidates?.some((candidate) => candidate.isAnswer === true)
-  ) {
-    return true;
-  }
-
-  if (problem.type === "sub" && problem.subAnswer === "") {
-    return true;
-  }
-
-  return false;
-};
-
-export const isCardOnBeingWrited = (problem: Problem) => {
-  if (!problem) {
-    return false;
-  }
-  if (problem.question !== "") {
-    return true;
-  }
-
-  if (
-    problem.candidates !== null &&
-    problem.candidates.some((candidate) => candidate.text !== "")
-  ) {
-    return true;
-  }
-
-  if (problem.image !== null) {
-    return true;
-  }
-
-  if (problem.additionalView !== "") {
-    return true;
-  }
-
-  if (problem.type === "sub" && problem.subAnswer !== "") {
-    return true;
-  }
-
-  return false;
-};
-
-export async function createProblem(
-  problem: Problem,
-  userId: string,
-): Promise<string> {
-  if (!problem) {
-    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
-  }
-  try {
-    let postId = "";
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          questionType: problem.type,
-          question: problem.question,
-          additionalView: problem.additionalView,
-          candidates: problem.candidates,
-          subjectiveAnswer: problem.subAnswer,
-          isAnswerMultiple: problem.isAnswerMultiple,
-          exam_user: {
-            connect: [userId],
-          },
-        }),
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok)
-      throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
-
-    const data = await response.json();
-    postId = data.data.id;
-    return postId;
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function uploadImageToProblem(image: any, problemId: string) {
-  if (!image) throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
-  try {
-    if (image && isImageFileObject(image)) {
-      const newFormData = new FormData();
-      newFormData.append("files", image as Blob);
-      newFormData.append("ref", "api::exam-problem.exam-problem");
-      newFormData.append("refId", problemId);
-      newFormData.append("field", "image");
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-          },
-          body: newFormData,
-          cache: "no-store",
-        },
-      );
-
-      if (!response.ok)
-        throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
-    } else if (image && isImageUrlObject(image)) {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems/${problemId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            image: image.id,
-          }),
-          cache: "no-store",
-        },
-      );
-      if (!response.ok)
-        throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
-    }
-  } catch (err) {
-    console.log(err);
-    throw new Error("이미지를 생성하는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function createProblemSets(
-  userId: string,
-  setName: string,
-  postIdArray: string[],
-  isShareLinkPurposeSet: boolean,
-) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: setName,
-          exam_problems: {
-            connect: [...postIdArray],
-          },
-          exam_user: {
-            connect: [userId],
-          },
-          isShareLinkPurposeSet,
-        }),
-        cache: "no-store",
-      },
-    );
-    if (!response.ok)
-      throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
-
-    const data = await response.json();
-
-    return data.data.UUID;
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
-  }
-}
 
 export async function postProblems(
   setName: string,
@@ -243,118 +32,359 @@ export async function postProblems(
   problems: Problem[],
   isShareLinkPurposeSet: boolean,
 ) {
-  checkEnvVariables();
-  const userId = (await getUser(userEmail)).id;
-
-  // 각 카드에 대한 작업을 병렬로 수행
-  const postIdArray = await Promise.all(
-    problems.map(async (problem) => {
-      if (isProblemEmpty(problem)) throw new Error("문제가 비어있습니다.");
-
-      // 문제와 이미지 생성은 순차적으로 처리
-      const postId = await createProblem(problem, userId);
-
-      await uploadImageToProblem(problem?.image, postId);
-
-      return postId;
-    }),
-  );
-
-  const createdUUID = await createProblemSets(
-    userId,
-    setName,
-    postIdArray,
-    isShareLinkPurposeSet,
-  );
-  return createdUUID;
-}
-
-export async function checkProblemSetName(name: string, userEmail: string) {
-  const query = qs.stringify({
-    filters: {
-      name: {
-        $eq: name,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-  });
-
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
+    const result = await prisma.$transaction(
+      async (pm) => {
+        console.time("createProblemSet");
+        const createdProblemSet = await pm.problemSet.create({
+          data: {
+            name: setName,
+            user: {
+              connect: {
+                email: userEmail,
+              },
+            },
+            problems: {
+              create: await Promise.all(
+                problems.map(async (problem, index) => {
+                  if (!problem) throw new Error("문제가 null입니다!");
+
+                  return {
+                    questionType: problem.type,
+                    question: problem.question,
+                    candidates: problem.candidates ?? undefined,
+                    additionalView: problem.additionalView,
+                    subjectiveAnswer: problem.subAnswer,
+                    isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
+                    order: index + 1,
+                    image: problem.image
+                      ? {
+                          connect: {
+                            uuid: (
+                              await createImageIfNotExist(
+                                problem.image,
+                                userEmail,
+                                pm,
+                              )
+                            ).uuid,
+                          },
+                        }
+                      : undefined,
+                    user: {
+                      connect: {
+                        email: userEmail,
+                      },
+                    },
+                  };
+                }),
+              ),
+            },
+            isShareLinkPurposeSet: isShareLinkPurposeSet,
+          },
+          select: {
+            uuid: true,
+          },
+        });
+        console.timeEnd("createProblemSet");
+
+        return createdProblemSet ? "OK" : "FAIL";
+      },
       {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
+        timeout: 20000, // 20초
       },
     );
 
-    if (!response.ok)
-      throw new Error("문제집 이름을 확인하는 중 오류가 발생했습니다.");
+    return result;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
+  }
+}
 
-    const data = await response.json();
+export async function createImageIfNotExist(
+  image: any,
+  userEmail: string,
+  pm: PrismaTransaction,
+) {
+  console.log("createImageIfNotExist 함수 시작");
+  const prismaInstance = pm;
 
-    return data.data.length === 0 ? false : true;
+  try {
+    if (image && isImageFileObject(image)) {
+      // 이미지가 파일 타입인 경우
+      console.log("[createImageIfNotExist] 이미지가 파일 타입인 경우");
+      const [hash, { uuid: userUuid }] = await Promise.all([
+        generateFileHash(image),
+        getUserByEmail(userEmail, prismaInstance),
+      ]);
+
+      const imageKey = `${hash}-${image.name}`;
+      console.log("[createImageIfNotExist] imageKey :", imageKey);
+
+      const [checkIfImageExistsOnS3, checkIfImageExistsOnDB] =
+        await Promise.all([
+          checkIfImageExistsOnS3ByImageKey(imageKey),
+          checkIfImageExistsOnDBByImageKey(imageKey, prismaInstance),
+        ]);
+
+      if (!checkIfImageExistsOnS3 && !checkIfImageExistsOnDB) {
+        // 넣으려고 하는 이미지가 s3와 prisma에 없는 경우
+        console.log(
+          `[createImageIfNotExist] 넣으려고 하는 이미지${image.name}가 s3와 prisma에 없는 경우`,
+        );
+        try {
+          const command = new PutObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: imageKey,
+            Body: (await image.arrayBuffer()) as Buffer,
+            ContentType: image.type,
+          });
+
+          const response = await s3Client.send(command);
+          if (!(response.$metadata.httpStatusCode === 200))
+            throw new Error(
+              "[createImageIfNotExist] S3에 이미지를 생성하는 중 오류가 발생했습니다.",
+            );
+
+          const result = await prismaInstance.image.upsert({
+            where: {
+              key: imageKey,
+            },
+            create: {
+              key: imageKey,
+              url: `https://${process.env.AWS_CLOUDFRONT_DOMAIN}/${encodeURIComponent(imageKey)}`,
+              hash: hash,
+              filename: image.name,
+              users: {
+                connect: {
+                  email: userEmail,
+                },
+              },
+            },
+            update: {},
+            select: {
+              uuid: true,
+            },
+          });
+
+          console.log(`[createImageIfNotExist] 이미지 ${image.name} 생성 성공`);
+
+          return result;
+        } catch (err) {
+          console.log(
+            "s3에 이미지를 업로드 하는 중 오류 발생, 이미지 삭제 시도..",
+          );
+          console.error(err);
+          const command = new DeleteObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: imageKey,
+          });
+
+          const response = await s3Client.send(command);
+
+          if (!(response.$metadata.httpStatusCode === 204)) {
+            throw new Error(
+              `[createImageIfNotExist] S3에서 이미지${image.name}를 삭제하는 중 오류가 발생했습니다.`,
+            );
+          } else {
+            console.log(
+              `[createImageIfNotExist] 이미지${image.name} 삭제 성공`,
+            );
+          }
+
+          throw new Error(
+            `[createImageIfNotExist] 이미지${image.name}를 생성하는 중 오류가 발생했습니다.`,
+          );
+        }
+      } else if (checkIfImageExistsOnS3 && checkIfImageExistsOnDB) {
+        //넣으려고 하는 이미지가 s3에 있는 경우 (이미 데이터베이스에 있는 경우)
+        console.log(
+          `[createImageIfNotExist] 넣으려고 하는 이미지 ${image.name}가 s3에 있는 경우 (이미 데이터베이스에 있는 경우)`,
+        );
+        const imageUuid = await getImageUuidByImageKey(
+          imageKey,
+          prismaInstance,
+        );
+        if (!imageUuid)
+          throw new Error(
+            `[createImageIfNotExist] 이미지 uuid ${image.name}를 찾는 중 오류가 발생했습니다.`,
+          );
+
+        const result = await prismaInstance.image.update({
+          where: {
+            uuid: imageUuid,
+          },
+          data: {
+            users: {
+              connect: {
+                email: userEmail,
+              },
+            },
+          },
+          select: {
+            uuid: true,
+          },
+        });
+
+        console.log(
+          `[createImageIfNotExist] 데이터베이스에 이미 이미지가 있어 이미지${imageKey}와 유저${userEmail}를 연결했습니다.`,
+        );
+        return result;
+      } else {
+        throw new Error(
+          `[createImageIfNotExist] 이미지가 s3와 DB에 동기화되어있지 않습니다!\n s3:${checkIfImageExistsOnS3} DB:${checkIfImageExistsOnDB}`,
+        );
+      }
+    } else if (image && isImageUrlObject(image)) {
+      // 이미지가 URL 타입인 경우
+      console.log("[createImageIfNotExist] 이미지가 URL 타입인 경우");
+      const imageUuid = await getImageUuidByImageKey(image.key, prismaInstance);
+      console.log("[createImageIfNotExist] imageKey :", image.key);
+      console.log("[createImageIfNotExist] imageUuid :", imageUuid);
+      if (!imageUuid)
+        throw new Error(
+          "[createImageIfNotExist] 이미지 uuid를 찾는 중 오류가 발생했습니다.",
+        );
+
+      const result = await prismaInstance.image.update({
+        where: {
+          uuid: imageUuid,
+        },
+        data: {
+          users: {
+            connect: {
+              email: userEmail,
+            },
+          },
+        },
+        select: {
+          uuid: true,
+        },
+      });
+
+      console.log(
+        `[createImageIfNotExist] 이미지${image.key}와 유저${userEmail}를 연결했습니다.`,
+      );
+
+      return result;
+    } else {
+      throw new Error("[createImageIfNotExist] 이미지가 없습니다.");
+    }
+  } catch (err) {
+    console.error(err);
+    throw new Error(
+      "[createImageIfNotExist] 이미지를 생성하는 중 오류가 발생했습니다.",
+    );
+  }
+}
+
+export async function checkProblemSetName(name: string, userEmail: string) {
+  try {
+    const result = await prisma.problemSet.findMany({
+      where: {
+        name: name,
+        user: {
+          email: userEmail,
+        },
+      },
+    });
+
+    return result.length > 0 ? true : false;
   } catch (err) {
     console.log(err);
     throw new Error("문제집 이름을 확인하는 중 오류가 발생했습니다.");
   }
 }
 
+export async function checkIfImageExistsOnDBByImageKey(
+  imageKey: string,
+  pm?: PrismaTransaction,
+) {
+  const prismaInstance = pm ?? prisma;
+  try {
+    const result = await prismaInstance.image.findFirst({
+      where: {
+        key: imageKey,
+      },
+    });
+
+    return result ? true : false;
+  } catch (err) {
+    console.log(err);
+    throw new Error("이미지를 확인하는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function checkIfImageExistsOnS3ByImageKey(imageKey: string) {
+  try {
+    const result = await s3Client.send(
+      new HeadObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: imageKey,
+      }),
+    );
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
 export async function getProblemSets(
   userEmail: string,
   page: string,
   pageSize: string,
 ) {
-  const query = qs.stringify({
-    filters: {
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-      isShareLinkPurposeSet: {
-        $eq: false,
-      },
-    },
-    populate: ["exam_problems"],
-    pagination: {
-      page,
-      pageSize,
-    },
-    sort: "updatedAt:desc",
-  });
-
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const [totalProblemSetsCount, problemSets] = await Promise.all([
+      prisma.problemSet.count({
+        where: {
+          user: {
+            email: userEmail,
+          },
         },
-        cache: "no-store",
+      }),
+      prisma.problemSet.findMany({
+        where: {
+          user: {
+            email: userEmail,
+          },
+        },
+        skip: (parseInt(page) - 1) * parseInt(pageSize),
+        take: parseInt(pageSize),
+        include: {
+          problems: {
+            orderBy: {
+              order: "asc",
+            },
+            include: {
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      }),
+    ]);
+
+    const returnData: ProblemSetWithPagination = {
+      data: problemSets.map((problemSet) => ({
+        uuid: problemSet.uuid,
+        name: problemSet.name,
+        createdAt: problemSet.createdAt,
+        updatedAt: problemSet.updatedAt,
+        isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
+        examProblemsCount: problemSet.problems.length,
+      })),
+      pagination: {
+        page: parseInt(page),
+        pageSize: parseInt(pageSize),
+        pageCount: Math.ceil(totalProblemSetsCount / parseInt(pageSize)),
+        total: problemSets.length,
       },
-    );
+    };
 
-    if (!response.ok)
-      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-
-    let responseJson: RawProblemSetResponse = await response.json();
-    responseJson.data.forEach((problemSet) => {
-      problemSet.updatedAt = problemSet.updatedAt.slice(0, 10);
-      problemSet.createdAt = problemSet.createdAt.slice(0, 10);
-      problemSet.examProblemsCount = problemSet.exam_problems?.length;
-      delete problemSet.exam_problems;
-    });
-
-    return responseJson;
+    return returnData;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
@@ -367,52 +397,48 @@ export async function getProblemSetsByName(
   page: string,
   pageSize: string,
 ) {
-  const query = qs.stringify({
-    filters: {
-      name: {
-        $contains: name,
-      },
-      isShareLinkPurposeSet: {
-        $eq: false,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-    populate: ["exam_problems"],
-    pagination: {
-      page,
-      pageSize,
-    },
-    sort: "updatedAt:desc",
-  });
-
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const problemSets = await prisma.problemSet.findMany({
+      where: {
+        name: {
+          contains: name,
         },
-        cache: "no-store",
+        user: {
+          email: userEmail,
+        },
       },
-    );
-
-    if (!response.ok)
-      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-
-    let responseJson: RawProblemSetResponse = await response.json();
-    responseJson.data.forEach((problemSet) => {
-      problemSet.updatedAt = problemSet.updatedAt.slice(0, 10);
-      problemSet.createdAt = problemSet.createdAt.slice(0, 10);
-      problemSet.examProblemsCount = problemSet.exam_problems?.length;
-      delete problemSet.exam_problems;
+      skip: (parseInt(page) - 1) * parseInt(pageSize),
+      take: parseInt(pageSize),
+      include: {
+        problems: {
+          include: {
+            image: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
 
-    return responseJson;
+    const returnData: ProblemSetWithPagination = {
+      data: problemSets.map((problemSet) => ({
+        uuid: problemSet.uuid,
+        name: problemSet.name,
+        createdAt: problemSet.createdAt,
+        updatedAt: problemSet.updatedAt,
+        isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
+        examProblemsCount: problemSet.problems.length,
+      })),
+      pagination: {
+        page: parseInt(page),
+        pageSize: parseInt(pageSize),
+        pageCount: Math.ceil(problemSets.length / parseInt(pageSize)),
+        total: problemSets.length,
+      },
+    };
+
+    return returnData;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
@@ -421,534 +447,299 @@ export async function getProblemSetsByName(
 
 export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
   // filter 조건에 userEmail을 추가해서 해당 유저의 문제집만 가져오도록 했음
-  const query = qs.stringify({
-    filters: {
-      UUID: {
-        $eq: uuid,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-
-    populate: {
-      exam_problems: {
-        populate: ["image"],
-      },
-    },
-  });
 
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const problemSet = await prisma.problemSet.findFirst({
+      where: {
+        uuid: uuid,
+        user: {
+          email: userEmail,
         },
-        cache: "no-store",
       },
-    );
+      include: {
+        problems: {
+          orderBy: {
+            order: "asc",
+          },
+          include: {
+            image: true,
+          },
+        },
+      },
+    });
 
-    if (!response.ok)
+    if (!problemSet) {
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+    }
 
-    let data = await response.json();
-    return data.data[0] as ProblemSetResponse;
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function getProblemSetByUUIDUnsecure(uuid: string) {
-  const query = qs.stringify({
-    filters: {
-      UUID: {
-        $eq: uuid,
-      },
-    },
-    populate: {
-      exam_problems: {
-        populate: ["image"],
-      },
-    },
-  });
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok)
-      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-
-    let data = await response.json();
-
-    return data.data[0] as ProblemSetResponse;
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function getProblemsSetIdByUUID(uuid: string) {
-  const query = qs.stringify({
-    filters: {
-      UUID: {
-        $eq: uuid,
-      },
-    },
-  });
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok)
-      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-
-    let data = await response.json();
-    return data.data[0].id;
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function getExamResultIdByUUID(uuid: string) {
-  const query = qs.stringify({
-    filters: {
-      uuid: {
-        $eq: uuid,
-      },
-    },
-  });
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok)
-      throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
-
-    let data = await response.json();
-
-    return data.data[0].id;
-  } catch (err) {
-    console.log(err);
-    throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function getProblemByUUID(uuid: string, userEmail: string) {
-  const query = qs.stringify({
-    filters: {
-      UUID: {
-        $eq: uuid,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-  });
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok)
-      throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
-
-    let data = await response.json();
-    return data.data[0] as Problem;
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function getProblemById(id: string, userEmail: string) {
-  const query = qs.stringify({
-    filters: {
-      id: {
-        $eq: id,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-  });
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok)
-      throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
-
-    let data = await response.json();
-    return data.data[0] as Problem;
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function updateProblem(id: string, problem: Problem) {
-  checkEnvVariables();
-
-  if (!problem) {
-    throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
-  }
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        questionType: problem.type,
+    const returnData = {
+      uuid: problemSet.uuid,
+      name: problemSet.name,
+      createdAt: problemSet.createdAt,
+      updatedAt: problemSet.updatedAt,
+      isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
+      problems: problemSet.problems.map((problem) => ({
+        uuid: problem.uuid,
         question: problem.question,
-        additionalView: problem.additionalView,
-        candidates: problem.candidates,
-        subjectiveAnswer: problem.subAnswer,
+        additionalView: problem.additionalView ?? "",
+        candidates: problem.candidates as Candidate[],
+        image: problem.image,
+        isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
         isAnswerMultiple: problem.isAnswerMultiple,
-      }),
-      cache: "no-store",
-    },
-  );
-  if (!response.ok)
-    throw new Error("문제를 업로드하는 중 오류가 발생했습니다.");
-}
+        isImageButtonClicked: problem.image ? true : false,
+        subjectiveAnswer: problem.subjectiveAnswer,
+        subAnswer: problem.subjectiveAnswer,
+        type: problem.questionType as "obj" | "sub",
+      })),
+    };
 
-export async function deletePhoto(id: string) {
-  checkEnvVariables();
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload/files/${id}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-      },
-      cache: "no-store",
-    },
-  );
-  if (!response.ok)
-    throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
-}
-
-export async function getProblemPhotoIdByProblemId(id: string) {
-  const query = qs.stringify({
-    filters: {
-      id: {
-        $eq: id,
-      },
-    },
-    populate: ["image"],
-  });
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
-      },
-    );
-    if (!response.ok)
-      throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
-
-    const data = await response.json();
-    const imageId = data?.data?.[0]?.image?.id;
-    const result = imageId ?? "null";
-    return result as string;
+    return returnData;
   } catch (err) {
     console.log(err);
-    throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
 
-export async function updateProblemSetName(
-  name: string,
-  problemSetUUID: string,
-) {
-  checkEnvVariables();
-  const problemSetId = await getProblemsSetIdByUUID(problemSetUUID);
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets/${problemSetId}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-      body: JSON.stringify({
-        name: name,
-      }),
-    },
-  );
-  if (!response.ok)
-    throw new Error("문제집 이름을 수정하는 중 오류가 발생했습니다.");
-}
 export async function updateProblems(
   setName: string,
-  problems: Problem[],
+  replacingProblems: Problem[],
   problemSetUUID: string,
   userEmail: string,
 ) {
-  checkEnvVariables();
-
-  //문제집 이름 수정
-  await updateProblemSetName(setName, problemSetUUID);
+  console.log("문제 업데이트 시작!");
 
   try {
-    for (const problem of problems) {
-      if (!problem?.id) {
-        //새로 추가된 문제인 경우
-        if (problem) {
-          problem.id = Number(
-            await createProblem(problem, (await getUser(userEmail)).id),
-          );
-        }
-
-        if (problem?.id) {
-          if (problem?.image && isImageFileObject(problem?.image)) {
-            await uploadImageToProblem(problem.image, problem.id.toString());
-          }
-          await linkProblemToProblemSet(
-            problem.id.toString(),
-            (await getProblemsSetIdByUUID(problemSetUUID)).toString(),
-          );
-          continue;
-        }
-      }
-
-      if (!problem?.id) {
-        throw new Error("문제를 수정하는 중 오류가 발생했습니다.");
-      }
-
-      if (problem && problem?.image && isImageFileObject(problem?.image)) {
-        //image가 파일 타입인 경우
-        const photoId = await getProblemPhotoIdByProblemId(
-          problem.id.toString(),
+    console.log("문제 업데이트 트랜잭션 시작");
+    const result = await prisma.$transaction(
+      async (pm) => {
+        console.log("기존 문제 불러오기 시작");
+        const oldProblems = (
+          await pm.problem.findMany({
+            where: {
+              problemSet: {
+                uuid: problemSetUUID,
+              },
+            },
+            select: {
+              uuid: true,
+              image: true,
+              order: true,
+            },
+          })
+        ).map((problem) => ({
+          uuid: problem.uuid,
+          image: problem.image,
+          order: problem.order,
+        }));
+        console.log(
+          "oldProblems : ",
+          oldProblems.sort((a, b) => a.order - b.order),
         );
 
-        if (photoId === "null") {
-          //기존에 이미지가 없는 경우
-          await uploadImageToProblem(problem.image, problem.id.toString());
-        } else {
-          //기존에 이미지가 있는 경우
-          await deletePhoto(photoId.toString());
-          await uploadImageToProblem(problem.image, problem.id.toString());
-        }
-      } else if (problem && problem?.image === null) {
-        //image가 null인 경우
-        const photoId = await getProblemPhotoIdByProblemId(
-          problem.id.toString(),
-        );
-        if (photoId !== "null") {
-          //기존에 이미지가 있는 경우
-          await deletePhoto(photoId.toString());
-        }
-      }
+        const newProblems = await Promise.all(
+          replacingProblems.map(async (problem, index) => {
+            if (!problem) throw new Error("문제가 null입니다!");
 
-      //이미지를 제외한 나머지 문제 정보 수정
-      await updateProblem(problem.id.toString(), problem);
-    }
+            console.log(`문제 ${index + 1} 생성 시작`);
+
+            const result = await pm.problem.create({
+              data: {
+                order: index + 1,
+                question: problem.question,
+                questionType: problem.type,
+                candidates: problem.candidates ?? undefined,
+                additionalView: problem.additionalView,
+                subjectiveAnswer: problem.subAnswer,
+                isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
+                image: problem.image
+                  ? {
+                      connect: {
+                        uuid: (
+                          await createImageIfNotExist(
+                            problem.image,
+                            userEmail,
+                            pm,
+                          )
+                        ).uuid,
+                      },
+                    }
+                  : undefined,
+                user: {
+                  connect: {
+                    email: userEmail,
+                  },
+                },
+                problemSet: {
+                  connect: {
+                    uuid: problemSetUUID,
+                  },
+                },
+              },
+              include: {
+                image: true,
+              },
+            });
+            console.log(`문제 ${index + 1} 생성 완료,`, result);
+            return result;
+          }),
+        );
+        console.log("newProblems : ", newProblems);
+
+        console.log(`기존 문제들 삭제 시작`);
+
+        //삭제할 이미지 키 중복 제거
+        const toBeDeletedImageKey = [
+          ...new Set(
+            oldProblems.reduce((acc, cur) => {
+              if (cur.image) acc.push(cur.image.key);
+              return acc;
+            }, [] as string[]),
+          ),
+        ].reduce((acc, cur) => {
+          const newProblemsImageKey = newProblems.reduce((acc, cur) => {
+            if (cur.image) acc.push(cur.image.key);
+            return acc;
+          }, [] as string[]);
+
+          if (!newProblemsImageKey.includes(cur)) acc.push(cur);
+          return acc;
+        }, [] as string[]);
+
+        console.log("toBeDeletedImageKey : ", toBeDeletedImageKey);
+
+        if (toBeDeletedImageKey.length > 0) {
+          await deleteImagesFromSet(toBeDeletedImageKey, userEmail, 1, pm);
+        }
+
+        if (oldProblems.length > 0) {
+          console.log(`기존 문제들 삭제 시작`, oldProblems);
+          const result = await pm.problemSet.update({
+            where: {
+              uuid: problemSetUUID,
+            },
+            data: {
+              name: setName,
+              problems: {
+                deleteMany: {
+                  uuid: {
+                    in: oldProblems.map((problem) => problem.uuid),
+                  },
+                },
+              },
+            },
+          });
+          if (!result) throw new Error("문제 업데이트 중 오류 발생");
+        }
+
+        console.log("기존 문제 삭제 완료");
+        return true;
+      },
+      {
+        timeout: 20000, // 20초
+      },
+    );
+
+    return result;
   } catch (err) {
-    console.log(err);
-    throw new Error("문제를 수정하는 중 오류가 발생했습니다.");
+    console.error("오류 발생:", err);
+    throw new Error("문제 업데이트 중 오류 발생");
   }
+}
 
-  return true;
+async function getImageUuidByImageKey(
+  imageKey: string,
+  pm?: PrismaTransaction,
+) {
+  try {
+    const prismaInstance = pm ?? prisma;
+    const result = await prismaInstance.image.findFirst({
+      where: {
+        key: imageKey,
+      },
+    });
+
+    return result ? result.uuid : null;
+  } catch (err) {
+    console.error("오류 발생:", err);
+    throw new Error("이미지 uuid를 찾는 중 오류 발생");
+  }
+}
+
+function extractFileName(text: string): string {
+  // '-'를 구분자로 사용하여 문자열을 분할
+  const parts = text.split("-");
+  // 해시 부분을 제외하고 파일 이름 부분만 조합하여 반환
+  return parts.slice(1).join("-");
+}
+
+async function getImageFileOnS3ByImageKey(imageKey: string) {
+  try {
+    console.log("getImageFileOnS3ByImageKey 함수 시작");
+    console.log("imageKey :", imageKey);
+    const result = await s3Client.send(
+      new GetObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: imageKey,
+      }),
+    );
+
+    const imageFile = new File(
+      [await result.Body?.transformToByteArray()!],
+      extractFileName(imageKey),
+      {
+        type: result.ContentType,
+      },
+    );
+
+    return imageFile;
+  } catch (error) {
+    console.error("Error creating File from image URL:", error);
+    throw error;
+  }
 }
 
 export async function checkUserPermissionForProblemSet(
   problemSetUUID: string,
   userEmail: string,
 ) {
-  const query = qs.stringify({
-    filters: {
-      UUID: {
-        $eq: problemSetUUID,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-  });
-
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const result = await prisma.problemSet.findFirst({
+      where: {
+        uuid: problemSetUUID,
+        user: {
+          email: userEmail,
         },
-        cache: "no-store",
       },
-    );
-    if (!response.ok)
-      throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
+    });
 
-    const data = await response.json();
-    const result = data.data.length === 1 ? "OK" : "NO";
-
-    return result;
+    return result ? "OK" : "NO";
   } catch (err) {
     console.log(err);
     throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
   }
 }
 
-export async function validateProblemId(problemId: string, userEmail: string) {
-  const query = qs.stringify({
-    filters: {
-      id: {
-        $eq: problemId,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-  });
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
-      },
-    );
-    if (!response.ok)
-      throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
-
-    const data = await response.json();
-    const result = data.data.length === 1 ? "OK" : "NO";
-
-    return result;
-  } catch (err) {
-    console.log(err);
-    throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
-  }
-}
-export async function linkProblemToProblemSet(
-  problemId: string,
-  problemSetId: string,
+export async function getAnswerByProblemUuid(
+  problemUuid: string,
+  pm?: PrismaTransaction,
 ) {
-  checkEnvVariables();
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems/${problemId}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-      body: JSON.stringify({
-        exam_problem_sets: {
-          connect: [problemSetId],
-        },
-      }),
-    },
-  );
-  if (!response.ok)
-    throw new Error("문제를 문제집에 연결하는 중 오류가 발생했습니다.");
-}
-
-export async function getAnswerByProblemId(problemId: number) {
-  const query = qs.stringify({
-    filters: {
-      id: {
-        $eq: problemId,
-      },
-    },
-  });
-
+  const prismaInstance = pm ?? prisma;
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problems?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-        cache: "no-store",
+    const problem = await prismaInstance.problem.findFirst({
+      where: {
+        uuid: problemUuid,
       },
-    );
-    if (!response.ok)
-      throw new Error("정답을 불러오는 중 오류가 발생했습니다.");
+      select: {
+        questionType: true,
+        candidates: true,
+        subjectiveAnswer: true,
+      },
+    });
 
-    const data = await response.json();
-    const problem: ProblemResponse = data.data[0];
+    if (!problem) throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
 
     const answer =
-      problem.questionType === "obj"
+      problem.questionType === "obj" && isCandidateArray(problem.candidates)
         ? problem.candidates
             ?.filter((candidate) => candidate.isAnswer)
             .map((candidate) => candidate.id)
@@ -958,6 +749,20 @@ export async function getAnswerByProblemId(problemId: number) {
     console.log(err);
     throw new Error("정답을 불러오는 중 오류가 발생했습니다.");
   }
+}
+
+export function isCandidateArray(candidates: any): candidates is Candidate[] {
+  return (
+    Array.isArray(candidates) &&
+    candidates.every((candidate) => {
+      return (
+        typeof candidate === "object" &&
+        candidate.id !== undefined &&
+        candidate.text !== undefined &&
+        candidate.isAnswer !== undefined
+      );
+    })
+  );
 }
 
 type ProblemsAndSetsName = {
@@ -1021,105 +826,44 @@ export function getParsedProblems<T extends boolean>(
   }
 }
 
-export function isProblemAsnwered(problem: ExamProblem) {
-  if (!problem) {
-    throw new Error("something is null");
-  }
-
-  const result =
-    problem.type === "obj"
-      ? problem.candidates?.some((candidate) => candidate.isAnswer)
-      : problem.subAnswer !== null && problem.subAnswer !== "";
-
-  if (result === undefined) throw new Error("result is undefined");
-
-  return result;
-}
-
-export function isAnsweredMoreThanOne(problem: ExamProblem) {
-  if (!problem || !problem.candidates) {
-    throw new Error("something is null");
-  }
-
-  return (
-    problem.candidates.filter((candidate) => candidate.isAnswer).length > 1
-  );
-}
-
-export async function validateExamProblem(
+export async function postProblemResult(
+  order: number,
   problem: ExamProblem,
-  answer: string | (number | null)[],
-) {
-  let finalResult: boolean | null = null;
-
-  if (!problem || !problem.id) throw new Error("something is null");
-
-  if (problem.type === "obj") {
-    if (!problem.candidates) throw new Error("candidates is null");
-
-    const answeredId = problem.candidates
-      .filter((candidate) => candidate.isAnswer)
-      .map((candidate) => candidate.id);
-
-    const isCorrect = isAnswerArray(answer)
-      ? answer.every((id) => answeredId.includes(id))
-      : null;
-
-    finalResult = isCorrect;
-  } else if (problem.type === "sub") {
-    if (!problem.subAnswer) throw new Error("subAnswer is null");
-
-    const isCorrect = problem.subAnswer === answer;
-
-    finalResult = isCorrect;
-  }
-
-  if (finalResult === null) throw new Error("finalResult is null");
-
-  return finalResult;
-}
-
-function isAnswerString(answer: string | (number | null)[]): answer is string {
-  return typeof answer === "string";
-}
-
-function isAnswerArray(
-  answer: string | (number | null)[],
-): answer is (number | null)[] {
-  return Array.isArray(answer);
-}
-
-export async function postExamProblemResult(
-  problem: ExamProblem,
+  resultsUuid: string,
   result: boolean,
   answer: string | (number | null)[],
-  userId: number,
+  userUuid: string,
+  pm: PrismaTransaction,
 ) {
-  if (!problem || !problem.id) throw new Error("something is null");
+  if (!problem || !problem.uuid) throw new Error("something is null");
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-results`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+  try {
+    const problemResult = await pm.problemResult.create({
+      data: {
+        order: order,
+        result: {
+          connect: {
+            uuid: resultsUuid,
+          },
+        },
         isCorrect: result,
-        exam_user: userId,
+        user: {
+          connect: {
+            uuid: userUuid,
+          },
+        },
         candidates: problem.candidates
           ? problem.candidates.map((candidate) => ({
               id: candidate.id,
               text: candidate.text,
               isSelected: candidate.isAnswer,
             }))
-          : null,
+          : undefined,
         subjectiveAnswered: problem.subAnswer,
         question: problem.question,
-        additionalView: problem.additionalView || null,
+        additionalView: problem.additionalView ?? null,
         questionType: problem.type,
-        isAnswerMultiple: problem.isAnswerMultiple,
+        isAnswerMultiple: problem.isAnswerMultiple ?? false,
         correctCandidates: isAnswerArray(answer)
           ? answer
               .map((id) => ({
@@ -1151,94 +895,53 @@ export async function postExamProblemResult(
                   return -1;
                 return 0;
               })
-          : null,
+          : undefined,
         correctSubjectiveAnswer: isAnswerString(answer) ? answer : null,
-        image: isImageUrlObject(problem.image) ? problem.image.id : null,
-      }),
-      cache: "no-store",
-    },
-  );
+        image: isImageUrlObject(problem.image)
+          ? {
+              connect: {
+                uuid: problem.image.uuid,
+              },
+            }
+          : undefined,
+      },
+      select: {
+        uuid: true,
+      },
+    });
 
-  if (!response.ok)
-    throw new Error(
-      "문제 결과를 생성하는 중 오류가 발생했습니다. (postExamProblemResult)",
-    );
-
-  return response.json().then((data) => data.data.id) as Promise<number>;
+    if (!problemResult)
+      throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
+  }
 }
 
-export async function createExamResult(
-  examProblemResultId: number[],
-  problemSetName: string,
-  userId: number,
-) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        exam_problem_results: examProblemResultId,
-        problemSetName: problemSetName,
-        exam_user: userId,
-      }),
-      cache: "no-store",
-    },
-  );
-
-  if (!response.ok)
-    throw new Error(
-      "시험 결과를 생성하는 중 오류가 발생했습니다. (createExamResult)",
-    );
-
-  const data = await response.json();
-  const uuid = data.data.uuid;
-
-  if (!uuid) throw new Error("uuid is null");
-
-  return uuid;
-}
-
-export async function getExamResultByUUID(uuid: string, userEmail: string) {
-  const query = qs.stringify({
-    filters: {
-      uuid: {
-        $eq: uuid,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-    populate: {
-      exam_problem_results: {
-        populate: ["image"],
-      },
-    },
-  });
-
+export async function getExamResultsByUUID(uuid: string, userEmail: string) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const result = await prisma.result.findFirst({
+      where: {
+        uuid: uuid,
+        user: {
+          email: userEmail,
         },
-        cache: "no-store",
       },
-    );
-    if (!response.ok)
+      include: {
+        problem_results: {
+          orderBy: {
+            order: "asc",
+          },
+          include: {
+            image: true,
+          },
+        },
+      },
+    });
+    if (!result)
       throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
 
-    const data = await response.json();
-    const examResult: ExamResult = data.data[0];
-
-    return examResult.exam_problem_results;
+    return result;
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
@@ -1250,48 +953,53 @@ export async function getExamResults(
   page: string,
   pageSize: string,
 ) {
-  const query = qs.stringify({
-    filters: {
-      exam_user: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    },
-    pagination: {
-      page,
-      pageSize,
-    },
-    populate: ["exam_problem_results"],
-    sort: "updatedAt:desc",
-  });
-
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const [totalExamResultsCount, examResults] = await Promise.all([
+      prisma.result.count({
+        where: {
+          user: {
+            email: userEmail,
+          },
         },
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok)
-      throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
-
-    const data = await response.json();
-    const result = {
-      ...data,
-      data: data.data.map((examProblemResult: any) => {
-        const newExamProblemResult: any = examProblemResult;
-        newExamProblemResult["examProblemResultsCount"] =
-          examProblemResult.exam_problem_results?.length;
-        delete newExamProblemResult.exam_problem_results;
-
-        return newExamProblemResult;
       }),
+      prisma.result.findMany({
+        where: {
+          user: {
+            email: userEmail,
+          },
+        },
+        skip: (parseInt(page) - 1) * parseInt(pageSize),
+        take: parseInt(pageSize),
+        include: {
+          problem_results: {
+            orderBy: {
+              order: "asc",
+            },
+            include: {
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      }),
+    ]);
+
+    const result: ResultsWithPagination = {
+      data: examResults.map((examResult) => ({
+        uuid: examResult.uuid,
+        problemResultsCount: examResult.problem_results.length,
+        problemSetName: examResult.problemSetName,
+        createdAt: examResult.createdAt,
+        updatedAt: examResult.updatedAt,
+      })),
+      pagination: {
+        page: parseInt(page),
+        pageSize: parseInt(pageSize),
+        pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
+        total: examResults.length,
+      },
     };
 
     return result;
@@ -1307,296 +1015,540 @@ export async function getExamResultsByName(
   page: string,
   pageSize: string,
 ) {
-  const query = qs.stringify({
-    filters: {
-      problemSetName: {
-        $contains: name,
-      },
-      exam_user: {
-        email: {
-          $eq: userEmail,
+  try {
+    const [totalExamResultsCount, examResults] = await Promise.all([
+      prisma.result.count({
+        where: {
+          user: {
+            email: userEmail,
+          },
+          problemSetName: {
+            contains: name,
+          },
         },
-      },
-    },
-    pagination: {
-      page,
-      pageSize,
-    },
-    populate: ["exam_problem_results"],
-    sort: "updatedAt:desc",
-  });
+      }),
+      prisma.result.findMany({
+        where: {
+          user: {
+            email: userEmail,
+          },
+          problemSetName: {
+            contains: name,
+          },
+        },
+        skip: (parseInt(page) - 1) * parseInt(pageSize),
+        take: parseInt(pageSize),
+        include: {
+          problem_results: {
+            orderBy: {
+              order: "asc",
+            },
+            include: {
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      }),
+    ]);
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results?${query}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const result: ResultsWithPagination = {
+      data: examResults.map((examResult) => ({
+        uuid: examResult.uuid,
+        problemResultsCount: examResult.problem_results.length,
+        problemSetName: examResult.problemSetName,
+        createdAt: examResult.createdAt,
+        updatedAt: examResult.updatedAt,
+      })),
+      pagination: {
+        page: parseInt(page),
+        pageSize: parseInt(pageSize),
+        pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
+        total: examResults.length,
       },
-      cache: "no-store",
-    },
-  );
+    };
 
-  if (!response.ok)
+    return result;
+  } catch (err) {
+    console.log(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
-
-  const data = await response.json();
-
-  const result = {
-    ...data,
-    data: data.data.map((examProblemResult: any) => {
-      const newExamProblemResult: any = examProblemResult;
-      newExamProblemResult["examProblemResultsCount"] =
-        examProblemResult.exam_problem_results?.length;
-      delete newExamProblemResult.exam_problem_results;
-
-      return newExamProblemResult;
-    }),
-  };
-
-  return result as ExamResultsWithCount;
-}
-
-export async function fetchExamResults(
-  isSearching: boolean,
-  debouncedSearchString: string,
-  resultsPage: number,
-  pageSize: number,
-  setResultsMaxPage: (maxPage: number) => void,
-) {
-  try {
-    if (pageSize === 0) return null;
-    let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getExamResultsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: resultsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getExamResults", {
-          params: {
-            page: resultsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    }
-    const data = res?.data;
-
-    if (data) {
-      setResultsMaxPage(data.meta.pagination.pageCount || 1);
-      return data;
-    }
-  } catch (err) {
-    console.log(err);
-    throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
   }
 }
 
-export async function fetchProblemSets(
-  isSearching: boolean,
-  debouncedSearchString: string,
-  problemSetsPage: number,
-  pageSize: number,
-  setProblemSetsMaxPage: (maxPage: number) => void,
+export async function deleteImagesFromSet(
+  images: string[],
+  userEmail: string,
+  deleteSetCount: number,
+  pm: PrismaTransaction,
 ) {
+  let problemFileImages: ({ imageFile: File; imageKey: string } | null)[] = [];
+  const prismaInstance = pm;
+  const s3 = s3Client;
+  console.log("[deleteImagesFromSet] 이미지 삭제 시작");
+
   try {
-    if (pageSize === 0) return null;
-    let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: problemSetsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getProblemSets", {
-          params: {
-            page: problemSetsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    }
-    const data = res?.data;
-    if (data) {
-      setProblemSetsMaxPage(data.meta.pagination.pageCount || 1);
-      return data;
-    }
+    // 삭제 실패에 대비하여 이미지 파일 복사
+    console.time("이미지 삭제 실패 대비 이미지 복사 시간");
+    problemFileImages = await Promise.all(
+      images.map(async (imageKey) => {
+        if (!imageKey) return null;
+        return {
+          imageFile: await getImageFileOnS3ByImageKey(imageKey),
+          imageKey: imageKey,
+        };
+      }),
+    );
+    console.timeEnd("이미지 삭제 실패 대비 이미지 복사 시간");
+
+    // 이미지가 다른곳에서 참조되는지 확인하고 참조가 없으면 삭제
+    await Promise.all(
+      images.map(async (imageKey) => {
+        if (imageKey) {
+          const totalReference = await getReferecesOfImageByImageKey(
+            imageKey,
+            prismaInstance,
+          );
+
+          console.log(
+            `[deleteImagesFromSet] 이미지 ${imageKey} totalReference :`,
+            totalReference,
+          );
+
+          const imageUuid = await getImageUuidByImageKey(
+            imageKey,
+            prismaInstance,
+          );
+
+          if (!imageUuid)
+            throw new Error("이미지 uuid를 찾는 중 오류가 발생했습니다.");
+
+          const currentUserImageReference = totalReference.users.find(
+            (user) => user.userEmail === userEmail,
+          )?.count.total;
+
+          if (!currentUserImageReference)
+            throw new Error(
+              "[deleteImagesFromSet] currentUserImageReference이 undefind입니다.",
+            );
+
+          if (totalReference.allUserCount.total === deleteSetCount) {
+            // 모든 유저의 이미지 참조가 삭제할 세트 숫자만큼인 경우 경우 s3에서 이미지 삭제 (s3 삭제 대상)
+            console.log(
+              `[deleteImagesFromSet] 참조가 없어 이미지 ${imageKey} 삭제 시작`,
+            );
+
+            const command = new DeleteObjectCommand({
+              Bucket: process.env.AWS_S3_BUCKET_NAME,
+              Key: imageKey,
+            });
+
+            const response = await s3.send(command);
+            if (!(response.$metadata.httpStatusCode === 204))
+              throw new Error(
+                "S3에서 이미지를 삭제하는 중 오류가 발생했습니다.",
+              );
+            console.log(`[deleteImagesFromSet] 이미지 ${imageKey} s3에서 삭제 성공`);
+
+            await prismaInstance.image.delete({
+              where: {
+                uuid: imageUuid,
+              },
+            });
+            console.log(
+              `[deleteImagesFromSet] 이미지 ${imageKey} image 테이블에서 삭제 성공`,
+            );
+
+            console.log(`[deleteImagesFromSet] 이미지 ${imageKey} 삭제 성공`);
+          }
+
+          if (currentUserImageReference === deleteSetCount) {
+            //해당하는 user테이블에서 problem테이블과 problem_result에 연결된 이미지가 삭제 대상이면 user테이블에서 이미지 연결 해제
+
+            console.log(
+              `[deleteImagesFromSet] user테이블에서 image ${imageKey}연결 해제 시작`,
+            );
+            await prismaInstance.user.update({
+              where: {
+                email: userEmail,
+              },
+              data: {
+                images: {
+                  disconnect: {
+                    uuid: imageUuid,
+                  },
+                },
+              },
+            });
+          }
+        }
+      }),
+    );
   } catch (err) {
-    if (err instanceof Error) {
-      console.log(err);
+    console.log("이미지 삭제 중 오류 발생, 이미지 복구 시작!");
+
+    const results = await Promise.all(
+      problemFileImages.map(async (image) => {
+        if (!image) return true;
+
+        const imageKey = image.imageKey;
+        const exists = await checkIfImageExistsOnS3ByImageKey(imageKey);
+
+        return !exists;
+      }),
+    );
+
+    try {
+      await Promise.all(
+        results.map(async (result, index) => {
+          if (!result) {
+            const image = problemFileImages[index];
+            if (!image) throw new Error("이미지가 null입니다.");
+
+            const command = new PutObjectCommand({
+              Bucket: process.env.AWS_S3_BUCKET_NAME,
+              Key: image.imageKey,
+              Body: (await image.imageFile.arrayBuffer()) as Uint8Array,
+              ContentType: image.imageFile.type,
+            });
+            const response = await s3.send(command);
+
+            if (!(response.$metadata.httpStatusCode === 200))
+              throw new Error("S3에 이미지를 복구하는 중 오류가 발생했습니다.");
+          }
+        }),
+      );
+    } catch (err) {
+      console.error("이미지 복구 중 오류 발생:", err);
+      throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
     }
-    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+    throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
   }
 }
 
-export async function getExamResultsMaxPage(
-  isSearching: boolean,
-  debouncedSearchString: string,
-  pageSize: number,
-) {
-  try {
-    if (pageSize === 0) return null;
-    let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getExamResultsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: 1,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getExamResults", {
-          params: {
-            page: 1,
-            pageSize,
-          },
-        });
-      }
-    }
-    const data: ExamResultsResponse = res?.data;
-
-    if (data) {
-      return data.meta.pagination.pageCount;
-    }
-  } catch (err) {
-    console.log(err);
-    throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function getProblemSetsMaxPage(
-  isSearching: boolean,
-  debouncedSearchString: string,
-  pageSize: number,
-) {
-  try {
-    if (pageSize === 0) return null;
-    let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: 1,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getProblemSets", {
-          params: {
-            page: 1,
-            pageSize,
-          },
-        });
-      }
-    }
-    const data: RawProblemSetResponse = res?.data;
-
-    if (data) {
-      return data.meta.pagination.pageCount;
-    }
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-export async function deleteProblemSet(problemSetUUID: string) {
-  const problemSetId = await getProblemsSetIdByUUID(problemSetUUID);
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-problem-sets/${problemSetId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-      },
-      cache: "no-store",
-    },
-  );
-  if (!response.ok)
-    throw new Error("문제집을 삭제하는 중 오류가 발생했습니다.");
-
-  return response.statusText;
-}
-
-export async function deleteProblemResult(resultUUID: string) {
-  const resultId = await getExamResultIdByUUID(resultUUID);
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-results/${resultId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-      },
-      cache: "no-store",
-    },
-  );
-  if (!response.ok)
-    throw new Error("시험 결과를 삭제하는 중 오류가 발생했습니다.");
-
-  return response.statusText;
-}
-
-export async function createProblemSetShareLink(
-  uuid: string,
+export async function deleteProblemSets(
+  problemSetUUIDs: string[],
   userEmail: string,
 ) {
-  //이 함수는 서버에서 실행되기 때문에 안전함
-  const { exam_problems: problemResponse } =
-    await getProblemSetByUUIDUnsecure(uuid);
+  console.log("[deleteProblemSet] 함수 시작");
+  try {
+    const result = await prisma.$transaction(async (pm) => {
+      // 문제집 안의 문제들 찾기
+      const allProblemsSet = await pm.problemSet.findMany({
+        where: {
+          uuid: {
+            in: problemSetUUIDs,
+          },
+          user: {
+            email: userEmail,
+          },
+        },
+        select: {
+          problems: {
+            select: {
+              image: true,
+            },
+          },
+        },
+      });
+      if (allProblemsSet.length === 0)
+        throw new Error("문제집들을 찾는 중 오류가 발생했습니다.");
 
-  if (!problemResponse)
-    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+      const toBeDeletedImage = {
+        problemSetCount: allProblemsSet.length,
+        imageKeys: [
+          ...new Set(
+            allProblemsSet.reduce((acc, cur) => {
+              const imageKeys = cur.problems.reduce((acc, cur) => {
+                if (cur.image) {
+                  acc.push(cur.image.key);
+                }
+                return acc;
+              }, [] as string[]);
+              acc.push(...imageKeys);
+              return acc;
+            }, [] as string[]),
+          ),
+        ],
+      };
 
-  const problems = problemResponse.map((problem) => {
-    const newProblem: Problem = {
-      additionalView: problem.additionalView,
-      candidates: problem.candidates,
-      image: problem.image,
-      isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
-      isAnswerMultiple: problem.isAnswerMultiple,
-      isImageButtonClicked: problem.image ? true : false,
-      question: problem.question,
-      subAnswer: problem.subjectiveAnswer,
-      type: problem.questionType as "obj" | "sub",
-      id: problem.id,
+      console.log("[deleteProblemSets] toBeDeletedImage: ", toBeDeletedImage);
+
+      // 문제집 안의 문제 이미지들 삭제
+      if (toBeDeletedImage.imageKeys.length > 0) {
+        await deleteImagesFromSet(
+          toBeDeletedImage.imageKeys,
+          userEmail,
+          toBeDeletedImage.problemSetCount,
+          pm,
+        );
+      }
+
+      await pm.problemSet.deleteMany({
+        where: {
+          uuid: {
+            in: problemSetUUIDs,
+          },
+          user: {
+            email: userEmail,
+          },
+        },
+      });
+      console.log(`[deleteProblemSets] 문제집 ${problemSetUUIDs} 삭제 성공`);
+      return true;
+    });
+    return result;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 삭제하는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function deleteProblemResults(
+  resultUUIDs: string[],
+  userEmail: string,
+) {
+  try {
+    const result = await prisma.$transaction(async (pm) => {
+      const AllResults = await pm.result.findMany({
+        where: {
+          uuid: {
+            in: resultUUIDs,
+          },
+
+          user: {
+            email: userEmail,
+          },
+        },
+        select: {
+          problem_results: {
+            select: {
+              image: true,
+            },
+          },
+        },
+      });
+
+      if (AllResults.length === 0)
+        throw new Error("시험 결과를 찾는 중 오류가 발생했습니다.");
+
+      console.log("[AllResults] : ", AllResults);
+
+      const toBeDeletedImage = {
+        resultsCount: AllResults.length,
+        imageKeys: [
+          ...new Set(
+            AllResults.reduce((acc, cur) => {
+              const imageKeys = cur.problem_results.reduce((acc, cur) => {
+                if (cur.image) {
+                  acc.push(cur.image.key);
+                }
+                return acc;
+              }, [] as string[]);
+              acc.push(...imageKeys);
+              return acc;
+            }, [] as string[]),
+          ),
+        ],
+      };
+      console.log(
+        "[deleteProblemResults] toBeDeletedImage : ",
+        toBeDeletedImage,
+      );
+
+      if (toBeDeletedImage.imageKeys.length > 0) {
+        await deleteImagesFromSet(
+          toBeDeletedImage.imageKeys,
+          userEmail,
+          toBeDeletedImage.resultsCount,
+          pm,
+        );
+      }
+
+      await pm.result.deleteMany({
+        where: {
+          uuid: {
+            in: resultUUIDs,
+          },
+        },
+      });
+      console.log(`[deleteProblemResults] 시험 결과 ${resultUUIDs} 삭제 성공`);
+      return true;
+    });
+
+    return result;
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과를 삭제하는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function generateFileHash(file: File): Promise<string> {
+  // File 객체를 ArrayBuffer로 읽어옴
+  const arrayBuffer = await file.arrayBuffer();
+
+  // crypto.subtle.digest를 사용하여 SHA-256 해시를 계산
+  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+
+  // 해시 값을 Hex 문자열로 변환
+  const hashArray = Array.from(new Uint8Array(hashBuffer)); // ArrayBuffer를 byte array로 변환
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return hashHex;
+}
+
+export async function getTotalReferencesOfImageByImageUuid(
+  imageUuid: string,
+  pm?: PrismaTransaction,
+) {
+  const prismaInstance = pm ?? prisma;
+  try {
+    const result = await prismaInstance.image.findFirst({
+      where: {
+        uuid: imageUuid,
+      },
+      select: {
+        problems: {
+          select: {
+            problemSet: {
+              select: {
+                uuid: true,
+              },
+            },
+          },
+        },
+        problem_results: {
+          select: {
+            result: {
+              select: {
+                uuid: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!result)
+      throw new Error("해당하는 uuid를 가진 이미지가 존재하지 않습니다.");
+
+    const problemSetCount = result.problems.reduce((acc, cur) => {
+      if (!acc.includes(cur.problemSet.uuid)) {
+        acc.push(cur.problemSet.uuid);
+      }
+      return acc;
+    }, [] as string[]).length;
+
+    const problemResultsCount = result.problem_results.reduce((acc, cur) => {
+      if (!acc.includes(cur.result.uuid)) {
+        acc.push(cur.result.uuid);
+      }
+      return acc;
+    }, [] as string[]).length;
+
+    return problemSetCount + problemResultsCount;
+  } catch (err) {
+    console.error(err);
+    throw new Error(
+      "이미지를 참조하는 문제나 결과의 개수를 확인하는 중 오류가 발생했습니다.",
+    );
+  }
+}
+
+export async function getReferecesOfImageByImageKey(
+  imageKey: string,
+  pm: PrismaTransaction,
+) {
+  const prismaInstance = pm ?? prisma;
+  try {
+    const users = await prismaInstance.user.findMany({
+      where: {
+        images: {
+          some: {
+            key: imageKey,
+          },
+        },
+      },
+      select: {
+        problems: {
+          select: {
+            problemSet: {
+              select: {
+                uuid: true,
+              },
+            },
+          },
+        },
+        problem_results: {
+          select: {
+            result: {
+              select: {
+                uuid: true,
+              },
+            },
+          },
+        },
+        uuid: true,
+        email: true,
+      },
+    });
+
+    if (users.length === 0)
+      throw new Error("해당하는 key를 가진 이미지가 존재하지 않습니다.");
+
+    const result = {
+      users: users.map((user) => {
+        const problemSetCount = user.problems.reduce((acc, cur) => {
+          if (!acc.includes(cur.problemSet.uuid)) {
+            acc.push(cur.problemSet.uuid);
+          }
+          return acc;
+        }, [] as string[]).length;
+
+        const problemResultsCount = user.problem_results.reduce((acc, cur) => {
+          if (!acc.includes(cur.result.uuid)) {
+            acc.push(cur.result.uuid);
+          }
+          return acc;
+        }, [] as string[]).length;
+
+        return {
+          userEmail: user.email,
+          userUuid: user.uuid,
+          count: {
+            total: problemSetCount + problemResultsCount,
+            problemSetCount,
+            problemResultsCount,
+          },
+        };
+      }),
     };
-    return newProblem;
-  });
 
-  const createdShareLinkProblemSetUUID = await postProblems(
-    `share-link-of-${uuid}-${new Date().toISOString()}`,
-    userEmail,
-    problems,
-    true,
-  );
-
-  return createdShareLinkProblemSetUUID;
-
+    return {
+      ...result,
+      allUserCount: {
+        ...result.users.reduce(
+          (acc, cur) => {
+            acc.problemSetCount += cur.count.problemSetCount;
+            acc.problemResultsCount += cur.count.problemResultsCount;
+            return acc;
+          },
+          { problemSetCount: 0, problemResultsCount: 0 },
+        ),
+        total: result.users.reduce((acc, cur) => {
+          acc += cur.count.problemSetCount;
+          acc += cur.count.problemResultsCount;
+          return acc;
+        }, 0),
+      },
+    };
+  } catch (err) {
+    console.error(err);
+    throw new Error(
+      "이미지를 참조하는 문제나 결과의 개수를 확인하는 중 오류가 발생했습니다.",
+    );
+  }
 }

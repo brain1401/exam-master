@@ -20,8 +20,10 @@ Exam Master는 사용자가 시험 문제를 직접 생성하고 풀어보는 �
   - **Redux Toolkit**: Redux를 사용하기 쉽게 만들어주는 라이브러리
   
 - **백엔드**
-  - **Strapi**: 헤드리스 CMS, RESTful 또는 GraphQL API를 쉽게 생성
-
+  - **Prisma**: 데이터베이스를 위한 ORM(Object-Relational Mapping) 라이브러리
+  - **AWS RDS for PostgreSQL**: AWS 클라우드 서비스를 이용한 관계형 데이터베이스
+  - **AWS S3**: AWS 클라우드 서비스를 이용한 파일 저장소
+  
 - **인증**
   - **NextAuth (JWT)**: 서버사이드 인증을 위한 라이브러리, JSON Web Token(JWT)를 사용
 
@@ -46,8 +48,8 @@ Exam Master는 사용자가 시험 문제를 직접 생성하고 풀어보는 �
 
 ### 문제 풀이 이력 기반 추천
 
-- 이전에 풀었던 문제를 분석하여 약점 부분을 파악
-- 약점 부분에 해당하는 문제를 더 자주 출제
+- 이전에 풀었던 문제를 분석하여 약점 부분을 파악 (예정)
+- 약점 부분에 해당하는 문제를 더 자주 출제 (예정)
 
 ## 🌐 서비스 링크
 
@@ -63,4 +65,4 @@ MIT 라이센스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE) 파일�
 
 ---
 
-© 2023 Aiden. All Rights Reserved.
+© 2024 Aiden. All Rights Reserved.

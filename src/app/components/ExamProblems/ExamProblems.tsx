@@ -13,10 +13,11 @@ import ExamCardLayout from "../layouts/ExamCardLayout";
 import useExamProblems from "@/hooks/useExamProblems";
 import CustomLoading from "../ui/CustomLoading";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
-import { isImageUrlObject } from "@/service/problems";
 import Image from "next/image";
 import checkImage from "/public/images/checkBlack.png";
 import ProblemGridLayout from "../layouts/ProblemGridLayout";
+import { isImageUrlObject } from "@/utils/problems";
+import { ExamProblemSet } from "@/types/problems";
 
 type Props = {
   UUID: string;
@@ -26,7 +27,7 @@ export default function ExamProblems({ UUID }: Props) {
     setExamProblems,
     resetExamProblems,
     currentExamProblem,
-    examProblems: { exam_problems },
+    examProblems: { problems },
   } = useExamProblems();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,16 +38,16 @@ export default function ExamProblems({ UUID }: Props) {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`/api/getExamProblemsByProblemSetUUID`, {
+      .get<ExamProblemSet>(`/api/getExamProblemsByProblemSetUUID`, {
         params: {
           UUID,
         },
       })
       .then((res) => {
         setExamProblems({
-          id: res.data.id,
+          uuid: res.data.uuid,
           name: res.data.name,
-          exam_problems: res.data.exam_problems,
+          problems: res.data.problems,
         });
       })
       .catch((err) => {
@@ -76,14 +77,14 @@ export default function ExamProblems({ UUID }: Props) {
     <ProblemGridLayout>
       <div>
         {/* preload images */}
-        {exam_problems &&
-          exam_problems.map((examProblem) => {
+        {problems &&
+          problems.map((examProblem) => {
             const image = examProblem.image;
             if (image && isImageUrlObject(image)) {
               return (
                 <Image
-                  key={examProblem.id + "preload"}
-                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                  key={examProblem.uuid + "preload"}
+                  src={image.url}
                   alt="preload image"
                   width={400}
                   height={400}

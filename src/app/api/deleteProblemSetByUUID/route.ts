@@ -1,22 +1,22 @@
-import { deleteProblemResult, deleteProblemSet } from "@/service/problems";
+import { deleteProblemSets } from "@/service/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = {
-  params: { uuid: string };
-};
 
-export async function DELETE(req: NextRequest, { params: { uuid } }: Params) {
+
+export async function DELETE(req: NextRequest) {
   const session = await getServerSession();
 
   if (!session || !session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await deleteProblemResult(uuid);
+  const {uuids} = await req.json();
+
+  const result = await deleteProblemSets(uuids, session.user.email);
 
   return NextResponse.json(
     { message: result },
-    { status: result === "OK" ? 200 : 500 },
+    { status: result === true ? 200 : 500 },
   );
 }

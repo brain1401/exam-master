@@ -2,7 +2,7 @@ import {
   getProblemsSetByUUID,
   checkUserPermissionForProblemSet,
 } from "@/service/problems";
-import { ExamProblemSet, uuidSchema } from "@/types/problems";
+import { ExamProblem, ExamProblemSet, uuidSchema } from "@/types/problems";
 import { problemShuffle } from "@/utils/problemShuffle";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -44,35 +44,40 @@ export async function GET(req: NextRequest) {
 
   const data = await getProblemsSetByUUID(UUID, session?.user?.email);
 
-  if (data.exam_problems === undefined)
+  if (data.problems === undefined)
     return NextResponse.json(
       { error: "문제집을 불러오는 중 오류가 발생했습니다." },
       { status: 500 },
     );
 
-  const examProblems = data.exam_problems.map((problem) => ({
-    id: problem.id,
-    type: problem.questionType as "obj" | "sub",
-    question: problem.question,
-    additionalView: problem.additionalView,
-    image: problem.image,
-    isAnswerMultiple: problem.isAnswerMultiple,
-    // 문제의 정답을 알 수 없게 함
-    candidates:
-      problem.candidates?.map((candidate) => ({
-        id: candidate.id,
-        text: candidate.text,
-        isAnswer: false,
-      })) ?? null,
+  const examProblems:ExamProblem[] = data.problems.map((problem) => {
+    if(!problem) throw new Error("문제가 없습니다.");
 
-    // 문제의 정답을 알 수 없게 함
-    subAnswer: problem.questionType === "sub" ? "" : null,
-  }));
+    return {
+      uuid: problem.uuid,
+      type: problem.type as "obj" | "sub",
+      question: problem.question,
+      additionalView: problem.additionalView,
+      image: problem.image ? problem.image : null,
+      isAnswerMultiple: problem.isAnswerMultiple,
+      // 문제의 정답을 알 수 없게 함
+      candidates:
+        problem.candidates?.map((candidate) => ({
+          id: candidate.id,
+          text: candidate.text,
+          isAnswer: false,
+        })) ?? null,
+
+      // 문제의 정답을 알 수 없게 함
+      subAnswer: problem.type === "sub" ? "" : null,
+    };
+    
+  });
 
   const result: ExamProblemSet = {
-    id: data.id,
+    uuid: data.uuid,
     name: data.name,
-    exam_problems: problemShuffle(examProblems),
+    problems: problemShuffle(examProblems),
   };
 
   return NextResponse.json(result);

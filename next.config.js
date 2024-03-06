@@ -7,6 +7,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "strapi-exam.brain1401.duckdns.org",
       },
+      {
+        protocol: "https",
+        hostname: process.env.AWS_CLOUDFRONT_DOMAIN,
+      },
     ],
   },
 };

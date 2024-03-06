@@ -1,5 +1,5 @@
 "use client";
-import useExamProblemResults from "@/hooks/useExamProblemResults";
+import useProblemResults from "@/hooks/useProblemResults";
 import { Button } from "@nextui-org/react";
 import useScrollEffect from "@/hooks/useScrollEffect";
 
@@ -8,7 +8,7 @@ export default function NextOrPrevButton() {
     examProblemResultsIndex,
     setExamProblemResultsIndex,
     examProblemResults,
-  } = useExamProblemResults();
+  } = useProblemResults();
 
   useScrollEffect([examProblemResultsIndex]);
 

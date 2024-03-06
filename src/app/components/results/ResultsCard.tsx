@@ -1,12 +1,12 @@
 "use client";
 
 import useUiState from "@/hooks/useUiState";
-import { ExamResultsWithCount } from "@/types/problems";
+import { ResultWithCount } from "@/types/problems";
 import { Checkbox } from "@nextui-org/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 type Props = {
-  result: ExamResultsWithCount;
+  result: ResultWithCount;
 };
 
 export default function ResultsCard({ result }: Props) {
@@ -59,7 +59,7 @@ export default function ResultsCard({ result }: Props) {
           <h2 className="mb-1 truncate text-center text-xl">
             {result.problemSetName}
           </h2>
-          <p className="text-center text-sm font-semibold">{`${result.examProblemResultsCount} 문제`}</p>
+          <p className="text-center text-sm font-semibold">{`${result.problemResultsCount} 문제`}</p>
           <p className="mx-auto w-fit whitespace-pre-line text-center text-sm text-gray-500">
             {formattedDate}
           </p>

@@ -3,7 +3,7 @@ import useExamProblems from "@/hooks/useExamProblems";
 export default function CurrentProblemIndicator() {
   const {
     examProblems: {
-      exam_problems: { length },
+      problems: { length },
     },
     currentExamProblemIndex,
   } = useExamProblems();

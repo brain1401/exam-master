@@ -15,7 +15,7 @@ import {
   setProblemSetsNameAction,
   setLocalProblemSetsNameAction,
 } from "@/slices/problems";
-import { Problem, candidate } from "@/types/problems";
+import { Problem, Candidate } from "@/types/problems";
 import { useCallback } from "react";
 
 export default function useProblems() {
@@ -89,7 +89,7 @@ export default function useProblems() {
   );
 
   const setCurrentProblemCandidates = useCallback(
-    (candidates: candidate[]) => {
+    (candidates: Candidate[]) => {
       dispatch(setCurrentProblemCandidatesAction(candidates));
     },
     [dispatch],

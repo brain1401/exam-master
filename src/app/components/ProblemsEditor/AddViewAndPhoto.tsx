@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { Textarea, Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { isImageFileObject, isImageUrlObject } from "@/service/problems";
 import { twMerge } from "tailwind-merge";
 import useProblems from "@/hooks/useProblems";
+import { isImageFileObject, isImageUrlObject } from "@/utils/problems";
 
 type Props = {
   className?: string;
@@ -35,7 +35,7 @@ export default function AddViewAndPhoto({ className }: Props) {
       };
     } else if (isImageUrlObject(image)) {
       // image가 null이 아니고 URL프로퍼티를 포함한 객체인 경우
-      setImageURL(`${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.url}`);
+      setImageURL(image?.url);
     } else {
       setImageURL(null);
     }

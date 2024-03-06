@@ -1,12 +1,16 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import usePagenationState from "./usePagenationState";
 import {
   fetchExamResults,
   fetchProblemSets,
   getExamResultsMaxPage,
   getProblemSetsMaxPage,
-} from "@/service/problems";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import usePagenationState from "./usePagenationState";
+} from "@/utils/problems";
+import {
+  ProblemSetWithPagination,
+  ResultsWithPagination,
+} from "@/types/problems";
 
 export default function usePrefetchPagination(
   type: "manage" | "exam" | "results",
@@ -14,7 +18,8 @@ export default function usePrefetchPagination(
   debouncedSearchString: string,
 ) {
   const queryClient = useQueryClient();
-  const { setProblemSetsMaxPage, setResultsMaxPage, pageSize } = usePagenationState();
+  const { setProblemSetsMaxPage, setResultsMaxPage, pageSize } =
+    usePagenationState();
   // 페이지네이션 데이터 prefetch
   useEffect(() => {
     const prefetch = async () => {
@@ -32,8 +37,9 @@ export default function usePrefetchPagination(
         type === "manage" || type === "exam"
           ? setProblemSetsMaxPage
           : setResultsMaxPage;
-      const queryKey = type === "manage" || type === "exam" ? "problemSets" : "results";
-      
+      const queryKey =
+        type === "manage" || type === "exam" ? "problemSets" : "results";
+
       const fetchs: Promise<any>[] = [];
 
       let maxPage =
@@ -43,7 +49,9 @@ export default function usePrefetchPagination(
 
       for (let i = 1; i <= maxPage; i++) {
         fetchs.push(
-          queryClient.prefetchQuery({
+          queryClient.prefetchQuery<
+            ProblemSetWithPagination | ResultsWithPagination | null
+          >({
             queryKey: [
               queryKey,
               i,
@@ -64,7 +72,7 @@ export default function usePrefetchPagination(
         );
       }
 
-      Promise.all(fetchs);
+      await Promise.all(fetchs);
     };
 
     prefetch();

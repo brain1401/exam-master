@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  uuid            String          @id @unique @default(uuid())
+  name            String
+  email           String          @unique
+  image           String?
+  problems        Problem[]
+  problem_sets    ProblemSet[]
+  problem_results ProblemResult[]
+  results         Result[]
+  images          Image[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Image {
+  uuid            String          @id @unique @default(uuid())
+  filename        String
+  key             String          @unique
+  url             String          @unique
+  hash            String          @unique
+  problems        Problem[]
+  problem_results ProblemResult[]
+  users           User[]
+}
+
+model ProblemSet {
+  uuid                  String    @id @unique @default(uuid())
+  name                  String
+  problems              Problem[]
+  userUuid              String
+  user                  User      @relation(fields: [userUuid], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  isShareLinkPurposeSet Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Problem {
+  uuid             String     @id @unique @default(uuid())
+  order            Int
+  question         String
+  questionType     String
+  imageUuid        String?
+  image            Image?     @relation(fields: [imageUuid], references: [uuid], onDelete: SetNull, onUpdate: Cascade)
+  candidates       Json?
+  additionalView   String?
+  problemSetUuid   String
+  problemSet       ProblemSet @relation(fields: [problemSetUuid], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  subjectiveAnswer String?
+  userUuid         String
+  user             User       @relation(fields: [userUuid], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  isAnswerMultiple Boolean    @default(false)
+}
+
+model ProblemResult {
+  uuid                    String   @id @unique @default(uuid())
+  order                   Int
+  question                String
+  questionType            String
+  additionalView          String?
+  resultUuid              String
+  result                  Result   @relation(fields: [resultUuid], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  isCorrect               Boolean
+  candidates              Json?
+  isAnswerMultiple        Boolean
+  userUuId                String
+  user                    User     @relation(fields: [userUuId], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  imageUuid               String?
+  image                   Image?   @relation(fields: [imageUuid], references: [uuid], onDelete: SetNull, onUpdate: Cascade)
+  subjectiveAnswered      String?
+  correctSubjectiveAnswer String?
+  correctCandidates       Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Result {
+  uuid            String          @id @unique @default(uuid())
+  problem_results ProblemResult[]
+  userUuid        String
+  user            User            @relation(fields: [userUuid], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  problemSetName  String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}

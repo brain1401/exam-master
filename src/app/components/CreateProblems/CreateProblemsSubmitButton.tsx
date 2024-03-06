@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { isProblemEmpty } from "@/service/problems";
 import { Button } from "@nextui-org/react";
 import useProblems from "@/hooks/useProblems";
+import { isProblemEmpty } from "@/utils/problems";
 
 export default function CreateProblemsSubmitButton() {
   const { problems, problemSetsName, setProblemSetsName, resetProblems } =
@@ -38,14 +38,17 @@ export default function CreateProblemsSubmitButton() {
       });
 
       const data = await response.json();
-      if (data === "OK") {
+
+      if (data.success === "OK") {
         alert("문제집이 성공적으로 등록되었습니다.");
         resetProblems();
         setProblemSetsName("");
       } else {
+        console.error(data.success);
         alert("문제집 등록에 실패했습니다.");
       }
     } catch (err) {
+      console.error(err);
       alert("문제집 등록에 실패했습니다.");
     } finally {
       setIsLoading(false); // 로딩 완료

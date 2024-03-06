@@ -8,23 +8,23 @@ import NextOrPrevButton from "./NextOrPrevButton";
 import CurrentImage from "./CurrentImage";
 import SubjectiveAnswered from "./SubjectiveAnswered";
 import ExamCardLayout from "../layouts/ExamCardLayout";
-import useExamProblemResults from "@/hooks/useExamProblemResults";
+import useProblemResults from "@/hooks/useProblemResults";
 import CorrectAnswer from "./CorrectAnswer";
 import CustomLoading from "../ui/CustomLoading";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
-import { isImageUrlObject } from "@/service/problems";
 import CorrectMark from "/public/images/correctCircle.png";
 import WrongMark from "/public/images/wrong.png";
 import checkImage from "/public/images/checkBlack.png";
 import Image from "next/image";
-import ProblemGridLayout from "../layouts/ProblemGridLayout";
+import { isImageUrlObject } from "@/utils/problems";
+import { ExamResults, ProblemResult } from "@/types/problems";
 type Props = {
   UUID: string;
 };
 
 export default function ResultPage({ UUID }: Props) {
   const { setExamProblemResults, resetExamProblemResults, examProblemResults } =
-    useExamProblemResults();
+    useProblemResults();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ error: string } | null>(null);
@@ -35,7 +35,7 @@ export default function ResultPage({ UUID }: Props) {
     setLoading(true);
     const fetchData = async () => {
       try {
-        const res = await axios.get(`/api/getExamResultByUUID`, {
+        const res = await axios.get<ProblemResult[]>(`/api/getExamResultByUUID`, {
           params: {
             uuid: UUID,
           },
@@ -67,12 +67,12 @@ export default function ResultPage({ UUID }: Props) {
         {/* preload images */}
         {examProblemResults &&
           examProblemResults.map((examProblem) => {
-            const image = examProblem?.image?.[0];
+            const image = examProblem?.image;
             if (image && isImageUrlObject(image)) {
               return (
                 <Image
-                  key={examProblem.id + "preload"}
-                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                  key={examProblem.uuid + "preload"}
+                  src={image.url}
                   alt="preload image"
                   width={400}
                   height={400}

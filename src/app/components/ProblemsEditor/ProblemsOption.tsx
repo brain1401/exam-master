@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { isCardOnBeingWrited } from "@/service/problems";
 import { Problem } from "@/types/problems";
 import { Button, Input } from "@nextui-org/react";
 import useProblems from "@/hooks/useProblems";
+import { isCardOnBeingWrited } from "@/utils/problems";
 
 const BUTTON_CLASSNAMES =
   "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";

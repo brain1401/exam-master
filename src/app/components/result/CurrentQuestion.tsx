@@ -1,6 +1,6 @@
 "use client";
 
-import useExamProblemResults from "@/hooks/useExamProblemResults";
+import useProblemResults from "@/hooks/useProblemResults";
 import Image from "next/image";
 import WrongMark from "/public/images/wrong.png";
 import CorrectMark from "/public/images/correctCircle.png";
@@ -9,7 +9,7 @@ export default function CurrentQuestion() {
   const {
     currentExamProblemResult: { question, isCorrect },
     examProblemResultsIndex: index,
-  } = useExamProblemResults();
+  } = useProblemResults();
 
   return (
     <div className="relative">

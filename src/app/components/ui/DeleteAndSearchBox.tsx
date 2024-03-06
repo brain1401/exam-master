@@ -49,12 +49,9 @@ export default function DeleteAndSearchBox({
   const deleteProblemSets = async (uuids: string[]) => {
     if (uuids.length === 0) return alert("삭제할 문제집을 선택해주세요.");
 
-    await Promise.all(
-      uuids.map(async (uuid) => {
-        const res = await axios.delete(`/api/deleteProblemSetByUUID/${uuid}`);
-        return res;
-      }),
-    );
+    const res = await axios.delete(`/api/deleteProblemSetByUUID`, {
+      data: { uuids },
+    });
 
     queryClient.invalidateQueries({ queryKey: ["problemSets"] });
 
@@ -64,14 +61,11 @@ export default function DeleteAndSearchBox({
   const deleteProblemResults = async (uuids: string[]) => {
     if (uuids.length === 0) return alert("삭제할 문제집을 선택해주세요.");
 
-    await Promise.all(
-      uuids.map(async (uuid) => {
-        const res = await axios.delete(
-          `/api/deleteProblemResultsByUUID/${uuid}`,
-        );
-        return res;
-      }),
-    );
+    const res = await axios.delete(`/api/deleteProblemResultsByUUID`, {
+      data: {
+        uuids,
+      },
+    });
 
     queryClient.invalidateQueries({ queryKey: ["results"] });
 

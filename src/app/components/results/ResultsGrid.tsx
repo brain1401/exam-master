@@ -1,13 +1,13 @@
 "use client";
 import ResultsCard from "./ResultsCard";
 import usePagenationState from "@/hooks/usePagenationState";
-import { fetchExamResults } from "@/service/problems";
-import { ExamResultsWithCountResponse } from "@/types/problems";
+import { ExamResultsWithCountResponse, ResultsWithPagination } from "@/types/problems";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import CustomLoading from "../ui/CustomLoading";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 import ResultsCardSkeleton from "./ResultsCardSkeleton";
+import { fetchExamResults } from "@/utils/problems";
 
 type Props = {
   pageSize: number;
@@ -26,7 +26,7 @@ export default function ResultsGrid({
     data: results,
     isLoading,
     error,
-  } = useQuery<ExamResultsWithCountResponse>({
+  } = useQuery<ResultsWithPagination | null>({
     queryKey: [
       "results",
       resultsPage,

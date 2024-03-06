@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { isProblemEmpty } from "@/service/problems";
 import { Button } from "@nextui-org/react";
 import useProblems from "@/hooks/useProblems";
+import { isProblemEmpty } from "@/utils/problems";
 
 type Props = {
   uuid: string;

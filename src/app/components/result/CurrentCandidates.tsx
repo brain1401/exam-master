@@ -3,14 +3,14 @@
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
 import checkImage from "/public/images/checkBlack.png";
-import useExamProblemResults from "@/hooks/useExamProblemResults";
+import useProblemResults from "@/hooks/useProblemResults";
 import { twMerge } from "tailwind-merge";
 import { checkMarkClassName } from "@/classnames/checkMark";
 
 export default function CurrentCandidates() {
   const {
     currentExamProblemResult: { candidates },
-  } = useExamProblemResults();
+  } = useProblemResults();
 
 
   return (

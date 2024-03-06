@@ -1,5 +1,5 @@
 import { RootState } from "@/lib/store";
-import { Problem, candidate } from "@/types/problems";
+import { Problem, Candidate } from "@/types/problems";
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 type StateType = {
@@ -11,6 +11,7 @@ type StateType = {
   candidatesCount: string;
   currentTab: "obj" | "sub";
 };
+
 const initialState: StateType = {
   problems: Array.from(Array<Problem>(10), (_, i) =>
     i === 0
@@ -23,7 +24,7 @@ const initialState: StateType = {
           isImageButtonClicked: false,
           image: null,
           isAnswerMultiple: false,
-          candidates: Array.from(Array<candidate>(4), (_, i) => ({
+          candidates: Array.from(Array<Candidate>(4), (_, i) => ({
             id: i,
             text: "",
             isAnswer: false,
@@ -67,7 +68,7 @@ export const problemsSlice = createSlice({
       const { currentTab, currentProblemIndex, problems } = state;
       if (problems[currentProblemIndex] === null) {
         problems[currentProblemIndex] = {
-          id: undefined,
+          uuid: undefined,
           type: currentTab === "obj" ? "obj" : "sub",
           question: "",
           additionalView: "",
@@ -77,7 +78,7 @@ export const problemsSlice = createSlice({
           isAnswerMultiple: false,
           candidates:
             currentTab === "obj"
-              ? Array.from(Array<candidate>(4), (_, i) => ({
+              ? Array.from(Array<Candidate>(4), (_, i) => ({
                   id: i,
                   text: "",
                   isAnswer: false,
@@ -99,7 +100,7 @@ export const problemsSlice = createSlice({
     },
     setCurrentProblemCandidatesAction: (
       state,
-      action: PayloadAction<candidate[]>,
+      action: PayloadAction<Candidate[]>,
     ) => {
       const { currentProblemIndex, problems } = state;
       const currentProblem = problems[currentProblemIndex];

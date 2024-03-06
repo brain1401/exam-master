@@ -1,11 +1,11 @@
 "use client";
 
-import useExamProblemResults from "@/hooks/useExamProblemResults";
+import useProblemResults from "@/hooks/useProblemResults";
 
 export default function SubjectiveAnswered() {
   const {
     currentExamProblemResult: { subjectiveAnswered },
-  } = useExamProblemResults();
+  } = useProblemResults();
 
   return (
     <>

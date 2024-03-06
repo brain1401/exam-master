@@ -58,15 +58,22 @@ export async function PUT(req: NextRequest) {
     );
   }
 
-  const result = await updateProblems(
-    problemSetsName,
-    problems,
-    problemSetUUID,
-    session?.user?.email,
-  );
+  try {
+    const result = await updateProblems(
+      problemSetsName,
+      problems,
+      problemSetUUID,
+      session.user.email,
+    );
 
-  return NextResponse.json(
-    result ? true : false,
-    result ? { status: 200 } : { status: 500 },
-  );
+    return NextResponse.json(
+      result ? true : false,
+      result ? { status: 200 } : { status: 500 },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error: "문제를 수정하는 도중 에러가 발생했습니다!" },
+      { status: 400 },
+    );
+  }
 }

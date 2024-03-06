@@ -30,20 +30,37 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if(!problemsSchema.safeParse(problems).success) {
+  try {
+    problemsSchema.parse(problems);
+  } catch (e) {
+    console.log(e);
+    console.log(problems);
     return NextResponse.json(
-      { error: "서버로 전송된 문제 형식이 올바르지 않습니다." },
+      { error: e, problems },
       { status: 400 },
     );
   }
+  // if (!problemSchema.safeParse(problems).success) {
+  //   console.log(problems);
+  //   return NextResponse.json(
+  //     { error: "서버로 전송된 문제 형식이 올바르지 않습니다." },
+  //     { status: 400 },
+  //   );
+  // }
 
+  try {
+    const response = await postProblems(
+      problemSetsName,
+      session?.user?.email,
+      problems,
+      false,
+    );
 
-  const response = await postProblems(
-    problemSetsName,
-    session?.user?.email,
-    problems,
-    false,
-  );
-
-  return NextResponse.json(response);
+    return NextResponse.json({ success: response ? "OK" : "FAIL" });
+  } catch (e) {
+    return NextResponse.json(
+      { error: "문제를 업로드 하는 도중 에러가 발생했습니다!" },
+      { status: 400 },
+    );
+  }
 }

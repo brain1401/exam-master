@@ -30,7 +30,10 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const validateResult = await checkUserPermissionForProblemSet(UUID, session.user.email);
+  const validateResult = await checkUserPermissionForProblemSet(
+    UUID,
+    session.user.email,
+  );
 
   if (validateResult === "NO") {
     return NextResponse.json(
@@ -41,28 +44,15 @@ export async function GET(req: NextRequest) {
 
   const data = await getProblemsSetByUUID(UUID, session?.user?.email);
 
-  if (data.exam_problems === undefined)
+  if (data.problems === undefined)
     return NextResponse.json(
       { error: "문제집을 불러오는 중 오류가 발생했습니다." },
       { status: 500 },
     );
   const result: ProblemSetWithName = {
-    id: data.id,
+    id: data.uuid.toString(),
     name: data.name,
-    exam_problems: [
-      ...data.exam_problems.map((problem) => ({
-        type: problem.questionType as "obj" | "sub",
-        question: problem.question,
-        additionalView: problem.additionalView,
-        image: problem.image,
-        candidates: problem.candidates,
-        subAnswer: problem.subjectiveAnswer,
-        isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
-        isImageButtonClicked: problem.image ? true : false,
-        isAnswerMultiple: problem.isAnswerMultiple,
-        id: problem.id,
-      })),
-    ],
+    problems: data.problems,
   };
 
   return NextResponse.json(result);

@@ -2,10 +2,10 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
-import { isCardOnBeingWrited, isImageUrlObject } from "@/service/problems";
 import usePreventClose from "@/hooks/usePreventClose";
 import useProblems from "@/hooks/useProblems";
 import Image from "next/image";
+import { isCardOnBeingWrited, isImageUrlObject } from "@/utils/problems";
 
 export default function ProblemsEditor() {
   const {
@@ -17,7 +17,7 @@ export default function ProblemsEditor() {
   } = useProblems();
 
   usePreventClose();
-
+  
   const onTabChange = (tab: "obj" | "sub") => {
     if (isCardOnBeingWrited(currentProblem)) {
       const value = confirm(
@@ -27,7 +27,7 @@ export default function ProblemsEditor() {
     }
     setCurrentTab(tab);
     setCurrentProblem({
-      id: currentProblem?.id,
+      uuid: currentProblem?.uuid,
       type: tab,
       question: "",
       additionalView: "",
@@ -58,22 +58,22 @@ export default function ProblemsEditor() {
     return value;
   };
   return (
-    <section className="flex flex-col mx-auto items-center max-w-[60rem] justify-center">
+    <section className="mx-auto flex max-w-[60rem] flex-col items-center justify-center">
       <div>
-        {/* preload image */}
+        {/* preload images */}
         {problems &&
           problems.map((problem) => {
             if (problem && problem.image && isImageUrlObject(problem.image)) {
               const image = problem.image;
               return (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`}
+                  src={image.url}
                   alt="preload image"
                   className="hidden"
                   height={400}
                   width={400}
                   priority
-                  key={problem?.id + "preload"}
+                  key={problem?.uuid + "preload"}
                 />
               );
             }

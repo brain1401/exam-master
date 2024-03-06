@@ -1,71 +1,44 @@
-import axios from "axios";
-import qs from "qs";
+import prisma from "@/lib/prisma";
+import { PrismaTransaction } from "@/types/problems";
 
 export async function createUserIfNotExists(
   email: string,
   name: string,
-  image: string
+  image: string,
 ): Promise<boolean> {
   let result: boolean = false;
   const isUserExist = await checkUser(email);
 
   if (!isUserExist) {
-    if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
-      throw new Error("환경 변수가 설정되지 않았습니다.");
-    }
-
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-users`,
-        {
-          email,
+      const user = await prisma.user.create({
+        data: {
           name,
+          email,
           image,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-          },
-        }
-      );
-      result = true;
+      });
+
+      result = user ? true : false;
     } catch (err) {
       console.log(err);
       result = false;
     }
-  }
-  else{
+  } else {
     result = true;
   }
   return result;
 }
 
 export async function checkUser(email: string) {
-  if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
-    throw new Error("환경 변수가 설정되지 않았습니다.");
-  }
-
-  const query = qs.stringify({
-    filters: {
-      email: {
-        $eq: email,
-      },
-    },
-  });
-
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-users?${query}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
-        },
-      }
-    );
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
 
-    const user = Boolean(response.data.data[0]);
-
-    return user;
+    return user ? true : false;
   } catch (err) {
     console.log(err);
 
@@ -73,31 +46,59 @@ export async function checkUser(email: string) {
   }
 }
 
-export async function getUser(email: string) {
-  if (!process.env.NEXT_PUBLIC_STRAPI_URL || !process.env.STRAPI_TOKEN) {
-    throw new Error("환경 변수가 설정되지 않았습니다.");
-  }
-
-  const query = qs.stringify({
-    filters: {
-      email: {
-        $eq: email,
-      },
-    },
-  });
-
+export async function getUserByEmail(email: string, pm?: PrismaTransaction) {
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exam-users?${query}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_TOKEN}`,
+    const prismaInstance = pm ?? prisma;
+
+    const user = await prismaInstance.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (!user) throw new Error("유저를 찾을 수 없습니다.");
+    return user;
+  } catch (err) {
+    console.log(err);
+
+    throw new Error("유저를 가져오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getUserByProblemUuId(problemUuid: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        problems: {
+          some: {
+            uuid: problemUuid,
+          },
         },
-      }
-    );
+      },
+    });
 
-    const user = response.data.data[0];
+    return user;
+  } catch (err) {
+    console.log(err);
 
+    throw new Error("유저를 가져오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getUserByImageUuId(
+  imageUuid: string,
+  pm?: PrismaTransaction,
+) {
+  try {
+    const prismaInstance = pm ?? prisma;
+    const user = await prismaInstance.user.findFirst({
+      where: {
+        images: {
+          some: {
+            uuid: imageUuid,
+          },
+        },
+      },
+    });
     return user;
   } catch (err) {
     console.log(err);

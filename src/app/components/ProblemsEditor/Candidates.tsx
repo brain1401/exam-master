@@ -107,7 +107,7 @@ export default function Candidates({ className }: Props) {
           value={currentProblemCandidates?.[index]?.text ?? ""}
           variant="bordered"
           classNames={{
-            inputWrapper: "border-nextUiBorder",
+            inputWrapper: "border-nextUiBorder h-[3rem]",
             input: "text-[.9rem]",
           }}
           size="sm"
