@@ -7,7 +7,6 @@ import axios from "axios";
 import { useState } from "react";
 
 export default function SubmitButton() {
-
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -16,26 +15,27 @@ export default function SubmitButton() {
 
   const router = useRouter();
 
-  const onClick = async() => {
+  const onClick = async () => {
     if (problems.some((problem) => !isProblemAsnwered(problem)))
       return alert("모든 문제에 답을 입력해주세요.");
 
-      setIsLoading(true);
-      try {
-        const {data: {uuid}} = await axios.post("/api/evaluateProblems", {
-          examProblems: problems,
-          problemSetName,
-        });
+    setIsLoading(true);
+    let uuid = "";
+    try {
+      const { data } = await axios.post("/api/evaluateProblems", {
+        examProblems: problems,
+        problemSetName,
+      });
+      uuid = data.uuid;
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
 
-        router.push(`/result/${uuid}`);
-      } catch (e) {
-        if (e instanceof Error) {
-          console.error(e.message);
-        }
-      }
-      finally {
-        setIsLoading(false);
-      }
+    router.push(`/result/${uuid}`);
   };
   return (
     <>
