@@ -1,13 +1,14 @@
 "use client";
 import { Button } from "@nextui-org/react";
-import { useTransition } from "react";
-import { evaluateProblems } from "@/action/evaluateProblems";
 import { useRouter } from "next/navigation";
 import useExamProblems from "@/hooks/useExamProblems";
 import { isProblemAsnwered } from "@/utils/problems";
+import axios from "axios";
+import { useState } from "react";
 
 export default function SubmitButton() {
-  const [isPending, startTransition] = useTransition();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     examProblems: { problems, name: problemSetName },
@@ -15,25 +16,31 @@ export default function SubmitButton() {
 
   const router = useRouter();
 
-  const onClick = () => {
+  const onClick = async() => {
     if (problems.some((problem) => !isProblemAsnwered(problem)))
       return alert("모든 문제에 답을 입력해주세요.");
-    // server actions
-    startTransition(async () => {
+
+      setIsLoading(true);
       try {
-        const uuid = await evaluateProblems(problems, problemSetName);
+        const {data: {uuid}} = await axios.post("/api/evaluateProblems", {
+          examProblems: problems,
+          problemSetName,
+        });
+
         router.push(`/result/${uuid}`);
       } catch (e) {
         if (e instanceof Error) {
           console.error(e.message);
         }
       }
-    });
+      finally {
+        setIsLoading(false);
+      }
   };
   return (
     <>
-      <Button className="mt-3" onClick={onClick} isLoading={isPending}>
-        {isPending ? "채점중..." : "제출하기"}
+      <Button className="mt-3" onClick={onClick} isLoading={isLoading}>
+        {isLoading ? "채점중..." : "제출하기"}
       </Button>
     </>
   );

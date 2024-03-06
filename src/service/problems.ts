@@ -1,3 +1,5 @@
+import "server-only";
+
 import {
   Problem,
   ExamProblem,
@@ -5,6 +7,7 @@ import {
   Candidate,
   PrismaTransaction,
   ResultsWithPagination,
+  problemsSchema,
 } from "@/types/problems";
 import {
   getUserByEmail,
@@ -13,8 +16,10 @@ import {
   generateFileHash,
   isAnswerArray,
   isAnswerString,
+  isAnsweredMoreThanOne,
   isImageFileObject,
   isImageUrlObject,
+  isProblemAsnwered,
 } from "@/utils/problems";
 import {
   DeleteObjectCommand,
@@ -1575,4 +1580,85 @@ export function validateS3Key(fileName: string): boolean {
   // SHA-256 해시-파일이름.확장자 패턴 정의
   const pattern = /^[a-fA-F0-9]{64}-[^.]+\.[a-zA-Z0-9]+$/;
   return pattern.test(fileName);
+}
+
+export async function evaluateProblems(
+  examProblems: ExamProblem[],
+  problemSetName: string,
+  userEmail: string,
+) {
+
+  try {
+    const result = await prisma.$transaction(async (pm) => {
+
+      const { uuid: userUuid } = await getUserByEmail(userEmail,pm);
+
+      const validateResult = problemsSchema.safeParse(examProblems);
+
+      if (!validateResult.success) {
+        throw new Error("인수로 전달된 문제들이 유효하지 않습니다.");
+      }
+
+      const { uuid: resultsUuid } = await pm.result.create({
+        data: {
+          problemSetName,
+          user: {
+            connect: {
+              uuid: userUuid,
+            },
+          },
+        },
+      });
+
+      await Promise.all(
+        examProblems.map(async (problem, index) => {
+          if (!problem || !problem.uuid) throw new Error("something is null");
+
+          if (!isProblemAsnwered(problem))
+            throw new Error("모든 정답을 입력해주세요.");
+
+          if (problem.type === "obj" && problem.isAnswerMultiple === false) {
+            if (isAnsweredMoreThanOne(problem)) {
+              throw new Error(
+                "단일 선택 문제입니다. 하나의 정답만 선택해주세요.",
+              );
+            }
+          }
+
+          if (
+            problem.type === "sub" &&
+            (problem.subAnswer === "" || problem.subAnswer === null)
+          ) {
+            throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
+          }
+
+          const answer = await getAnswerByProblemUuid(problem.uuid, pm);
+
+          if (!answer) {
+            throw new Error("result is null");
+          }
+
+          const evaluationResult = await validateExamProblem(problem, answer);
+
+          await postProblemResult(
+            index + 1,
+            problem,
+            resultsUuid,
+            evaluationResult,
+            answer,
+            userUuid,
+            pm,
+          );
+        }),
+      );
+
+      return resultsUuid;
+    });
+
+    return result;
+  } catch (err) {
+    if (err instanceof Error) {
+      throw new Error(err.message);
+    }
+  }
 }
