@@ -1,8 +1,15 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@nextui-org/react";
+import axios from "axios";
 import useProblems from "@/hooks/useProblems";
-import { isProblemEmpty } from "@/utils/problems";
+import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
+
+import {
+  generateFileHash,
+  isImageFileObject,
+  isProblemEmpty,
+} from "@/utils/problems";
 
 export default function CreateProblemsSubmitButton() {
   const { problems, problemSetsName, setProblemSetsName, resetProblems } =
@@ -22,8 +29,40 @@ export default function CreateProblemsSubmitButton() {
 
     if (!confirm("문제집을 제출하시겠습니까?")) return;
 
-    setIsLoading(true); // 로딩 시작
+    // try {
+    //   const uploadedKeys = await Promise.all(
+    //     problems.map(async (problem) => {
+    //       if (problem && problem.image && isImageFileObject(problem.image)) {
+    //         const hash = await generateFileHash(problem.image);
+    //         const key = `${hash}-${problem.image.name}`;
+    //         const response = await axios.get<PresignedPost>(
+    //           `/api/getPresignedUrl?key=${key}`,
+    //         );
+    //         const {url, fields} = response.data;
+    //         const formData = new FormData();
+    //         Object.entries(fields).forEach(([field, value]) => {
+    //           formData.append(field, value);
+    //         });
+    //         formData.append("Content-Type", problem.image.type);
+    //         formData.append("file", problem.image);
 
+    //         await axios.post(url, formData);
+
+    //         return key;
+    //       }
+    //       return null;
+    //     }),
+    //   );
+
+    //   console.log(uploadedKeys);
+    // } catch (err) {
+    //   console.error(err);
+    // } finally {
+    //   setIsLoading(false); // 로딩 완료
+    // }
+
+    setIsLoading(true); // 로딩 시작
+    
     const formData = new FormData();
     problems.forEach((problem, index) => {
       formData.append(`image[${index}]`, problem?.image as Blob);

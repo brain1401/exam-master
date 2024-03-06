@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.525.0",
+    "@aws-sdk/s3-presigned-post": "^3.525.0",
     "@nextui-org/react": "^2.2.10",
     "@prisma/client": "^5.10.2",
     "@radix-ui/react-tabs": "^1.0.4",
@@ -39,6 +40,7 @@
     "react-responsive": "^9.0.2",
     "react-spinners": "^0.13.8",
     "redux": "^5.0.1",
+    "server-only": "^0.0.1",
     "sharp": "^0.33.2",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",

@@ -1,12 +1,11 @@
 "use server";
 
-import { getAnswerByProblemUuid, postProblemResult } from "@/service/problems";
+import { getAnswerByProblemUuid, postProblemResult, validateExamProblem } from "@/service/problems";
 import { getUserByEmail } from "@/service/user";
 import { ExamProblem, problemsSchema } from "@/types/problems";
 import {
   isAnsweredMoreThanOne,
   isProblemAsnwered,
-  validateExamProblem,
 } from "@/utils/problems";
 import { getServerSession } from "next-auth";
 

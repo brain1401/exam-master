@@ -307,39 +307,6 @@ export function isAnsweredMoreThanOne(problem: ExamProblem) {
   );
 }
 
-export async function validateExamProblem(
-  problem: ExamProblem,
-  answer: string | (number | null)[],
-) {
-  let finalResult: boolean | null = null;
-
-  if (!problem || !problem.uuid) throw new Error("something is null");
-
-  if (problem.type === "obj") {
-    if (!problem.candidates) throw new Error("candidates is null");
-
-    const answeredId = problem.candidates
-      .filter((candidate) => candidate.isAnswer)
-      .map((candidate) => candidate.id);
-
-    const isCorrect = isAnswerArray(answer)
-      ? answer.every((id) => answeredId.includes(id))
-      : null;
-
-    finalResult = isCorrect;
-  } else if (problem.type === "sub") {
-    if (!problem.subAnswer) throw new Error("subAnswer is null");
-
-    const isCorrect = problem.subAnswer === answer;
-
-    finalResult = isCorrect;
-  }
-
-  if (finalResult === null) throw new Error("finalResult is null");
-
-  return finalResult;
-}
-
 export function isAnswerString(
   answer: string | (number | null)[],
 ): answer is string {
@@ -350,4 +317,20 @@ export function isAnswerArray(
   answer: string | (number | null)[],
 ): answer is (number | null)[] {
   return Array.isArray(answer);
+}
+
+export async function generateFileHash(file: File): Promise<string> {
+  // File 객체를 ArrayBuffer로 읽어옴
+  const arrayBuffer = await file.arrayBuffer();
+
+  // crypto.subtle.digest를 사용하여 SHA-256 해시를 계산
+  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+
+  // 해시 값을 Hex 문자열로 변환
+  const hashArray = Array.from(new Uint8Array(hashBuffer)); // ArrayBuffer를 byte array로 변환
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return hashHex;
 }

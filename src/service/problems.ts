@@ -1,3 +1,5 @@
+import "server-only";
+
 import {
   Problem,
   ExamProblem,
@@ -10,6 +12,7 @@ import {
   getUserByEmail,
 } from "./user";
 import {
+  generateFileHash,
   isAnswerArray,
   isAnswerString,
   isImageFileObject,
@@ -1384,20 +1387,37 @@ export async function deleteProblemResults(
   }
 }
 
-export async function generateFileHash(file: File): Promise<string> {
-  // File 객체를 ArrayBuffer로 읽어옴
-  const arrayBuffer = await file.arrayBuffer();
+export async function validateExamProblem(
+  problem: ExamProblem,
+  answer: string | (number | null)[],
+) {
+  let finalResult: boolean | null = null;
 
-  // crypto.subtle.digest를 사용하여 SHA-256 해시를 계산
-  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+  if (!problem || !problem.uuid) throw new Error("something is null");
 
-  // 해시 값을 Hex 문자열로 변환
-  const hashArray = Array.from(new Uint8Array(hashBuffer)); // ArrayBuffer를 byte array로 변환
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  if (problem.type === "obj") {
+    if (!problem.candidates) throw new Error("candidates is null");
 
-  return hashHex;
+    const answeredId = problem.candidates
+      .filter((candidate) => candidate.isAnswer)
+      .map((candidate) => candidate.id);
+
+    const isCorrect = isAnswerArray(answer)
+      ? answer.every((id) => answeredId.includes(id))
+      : null;
+
+    finalResult = isCorrect;
+  } else if (problem.type === "sub") {
+    if (!problem.subAnswer) throw new Error("subAnswer is null");
+
+    const isCorrect = problem.subAnswer === answer;
+
+    finalResult = isCorrect;
+  }
+
+  if (finalResult === null) throw new Error("finalResult is null");
+
+  return finalResult;
 }
 
 export async function getTotalReferencesOfImageByImageUuid(
@@ -1551,4 +1571,10 @@ export async function getReferecesOfImageByImageKey(
       "이미지를 참조하는 문제나 결과의 개수를 확인하는 중 오류가 발생했습니다.",
     );
   }
+}
+
+export function validateS3Key(fileName: string): boolean {
+  // SHA-256 해시-파일이름.확장자 패턴 정의
+  const pattern = /^[a-fA-F0-9]{64}-[^.]+\.[a-zA-Z0-9]+$/;
+  return pattern.test(fileName);
 }
