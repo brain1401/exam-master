@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { s3Client } from "@/utils/AWSs3Client";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
+import { HeadObjectCommand, HeadObjectCommandOutput } from "@aws-sdk/client-s3";
 import { validateS3Key } from "@/service/problems";
 
 export async function GET(req: NextRequest) {
@@ -16,6 +17,7 @@ export async function GET(req: NextRequest) {
 
   const searchParams = req.nextUrl.searchParams;
   const key = searchParams.get("key");
+  console.log("key in seachParams : ", key);
 
   if (!key) {
     return NextResponse.json(
@@ -30,7 +32,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       { error: "잘못된 요청입니다." },
       {
-        status: 400,
+        status: 422,
       },
     );
   }
@@ -45,6 +47,29 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  let headObjectResponse:HeadObjectCommandOutput | null = null;
+  try {
+    headObjectResponse = await s3Client.send(
+      new HeadObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }),
+    );
+  } catch (e) {
+    headObjectResponse = null;
+  }
+  
+  if(headObjectResponse !== null) {
+    return NextResponse.json(
+      { error: "이미지가 존재합니다." },
+      {
+        status: 409,
+      },
+    );
+  }
+
+  
+
   const url = await createPresignedPost(s3Client, {
     Bucket: bucket,
     Key: key,
@@ -54,6 +79,8 @@ export async function GET(req: NextRequest) {
     ],
     Expires: 20,
   });
+
+  
 
   console.log(url);
 

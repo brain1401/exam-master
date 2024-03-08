@@ -13,7 +13,7 @@ export default function CurrentExamImage() {
       {image && isImageUrlObject(image) && (
         <div className="mb-5">
           <Image
-            src={image.url}
+            src={(image.url)}
             width={400}
             height={400}
             priority

@@ -58,6 +58,8 @@ export async function PUT(req: NextRequest) {
     );
   }
 
+  console.log("problems :", problems);
+  
   try {
     const result = await updateProblems(
       problemSetsName,

@@ -1,23 +1,21 @@
 import "server-only";
 
 import {
-  Problem,
   ExamProblem,
   ProblemSetWithPagination,
   Candidate,
   PrismaTransaction,
   ResultsWithPagination,
   problemsSchema,
+  ProblemReplacedImageKey,
 } from "@/types/problems";
+import { getUserByEmail } from "./user";
 import {
-  getUserByEmail,
-} from "./user";
-import {
+  analyzeProblemsImagesAndDoCallback,
   generateFileHash,
   isAnswerArray,
   isAnswerString,
   isAnsweredMoreThanOne,
-  isImageFileObject,
   isImageUrlObject,
   isProblemAsnwered,
 } from "@/utils/problems";
@@ -31,17 +29,67 @@ import {
 import prisma from "@/lib/prisma";
 import { s3Client } from "@/utils/AWSs3Client";
 
-
 export async function postProblems(
   setName: string,
   userEmail: string,
-  problems: Problem[],
+  problems: ProblemReplacedImageKey[],
   isShareLinkPurposeSet: boolean,
 ) {
   try {
     const result = await prisma.$transaction(
       async (pm) => {
-        console.time("createProblemSet");
+        const createdImages = await analyzeProblemsImagesAndDoCallback({
+          problems,
+          flatResult: true,
+          skipDuplicated: true,
+          callback: async ({
+            index,
+            isNoImage,
+            duplicateIndexes,
+            isFirstImage,
+            imageKey,
+            toBeCallbacked,
+          }) => {
+            if (!isNoImage && isFirstImage) {
+              // 이미지가 있으면서 배열 내 처음 이미지인 경우
+              if (imageKey) {
+                const uuid = await createImageOnDBIfNotExistByS3Key(
+                  imageKey,
+                  userEmail,
+                  pm,
+                );
+
+                if (duplicateIndexes && duplicateIndexes.length > 0) {
+                  const result = duplicateIndexes.map((i) => {
+                    const imageKey = toBeCallbacked[i].imageKey;
+                    if (!imageKey)
+                      throw new Error("이미지가 올바르지 않습니다.");
+                    return {
+                      index: i,
+                      uuid: uuid,
+                    };
+                  });
+                  return result;
+                }
+                return {
+                  index,
+                  uuid,
+                };
+              }
+            }
+
+            return {
+              index,
+              uuid: null,
+            };
+          },
+        });
+
+        console.log(
+          "createdImages :",
+          createdImages.toSorted((a, b) => a.index - b.index),
+        );
+
         const createdProblemSet = await pm.problemSet.create({
           data: {
             name: setName,
@@ -51,39 +99,34 @@ export async function postProblems(
               },
             },
             problems: {
-              create: await Promise.all(
-                problems.map(async (problem, index) => {
-                  if (!problem) throw new Error("문제가 null입니다!");
+              create: problems.map((problem, index) => {
+                if (!problem) throw new Error("문제가 null입니다!");
 
-                  return {
-                    questionType: problem.type,
-                    question: problem.question,
-                    candidates: problem.candidates ?? undefined,
-                    additionalView: problem.additionalView,
-                    subjectiveAnswer: problem.subAnswer,
-                    isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
-                    order: index + 1,
-                    image: problem.image
-                      ? {
-                          connect: {
-                            uuid: (
-                              await createImageIfNotExist(
-                                problem.image,
-                                userEmail,
-                                pm,
-                              )
-                            ).uuid,
-                          },
-                        }
-                      : undefined,
-                    user: {
-                      connect: {
-                        email: userEmail,
-                      },
+                return {
+                  questionType: problem.type,
+                  question: problem.question,
+                  candidates: problem.candidates ?? undefined,
+                  additionalView: problem.additionalView,
+                  subjectiveAnswer: problem.subAnswer,
+                  isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
+                  order: index + 1,
+                  image: problem.image
+                    ? {
+                        connect: {
+                          uuid:
+                            createdImages.find(
+                              (image) => image?.index === index,
+                            )?.uuid ?? undefined,
+                        },
+                      }
+                    : undefined,
+                  user: {
+                    connect: {
+                      email: userEmail,
                     },
-                  };
-                }),
-              ),
+                  },
+                };
+              }),
             },
             isShareLinkPurposeSet: isShareLinkPurposeSet,
           },
@@ -91,7 +134,6 @@ export async function postProblems(
             uuid: true,
           },
         });
-        console.timeEnd("createProblemSet");
 
         return createdProblemSet ? "OK" : "FAIL";
       },
@@ -107,8 +149,202 @@ export async function postProblems(
   }
 }
 
-export async function createImageIfNotExist(
-  image: any,
+export async function updateProblems(
+  setName: string,
+  replacingProblems: ProblemReplacedImageKey[],
+  problemSetUUID: string,
+  userEmail: string,
+) {
+  console.log("문제 업데이트 시작!");
+
+  try {
+    console.log("문제 업데이트 트랜잭션 시작");
+    const result = await prisma.$transaction(
+      async (pm) => {
+        console.log("기존 문제 불러오기 시작");
+        const oldProblems = (
+          await pm.problem.findMany({
+            where: {
+              problemSet: {
+                uuid: problemSetUUID,
+              },
+            },
+            select: {
+              uuid: true,
+              image: true,
+              order: true,
+            },
+          })
+        ).map((problem) => ({
+          uuid: problem.uuid,
+          image: problem.image,
+          order: problem.order,
+        }));
+        console.log(
+          "oldProblems : ",
+          oldProblems.sort((a, b) => a.order - b.order),
+        );
+
+        const createdImages = await analyzeProblemsImagesAndDoCallback({
+          problems: replacingProblems,
+          flatResult: true,
+          skipDuplicated: true,
+          callback: async ({
+            index,
+            isNoImage,
+            duplicateIndexes,
+            isFirstImage,
+            imageKey,
+            toBeCallbacked,
+          }) => {
+            if (!isNoImage && isFirstImage) {
+              // 이미지가 있으면서 배열 내 처음 이미지인 경우
+              if (imageKey) {
+                const uuid = await createImageOnDBIfNotExistByS3Key(
+                  imageKey,
+                  userEmail,
+                  pm,
+                );
+
+                if (duplicateIndexes && duplicateIndexes.length > 0) {
+                  const result = duplicateIndexes.map((i) => {
+                    const imageKey = toBeCallbacked[i].imageKey;
+                    if (!imageKey)
+                      throw new Error("이미지가 올바르지 않습니다.");
+                    return {
+                      index: i,
+                      uuid: uuid,
+                    };
+                  });
+                  return result;
+                }
+                return {
+                  index,
+                  uuid,
+                };
+              }
+            }
+
+            return {
+              index,
+              uuid: null,
+            };
+          },
+        });
+
+        console.log(
+          "createdImages :",
+          createdImages.toSorted((a, b) => a.index - b.index),
+        );
+
+        const newProblems = await Promise.all(
+          replacingProblems.map(async (problem, index) => {
+            if (!problem) throw new Error("문제가 null입니다!");
+
+            console.log(`문제 ${index + 1} 생성 시작`);
+
+            const result = await pm.problem.create({
+              data: {
+                order: index + 1,
+                question: problem.question,
+                questionType: problem.type,
+                candidates: problem.candidates ?? undefined,
+                additionalView: problem.additionalView,
+                subjectiveAnswer: problem.subAnswer,
+                isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
+                image: problem.image
+                  ? {
+                      connect: {
+                        uuid:
+                          createdImages.find((image) => image?.index === index)
+                            ?.uuid ?? undefined,
+                      },
+                    }
+                  : undefined,
+                user: {
+                  connect: {
+                    email: userEmail,
+                  },
+                },
+                problemSet: {
+                  connect: {
+                    uuid: problemSetUUID,
+                  },
+                },
+              },
+              include: {
+                image: true,
+              },
+            });
+            console.log(`문제 ${index + 1} 생성 완료,`, result);
+            return result;
+          }),
+        );
+        console.log("newProblems : ", newProblems);
+
+        console.log(`기존 문제들 삭제 시작`);
+
+        //삭제할 이미지 키 중복 제거
+        const toBeDeletedImageKey = [
+          ...new Set(
+            oldProblems.reduce((acc, cur) => {
+              if (cur.image) acc.push(cur.image.key);
+              return acc;
+            }, [] as string[]),
+          ),
+        ].reduce((acc, cur) => {
+          const newProblemsImageKey = newProblems.reduce((acc, cur) => {
+            if (cur.image) acc.push(cur.image.key);
+            return acc;
+          }, [] as string[]);
+
+          if (!newProblemsImageKey.includes(cur)) acc.push(cur);
+          return acc;
+        }, [] as string[]);
+
+        console.log("toBeDeletedImageKey : ", toBeDeletedImageKey);
+
+        if (toBeDeletedImageKey.length > 0) {
+          await deleteImagesFromSet(toBeDeletedImageKey, userEmail, 1, pm);
+        }
+
+        if (oldProblems.length > 0) {
+          console.log(`기존 문제들 삭제 시작`, oldProblems);
+          const result = await pm.problemSet.update({
+            where: {
+              uuid: problemSetUUID,
+            },
+            data: {
+              name: setName,
+              problems: {
+                deleteMany: {
+                  uuid: {
+                    in: oldProblems.map((problem) => problem.uuid),
+                  },
+                },
+              },
+            },
+          });
+          if (!result) throw new Error("문제 업데이트 중 오류 발생");
+        }
+
+        console.log("기존 문제 삭제 완료");
+        return true;
+      },
+      {
+        timeout: 20000, // 20초
+      },
+    );
+
+    return result;
+  } catch (err) {
+    console.error("오류 발생:", err);
+    throw new Error("문제 업데이트 중 오류 발생");
+  }
+}
+
+export async function createImageOnDBIfNotExistByS3Key(
+  imageKey: string,
   userEmail: string,
   pm: PrismaTransaction,
 ) {
@@ -116,111 +352,27 @@ export async function createImageIfNotExist(
   const prismaInstance = pm;
 
   try {
-    if (image && isImageFileObject(image)) {
-      // 이미지가 파일 타입인 경우
-      console.log("[createImageIfNotExist] 이미지가 파일 타입인 경우");
-      const [hash, { uuid: userUuid }] = await Promise.all([
-        generateFileHash(image),
-        getUserByEmail(userEmail, prismaInstance),
-      ]);
+    if (imageKey) {
+      const imageUuid = await getImageUuidOnDBByImageKey(
+        imageKey,
+        prismaInstance,
+      );
 
-      const imageKey = `${hash}-${image.name}`;
-      console.log("[createImageIfNotExist] imageKey :", imageKey);
+      if (imageUuid) {
+        return imageUuid;
+      } else {
+        const file = await getImageFileOnS3ByImageKey(imageKey);
+        const hash = await generateFileHash(file);
 
-      const [checkIfImageExistsOnS3, checkIfImageExistsOnDB] =
-        await Promise.all([
-          checkIfImageExistsOnS3ByImageKey(imageKey),
-          checkIfImageExistsOnDBByImageKey(imageKey, prismaInstance),
-        ]);
-
-      if (!checkIfImageExistsOnS3 && !checkIfImageExistsOnDB) {
-        // 넣으려고 하는 이미지가 s3와 prisma에 없는 경우
-        console.log(
-          `[createImageIfNotExist] 넣으려고 하는 이미지${image.name}가 s3와 prisma에 없는 경우`,
-        );
-        try {
-          const command = new PutObjectCommand({
-            Bucket: process.env.AWS_S3_BUCKET_NAME,
-            Key: imageKey,
-            Body: (await image.arrayBuffer()) as Buffer,
-            ContentType: image.type,
-          });
-
-          const response = await s3Client.send(command);
-          if (!(response.$metadata.httpStatusCode === 200))
-            throw new Error(
-              "[createImageIfNotExist] S3에 이미지를 생성하는 중 오류가 발생했습니다.",
-            );
-
-          const result = await prismaInstance.image.upsert({
-            where: {
-              key: imageKey,
-            },
-            create: {
-              key: imageKey,
-              url: `https://${process.env.AWS_CLOUDFRONT_DOMAIN}/${encodeURIComponent(imageKey)}`,
-              hash: hash,
-              filename: image.name,
-              users: {
-                connect: {
-                  email: userEmail,
-                },
-              },
-            },
-            update: {},
-            select: {
-              uuid: true,
-            },
-          });
-
-          console.log(`[createImageIfNotExist] 이미지 ${image.name} 생성 성공`);
-
-          return result;
-        } catch (err) {
-          console.log(
-            "s3에 이미지를 업로드 하는 중 오류 발생, 이미지 삭제 시도..",
-          );
-          console.error(err);
-          const command = new DeleteObjectCommand({
-            Bucket: process.env.AWS_S3_BUCKET_NAME,
-            Key: imageKey,
-          });
-
-          const response = await s3Client.send(command);
-
-          if (!(response.$metadata.httpStatusCode === 204)) {
-            throw new Error(
-              `[createImageIfNotExist] S3에서 이미지${image.name}를 삭제하는 중 오류가 발생했습니다.`,
-            );
-          } else {
-            console.log(
-              `[createImageIfNotExist] 이미지${image.name} 삭제 성공`,
-            );
-          }
-
-          throw new Error(
-            `[createImageIfNotExist] 이미지${image.name}를 생성하는 중 오류가 발생했습니다.`,
-          );
-        }
-      } else if (checkIfImageExistsOnS3 && checkIfImageExistsOnDB) {
-        //넣으려고 하는 이미지가 s3에 있는 경우 (이미 데이터베이스에 있는 경우)
-        console.log(
-          `[createImageIfNotExist] 넣으려고 하는 이미지 ${image.name}가 s3에 있는 경우 (이미 데이터베이스에 있는 경우)`,
-        );
-        const imageUuid = await getImageUuidByImageKey(
-          imageKey,
-          prismaInstance,
-        );
-        if (!imageUuid)
-          throw new Error(
-            `[createImageIfNotExist] 이미지 uuid ${image.name}를 찾는 중 오류가 발생했습니다.`,
-          );
-
-        const result = await prismaInstance.image.update({
+        const result = await prismaInstance.image.upsert({
           where: {
-            uuid: imageUuid,
+            key: imageKey,
           },
-          data: {
+          create: {
+            filename: extractFileName(imageKey),
+            hash: hash,
+            url: `https://${process.env.AWS_CLOUDFRONT_DOMAIN}/${encodeURIComponent(imageKey)}`,
+            key: imageKey,
             users: {
               connect: {
                 email: userEmail,
@@ -230,51 +382,12 @@ export async function createImageIfNotExist(
           select: {
             uuid: true,
           },
+          update: {},
         });
-
-        console.log(
-          `[createImageIfNotExist] 데이터베이스에 이미 이미지가 있어 이미지${imageKey}와 유저${userEmail}를 연결했습니다.`,
-        );
-        return result;
-      } else {
-        throw new Error(
-          `[createImageIfNotExist] 이미지가 s3와 DB에 동기화되어있지 않습니다!\n s3:${checkIfImageExistsOnS3} DB:${checkIfImageExistsOnDB}`,
-        );
+        return result.uuid;
       }
-    } else if (image && isImageUrlObject(image)) {
-      // 이미지가 URL 타입인 경우
-      console.log("[createImageIfNotExist] 이미지가 URL 타입인 경우");
-      const imageUuid = await getImageUuidByImageKey(image.key, prismaInstance);
-      console.log("[createImageIfNotExist] imageKey :", image.key);
-      console.log("[createImageIfNotExist] imageUuid :", imageUuid);
-      if (!imageUuid)
-        throw new Error(
-          "[createImageIfNotExist] 이미지 uuid를 찾는 중 오류가 발생했습니다.",
-        );
-
-      const result = await prismaInstance.image.update({
-        where: {
-          uuid: imageUuid,
-        },
-        data: {
-          users: {
-            connect: {
-              email: userEmail,
-            },
-          },
-        },
-        select: {
-          uuid: true,
-        },
-      });
-
-      console.log(
-        `[createImageIfNotExist] 이미지${image.key}와 유저${userEmail}를 연결했습니다.`,
-      );
-
-      return result;
     } else {
-      throw new Error("[createImageIfNotExist] 이미지가 없습니다.");
+      throw new Error("이미지가 올바르지 않습니다.");
     }
   } catch (err) {
     console.error(err);
@@ -506,153 +619,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
   }
 }
 
-export async function updateProblems(
-  setName: string,
-  replacingProblems: Problem[],
-  problemSetUUID: string,
-  userEmail: string,
-) {
-  console.log("문제 업데이트 시작!");
-
-  try {
-    console.log("문제 업데이트 트랜잭션 시작");
-    const result = await prisma.$transaction(
-      async (pm) => {
-        console.log("기존 문제 불러오기 시작");
-        const oldProblems = (
-          await pm.problem.findMany({
-            where: {
-              problemSet: {
-                uuid: problemSetUUID,
-              },
-            },
-            select: {
-              uuid: true,
-              image: true,
-              order: true,
-            },
-          })
-        ).map((problem) => ({
-          uuid: problem.uuid,
-          image: problem.image,
-          order: problem.order,
-        }));
-        console.log(
-          "oldProblems : ",
-          oldProblems.sort((a, b) => a.order - b.order),
-        );
-
-        const newProblems = await Promise.all(
-          replacingProblems.map(async (problem, index) => {
-            if (!problem) throw new Error("문제가 null입니다!");
-
-            console.log(`문제 ${index + 1} 생성 시작`);
-
-            const result = await pm.problem.create({
-              data: {
-                order: index + 1,
-                question: problem.question,
-                questionType: problem.type,
-                candidates: problem.candidates ?? undefined,
-                additionalView: problem.additionalView,
-                subjectiveAnswer: problem.subAnswer,
-                isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
-                image: problem.image
-                  ? {
-                      connect: {
-                        uuid: (
-                          await createImageIfNotExist(
-                            problem.image,
-                            userEmail,
-                            pm,
-                          )
-                        ).uuid,
-                      },
-                    }
-                  : undefined,
-                user: {
-                  connect: {
-                    email: userEmail,
-                  },
-                },
-                problemSet: {
-                  connect: {
-                    uuid: problemSetUUID,
-                  },
-                },
-              },
-              include: {
-                image: true,
-              },
-            });
-            console.log(`문제 ${index + 1} 생성 완료,`, result);
-            return result;
-          }),
-        );
-        console.log("newProblems : ", newProblems);
-
-        console.log(`기존 문제들 삭제 시작`);
-
-        //삭제할 이미지 키 중복 제거
-        const toBeDeletedImageKey = [
-          ...new Set(
-            oldProblems.reduce((acc, cur) => {
-              if (cur.image) acc.push(cur.image.key);
-              return acc;
-            }, [] as string[]),
-          ),
-        ].reduce((acc, cur) => {
-          const newProblemsImageKey = newProblems.reduce((acc, cur) => {
-            if (cur.image) acc.push(cur.image.key);
-            return acc;
-          }, [] as string[]);
-
-          if (!newProblemsImageKey.includes(cur)) acc.push(cur);
-          return acc;
-        }, [] as string[]);
-
-        console.log("toBeDeletedImageKey : ", toBeDeletedImageKey);
-
-        if (toBeDeletedImageKey.length > 0) {
-          await deleteImagesFromSet(toBeDeletedImageKey, userEmail, 1, pm);
-        }
-
-        if (oldProblems.length > 0) {
-          console.log(`기존 문제들 삭제 시작`, oldProblems);
-          const result = await pm.problemSet.update({
-            where: {
-              uuid: problemSetUUID,
-            },
-            data: {
-              name: setName,
-              problems: {
-                deleteMany: {
-                  uuid: {
-                    in: oldProblems.map((problem) => problem.uuid),
-                  },
-                },
-              },
-            },
-          });
-          if (!result) throw new Error("문제 업데이트 중 오류 발생");
-        }
-
-        console.log("기존 문제 삭제 완료");
-        return true;
-      },
-      {
-        timeout: 20000, // 20초
-      },
-    );
-
-    return result;
-  } catch (err) {
-    console.error("오류 발생:", err);
-    throw new Error("문제 업데이트 중 오류 발생");
-  }
-}
-
-async function getImageUuidByImageKey(
+async function getImageUuidOnDBByImageKey(
   imageKey: string,
   pm?: PrismaTransaction,
 ) {
@@ -678,7 +645,7 @@ function extractFileName(text: string): string {
   return parts.slice(1).join("-");
 }
 
-async function getImageFileOnS3ByImageKey(imageKey: string) {
+export async function getImageFileOnS3ByImageKey(imageKey: string) {
   try {
     console.log("getImageFileOnS3ByImageKey 함수 시작");
     console.log("imageKey :", imageKey);
@@ -773,7 +740,7 @@ export function isCandidateArray(candidates: any): candidates is Candidate[] {
 
 type ProblemsAndSetsName = {
   problemSetsName: string;
-  problems: Problem[];
+  problems: ProblemReplacedImageKey[];
 };
 
 type ProblemsAndSetsNameWithUUID = ProblemsAndSetsName & {
@@ -786,7 +753,7 @@ export function getParsedProblems<T extends boolean>(
 ): T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetsName {
   const entries = Array.from(formData.entries());
 
-  const problems: NonNullable<Problem>[] = [];
+  const problems: NonNullable<ProblemReplacedImageKey>[] = [];
   let problemSetsName: string | undefined;
   let problemSetUUID: string | undefined;
 
@@ -805,18 +772,23 @@ export function getParsedProblems<T extends boolean>(
       const [, prefix, indexStr] = match;
       const index = parseInt(indexStr);
 
-      if (!problems[index]) {
-        problems[index] = {} as NonNullable<Problem>;
+      if (problems[index] === undefined) {
+        problems[index] =
+          problems[index] ?? ({} as NonNullable<ProblemReplacedImageKey>);
       }
 
       if (prefix === "data") {
         const ProblemData = JSON.parse(value as string);
         problems[index] = {
-          ...problems[index],
           ...ProblemData,
+          ...problems[index],
         };
-      } else if (prefix === "image" && value !== "null") {
-        problems[index].image = value as File;
+      } else if (prefix === "image") {
+        if (typeof value === "string") {
+          problems[index].image = value === "null" ? null : { key: value };
+        } else {
+          throw new Error("이미지가 올바르지 않습니다.");
+        }
       }
     }
   }
@@ -1122,7 +1094,7 @@ export async function deleteImagesFromSet(
             totalReference,
           );
 
-          const imageUuid = await getImageUuidByImageKey(
+          const imageUuid = await getImageUuidOnDBByImageKey(
             imageKey,
             prismaInstance,
           );
@@ -1155,7 +1127,9 @@ export async function deleteImagesFromSet(
               throw new Error(
                 "S3에서 이미지를 삭제하는 중 오류가 발생했습니다.",
               );
-            console.log(`[deleteImagesFromSet] 이미지 ${imageKey} s3에서 삭제 성공`);
+            console.log(
+              `[deleteImagesFromSet] 이미지 ${imageKey} s3에서 삭제 성공`,
+            );
 
             await prismaInstance.image.delete({
               where: {
@@ -1587,11 +1561,9 @@ export async function evaluateProblems(
   problemSetName: string,
   userEmail: string,
 ) {
-
   try {
     const result = await prisma.$transaction(async (pm) => {
-
-      const { uuid: userUuid } = await getUserByEmail(userEmail,pm);
+      const { uuid: userUuid } = await getUserByEmail(userEmail, pm);
 
       const validateResult = problemsSchema.safeParse(examProblems);
 

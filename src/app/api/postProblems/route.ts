@@ -35,11 +35,9 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     console.log(e);
     console.log(problems);
-    return NextResponse.json(
-      { error: e, problems },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: e, problems }, { status: 400 });
   }
+
   // if (!problemSchema.safeParse(problems).success) {
   //   console.log(problems);
   //   return NextResponse.json(
@@ -55,6 +53,7 @@ export async function POST(req: NextRequest) {
       problems,
       false,
     );
+
 
     return NextResponse.json({ success: response ? "OK" : "FAIL" });
   } catch (e) {

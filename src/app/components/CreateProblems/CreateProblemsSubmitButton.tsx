@@ -3,12 +3,14 @@ import { useState } from "react";
 import { Button } from "@nextui-org/react";
 import axios from "axios";
 import useProblems from "@/hooks/useProblems";
-import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 
 import {
   generateFileHash,
+  getPresignedUrlOnS3,
   isImageFileObject,
+  isPresignedPost,
   isProblemEmpty,
+  analyzeProblemsImagesAndDoCallback,
 } from "@/utils/problems";
 
 export default function CreateProblemsSubmitButton() {
@@ -29,48 +31,90 @@ export default function CreateProblemsSubmitButton() {
 
     if (!confirm("문제집을 제출하시겠습니까?")) return;
 
-    // try {
-    //   const uploadedKeys = await Promise.all(
-    //     problems.map(async (problem) => {
-    //       if (problem && problem.image && isImageFileObject(problem.image)) {
-    //         const hash = await generateFileHash(problem.image);
-    //         const key = `${hash}-${problem.image.name}`;
-    //         const response = await axios.get<PresignedPost>(
-    //           `/api/getPresignedUrl?key=${key}`,
-    //         );
-    //         const {url, fields} = response.data;
-    //         const formData = new FormData();
-    //         Object.entries(fields).forEach(([field, value]) => {
-    //           formData.append(field, value);
-    //         });
-    //         formData.append("Content-Type", problem.image.type);
-    //         formData.append("file", problem.image);
-
-    //         await axios.post(url, formData);
-
-    //         return key;
-    //       }
-    //       return null;
-    //     }),
-    //   );
-
-    //   console.log(uploadedKeys);
-    // } catch (err) {
-    //   console.error(err);
-    // } finally {
-    //   setIsLoading(false); // 로딩 완료
-    // }
-
     setIsLoading(true); // 로딩 시작
-    
-    const formData = new FormData();
-    problems.forEach((problem, index) => {
-      formData.append(`image[${index}]`, problem?.image as Blob);
-      formData.append(`data[${index}]`, JSON.stringify(problem));
-    });
-    formData.append("problemSetsName", problemSetsName);
-
     try {
+      console.time("processImagesAndUpload");
+      const handledImages = await analyzeProblemsImagesAndDoCallback({
+        problems,
+        flatResult: false,
+        skipDuplicated: false,
+        callback: async ({
+          index,
+          imageFile,
+          imageKey,
+          isNoImage,
+          isFirstImage,
+        }) => {
+          if (!isNoImage && isFirstImage) {
+            // 이미지가 있으면서 배열 내 첫 이미지인 경우
+
+            if (imageFile && isImageFileObject(imageFile)) {
+              const key = `${await generateFileHash(imageFile)}-${imageFile.name}`;
+
+              const result = await getPresignedUrlOnS3(key, () => {
+                return {
+                  index,
+                  imageKey: key,
+                };
+              });
+              if (!result) {
+                throw new Error("이미지 업로드에 실패했습니다.");
+              }
+
+              if (isPresignedPost(result)) {
+                const { fields, url } = result;
+                const formData = new FormData();
+                Object.entries(fields).forEach(([field, value]) => {
+                  formData.append(field, value);
+                });
+                formData.append("Content-Type", imageFile.type);
+                formData.append("file", imageFile);
+
+                await axios.post(url, formData);
+                return {
+                  index,
+                  imageKey: key,
+                };
+              } else {
+                // 이미 해당 키를 가진 이미지가 존재하는 경우
+                return result;
+              }
+            } else if (imageKey) {
+              return {
+                index,
+                imageKey: imageKey,
+              };
+            }
+          } else if (!isNoImage) {
+            // 이미지가 있는 경우
+            return {
+              index,
+              imageKey: imageKey ?? null,
+            };
+          } else if (isNoImage) {
+            // 이미지가 없는 경우
+            return {
+              index,
+              imageKey: null,
+            };
+          }
+        },
+      });
+      console.timeEnd("processImagesAndUpload");
+      console.log("uploadedImages : ", handledImages);
+
+      const formData = new FormData();
+
+      problems.forEach((problem, index) => {
+        formData.append(
+          `image[${index}]`,
+          handledImages[index]?.imageKey ?? "null",
+        );
+
+        formData.append(`data[${index}]`, JSON.stringify(problem));
+      });
+      formData.append("problemSetsName", problemSetsName);
+
       const response = await fetch("/api/postProblems", {
         method: "POST",
         body: formData,

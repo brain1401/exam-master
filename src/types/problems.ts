@@ -1,4 +1,5 @@
-import { Prettify } from "@/utils/type";
+import { Nullable, Prettify } from "@/utils/type";
+import { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type { DefaultArgs } from "@prisma/client/runtime/library";
 import { z } from "zod";
@@ -23,12 +24,26 @@ export type Problem = {
   question: string;
   additionalView: string;
   isAnswerMultiple: boolean | null;
-  image: File | z.infer<typeof ImageSchema> | null;
+  image: File | z.infer<typeof ImageSchema> | { key: string } | null;
   isAdditiondalViewButtonClicked: boolean;
   isImageButtonClicked: boolean;
   candidates: Candidate[] | null;
   subAnswer: string | null;
 } | null;
+
+export type ProblemReplacedImageKey = Prettify<
+  | (Omit<NonNullable<Problem>, "image"> & {
+      image: { key: string } | null;
+    })
+  | null
+>;
+
+export type ProblemReplacedImageKeyAndFile = Prettify<
+  | (Omit<NonNullable<Problem>, "image"> & {
+      image: { key: string } | File | null;
+    })
+  | null
+>;
 
 export type ExamProblem = z.infer<typeof examProblemSchema>;
 
@@ -52,7 +67,6 @@ export type ProblemSetWithPagination = {
   };
 };
 
-
 export type ProblemSetWithName = {
   id: string | undefined;
   name: string;
@@ -71,7 +85,7 @@ export const candidateSchema = z.object({
   isAnswer: z.boolean(),
 });
 
-export type MongoDBImageType = z.infer<typeof ImageSchema>;
+export type ImageType = z.infer<typeof ImageSchema>;
 
 export const problemSchema = z
   .object({
@@ -84,6 +98,7 @@ export const problemSchema = z
       .union([
         z.instanceof(File),
         z.array(ImageSchema).nullable(),
+        z.object({ key: z.string() }),
         ImageSchema.nullable(),
       ])
       .nullable(),
@@ -196,7 +211,59 @@ export const ExamResultsSchema = z.array(ExamResultSchema);
 
 export type ExamResults = z.infer<typeof ExamResultsSchema>;
 
-export type PrismaTransaction = Omit<
-  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+export type PrismaTransaction = Prettify<
+  Omit<
+    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+  >
 >;
+
+export type PresignedPostAlreadyExistsCallback<T> = (
+  key: string,
+) => Promise<T> | T;
+
+export type toBeCallbacked = {
+  index: number;
+  isUnique: boolean;
+  isFirstImage: boolean | null;
+  isNoImage: boolean;
+  imageKey: string | null;
+  imageFile: File | null;
+  duplicateIndexes: number[] | null;
+  toBeCallbacked: toBeCallbackedItSelf[];
+};
+
+export type toBeCallbackedItSelf = {
+  index: number;
+  isUnique: boolean;
+  isFirstImage: boolean | null;
+  isNoImage: boolean;
+  imageKey: string | null;
+  imageFile: File | null;
+  duplicateIndexes: number[] | null;
+};
+
+/**
+ * 업로드된 이미지 타입입니다.
+ *
+ * @typedef {Object} UploadedImage
+ * @property {number} index - 이미지의 인덱스입니다.
+ * @property {string | null} imageKey - 이미지 키입니다. `null`일 수도 있습니다.
+ */
+
+/**
+ * 콜백 함수 타입 `HandleDuplicateImageCallback`은 이미지 처리를 위한 콜백 함수입니다.
+ *
+ * @template T - 콜백 함수의 반환 타입입니다.
+ *
+ * @param toBeCallbackedImage - 콜백 함수에 전달되는 객체입니다.
+ * @param toBeCallbackedImage.index - Problem[]에서의 해당하는 이미지의 인덱스입니다.
+ * @param toBeCallbackedImage.imageKey - 이미지의 키 값입니다.
+ * @param toBeCallbackedImage.image - 이미지 파일입니다.
+ * @param toBeCallbackedImage.duplicateOf - 중복 이미지의 인덱스입니다. 중복 이미지가 아닌 경우에는 `null`입니다. 해당 문제에 이미지 파일이 없는 경우에는 `undefined`입니다.
+ *
+ * @returns Promise<T | undefined> - 콜백 함수의 반환 값입니다.
+ */
+export type HandleImageCallback<T> = (
+  toBeCallbackedImage: toBeCallbacked,
+) => Promise<T>;
