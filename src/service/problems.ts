@@ -1111,6 +1111,16 @@ export async function deleteImagesFromSet(
               "[deleteImagesFromSet] currentUserImageReference이 undefind입니다.",
             );
 
+          console.log(
+            "allUserCount.total : ",
+            totalReference.allUserCount.total,
+          );
+          console.log("deleteSetCount : ", deleteSetCount);
+          console.log(
+            "currentUserImageReference : ",
+            currentUserImageReference,
+          );
+
           if (totalReference.allUserCount.total === deleteSetCount) {
             // 모든 유저의 이미지 참조가 삭제할 세트 숫자만큼인 경우 경우 s3에서 이미지 삭제 (s3 삭제 대상)
             console.log(
@@ -1512,35 +1522,38 @@ export async function getReferecesOfImageByImageKey(
           return acc;
         }, [] as string[]).length;
 
+        const count = {
+          total: problemSetCount + problemResultsCount,
+          problemSetCount,
+          problemResultsCount,
+        };
+        console.log("count : ", count);
+
         return {
           userEmail: user.email,
           userUuid: user.uuid,
-          count: {
-            total: problemSetCount + problemResultsCount,
-            problemSetCount,
-            problemResultsCount,
-          },
+          count,
         };
       }),
     };
-
+    const allUserCount = {
+      ...result.users.reduce(
+        (acc, cur) => {
+          acc.problemSetCount += cur.count.problemSetCount;
+          acc.problemResultsCount += cur.count.problemResultsCount;
+          return acc;
+        },
+        { problemSetCount: 0, problemResultsCount: 0 },
+      ),
+      total: result.users.reduce((acc, cur) => {
+        acc += cur.count.problemSetCount;
+        acc += cur.count.problemResultsCount;
+        return acc;
+      }, 0),
+    };
     return {
       ...result,
-      allUserCount: {
-        ...result.users.reduce(
-          (acc, cur) => {
-            acc.problemSetCount += cur.count.problemSetCount;
-            acc.problemResultsCount += cur.count.problemResultsCount;
-            return acc;
-          },
-          { problemSetCount: 0, problemResultsCount: 0 },
-        ),
-        total: result.users.reduce((acc, cur) => {
-          acc += cur.count.problemSetCount;
-          acc += cur.count.problemResultsCount;
-          return acc;
-        }, 0),
-      },
+      allUserCount,
     };
   } catch (err) {
     console.error(err);
