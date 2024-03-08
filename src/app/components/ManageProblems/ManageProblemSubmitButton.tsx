@@ -80,12 +80,11 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
                 // 이미 해당 키를 가진 이미지가 존재하는 경우
                 return result;
               }
-            }
-            else if(imageKey) {
+            } else if (imageKey) {
               return {
                 index,
                 imageKey: imageKey,
-              }
+              };
             }
           } else if (!isNoImage) {
             // 이미지가 있는 경우
@@ -137,6 +136,8 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
     } catch (err) {
       alert(`이미지 업로드에 실패했습니다. \n에러 : ${err}`);
       throw err;
+    } finally {
+      setIsLoading(false); // 로딩 완료
     }
   };
   return (
