@@ -21,7 +21,7 @@ echo "App Dir: $APP_DIR"
 echo "Repo: $REPO"
 echo "Branch: $BRANCH"
 echo "Environment: $ENV"
-echo "Port: $PORT"
+echo "Port: $DEPLOY_PORT"
 echo "Storage Directory: $STORAGE_DIR"
 echo "Run Dir: $RUN_DIR"
 
