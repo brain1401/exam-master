@@ -21,7 +21,8 @@ export const navbarSlice = createSlice({
 // 각 action creator를 내보낸다.
 export const { toggleNavbar, setNavberState } = navbarSlice.actions;
 
-export const selectIsNavbarOpen = (state: RootState) => state.navbarReducer.isNavbarOpen;
+export const selectIsNavbarOpen = (state: RootState) =>
+  state.navbarReducer.isNavbarOpen;
 
 // reducer를 내보낸다.
 export default navbarSlice.reducer;
