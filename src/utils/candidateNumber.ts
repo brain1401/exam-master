@@ -1,4 +1,4 @@
-export default function candidateNumber(number:number) {
+export default function candidateNumber(number: number) {
   let result = "";
 
   switch (number) {
