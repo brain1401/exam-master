@@ -14,7 +14,7 @@ var child = null as ChildProcess | null; //prevents multiple deployment scripts 
 
 export async function GET(_req: NextRequest, res: NextResponse) {
   try {
-    const headers = await limiter.check(res, 2, "CACHE_TOKEN"); // 1 request within interval (not sure why the option is n-1)
+    const headers = await limiter.check(2, "CACHE_TOKEN"); // 1 request within interval (not sure why the option is n-1)
     const [names, values] = Object.entries(headers).reduce(
       (acc, [key, val]) => {
         return [acc[0].concat(key), acc[1].concat(val)];

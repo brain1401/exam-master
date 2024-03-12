@@ -6,7 +6,7 @@ type Options = {
   interval?: number;
 };
 
-type Headers = Record<string,any>[];
+type Headers = Record<string, any>[];
 
 export default function rateLimit(options?: Options) {
   const tokenCache = new LRUCache({
@@ -16,7 +16,7 @@ export default function rateLimit(options?: Options) {
 
   const headers = [] as Headers;
   return {
-    check: async<T> (res: NextResponse<T>, limit: number, token: string) =>
+    check: async <T>(limit: number, token: string) =>
       new Promise<Headers>((resolve, reject) => {
         const tokenCount = (tokenCache.get(token) as number[]) || [0];
         if (tokenCount[0] === 0) {
