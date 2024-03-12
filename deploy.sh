@@ -97,8 +97,8 @@ echo "cd $APP_DIR/releases/$DATE"
       cd $APP_DIR/releases/$DATE
 echo "pm2 delete $APP_NAME"
       pm2 delete $APP_NAME
-echo "lsof -i tcp:${DEPLOY_PORT} | awk 'NR!=1 {print $2}' | xargs kill"
-      lsof -i tcp:${DEPLOY_PORT} | awk 'NR!=1 {print $2}' | xargs kill
+echo "lsof -i tcp:$DEPLOY_PORT | awk 'NR!=1 {print $2}' | xargs kill"
+      lsof -i tcp:$DEPLOY_PORT | awk 'NR!=1 {print $2}' | xargs kill
 echo 'pm2 start npx --time --name="$APP_NAME" --no-treekill --node-args="--max-old-space-size=3096" -- next start -- --port=$DEPLOY_PORT'
       pm2 start npx --time --name="$APP_NAME" --no-treekill --node-args="--max-old-space-size=3096" -- next start -- --port=$DEPLOY_PORT
 
