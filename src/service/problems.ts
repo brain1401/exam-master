@@ -59,7 +59,7 @@ export async function postProblems(
                   pm,
                 );
 
-                if (duplicateIndexes && duplicateIndexes.length > 0) {
+                if (duplicateIndexes.length > 0) {
                   const result = duplicateIndexes.map((i) => {
                     const imageKey = toBeCallbacked[i].imageKey;
                     if (!imageKey)
@@ -1090,7 +1090,7 @@ export async function deleteImagesFromSet(
           );
 
           console.log(
-            `[deleteImagesFromSet] 이미지 ${imageKey} totalReference :`,
+            `[deleteImagesFromSet] 이미지 ${imageKey}\ntotalReference :`,
             totalReference,
           );
 
@@ -1112,13 +1112,7 @@ export async function deleteImagesFromSet(
             );
 
           console.log(
-            "allUserCount.total : ",
-            totalReference.allUserCount.total,
-          );
-          console.log("deleteSetCount : ", deleteSetCount);
-          console.log(
-            "currentUserImageReference : ",
-            currentUserImageReference,
+            `\nif(totalRefercence.allUserCount.total) === deleteSetCount\nif(${totalReference.allUserCount.total} === ${deleteSetCount})`,
           );
 
           if (totalReference.allUserCount.total === deleteSetCount) {
@@ -1153,6 +1147,10 @@ export async function deleteImagesFromSet(
             console.log(`[deleteImagesFromSet] 이미지 ${imageKey} 삭제 성공`);
           }
 
+          console.log(
+            `\nif(currentUserImageReference) === deleteSetCount\nif(${currentUserImageReference} === ${deleteSetCount})`,
+          );
+
           if (currentUserImageReference === deleteSetCount) {
             //해당하는 user테이블에서 problem테이블과 problem_result에 연결된 이미지가 삭제 대상이면 user테이블에서 이미지 연결 해제
 
@@ -1171,6 +1169,10 @@ export async function deleteImagesFromSet(
                 },
               },
             });
+
+            console.log(
+              `[deleteImagesFromSet] user테이블에서 image ${imageKey}연결 해제 성공`,
+            );
           }
         }
       }),
@@ -1221,7 +1223,7 @@ export async function deleteProblemSets(
   problemSetUUIDs: string[],
   userEmail: string,
 ) {
-  console.log("[deleteProblemSet] 함수 시작");
+  console.log("[deleteProblemSets] 함수 시작");
   try {
     const result = await prisma.$transaction(async (pm) => {
       // 문제집 안의 문제들 찾기

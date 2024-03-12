@@ -18,8 +18,9 @@ model User {
   name            String
   email           String          @unique
   image           String?
+  likedProblemSet ProblemSet[]    @relation("LikedProblemSets")
   problems        Problem[]
-  problem_sets    ProblemSet[]
+  problem_sets    ProblemSet[]    @relation("ProblemSets")
   problem_results ProblemResult[]
   results         Result[]
   images          Image[]
@@ -43,7 +44,9 @@ model ProblemSet {
   name                  String
   problems              Problem[]
   userUuid              String
-  user                  User      @relation(fields: [userUuid], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  user                  User      @relation("ProblemSets", fields: [userUuid], references: [uuid], onUpdate: Cascade, onDelete: Cascade)
+  likedUsers            User[]    @relation("LikedProblemSets")
+  isPublic              Boolean   @default(false)
   isShareLinkPurposeSet Boolean   @default(false)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt

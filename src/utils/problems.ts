@@ -347,14 +347,16 @@ export async function generateFileHash(file: File): Promise<string> {
 }
 
 /**
- * 문제들 안의 이미지 분석(중복 체크 등)을 수행하고 분석된 결과값을 바탕으로 비동기 콜백을 실행하고 콜백의 return값을 배열로 만들어서 반환하는 함수입니다.
+ * 분석된 문제 이미지를 처리하고 콜백을 실행하는 비동기 함수입니다.
  *
- * @template T - 콜백 함수의 반환 타입
- * @param {ProblemReplacedImageKeyAndFile[]} problems - 문제 목록
- * @param {HandleImageCallback<T>} callback - 이미지 처리 콜백 함수
- * @returns {Promise<(Awaited<T> | null)[]>} - 콜백 실행 결과 배열 (이미지가 없는 Problem인 경우 해당 Problem의 인덱스에 해당하는 인덱스에 null이 들어감)
+ * @template T - 콜백 함수의 반환 타입입니다.
+ * @param {Object} options - 함수 옵션 객체입니다.
+ * @param {ProblemReplacedImageKeyAndFile[]} options.problems - 문제 이미지가 포함된 배열입니다.
+ * @param {HandleImageCallback<T>} options.callback - 이미지 처리를 위한 콜백 함수입니다.
+ * @param {boolean} options.skipDuplicated - 중복된 이미지를 건너뛸지 여부를 나타내는 값입니다.
+ * @param {true} options.flatResult - 결과를 평면화할지 여부를 나타내는 값입니다.
+ * @returns {Promise<Prettify<Flatten<T>>>[]} - 평면화된 결과의 배열을 포함하는 프로미스 객체입니다.
  */
-
 export async function analyzeProblemsImagesAndDoCallback<T>({
   problems,
   callback,
@@ -367,6 +369,17 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
   flatResult: true;
 }): Promise<Prettify<Flatten<T>>[]>;
 
+/**
+ * 분석된 문제 이미지를 처리하고 콜백 함수를 실행하는 비동기 함수입니다.
+ *
+ * @template T - 콜백 함수의 반환 타입
+ * @param {Object} options - 함수 옵션
+ * @param {ProblemReplacedImageKeyAndFile[]} options.problems - 문제 이미지 배열
+ * @param {HandleImageCallback<T>} options.callback - 이미지 처리를 위한 콜백 함수
+ * @param {boolean} options.skipDuplicated - 중복된 이미지를 건너뛸지 여부
+ * @param {false} options.flatResult - 결과를 평면화할지 여부
+ * @returns {Promise<Prettify<T>[]>} - 콜백 함수의 반환 타입을 가진 Promise 배열
+ */
 export async function analyzeProblemsImagesAndDoCallback<T>({
   problems,
   callback,
@@ -439,7 +452,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
             isFirstImage: false,
             imageKey: imageKey,
             imageFile: problem.image,
-            duplicateIndexes: null,
+            duplicateIndexes: [],
           });
         } else {
           // 이미지 해시가 캐시에 없는 경우(처음 나오는 이미지인 경우)
@@ -455,7 +468,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
             isFirstImage: true,
             imageKey: imageKey,
             imageFile: problem.image,
-            duplicateIndexes: null,
+            duplicateIndexes: [],
           });
         }
       } else if (problem.image && isImageKeyObject(problem.image)) {
@@ -482,7 +495,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
             isFirstImage: false,
             imageKey: imageKey,
             imageFile: isImageFileObject(image) ? image : null,
-            duplicateIndexes: null,
+            duplicateIndexes: [],
           });
         } else {
           // 이미지 해시가 캐시에 없는 경우 (처음 나오는 이미지인 경우)
@@ -494,7 +507,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
             isFirstImage: true,
             imageKey: imageKey,
             imageFile: null,
-            duplicateIndexes: null,
+            duplicateIndexes: [],
           });
         }
       } else {
@@ -505,7 +518,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
           isFirstImage: null,
           imageKey: null,
           imageFile: null,
-          duplicateIndexes: null,
+          duplicateIndexes: [],
         });
       }
     }
@@ -519,12 +532,12 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
     for (const i of index) {
       toBeCallbacked[i].isUnique = isUnique;
       if (index.length === 1) continue;
-      toBeCallbacked[i].duplicateIndexes = index;
+      toBeCallbacked[i].duplicateIndexes = [...index];
     }
   }
 
   console.log("teBeCallbacked : ", toBeCallbacked);
-  let count = 0;
+  let callbackedCount = 0;
 
   const callbackedProblems: (Awaited<T> | undefined)[] = await Promise.all(
     toBeCallbacked.map(
@@ -539,7 +552,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
       }) => {
         if (skipDuplicated) {
           if (isFirstImage) {
-            count++;
+            callbackedCount++;
             return await callback({
               index,
               imageFile,
@@ -552,7 +565,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
             });
           }
         } else {
-          count++;
+          callbackedCount++;
           return await callback({
             index,
             imageFile,
@@ -568,7 +581,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
     ),
   );
 
-  console.log("count : ", count);
+  console.log("callbackedCount : ", callbackedCount);
 
   if (flatResult) {
     return callbackedProblems.reduce((acc, cur) => {

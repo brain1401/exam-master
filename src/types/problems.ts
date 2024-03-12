@@ -229,7 +229,7 @@ export type toBeCallbacked = {
   isNoImage: boolean;
   imageKey: string | null;
   imageFile: File | null;
-  duplicateIndexes: number[] | null;
+  duplicateIndexes: number[];
   toBeCallbacked: toBeCallbackedItSelf[];
 };
 
@@ -240,7 +240,7 @@ export type toBeCallbackedItSelf = {
   isNoImage: boolean;
   imageKey: string | null;
   imageFile: File | null;
-  duplicateIndexes: number[] | null;
+  duplicateIndexes: number[];
 };
 
 /**
