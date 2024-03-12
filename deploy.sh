@@ -97,7 +97,7 @@ echo "cd $APP_DIR/releases/$DATE"
       cd $APP_DIR/releases/$DATE
 echo "pm2 delete $APP_NAME"
       pm2 delete $APP_NAME
-echo "lsof -i tcp:${DEPLOY_PORT} | awk 'NR!=1 {print $2}' | xargs kill"
+echo "lsof -i tcp:${DEPLOY_PORT.} | awk 'NR!=1 {print $2}' | xargs kill"
       lsof -i tcp:${DEPLOY_PORT} | awk 'NR!=1 {print $2}' | xargs kill
 echo 'pm2 start npx --time --name="$APP_NAME" --no-treekill --node-args="--max-old-space-size=3096" -- next start -- --port=$DEPLOY_PORT'
       pm2 start npx --time --name="$APP_NAME" --no-treekill --node-args="--max-old-space-size=3096" -- next start -- --port=$DEPLOY_PORT
@@ -105,10 +105,10 @@ echo 'pm2 start npx --time --name="$APP_NAME" --no-treekill --node-args="--max-o
 
 
 #delete anything older than the last 4 releases
-OLD=$(ls -tl $APP_DIR/releases | grep '^d' | awk '{print $(NF)}' | tail -n+5 | sed "s|^|$APP_DIR/releases/|")
-OLD_ONELINE="$OLD | sed -z 's/\n/ /g'"
+OLD=$(ls -tl $APP_DIR/releases | grep '^d' | awk '{print $NF}' | tail -n+5 | sed "s|^|$APP_DIR/releases/|")
+OLD_ONELINE=$(echo "$OLD" | sed -z 's/\n/ /g')
 echo "removing: $OLD"
-if [ ! $OLD_ONELINE = "$APP_DIR/releases/" ]; then
+if [ ! "$OLD_ONELINE" = "$APP_DIR/releases/" ]; then
   rm -Rf $OLD
 fi
 
