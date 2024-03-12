@@ -20,7 +20,6 @@
     "@tanstack/react-query": "^5.26.3",
     "@tanstack/react-query-devtools": "^5.27.0",
     "@types/node": "20.11.26",
-    "@types/qs": "^6.9.12",
     "@types/react": "18.2.65",
     "@types/react-dom": "18.2.21",
     "@types/validator": "^13.11.9",
