@@ -3,63 +3,63 @@ RUN_DIR=$(pwd -LP)
 
 IS_RUNNING=$(pm2 list | grep -w "$APP_NAME" | grep -w "online")
 if [ -z "$IS_RUNNING" ]; then
-  echo "App is not running, will perform fresh start after deployment."
+  echo "앱이 실행 중이 아니므로, 배포 후 새로 시작할 예정입니다."
 else
-  echo "App is already running, will perform reload after deployment."
+  echo "앱이 이미 실행 중이므로, 배포 후 리로드할 예정입니다."
 fi
 
-#the presence of a .env file overrides the production file, which overrides staging, which overrides local
+# .env 파일의 존재는 production 파일을 오버라이드하며, production은 staging을, staging은 local을 오버라이드합니다.
 source ../../.env.local
 source ../../.env.staging
 source ../../.env.production
 source ../../.env
 
-#the following variables need to be in at least one of the above files.
-#APP_NAME="name-of-app" #pm2 handle for the process
-#APP_DIR="/home/userdir/$APP_NAME"  #needs to be an absolute directory. Webserver should point to the "current" subdirectory within
+# 다음 변수들은 위에 나열된 파일 중 적어도 하나에 있어야 합니다.
+#APP_NAME="앱-이름" #pm2에서 프로세스를 핸들링하기 위한 이름
+#APP_DIR="/home/userdir/$APP_NAME"  #절대 경로가 필요합니다. 웹서버는 "current" 하위 디렉토리를 가리켜야 합니다.
 #REPO="git@gitlab.yourhost.com:project/repo.git"
 #BRANCH="master"
-#ENV="production" #or staging or local.  defaults to production
-#PORT=port to run the app on
-#STORAGE_DIR="$APP_DIR/storage" #optional: a directory for persistant storage, if necessary
+#ENV="production" #또는 staging 또는 local. 기본값은 production입니다.
+#PORT=앱을 실행할 포트
+#STORAGE_DIR="$APP_DIR/storage" #필요한 경우, 영구 저장소를 위한 디렉토리
 
-echo "App Name: $APP_NAME"
-echo "App Dir: $APP_DIR"
-echo "Repo: $REPO"
-echo "Branch: $BRANCH"
-echo "Environment: $ENV"
-echo "Port: $DEPLOY_PORT"
-echo "Storage Directory: $STORAGE_DIR"
-echo "Run Dir: $RUN_DIR"
+echo "앱 이름: $APP_NAME"
+echo "앱 디렉토리: $APP_DIR"
+echo "리포지토리: $REPO"
+echo "브랜치: $BRANCH"
+echo "환경: $ENV"
+echo "포트: $DEPLOY_PORT"
+echo "저장소 디렉토리: $STORAGE_DIR"
+echo "실행 디렉토리: $RUN_DIR"
 
 cd $APP_DIR/current
 LAST=$(git rev-parse HEAD)
-echo "$LAST is 가 최신 commit hash"
+echo "$LAST 가 최신 커밋 해시입니다"
 
-#새 realease를 위한 디렉토리 생성
+# 새로운 릴리스를 위한 디렉토리 생성
 DATE=$(date +%Y%m%d%H%M%S)
 echo "$APP_DIR/releases/$DATE 생성"
 mkdir $APP_DIR/releases/$DATE
 cd $APP_DIR/releases/$DATE
 
-#repo를 release 디렉토리로 clone
-echo "${REPO}를 ${APP_DIR}/releases/${DATE}에 clone 시작"
+# 리포지토리를 릴리스 디렉토리로 클론
+echo "${REPO}를 ${APP_DIR}/releases/${DATE}에 클론 시작"
 git clone -b $BRANCH $REPO .
 
-#check if it is indeed a new commit
+# 실제로 새 커밋인지 확인
 NEW=$(git rev-parse HEAD)
-echo "$NEW is new commit"
+echo "$NEW 가 새 커밋입니다"
 if [ $LAST = $NEW ]; then
-  echo "Commit is same hash, aborting!!"
+  echo "커밋 해시가 동일하여 중단합니다!!"
   cp -f $RUN_DIR/latest_deploy.log $APP_DIR/latest_deploy.log
 
   if [ -z "$IS_RUNNING" ]; then
-    # 애플리케이션이 실행 중이지 않을 때, 나중에 서버 시작을 위해 플래그 설정
-    echo "App was not running; setting flag for later start."
+    # 애플리케이션이 실행 중이지 않을 때, 나중에 시작하기 위한 플래그 설정
+    echo "앱이 실행 중이지 않으므로 나중에 시작하기 위한 플래그를 설정합니다."
     SHOULD_START_APP="true"
   else
-    # 애플리케이션이 실행 중일 때, 즉각적으로 반환하거나 종료
-    echo "App is running; aborting with no further actions."
+    # 애플리케이션이 실행 중일 때, 추가 작업 없이 종료
+    echo "앱이 실행 중이므로 추가 작업 없이 종료합니다."
     cd $APP_DIR
     rm -Rf $APP_DIR/releases/$DATE
     if [[ -t 0 || -p /dev/stdin ]]; then
@@ -70,26 +70,26 @@ if [ $LAST = $NEW ]; then
   fi
 fi
 
-# create symbolic links to persistant server environment files
+# 영구 서버 환경 파일에 대한 심볼릭 링크 생성
 DOTENV=""
 if [ ! -z "$ENV" ]; then
-  DOTENV=.$ENV #if ENV is set, add a period separator to the filename
+  DOTENV=.$ENV #ENV가 설정되어 있으면 파일 이름 앞에 점을 추가합니다.
 fi
-echo "linking $APP_DIR/.env$DOTENV to .env"
+echo "$APP_DIR/.env$DOTENV 를 .env로 링크합니다"
 ln -s $APP_DIR/.env$DOTENV .env
-#add link to persistant storage if necessary
+# 필요한 경우 영구 저장소에 대한 링크 추가
 if [ $STORAGE_DIR ]; then
-  echo "linking $APP_DIR/releases/$DATE/storage to $STORAGE_DIR"
+  echo "$STORAGE_DIR 를 $APP_DIR/releases/$DATE/storage로 링크합니다"
   ln -s $STORAGE_DIR $APP_DIR/releases/$DATE/storage
 fi
 
-echo "installing npm packages"
+echo "npm 패키지 설치 중"
 npm install
-echo "building $APP_DIR/releases/$DATE $DOTENV"
+echo "$APP_DIR/releases/$DATE $DOTENV 빌드 중"
 if dotenv -e .env$DOTENV -- npx next build; then
-  echo "build successful"
+  echo "빌드 성공"
 else
-  echo "build failed! deleting release and aborting" #important to free the space in case failed deployments pile up
+  echo "빌드 실패! 릴리스 삭제 및 중단" #실패한 배포가 쌓이지 않도록 합니다.
   cp -f $RUN_DIR/latest_deploy.log $APP_DIR/latest_deploy.log
   cd $APP_DIR
   rm -Rf $APP_DIR/releases/$DATE
@@ -100,37 +100,36 @@ else
   fi
 fi
 
-#remove existing /current link and re-link to this latest directory
-echo "linking $APP_DIR/releases/$DATE to $APP_DIR/current"
+# 기존의 /current 링크를 제거하고 이 최신 디렉토리로 재링크
+echo "$APP_DIR/releases/$DATE 를 $APP_DIR/current로 링크합니다"
 rm $APP_DIR/current
 ln -s $APP_DIR/releases/$DATE $APP_DIR/current
 
-#restart the node server to serve latest build
-echo "reloading node server for $APP_NAME"
+# 노드 서버를 재시작하여 최신 빌드를 서비스
+echo "$APP_NAME 에 대한 노드 서버 리로딩"
 if [ "$SHOULD_START_APP" = "true" ]; then
-  # 애플리케이션이 실행 중이지 않을 때, 새로 시작
-  echo "Starting app for the first time with PM2"
+  # 애플리케이션이 실행 중이지 않을 때 처음으로 시작
+  echo "PM2로 처음으로 앱 시작"
   cd $APP_DIR/current
   pm2 start npx --name "$APP_NAME" --time -- next start --port=$DEPLOY_PORT
 else
-  # $SHOULD_START_APP이 "true"가 아니라면, 애플리케이션은 이미 실행 중이므로, 환경 변수와 함께 reload합니다.
-  echo "Reloading app with PM2"
+  # $SHOULD_START_APP이 "true"가 아니라면, 이미 실행 중인 애플리케이션을 환경 변수와 함께 리로드
+  echo "PM2로 앱 리로드"
   pm2 reload $APP_NAME --update-env
 fi
 
-#delete anything older than the last 4 releases
+# 마지막 4개 릴리스를 제외하고 모두 삭제
 OLD=$(ls -tl $APP_DIR/releases | grep '^d' | awk '{print $NF}' | tail -n+5 | sed "s|^|$APP_DIR/releases/|")
 OLD_ONELINE=$(echo "$OLD" | sed -z 's/\n/ /g')
-echo "removing: $OLD"
+echo "다음을 제거 중: $OLD"
 if [ ! "$OLD_ONELINE" = "$APP_DIR/releases/" ]; then
   rm -Rf $OLD
 fi
 
-echo "updating this script copy in appdir with the latest from the repo"
+echo "앱 디렉토리에서 최신 리포지토리의 이 스크립트 복사본을 업데이트 중"
 chmod u+x $APP_DIR/releases/$DATE/deploy.sh
 cp -f $APP_DIR/releases/$DATE/deploy.sh $APP_DIR/deploy.sh
 chmod u+x $APP_DIR/deploy.sh
 
-#cd ~
-echo "deployed!"
-#cp -f $RUN_DIR/last_deploy.log $APP_DIR/last_deploy.log
+#echo "deployed!"
+#echo "cp -f $RUN_DIR/last_deploy.log $APP_DIR/last_deploy.log"
