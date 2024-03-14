@@ -1,61 +1,60 @@
-  name: exam-master Node.js CI
+name: exam-master Node.js CI
 
-  on:
-    push:
-      branches: ["main"]
+on:
+  push:
+    branches: ["main"]
 
-  jobs:
-    build:
-      name: Build
-      runs-on: self-hosted
-      strategy:
-        matrix:
-          node-version: [20.x]
-      steps:
-        - uses: actions/checkout@v3
+jobs:
+  build:
+    name: Build
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v3
 
-        - name: Use Node.js ${{ matrix.node-version }}
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
-        - name: Make envfile
-          uses: SpicyPizza/create-envfile@v2.0
-          with:
-            envkey_DATABASE_URL: ${{ secrets.DATABASE_URL }}
-            envkey_AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
-            envkey_NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
-            envkey_AWS_S3_ACCESS_KEY_ID: ${{ secrets.AWS_S3_ACCESS_KEY_ID }}
-            envkey_AWS_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}
-            envkey_AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
-            envkey_AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
-            envkey_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-            envkey_NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
-            envkey_SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-            envkey_SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-            envkey_NEXT_PUBLIC_GTM: ${{ secrets.NEXT_PUBLIC_GTM }}
-            envkey_NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-            envkey_NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-            envkey_GOOGLE_API: ${{ secrets.GOOGLE_API }}
-            envkey_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-            envkey_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      - name: Make envfile
+        run: |
+          echo "DATABASE_URL: ${{ secrets.DATABASE_URL }}" >> .env
+          echo "AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}" >> .env
+          echo "NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> .env
+          echo "AWS_S3_ACCESS_KEY_ID: ${{ secrets.AWS_S3_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}" >> .env
+          echo "AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}" >> .env
+          echo "AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}" >> .env
+          echo "SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
+          echo "NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}" >> .env
+          echo "SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}" >> .env
+          echo "SENTRY_ORG: ${{ secrets.SENTRY_ORG }}" >> .env
+          echo "NEXT_PUBLIC_GTM: ${{ secrets.NEXT_PUBLIC_GTM }}" >> .env
+          echo "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}" >> .env
+          echo "NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "GOOGLE_API: ${{ secrets.GOOGLE_API }}" >> .env
+          echo "GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
 
-        - name: "Build project"
-          run: |
-            npm install
-            npm run build
-            rm -r node_modules
+      - name: "Build project"
+        run: |
+          npm install
+          npm run build
+          rm -r node_modules
 
-        - name: AWS CodeDeploy
-          uses: sourcetoad/aws-codedeploy-action@v1
-          with:
-            aws_access_key: ${{ secrets.AWS_SECRET_ID }}
-            aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-            aws_region: ap-northeast-2
-            codedeploy_name: exam-master
-            codedeploy_group: Dev
-            codedeploy_register_only: false
-            s3_bucket: exam-master-build
-            s3_folder: dev
-            max_polling_iterations: 0
-            directory: ./
+      - name: AWS CodeDeploy
+        uses: sourcetoad/aws-codedeploy-action@v1
+        with:
+          aws_access_key: ${{ secrets.AWS_SECRET_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+          aws_region: ap-northeast-2
+          codedeploy_name: exam-master
+          codedeploy_group: Dev
+          codedeploy_register_only: false
+          s3_bucket: exam-master-build
+          s3_folder: dev
+          max_polling_iterations: 0
+          directory: ./
