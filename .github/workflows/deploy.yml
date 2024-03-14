@@ -22,6 +22,7 @@
         - name: Create .env file
           uses: ozaytsev86/create-env-file@v1
           with:
+            file-name: .env
             ENV_DATABASE_URL: ${{ secrets.DATABASE_URL }}
             ENV_AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
             ENV_NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
