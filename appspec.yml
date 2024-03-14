@@ -2,7 +2,7 @@
   os: linux
   files:
     - source: /
-      destination: /var/frontend/
+      destination: /home/ubuntu/nextjs/exam-master/
       overwrite: true
   file_exists_behavior: OVERWRITE
 
