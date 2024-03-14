@@ -131,5 +131,5 @@ chmod u+x $APP_DIR/releases/$DATE/deploy.sh
 cp -f $APP_DIR/releases/$DATE/deploy.sh $APP_DIR/deploy.sh
 chmod u+x $APP_DIR/deploy.sh
 
-#echo "deployed!"
+echo "배포됨!"
 #echo "cp -f $RUN_DIR/last_deploy.log $APP_DIR/last_deploy.log"
