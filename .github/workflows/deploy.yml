@@ -1,0 +1,45 @@
+  name: exam-master Node.js CI
+
+  on:
+    push:
+      branches: ["main"]
+
+  jobs:
+    build:
+      name: Build
+      runs-on: self-hosted
+      strategy:
+        matrix:
+          node-version: [20.x]
+      steps:
+        - uses: actions/checkout@v3
+
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.node-version }}
+
+        - name: Create .env file
+          uses: ozaytsev86/create-env-file@v1
+          with:
+            ENV_API_URL: ${{ vars.API_URL }}
+
+        - name: "Build project"
+          run: |
+            npm install
+            npm run build
+            rm -r node_modules
+
+        - name: AWS CodeDeploy
+          uses: sourcetoad/aws-codedeploy-action@v1
+          with:
+            aws_access_key: ${{ secrets.AWS_SECRET_ID }}
+            aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+            aws_region: ap-northeast-2
+            codedeploy_name: exam-master
+            codedeploy_group: Dev
+            codedeploy_register_only: false
+            s3_bucket: exam-master-build
+            s3_folder: dev
+            max_polling_iterations: 0
+            directory: ./
