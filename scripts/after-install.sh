@@ -11,6 +11,3 @@ if [ ! -d "node_modules" ]; then
 else
     echo "node_modules exists, skipping dependency installation"
 fi
-
-# npm install 실행
-npm install
