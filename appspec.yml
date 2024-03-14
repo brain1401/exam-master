@@ -2,12 +2,11 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/nextjs/exam-master/
+    destination: /home/ubuntu/nextjs/exam-master
     overwrite: true
 file_exists_behavior: OVERWRITE
 permissions:
-  - object: /home/ubuntu/nextjs/exam-master/
-    pattern: "**/*"
+  - object: /home/ubuntu/nextjs/exam-master
     owner: ubuntu
     group: ubuntu
 hooks:
