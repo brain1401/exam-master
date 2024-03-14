@@ -1,13 +1,12 @@
 #!/bin/bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-nvm use 20
+export PATH=$PATH:/home/ubuntu/.nvm/versions/node/v20.11.1/bin
 
 cd /home/ubuntu/nextjs/exam-master/
 
-if [ ! -d "node_modules" ]; then
-    echo "node_modules not found, installing dependencies"
-    npm install
-else
-    echo "node_modules exists, skipping dependency installation"
+# node_modules 디렉토리가 존재하면 삭제
+if [ -d "node_modules" ]; then
+    rm -rf node_modules/
 fi
+
+# npm install 실행
+npm install
