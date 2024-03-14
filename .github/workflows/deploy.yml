@@ -29,6 +29,8 @@
             ENV_AWS_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}
             ENV_AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
             ENV_AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+            ENV_AWS_SECRET_ID: ${{ secrets.AWS_SECRET_ID }}
+            ENV_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
             ENV_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
             ENV_NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
             ENV_SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
