@@ -1,3 +1,5 @@
+export PATH=$PATH:/home/ubuntu/.nvm/versions/node/v20.11.1/bin
+
 pm2 describe exam-master > /dev/null
 RUNNING=$?
 
