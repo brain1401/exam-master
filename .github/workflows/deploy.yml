@@ -46,7 +46,6 @@
           run: |
             npm install
             npm run build
-            rm -r node_modules
 
         - name: AWS CodeDeploy
           uses: sourcetoad/aws-codedeploy-action@v1
