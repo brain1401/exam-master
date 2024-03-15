@@ -51,7 +51,7 @@ jobs:
 
       - name: archive
         run: |
-          tar -czvf exam-master.tar.gz ./
+          tar -czvf exam-master.tar.gz ./ -exclude=exam-master.tar.gz
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
