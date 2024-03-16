@@ -7,7 +7,6 @@ FROM base AS deps
 WORKDIR /app
 
 # Install PM2 globally
-RUN npm install npm -g
 RUN npm install pm2 -g
 
 # Install dependencies based on the preferred package manager
