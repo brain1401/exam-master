@@ -60,7 +60,7 @@ jobs:
 
       - name: upload appspec.yml to S3
         run: |
-          aws s3 cp appspec.yml s3://exam-master-build/appspec.yml
+          aws s3 cp appspec.yml.tar.gz s3://exam-master-build/appspec.yml.tar.gz
 
       - name: AWS CodeDeploy
         run: |
