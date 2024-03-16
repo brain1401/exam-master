@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -46,7 +46,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Install PM2 globally
-RUN npm install pm2 -g --verbose
+RUN npm install pm2 -g
 
 COPY --from=builder /app/public ./public
 
