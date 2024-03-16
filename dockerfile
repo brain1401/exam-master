@@ -6,7 +6,8 @@ FROM base AS deps
 # RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install PM2 globally
+# Install PM2 and npm globally
+RUN npm install npm -g
 RUN npm install pm2 -g
 
 # Install dependencies based on the preferred package manager
