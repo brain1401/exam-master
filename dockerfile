@@ -7,6 +7,8 @@ FROM base AS deps
 WORKDIR /app
 
 RUN apt-get update -y && apt-get install -y openssl
+RUN apt-get install -y ca-certificates
+
 # Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .env ./prisma ./
 RUN \
