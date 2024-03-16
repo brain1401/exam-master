@@ -6,12 +6,6 @@ FROM base AS deps
 # RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install PM2 and npm globally
-RUN apt-get update -y && apt-get install -y openssl
-RUN apt-get install ca-certificates
-RUN npm install npm -g
-RUN npm install uuid -g
-RUN npm install pm2 -g
 
 # Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .env ./prisma ./
@@ -63,6 +57,10 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+
+# Install `pm2` globally
+RUN npm install pm2 -g
 
 USER nextjs
 
