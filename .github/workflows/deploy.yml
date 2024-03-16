@@ -8,16 +8,8 @@ jobs:
   build:
     name: Build
     runs-on: self-hosted
-    strategy:
-      matrix:
-        node-version: [20.x]
     steps:
       - uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
 
       - name: Make envfile
         uses: ozaytsev86/create-env-file@v1
@@ -34,6 +26,8 @@ jobs:
           ENV_AWS_CODEDEPLOY_SECRET_KEY: ${{ secrets.AWS_CODEDEPLOY_SECRET_KEY }}
           ENV_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           ENV_NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          ENV_DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          ENV_DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           ENV_SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
           ENV_SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           ENV_NEXT_PUBLIC_GTM: ${{ secrets.NEXT_PUBLIC_GTM }}
@@ -43,40 +37,24 @@ jobs:
           ENV_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           ENV_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
-      - name: Cache Next.js build
-        uses: actions/cache@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          # See here for caching with `yarn` https://github.com/actions/cache/blob/main/examples.md#node---yarn or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
-          path: |
-            ~/.npm 
-            ${{ github.workspace }}/.next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: "Build project"
+      - name: Build and push Docker image
         run: |
-          npm install
-          npm run build
-          rm -r node_modules
+          rm -rf ./node_modules
+          docker buildx build --platform=linux/amd64,linux/arm64,linux/arm/v7 -t ${{ secrets.DOCKERHUB_USERNAME}}/exam-master --push .
 
-      - name: archive
-        run: |
-          tar -czf exam-master.tar.gz --exclude=exam-master.tar.gz ./
-
-      - name: Configure AWS Credentials
+      - name: AWS credentials configure
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-access-key-id: ${{ secrets.AWS_CODEDEPLOY_SECRET_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CODEDEPLOY_SECRET_KEY }}
           aws-region: ${{ secrets.AWS_CODEDEPLOY_REGION }}
 
-      - name: Upload to S3
-        run: |
-          aws s3 cp ./exam-master.tar.gz s3://exam-master-build/deploy/
-
       - name: AWS CodeDeploy
         run: |
-          aws deploy create-deployment --application-name exam-master --s3-location bucket=exam-master-build,bundleType=tgz,key=deploy/exam-master.tar.gz --deployment-group-name Deploy --description "Deploying exam-master" --file-exists-behavior OVERWRITE
+          aws deploy create-deployment --application-name exam-master --deployment-group-name Deploy --description "Deploying exam-master"

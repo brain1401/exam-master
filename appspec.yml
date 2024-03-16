@@ -1,24 +1,13 @@
 version: 0.0
 os: linux
 files:
-  - source: /
-    destination: /home/ubuntu/nextjs/exam-master
-    overwrite: true
-file_exists_behavior: OVERWRITE
-permissions:
-  - object: /home/ubuntu/nextjs/exam-master
-    owner: ubuntu
-    group: ubuntu
+
 hooks:
-  BeforeInstall:
-    - location: scripts/before-install.sh
-      timeout: 300
-      runas: ubuntu
-  AfterInstall:
-    - location: scripts/after-install.sh
-      timeout: 300
-      runas: ubuntu
   ApplicationStart:
-    - location: scripts/application-start.sh
+    - location: scripts/auto_deploy.sh
       timeout: 300
-      runas: ubuntu
+      runas: root
+  ValidateService:
+    - location: scripts/swap_traffic.sh
+      timeout: 300
+      runas: root
