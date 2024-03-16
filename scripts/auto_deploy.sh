@@ -39,7 +39,10 @@ fi
 # 새로운 배포 대상 결정
 NEW=$([ "$PREVIOUS_PORT" -eq 3001 ] && echo "blue" || echo "green")
 
+
 # 새로운 이미지를 끌어옴
+docker login
+
 docker pull exam-master:latest || {
     echo "이미지를 끌어오는데 실패했습니다."
     exit 1

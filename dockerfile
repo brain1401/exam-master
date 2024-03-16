@@ -7,9 +7,6 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Install `pm2` globally
-RUN npm install pm2 -g
-
 # Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .env ./prisma ./
 RUN \
@@ -59,6 +56,9 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Install `pm2` globally
+RUN npm install pm2 -g
 
 USER nextjs
 
