@@ -46,7 +46,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Install PM2 globally
-RUN npm install pm2 -g
+RUN npm install pm2 -g --verbose
 
 COPY --from=builder /app/public ./public
 
