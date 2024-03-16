@@ -54,6 +54,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_CODEDEPLOY_SECRET_KEY }}
           aws-region: ${{ secrets.AWS_CODEDEPLOY_REGION }}
 
+      - name: archive appspec.yml
+        run: |
+          tar -cvzf appspec.yml.tar.gz appspec.yml
+
+      - name: upload appspec.yml to S3
+        run: |
+          aws s3 cp appspec.yml s3://exam-master-build/appspec.yml
+
       - name: AWS CodeDeploy
         run: |
-          aws deploy create-deployment --application-name exam-master --deployment-group-name Deploy --description "Deploying exam-master" --s3-location bucket=exam-master-build,bundleType=zip,key=exam-master.zip
+          aws deploy create-deployment --application-name exam-master --deployment-group-name Deploy --description "Deploying exam-master" --s3-location bucket=exam-master-build,bundleType=tar,key=appspec.yml.tar.gz --file-exists-behavior OVERWRITE

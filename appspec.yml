@@ -1,9 +1,5 @@
 version: 0.0
 os: linux
-files:
-  - source: /
-    destination: /temp
-    overwrite: true
 
 hooks:
   ApplicationStart:
