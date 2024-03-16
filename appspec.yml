@@ -2,7 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /dev/null
+    destination: /temp
+    overwrite: true
+
 hooks:
   ApplicationStart:
     - location: scripts/auto_deploy.sh
