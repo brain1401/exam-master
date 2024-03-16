@@ -8,6 +8,7 @@ WORKDIR /app
 
 # Install PM2 and npm globally
 RUN apt-get update -y && apt-get install -y openssl
+RUN apt-get install ca-certificates
 RUN npm install npm -g
 RUN npm install uuid -g
 RUN npm install pm2 -g
