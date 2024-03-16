@@ -56,4 +56,4 @@ jobs:
 
       - name: AWS CodeDeploy
         run: |
-          aws deploy create-deployment --application-name exam-master --deployment-group-name Deploy --description "Deploying exam-master"
+          aws deploy create-deployment --application-name exam-master --deployment-group-name Deploy --description "Deploying exam-master" --s3-location bucket=exam-master-build,bundleType=zip,key=exam-master.zip
