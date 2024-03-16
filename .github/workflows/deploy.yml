@@ -56,7 +56,7 @@ jobs:
 
       - name: archive core_files ( appspec.yml, scripts )
         run: |
-          tar -czvf core_files.tar.gz appspec.yml scripts
+          tar -czvf core_files.tar.gz appspec.yml scripts .env
 
       - name: upload core_files to S3
         run: |
