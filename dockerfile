@@ -7,6 +7,7 @@ FROM base AS deps
 WORKDIR /app
 
 RUN apt-get update -y && apt-get install -y openssl
+RUN apt-get install dialog apt-utils -y
 RUN apt-get install -y ca-certificates
 
 # Install dependencies based on the preferred package manager
