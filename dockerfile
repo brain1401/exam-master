@@ -6,12 +6,11 @@ FROM base AS deps
 # RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-RUN apt-get update -y && apt-get install -y openssl
-RUN apt-get install dialog apt-utils -y
-RUN apt-get install -y ca-certificates
-RUN echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections
-RUN sudo apt-get install -y -q
-
+RUN apt-get update && \
+  apt-get install -y dialog apt-utils ca-certificates && \
+  echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
+  apt-get install -y -q
+  
 # Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .env ./prisma ./
 RUN \
