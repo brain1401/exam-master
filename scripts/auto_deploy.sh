@@ -27,9 +27,12 @@ fi
 
 # 환경변수 파일 로드
 if [ -f /tmp/CodeDeploy/.env ]; then
-    sed '1d' /tmp/CodeDeploy/.env | while read -r line; do
-        export "$line"
-    done
+   # 임시 파일 생성
+    TMP_ENV="/tmp/CodeDeploy/.env_tmp"
+    tail -n +2 /tmp/CodeDeploy/.env > "$TMP_ENV"
+    source "$TMP_ENV"
+    # 임시 파일 삭제
+    rm "$TMP_ENV"
 else
     echo "환경변수 파일이 존재하지 않습니다."
     exit 1
