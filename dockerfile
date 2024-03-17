@@ -68,6 +68,9 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl --max-time 5 --silent --write-out %{http_code} --output /dev/null https://exammaster.co.kr || exit 1
+
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
 CMD ["pm2-runtime", "start", "server.js"]

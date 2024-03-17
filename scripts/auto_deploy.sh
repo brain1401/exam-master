@@ -40,7 +40,6 @@ fi
 
 echo ${DOCKERHUB_TOKEN} > password.txt
 
-echo ${DOCKERHUB_TOKEN}
 # 도커 허브 로그인
 cat password.txt | docker login -u $DOCKERHUB_USERNAME --password-stdin || {
     echo "도커 허브 로그인에 실패했습니다."
