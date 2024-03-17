@@ -32,8 +32,11 @@ fi
 # 새 컨테이너에 사용할 포트 결정
 if [ "$PREVIOUS_PORT" -eq 3001 ]; then
     NEW_PORT=3002
-else
+elif [ "$PREVIOUS_PORT" -eq 3002 ]; then
     NEW_PORT=3001
+else
+    echo "현재 실행 중인 컨테이너의 포트( 3001, 3002 )를 찾을 수 없습니다."
+    exit 1
 fi
 
 # 새로운 배포 대상 결정
