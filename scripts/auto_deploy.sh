@@ -32,7 +32,8 @@ else
     exit 1
 fi
 
-docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN || {
+# 도커 허브 로그인
+echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin || {
     echo "도커 허브 로그인에 실패했습니다."
     exit 1
 }
