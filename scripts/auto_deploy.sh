@@ -14,17 +14,18 @@ fi
 # 새 컨테이너에 사용할 포트 결정
 if [ "$PREVIOUS_PORT" -eq 3001 ]; then
     NEW_PORT=3002
+    NEW="green"
+    OLD="blue"
 elif [ "$PREVIOUS_PORT" -eq 3002 ]; then
     NEW_PORT=3001
+    NEW="blue"
+    OLD="green"
 else
     echo "현재 실행 중인 컨테이너의 포트( 3001, 3002 )를 찾을 수 없습니다."
     exit 1
 fi
 
-# 새로운 배포 대상 결정
-NEW=$([ "$PREVIOUS_PORT" -eq 3001 ] && echo "blue" || echo "green")
-
-# 새로운 이미지를 끌어옴
+# 환경변수 파일 로드
 if [ -f /tmp/CodeDeploy/.env ]; then
     source /tmp/CodeDeploy/.env
 else
@@ -38,10 +39,18 @@ echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdi
     exit 1
 }
 
+# 이미지를 끌어오는데 실패하면 스크립트 종료
 docker pull exam-master:latest || {
     echo "이미지를 끌어오는데 실패했습니다."
     exit 1
 }
+
+# 기존 컨테이너 종료 및 제거
+docker stop exam-master-${OLD} 2>/dev/null || true
+docker rm exam-master-${OLD} 2>/dev/null || true
+
+# 기존 이미지 제거
+sudo docker rmi $( docker images -f "dangling=true" -q ) --force
 
 # 새 컨테이너 시작
 docker run -d --name exam-master-${NEW} -p ${NEW_PORT}:3000 exam-master:latest
