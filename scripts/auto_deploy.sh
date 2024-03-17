@@ -51,7 +51,7 @@ cat password.txt | docker login -u $DOCKERHUB_USERNAME --password-stdin || {
 rm -f password.txt
 
 # 이미지를 끌어오는데 실패하면 스크립트 종료
-docker pull exam-master:latest || {
+docker pull brain1401/exam-master:latest || {
     echo "이미지를 끌어오는데 실패했습니다."
     exit 1
 }
