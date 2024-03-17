@@ -57,18 +57,17 @@ docker pull brain1401/exam-master:latest || {
 }
 
 # 새 컨테이너 시작
-docker run -d --name exam-master-${START_CONTAINER} -p ${START_PORT}:3000 brain1401/exam-master:latest
-
-# NGINX 구성 업데이트하여 트래픽을 새 컨테이너로 리디렉션
-sudo sed -i "s|\(proxy_pass http://localhost:\)${TERMINATE_PORT}|\1${START_PORT}|" /etc/nginx/sites-available/exam-master
-nginx -s reload
-
+docker run -d -e PORT=${START_PORT} --name exam-master-${START_CONTAINER} -p ${START_PORT}:3000 brain1401/exam-master:latest
 
 # 컨테이너가 'healthy' 상태가 될 때까지 기다림
 until [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "healthy" ]; do
     sleep 1
     echo "컨테이너가 준비될 때까지 기다립니다..."
 done
+
+# NGINX 구성 업데이트하여 트래픽을 새 컨테이너로 리디렉션
+sudo sed -i "s|\(proxy_pass http://localhost:\)${TERMINATE_PORT}|\1${START_PORT}|" /etc/nginx/sites-available/exam-master
+nginx -s reload
 
 # 리디렉션이 완료되었는지 확인
 HTTPCODE=$(curl --max-time 5 --silent --write-out %{http_code} --output /dev/null https://exammaster.co.kr)
