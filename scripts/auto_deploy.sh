@@ -33,11 +33,16 @@ else
     exit 1
 fi
 
+echo ${DOCKERHUB_PASSWORD} > password.txt
+
 # 도커 허브 로그인
-echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin || {
+cat password.txt | docker login -u $DOCKERHUB_USERNAME --password-stdin || {
     echo "도커 허브 로그인에 실패했습니다."
     exit 1
 }
+
+# 도커 허브 로그인 성공 후 비밀번호 파일 삭제
+rm -f password.txt
 
 # 이미지를 끌어오는데 실패하면 스크립트 종료
 docker pull exam-master:latest || {
@@ -50,7 +55,7 @@ docker stop exam-master-${OLD} 2>/dev/null || true
 docker rm exam-master-${OLD} 2>/dev/null || true
 
 # 기존 이미지 제거
-sudo docker rmi $( docker images -f "dangling=true" -q ) --force
+sudo docker rmi $(docker images -f "dangling=true" -q) --force
 
 # 새 컨테이너 시작
 docker run -d --name exam-master-${NEW} -p ${NEW_PORT}:3000 exam-master:latest
