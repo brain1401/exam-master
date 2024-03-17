@@ -81,7 +81,7 @@ done
 
 # NGINX 구성 업데이트하여 트래픽을 새 컨테이너로 리디렉션
 sudo sed -i "s|\(proxy_pass http://localhost:\)${TERMINATE_PORT}|\1${START_PORT}|" /etc/nginx/sites-available/exam-master
-nginx -s reload
+sudo nginx -s reload
 
 # 리디렉션이 완료되었는지 확인을 위한 반복 시도
 RETRY_LIMIT=5
