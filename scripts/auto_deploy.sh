@@ -59,7 +59,6 @@ docker pull brain1401/exam-master:latest || {
 # 새 컨테이너 시작
 docker run -d --env PORT=${START_PORT} --name exam-master-${START_CONTAINER} -p ${START_PORT}:3000 brain1401/exam-master:latest
 
-
 # 컨테이너가 'healthy' 상태가 될 때까지 기다림
 while true; do
     STATUS=$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})
@@ -84,17 +83,32 @@ done
 sudo sed -i "s|\(proxy_pass http://localhost:\)${TERMINATE_PORT}|\1${START_PORT}|" /etc/nginx/sites-available/exam-master
 nginx -s reload
 
-# 리디렉션이 완료되었는지 확인
-HTTPCODE=$(curl --max-time 5 --silent --write-out %{http_code} --output /dev/null https://exammaster.co.kr)
-IS_DOCKER_NEW_IMAGE=$(docker ps -a | grep "exam-master-${START_CONTAINER}")
+# 리디렉션이 완료되었는지 확인을 위한 반복 시도
+RETRY_LIMIT=5
+RETRY_COUNT=0
+SUCCESS=false
 
-if [ "$HTTPCODE" -eq 200 ] && [ -n "$IS_DOCKER_NEW_IMAGE" ]; then
+while [ $RETRY_COUNT -lt $RETRY_LIMIT ]; do
+    HTTPCODE=$(curl --max-time 3 --silent --write-out %{http_code} --output /dev/null https://exammaster.co.kr)
+    IS_DOCKER_NEW_IMAGE=$(docker ps -a | grep "exam-master-${START_CONTAINER}")
+
+    if [ "$HTTPCODE" -eq 200 ] && [ -n "$IS_DOCKER_NEW_IMAGE" ]; then
+        SUCCESS=true
+        break
+    else
+        echo "배포 확인 중... 시도 ${RETRY_COUNT}/${RETRY_LIMIT}"
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        sleep 3
+    fi
+done
+
+if [ "$SUCCESS" = true ]; then
     # 기존 컨테이너 종료 및 제거
     docker stop exam-master-${TERMINATE_CONTAINER}
     docker rm exam-master-${TERMINATE_CONTAINER}
 
     # 기존 이미지 제거
-    sudo docker rmi $(docker images -f "dangling=true" -q) --force
+    sudo docker image prune -a -f
 
     echo "배포가 완료되었습니다."
     exit 0
