@@ -90,9 +90,7 @@ SUCCESS=false
 
 while [ $RETRY_COUNT -lt $RETRY_LIMIT ]; do
     HTTPCODE=$(curl --max-time 3 --silent --write-out %{http_code} --output /dev/null https://exammaster.co.kr)
-    IS_DOCKER_NEW_IMAGE=$(docker ps -a | grep "exam-master-${START_CONTAINER}")
-
-    if [ "$HTTPCODE" -eq 200 ] && [ -n "$IS_DOCKER_NEW_IMAGE" ]; then
+    if [ "$HTTPCODE" -eq 200 ]; then
         SUCCESS=true
         break
     else
