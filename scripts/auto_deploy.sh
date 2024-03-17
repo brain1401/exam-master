@@ -59,34 +59,22 @@ docker pull brain1401/exam-master:latest || {
 # 새 컨테이너 시작
 docker run -d --env PORT=${START_PORT} --name exam-master-${START_CONTAINER} -p ${START_PORT}:3000 brain1401/exam-master:latest
 
-# 최대 대기 시간(초)
-MAX_WAIT=150
-
-# 시작 시간
-START_TIME=$SECONDS
-
-TIMEOVER=0
 
 # 컨테이너가 'healthy' 상태가 될 때까지 기다림
-until [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "healthy" ] || [ $(($SECONDS - $START_TIME)) -ge $MAX_WAIT ]; do
-    if [ $(($SECONDS - $START_TIME)) -ge $MAX_WAIT ]; then
-        echo "최대 대기 시간을 초과했습니다."
-        TIMEOVER=1
-        break
+until [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "healthy" ] || [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "unhealthy" ]; do
+    if [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "unhealthy" ]; then
+
+        # 실패한 경우 새 컨테이너도 종료
+        docker stop exam-master-${START_CONTAINER}
+        docker rm -f exam-master-${START_CONTAINER}
+
+        echo "컨테이너가 정상적으로 준비되지 않았습니다."
+        exit 1
     fi
+
     sleep 1
     echo "컨테이너가 준비될 때까지 기다립니다..."
 done
-
-if [ "$TIMEOVER" -eq 1 ]; then
-    echo "컨테이너가 정상적으로 준비되지 않았습니다."
-
-    # 실패한 경우 새 컨테이너도 종료
-    docker stop exam-master-${START_CONTAINER}
-    docker rm -f exam-master-${START_CONTAINER}
-
-    exit 1
-fi
 
 # NGINX 구성 업데이트하여 트래픽을 새 컨테이너로 리디렉션
 sudo sed -i "s|\(proxy_pass http://localhost:\)${TERMINATE_PORT}|\1${START_PORT}|" /etc/nginx/sites-available/exam-master
