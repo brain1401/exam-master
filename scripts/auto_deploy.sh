@@ -25,8 +25,8 @@ fi
 NEW=$([ "$PREVIOUS_PORT" -eq 3001 ] && echo "blue" || echo "green")
 
 # 새로운 이미지를 끌어옴
-if [ -f .env ]; then
-    source .env
+if [ -f /tmp/CodeDeploy/.env ]; then
+    source /tmp/CodeDeploy/.env
 else
     echo "환경변수 파일이 존재하지 않습니다."
     exit 1
