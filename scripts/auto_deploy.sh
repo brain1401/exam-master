@@ -72,3 +72,14 @@ done
 # NGINX 구성 업데이트하여 트래픽을 새 컨테이너로 리디렉션
 sed -i "s/localhost:${PREVIOUS_PORT}/localhost:${NEW_PORT}/g" /etc/nginx/sites-available/exammaster
 nginx -s reload
+
+# 리디렉션이 완료되었는지 확인
+HTTPCODE=$(curl --max-time 5 --silent --write-out %{http_code} --output /dev/null https://exammaster.co.kr)
+IS_DOCKER_NEW_IMAGE=$(docker ps -a | grep "exam-master-${NEW}")
+
+if [ "$HTTPCODE" -eq 200 ] && [ -n "$IS_DOCKER_NEW_IMAGE" ]; then
+    echo "배포가 완료되었습니다."
+else
+    echo "배포에 실패했습니다."
+    exit 1
+fi
