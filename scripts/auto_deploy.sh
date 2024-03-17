@@ -61,19 +61,23 @@ docker run -d --env PORT=${START_PORT} --name exam-master-${START_CONTAINER} -p 
 
 
 # 컨테이너가 'healthy' 상태가 될 때까지 기다림
-until [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "healthy" ] || [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "unhealthy" ]; do
-    if [ "$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})" == "unhealthy" ]; then
+while true; do
+    STATUS=$(docker inspect --format='{{.State.Health.Status}}' exam-master-${START_CONTAINER})
 
+    if [ "$STATUS" == "healthy" ]; then
+        echo "컨테이너가 준비되었습니다."
+        break
+    elif [ "$STATUS" == "unhealthy" ]; then
         # 실패한 경우 새 컨테이너도 종료
         docker stop exam-master-${START_CONTAINER}
         docker rm -f exam-master-${START_CONTAINER}
 
         echo "컨테이너가 정상적으로 준비되지 않았습니다."
         exit 1
+    else
+        echo "컨테이너가 준비될 때까지 기다립니다..."
+        sleep 1
     fi
-
-    sleep 1
-    echo "컨테이너가 준비될 때까지 기다립니다..."
 done
 
 # NGINX 구성 업데이트하여 트래픽을 새 컨테이너로 리디렉션
