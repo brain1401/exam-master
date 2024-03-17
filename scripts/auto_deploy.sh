@@ -27,15 +27,17 @@ fi
 
 # 환경변수 파일 로드
 if [ -f /tmp/CodeDeploy/.env ]; then
-    source /tmp/CodeDeploy/.env
+    sed '1d' /tmp/CodeDeploy/.env | while read -r line; do
+        export "$line"
+    done
 else
     echo "환경변수 파일이 존재하지 않습니다."
     exit 1
 fi
 
-echo ${DOCKERHUB_PASSWORD} > password.txt
+echo ${DOCKERHUB_TOKEN} > password.txt
 
-echo ${DOCKERHUB_PASSWORD}
+echo ${DOCKERHUB_TOKEN}
 # 도커 허브 로그인
 cat password.txt | docker login -u $DOCKERHUB_USERNAME --password-stdin || {
     echo "도커 허브 로그인에 실패했습니다."
