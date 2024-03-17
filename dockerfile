@@ -59,6 +59,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Install `pm2` globally
 RUN npm install pm2 -g
+RUN apk add curl
 
 USER nextjs
 
