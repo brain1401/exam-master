@@ -28,9 +28,9 @@ fi
 
 # 환경변수 파일 로드
 if [ -f /tmp/CodeDeploy/.env ]; then
-   # 임시 파일 생성
+    # 임시 파일 생성
     TMP_ENV="/tmp/CodeDeploy/.env_tmp"
-    tail -n +2 /tmp/CodeDeploy/.env > "$TMP_ENV"
+    tail -n +2 /tmp/CodeDeploy/.env >"$TMP_ENV"
     source "$TMP_ENV"
     # 임시 파일 삭제
     rm "$TMP_ENV"
@@ -39,7 +39,7 @@ else
     exit 1
 fi
 
-echo ${DOCKERHUB_TOKEN} > password.txt
+echo ${DOCKERHUB_TOKEN} >password.txt
 
 # 도커 허브 로그인
 cat password.txt | docker login -u $DOCKERHUB_USERNAME --password-stdin || {
@@ -74,16 +74,20 @@ HTTPCODE=$(curl --max-time 5 --silent --write-out %{http_code} --output /dev/nul
 IS_DOCKER_NEW_IMAGE=$(docker ps -a | grep "exam-master-${START_CONTAINER}")
 
 if [ "$HTTPCODE" -eq 200 ] && [ -n "$IS_DOCKER_NEW_IMAGE" ]; then
+    # 기존 컨테이너 종료 및 제거
+    docker stop exam-master-${TERMINATE_CONTAINER}
+    docker rm exam-master-${TERMINATE_CONTAINER}
+
+    # 기존 이미지 제거
+    sudo docker rmi $(docker images -f "dangling=true" -q) --force
+
     echo "배포가 완료되었습니다."
 else
     echo "배포에 실패했습니다."
+
+    # 실패한 경우 새 컨테이너도 종료
+    docker stop exam-master-${START_CONTAINER}
+    docker rm exam-master-${START_CONTAINER}
+
     exit 1
 fi
-
-# 기존 컨테이너 종료 및 제거
-docker stop exam-master-${TERMINATE_CONTAINER}
-docker rm exam-master-${TERMINATE_CONTAINER}
-
-# 기존 이미지 제거
-sudo docker rmi $(docker images -f "dangling=true" -q) --force
-
