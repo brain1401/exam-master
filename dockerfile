@@ -67,12 +67,11 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-ENV EXTERNAL_PORT=3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
 HEALTHCHECK --interval=1s --timeout=10s --retries=60 \
-  CMD curl --fail http://localhost:${EXTERNAL_PORT}/ || exit 1
+  CMD curl --fail http://localhost:3000/ || exit 1
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
