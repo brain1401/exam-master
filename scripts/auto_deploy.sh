@@ -60,7 +60,7 @@ docker pull brain1401/exam-master:latest || {
 docker run -d --env PORT=${START_PORT} --name exam-master-${START_CONTAINER} -p ${START_PORT}:3000 brain1401/exam-master:latest
 
 # 최대 대기 시간(초)
-MAX_WAIT=200
+MAX_WAIT=150
 
 # 시작 시간
 START_TIME=$SECONDS
