@@ -60,7 +60,8 @@ docker pull brain1401/exam-master:latest || {
 docker run -d --env PORT=${START_PORT} --name exam-master-${START_CONTAINER} -p ${START_PORT}:3000 brain1401/exam-master:latest
 
 # 최대 대기 시간(초)
-MAX_WAIT=30
+MAX_WAIT=200
+
 # 시작 시간
 START_TIME=$SECONDS
 
@@ -79,7 +80,7 @@ done
 
 if [ "$TIMEOVER" -eq 1 ]; then
     echo "컨테이너가 정상적으로 준비되지 않았습니다."
-    
+
     # 실패한 경우 새 컨테이너도 종료
     docker stop exam-master-${START_CONTAINER}
     docker rm -f exam-master-${START_CONTAINER}
