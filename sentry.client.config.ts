@@ -20,7 +20,5 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
 
   // You can remove this option if you're not planning to use the Sentry Session Replay feature:
-  integrations: [Sentry.replayIntegration({
-    
-  })],
+  integrations: [Sentry.replayIntegration({})],
 });
