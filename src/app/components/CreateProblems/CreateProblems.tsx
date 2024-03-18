@@ -11,6 +11,12 @@ import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 export default function CreateProblems() {
   const { resetProblems } = useProblems();
 
+  useEffect(() => {
+    return () => {
+      resetProblems();
+    };
+  }, [resetProblems]);
+
   return (
     <ProblemEditorLayout>
       <ProblemsOption />
