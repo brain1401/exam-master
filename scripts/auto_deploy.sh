@@ -83,13 +83,13 @@ done
 sudo sed -i "s|\(proxy_pass http://localhost:\)${TERMINATE_PORT}|\1${START_PORT}|" /etc/nginx/sites-available/exam-master
 sudo nginx -s reload
 
-# 리디렉션이 완료되었는지 확인을 위한 반복 시도
+# 이상이 없는지 확인을 위한 반복 시도
 RETRY_LIMIT=5
 RETRY_COUNT=0
 SUCCESS=false
 
 while [ $RETRY_COUNT -lt $RETRY_LIMIT ]; do
-    HTTPCODE=$(curl --max-time 3 --silent --write-out %{http_code} --output /dev/null https://exammaster.co.kr)
+    HTTPCODE=$(curl --max-time 3 --silent --write-out %{http_code} --output /dev/null http://localhost:${START_PORT})
     if [ "$HTTPCODE" -eq 200 ]; then
         SUCCESS=true
         break
