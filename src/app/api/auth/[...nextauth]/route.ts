@@ -1,5 +1,6 @@
 import { checkUser, createUserIfNotExists } from "@/service/user";
 import prisma from "@/lib/prisma";
+import { dbDayjs } from "@/utils/dbTime";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -42,7 +43,7 @@ const handler = NextAuth({
               email: user.email,
             },
             data: {
-              updatedAt: new Date(),
+              updatedAt: dbDayjs(new Date()),
             },
           });
         }
