@@ -1,4 +1,4 @@
-import { createUserIfNotExists } from "@/service/user";
+import { checkUser, createUserIfNotExists } from "@/service/user";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -33,14 +33,16 @@ const handler = NextAuth({
         );
 
         // 유저가 로그인을 시도했을 때, 마지막 로그인 시간을 업데이트
-        await global.prisma.user.update({
-          where: {
-            email: user.email,
-          },
-          data: {
-            updatedAt: new Date(),
-          },
-        });
+        if (await checkUser(user.email)) {
+          await global.prisma.user.update({
+            where: {
+              email: user.email,
+            },
+            data: {
+              updatedAt: new Date(),
+            },
+          });
+        }
 
         return result;
       } catch (error) {
