@@ -38,6 +38,7 @@ export async function checkUser(email: string) {
       },
     });
 
+    console.log("checkUser user:", user)
     return user ? true : false;
   } catch (err) {
     console.log(err);

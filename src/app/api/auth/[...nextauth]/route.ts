@@ -1,4 +1,5 @@
 import { checkUser, createUserIfNotExists } from "@/service/user";
+import prisma from "@/lib/prisma";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -25,16 +26,18 @@ const handler = NextAuth({
         if (!user.email || !user.name) {
           throw new Error("Invalid user data");
         }
+
+        console.log("user:", user);
+
         // 유저가 없으면 생성하고 있으면 그냥 넘어감
         const result = await createUserIfNotExists(
           user.email,
           user.name,
           user.image || "",
         );
-
         // 유저가 로그인을 시도했을 때, 마지막 로그인 시간을 업데이트
         if (await checkUser(user.email)) {
-          await global.prisma.user.update({
+          await prisma.user.update({
             where: {
               email: user.email,
             },
