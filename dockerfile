@@ -70,7 +70,7 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
-HEALTHCHECK --interval=1s --timeout=10s --retries=60 \
+HEALTHCHECK --interval=1s --timeout=10s --start-period=5s --retries=60 \
   CMD curl --fail http://localhost:3000/ || exit 1
 
 # server.js is created by next build from the standalone output
