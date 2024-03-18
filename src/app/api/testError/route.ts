@@ -7,6 +7,8 @@ export async function GET(req: NextRequest) {
   if (!session) {
     return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   }
+
+  new Error("에러 발생시키기");
   
   return NextResponse.json({ message: "error test" }, { status: 400 });
 }
