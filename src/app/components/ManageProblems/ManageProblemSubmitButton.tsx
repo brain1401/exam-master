@@ -71,7 +71,10 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
                 formData.append("Content-Type", imageFile.type);
                 formData.append("file", imageFile);
 
-                await axios.post(url, formData);
+                await axios.post(url, formData, {
+                  validateStatus: (status) => status < 400,
+                });
+                
                 return {
                   index,
                   imageKey: key,
