@@ -64,4 +64,4 @@ jobs:
 
       - name: AWS CodeDeploy
         run: |
-          aws deploy create-deployment --application-name exam-master --deployment-group-name blue-green --description "Deploying exam-master" --s3-location bucket=exam-master-build,bundleType=tar,key=core_files.tar.gz --file-exists-behavior OVERWRITE
+          aws deploy create-deployment --application-name exam-master --deployment-group-name Deploy --description "Deploying exam-master" --s3-location bucket=exam-master-build,bundleType=tar,key=core_files.tar.gz --file-exists-behavior OVERWRITE
