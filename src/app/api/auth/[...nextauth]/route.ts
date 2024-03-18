@@ -33,7 +33,7 @@ const handler = NextAuth({
         );
 
         // 유저가 로그인을 시도했을 때, 마지막 로그인 시간을 업데이트
-        global.prisma.user.update({
+        await global.prisma.user.update({
           where: {
             email: user.email,
           },
