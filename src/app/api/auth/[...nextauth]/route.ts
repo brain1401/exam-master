@@ -25,12 +25,23 @@ const handler = NextAuth({
         if (!user.email || !user.name) {
           throw new Error("Invalid user data");
         }
-
+        // 유저가 없으면 생성하고 있으면 그냥 넘어감
         const result = await createUserIfNotExists(
           user.email,
           user.name,
-          user.image || ""
-        ); // 유저가 없으면 생성하고 있으면 그냥 넘어감
+          user.image || "",
+        );
+
+        // 유저가 로그인을 시도했을 때, 마지막 로그인 시간을 업데이트
+        global.prisma.user.update({
+          where: {
+            email: user.email,
+          },
+          data: {
+            updatedAt: new Date(),
+          },
+        });
+
         return result;
       } catch (error) {
         console.error("signIn callback 중 에러:", error);
