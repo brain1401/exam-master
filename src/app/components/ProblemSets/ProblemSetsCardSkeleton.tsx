@@ -5,7 +5,7 @@ type Props = {
 };
 
 export default function ProblemSetsCardSkeleton({ pageSize }: Props) {
-  const skeletonArray = Array.from({ length: pageSize }, (_, i) => i) ;
+  const skeletonArray = Array.from({ length: pageSize }, (_, i) => i);
 
   return (
     <ProblemSetsGridLayout>
