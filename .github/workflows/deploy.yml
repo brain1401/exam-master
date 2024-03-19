@@ -41,6 +41,7 @@ jobs:
         run: |
           echo "[auth]" > .sentryclirc
           echo "token=${{ secrets.SENTRY_BUILD_AUTH_TOKEN }}" >> .sentryclirc
+        
       - name: remove ./node_modules
         run: |
           rm -rf ./node_modules
@@ -53,21 +54,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: build next app
-        run: |
-          rm -rf ./app
-          mkdir app
-          npm install
-          cp -rf ./node_modules ./app 
-
-          npm run build
-          cp -rf ./public ./app
-
-          mkdir -p ./app/.next/standalone && cp -rf ./.next/standalone ./app/.next/standalone
-          mkdir -p ./app/.next/static && cp -rf ./.next/static ./app/.next/static
-
-
+          
       - name: push Docker image
         uses: docker/build-push-action@v5
         with:
