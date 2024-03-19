@@ -58,15 +58,15 @@ jobs:
         run: |
           mkdir app
           npm install
-          cp -r ./node_modules ./app 
+          cp -rf ./node_modules ./app 
 
           npm run build
-          cp -r ./public ./app
+          cp -rf ./public ./app
 
-          mkdir -p ./app/.next/standalone && cp -r ./.next/standalone ./app/.next/standalone
-          mkdir -p ./app/.next/static && cp -r ./.next/static ./app/.next/static
+          mkdir -p ./app/.next/standalone && cp -rf ./.next/standalone ./app/.next/standalone
+          mkdir -p ./app/.next/static && cp -rf ./.next/static ./app/.next/static
 
-          
+
       - name: push Docker image
         uses: docker/build-push-action@v5
         with:
