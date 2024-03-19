@@ -58,13 +58,13 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/exam-master:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          cache-from: type=local,src=./.next/cache
+          cache-to: type=local,dest=./.next/cache-new,mode=max
 
       - name: Move cache
         run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          rm -rf ./.next/cache
+          mv ./.next/cache-new ./.next/cache
 
       - name: AWS credentials configure
         uses: aws-actions/configure-aws-credentials@v4.0.2
