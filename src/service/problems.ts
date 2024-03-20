@@ -1125,11 +1125,15 @@ export async function deleteImagesFromSet(
             );
 
           console.log(
-            `\nif(totalRefercence.allUserCount.total) === deleteSetCount\nif(${totalReference.allUserCount.total} === ${deleteSetCount})`,
+            `\n[${imageKey}]\nif(totalRefercence.allUserCount.total) === deleteSetCount\nif(${totalReference.allUserCount.total} === ${deleteSetCount})`,
           );
+          // 삭제 후 이미지 키를 검색해서 유저가 하나도 연결되어 있지 않으면 이미지 삭제 구현할 것
+          // await prismaInstance.image.findMany({
+
+          // })
 
           if (totalReference.allUserCount.total === deleteSetCount) {
-            // 모든 유저의 이미지 참조가 삭제할 세트 숫자만큼인 경우 경우 s3에서 이미지 삭제 (s3 삭제 대상)
+            // 모든 유저의 이미지 참조가 삭제할 세트 숫자만큼인 경우 s3에서 이미지 삭제 (s3 삭제 대상)
             console.log(
               `[deleteImagesFromSet] 참조가 없어 이미지 ${imageKey} 삭제 시작`,
             );
@@ -1161,7 +1165,7 @@ export async function deleteImagesFromSet(
           }
 
           console.log(
-            `\nif(currentUserImageReference) === deleteSetCount\nif(${currentUserImageReference} === ${deleteSetCount})`,
+            `\n[${imageKey}]\nif(currentUserImageReference) === deleteSetCount\nif(${currentUserImageReference} === ${deleteSetCount})`,
           );
 
           if (currentUserImageReference === deleteSetCount) {
