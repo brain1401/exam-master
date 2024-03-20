@@ -359,6 +359,19 @@ export async function createImageOnDBIfNotExistByS3Key(
       );
 
       if (imageUuid) {
+        await prismaInstance.image.update({
+          where: {
+            key: imageKey,
+          },
+          data: {
+            users: {
+              connect: {
+                email: userEmail,
+              },
+            },
+          },
+        });
+
         return imageUuid;
       } else {
         const file = await getImageFileOnS3ByImageKey(imageKey);
@@ -379,10 +392,10 @@ export async function createImageOnDBIfNotExistByS3Key(
               },
             },
           },
+          update: {},
           select: {
             uuid: true,
           },
-          update: {},
         });
         return result.uuid;
       }
