@@ -5,11 +5,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "d2j8ft6kq15eqf.cloudfront.net",
+        hostname: process.env.AWS_CLOUDFRONT_DOMAIN,
       },
     ],
   },
-  output: 'standalone',
+  output: "standalone",
 };
 
 module.exports = nextConfig
