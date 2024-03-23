@@ -57,9 +57,8 @@ while true; do
     fi
 done
 
-# NGINX 구성 업데이트
-
-sudo nginx -s reload
+# NGINX 시작
+sudo systemctl start nginx
 
 # 이상이 없는지 확인을 위한 반복 시도
 RETRY_LIMIT=5
