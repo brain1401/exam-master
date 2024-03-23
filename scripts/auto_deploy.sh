@@ -2,13 +2,7 @@
 
 # AWS AutoScaling, ELB, blue/green CodeDeploy를 이용한 자동 배포 스크립트
 
-# NGINX 설정 파일에서 현재 설정된 포트 조회
-CURRENT_PORT=$(grep "proxy_pass http://localhost" /etc/nginx/sites-available/exam-master | grep -o '[0-9]\+')
-
-if [ -z "$CURRENT_PORT" ]; then
-    echo "NGINX 설정 파일에서 포트 조회에 실패했습니다."
-    exit 1
-fi
+APP_PORT=3000
 
 # 환경변수 파일 로드
 if [ -f /tmp/CodeDeploy/.env ]; then
@@ -45,7 +39,7 @@ docker stop exam-master
 docker rm -f exam-master
 
 # 새 컨테이너 시작
-docker run -d --name exam-master -p ${CURRENT_PORT}:3000 brain1401/exam-master:latest
+docker run -d --name exam-master -p ${APP_PORT}:3000 brain1401/exam-master:latest
 
 # 컨테이너가 'healthy' 상태가 될 때까지 기다림
 while true; do
@@ -73,7 +67,7 @@ RETRY_COUNT=0
 SUCCESS=false
 
 while [ $RETRY_COUNT -lt $RETRY_LIMIT ]; do
-    HTTPCODE=$(curl --max-time 3 --silent --write-out %{http_code} --output /dev/null http://localhost:${CURRENT_PORT})
+    HTTPCODE=$(curl --max-time 3 --silent --write-out %{http_code} --output /dev/null http://localhost:${APP_PORT})
     if [ "$HTTPCODE" -eq 200 ]; then
         SUCCESS=true
         break
