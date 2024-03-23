@@ -6,12 +6,7 @@ APP_PORT=3000
 
 # 환경변수 파일 로드
 if [ -f /tmp/CodeDeploy/.env ]; then
-    # 임시 파일 생성
-    TMP_ENV="/tmp/CodeDeploy/.env_tmp"
-    tail -n +2 /tmp/CodeDeploy/.env >"$TMP_ENV"
-    source "$TMP_ENV"
-    # 임시 파일 삭제
-    rm "$TMP_ENV"
+    source /tmp/CodeDeploy/.env
 else
     echo "환경변수 파일이 존재하지 않습니다."
     exit 1
@@ -58,7 +53,7 @@ while true; do
 done
 
 # NGINX 시작
-sudo systemctl start nginx
+sudo nginx -s reload
 
 # 이상이 없는지 확인을 위한 반복 시도
 RETRY_LIMIT=5
