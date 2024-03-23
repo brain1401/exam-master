@@ -34,7 +34,7 @@ docker stop exam-master
 docker rm -f exam-master
 
 # 새 컨테이너 시작
-docker run -d --name exam-master -p ${APP_PORT}:3000 brain1401/exam-master:latest
+docker run -d --name exam-master -p ${APP_PORT}:3000 --restart=always brain1401/exam-master:latest
 
 # 컨테이너가 'healthy' 상태가 될 때까지 기다림
 while true; do
