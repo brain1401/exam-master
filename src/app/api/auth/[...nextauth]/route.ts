@@ -41,6 +41,7 @@ const handler = NextAuth({
         } else {
           await createUser(user.email, user.name, user.image || "");
         }
+        
         return true;
       } catch (error) {
         console.error("signIn callback 중 에러:", error);

@@ -36,11 +36,11 @@ export async function createUser(
 
 export async function checkUser(email: string) {
   try {
-    const users = await drizzleSession.query.user.findFirst({
+    const user = await drizzleSession.query.user.findFirst({
       where: eq(userTable.email, email),
     });
 
-    return users ? true : false;
+    return user ? true : false;
   } catch (err) {
     console.log(err);
 
