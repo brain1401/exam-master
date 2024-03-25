@@ -55,8 +55,7 @@ jobs:
 
       - name: push Docker image
         run: |
-          export DATABASE_URL=${{ secrets.DATABASE_URL }}
-          docker buildx build -t ${{ secrets.DOCKERHUB_USERNAME }}/exam-master --push .
+          docker buildx build -t ${{ secrets.DOCKERHUB_USERNAME }}/exam-master --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} --push .
 
       - name: AWS credentials configure
         uses: aws-actions/configure-aws-credentials@v4.0.2
