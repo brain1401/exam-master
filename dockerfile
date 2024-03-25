@@ -24,7 +24,7 @@ RUN npm install -g drizzle-orm
 
 RUN \
   drizzle-kit generate:pg --schema=./schema.ts && \
-  drizzle-kit push:pg --driver=pg --schema=src/db/schema.ts --connectionString=$DATABASE_URL
+  drizzle-kit push:pg --driver=pg --schema=./schema.ts --connectionString=$DATABASE_URL
 
 
 # Rebuild the source code only when needed
