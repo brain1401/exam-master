@@ -10,9 +10,6 @@ WORKDIR /app
 # Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .env ./drizzle ./scripts ./
 
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
 RUN \
   drizzle-kit generate:pg --schema=src/db/schema.ts && drizzle-kit push:pg --driver=pg --schema=src/db/schema.ts --connectionString=${DATABASE_URL}
 
