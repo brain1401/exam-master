@@ -95,25 +95,3 @@ export async function getUserByProblemUuId(
     throw new Error("유저를 가져오는 중 오류가 발생했습니다.");
   }
 }
-
-export async function getUserByImageUuId(
-  imageUuid: string,
-  transaction?: DrizzleTransaction,
-) {
-  try {
-    const drizzle = transaction ?? drizzleSession;
-    const user = await drizzle.query.user.findFirst({
-      with: {
-        images: {
-          where: (images, { eq }) => eq(images.imageUuid, imageUuid),
-        },
-      },
-    });
-
-    return user ?? null;
-  } catch (err) {
-    console.log(err);
-
-    throw new Error("유저를 가져오는 중 오류가 발생했습니다.");
-  }
-}

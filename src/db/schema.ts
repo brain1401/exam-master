@@ -8,6 +8,7 @@ import {
   boolean,
   jsonb,
   uuid,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
@@ -97,7 +98,7 @@ export const problem = pgTable(
   },
 );
 
-export const problemRelation = relations(problem, ({ one }) => ({
+export const problemRelation = relations(problem, ({ one, many }) => ({
   problemSet: one(problemSet, {
     fields: [problem.problemSetUuid],
     references: [problemSet.uuid],
@@ -155,10 +156,6 @@ export const userRelation = relations(user, ({ many }) => ({
 export const likedProblemSets = pgTable(
   "_LikedProblemSets",
   {
-    uuid: uuid("uuid")
-      .primaryKey()
-      .default(sql`uuid_generate_v4()`)
-      .notNull(),
     problemSetUuid: uuid("problemSetUuid")
       .notNull()
       .references(() => problemSet.uuid, {
@@ -172,15 +169,9 @@ export const likedProblemSets = pgTable(
         onUpdate: "cascade",
       }),
   },
-  (table) => {
-    return {
-      abUnique: uniqueIndex("_LikedProblemSets_AB_unique").on(
-        table.problemSetUuid,
-        table.userUuid,
-      ),
-      bIdx: index().on(table.userUuid),
-    };
-  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.problemSetUuid, t.userUuid] }),
+  }),
 );
 
 export const likedProblemSetsRelation = relations(
@@ -338,10 +329,6 @@ export const problemResultRelation = relations(problemResult, ({ one }) => ({
 export const imageToUser = pgTable(
   "_ImageToUser",
   {
-    uuid: uuid("uuid")
-      .primaryKey()
-      .default(sql`uuid_generate_v4()`)
-      .notNull(),
     imageUuid: uuid("imageUuid")
       .notNull()
       .references(() => image.uuid, {
@@ -355,15 +342,9 @@ export const imageToUser = pgTable(
         onUpdate: "cascade",
       }),
   },
-  (table) => {
-    return {
-      abUnique: uniqueIndex("_ImageToUser_imageuser_unique").on(
-        table.imageUuid,
-        table.userUuid,
-      ),
-      bIdx: index().on(table.userUuid),
-    };
-  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.imageUuid, t.userUuid] }),
+  }),
 );
 
 export const imageToUserRelation = relations(imageToUser, ({ one }) => ({

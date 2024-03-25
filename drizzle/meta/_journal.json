@@ -99,6 +99,34 @@
       "when": 1711381447437,
       "tag": "0013_premium_virginia_dare",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1711400542866,
+      "tag": "0014_glossy_reptil",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1711400813324,
+      "tag": "0015_rapid_corsair",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1711403858303,
+      "tag": "0016_special_hawkeye",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1711404284561,
+      "tag": "0017_plain_hitman",
+      "breakpoints": true
     }
   ]
 }

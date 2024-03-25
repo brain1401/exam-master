@@ -57,8 +57,8 @@ import {
   result,
   problemSet,
   problemResult,
-  imageToUser,
   likedProblemSets,
+  imageToUser,
 } from "@/db/schema";
 
 import { s3Client } from "@/utils/AWSs3Client";
@@ -158,16 +158,6 @@ export async function postProblems(
             userUuid: userUuId,
             problemSetUuid: createdProblemSet.uuid,
           });
-
-          if (currentImageUuid) {
-            await dt
-              .insert(imageToUser)
-              .values({
-                imageUuid: currentImageUuid,
-                userUuid: userUuId,
-              })
-              .onConflictDoNothing();
-          }
         }),
       );
 
@@ -288,13 +278,6 @@ export async function updateProblems(
             })
             .returning({ uuid: problem.uuid });
 
-          if (currentImageUuid) {
-            await dt.insert(imageToUser).values({
-              imageUuid: currentImageUuid,
-              userUuid: userUuid,
-            });
-          }
-
           const result = await dt.query.problem.findFirst({
             where: eq(problem.uuid, createdProblem.uuid),
             with: {
@@ -379,13 +362,19 @@ export async function createImageOnDBIfNotExistByS3Key(
       const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);
       if (imageUuid) {
+        // 이미지가 DB에 이미 존재하는 경우
+
         await dt
-          .update(imageToUser)
-          .set({ imageUuid: imageUuid, userUuid: userUuid })
-          .where(eq(imageToUser.imageUuid, imageUuid));
+          .insert(imageToUser)
+          .values({
+            imageUuid: imageUuid,
+            userUuid: userUuid,
+          })
+          .onConflictDoNothing();
 
         return imageUuid;
       } else {
+        // 이미지가 DB에 존재하지 않는 경우 ( 생성 )
         const file = await getImageFileOnS3ByImageKey(imageKey);
         const hash = await generateFileHash(file);
 
@@ -404,20 +393,11 @@ export async function createImageOnDBIfNotExistByS3Key(
           // insert가 성공한 경우
           const imageUuid = images[0].uuid;
 
-          await dt
-            .insert(imageToUser)
-            .values({
-              imageUuid: imageUuid,
-              userUuid: userUuid,
-            })
-            .onConflictDoNothing();
+          await dt.insert(imageToUser).values({
+            imageUuid: imageUuid,
+            userUuid: userUuid,
+          });
 
-          return imageUuid;
-        } else {
-          // insert를 시도했지만 이미지가 이미 존재하는 경우
-
-          const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
-          if (!imageUuid) throw new Error("이미지를 찾을 수 없습니다.");
           return imageUuid;
         }
       }
@@ -907,16 +887,6 @@ export async function postProblemResult(
         updatedAt: new Date(),
       })
       .returning({ uuid: problemResult.uuid });
-
-    if (isImageUrlObject(problem.image)) {
-      await dt
-        .insert(imageToUser)
-        .values({
-          imageUuid: problem.image.uuid,
-          userUuid: userUuid,
-        })
-        .onConflictDoNothing();
-    }
 
     if (!createdProblemResult)
       throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
