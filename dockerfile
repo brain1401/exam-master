@@ -13,6 +13,7 @@ COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .env ./drizzle .
 ARG DATABASE_URL
 
 RUN \
+  npm install -g drizzle-kit \
   drizzle-kit generate:pg --schema=src/db/schema.ts\
   drizzle-kit push:pg --driver=pg --schema=src/db/schema.ts --connectionString=$DATABASE_URL
 
