@@ -1,5 +1,9 @@
 import { getExamResultsByUUID } from "@/service/problems";
-import { CorrectCandidate, ExamResultCandidate, ProblemResult } from "@/types/problems";
+import {
+  CorrectCandidate,
+  ExamResultCandidate,
+  ProblemResult,
+} from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
@@ -27,7 +31,7 @@ export async function GET(req: NextRequest) {
   try {
     const result = await getExamResultsByUUID(uuid, userEmail);
 
-    const finalResult: ProblemResult[] = result.problem_results.map((r) => {
+    const finalResult: ProblemResult[] = result.problemResults.map((r) => {
       return {
         uuid: r.uuid,
         question: r.question,

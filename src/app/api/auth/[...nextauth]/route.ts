@@ -1,7 +1,9 @@
-import { checkUser, createUserIfNotExists } from "@/service/user";
-import prisma from "@/lib/prisma";
+import { checkUser, createUser } from "@/service/user";
+import drizzleSession from "@/db/drizzle";
+import { user as userTable } from "@/db/schema";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { eq } from "drizzle-orm";
 
 const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
@@ -29,25 +31,17 @@ const handler = NextAuth({
 
         console.log("user:", user);
 
-        // 유저가 없으면 생성하고 있으면 그냥 넘어감
-        const result = await createUserIfNotExists(
-          user.email,
-          user.name,
-          user.image || "",
-        );
-        // 유저가 로그인을 시도했을 때, 마지막 로그인 시간을 업데이트
         if (await checkUser(user.email)) {
-          await prisma.user.update({
-            where: {
-              email: user.email,
-            },
-            data: {
+          await drizzleSession
+            .update(userTable)
+            .set({
               updatedAt: new Date(),
-            },
-          });
+            })
+            .where(eq(userTable.email, user.email));
+        } else {
+          await createUser(user.email, user.name, user.image || "");
         }
-
-        return result;
+        return true;
       } catch (error) {
         console.error("signIn callback 중 에러:", error);
         return false; // 로그인 실패

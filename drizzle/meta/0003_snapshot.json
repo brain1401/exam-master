@@ -1,0 +1,702 @@
+{
+  "id": "9dde9c9e-1be4-4443-aa2d-5226e4ac6979",
+  "prevId": "fe880fa1-ad94-4aa1-ae94-cfbfc0f83b1c",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "Image": {
+      "name": "Image",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "filename": {
+          "name": "filename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hash": {
+          "name": "hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "Image_uuid_key": {
+          "name": "Image_uuid_key",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": true
+        },
+        "Image_key_key": {
+          "name": "Image_key_key",
+          "columns": [
+            "key"
+          ],
+          "isUnique": true
+        },
+        "Image_url_key": {
+          "name": "Image_url_key",
+          "columns": [
+            "url"
+          ],
+          "isUnique": true
+        },
+        "Image_hash_key": {
+          "name": "Image_hash_key",
+          "columns": [
+            "hash"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "_ImageToUser": {
+      "name": "_ImageToUser",
+      "schema": "",
+      "columns": {
+        "imageUuid": {
+          "name": "imageUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userUuid": {
+          "name": "userUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "_ImageToUser_imageuser_unique": {
+          "name": "_ImageToUser_imageuser_unique",
+          "columns": [
+            "imageUuid",
+            "userUuid"
+          ],
+          "isUnique": true
+        },
+        "_ImageToUser_userUuid_index": {
+          "name": "_ImageToUser_userUuid_index",
+          "columns": [
+            "userUuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "_ImageToUser_imageUuid_Image_uuid_fk": {
+          "name": "_ImageToUser_imageUuid_Image_uuid_fk",
+          "tableFrom": "_ImageToUser",
+          "tableTo": "Image",
+          "columnsFrom": [
+            "imageUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "_ImageToUser_userUuid_User_uuid_fk": {
+          "name": "_ImageToUser_userUuid_User_uuid_fk",
+          "tableFrom": "_ImageToUser",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "_LikedProblemSets": {
+      "name": "_LikedProblemSets",
+      "schema": "",
+      "columns": {
+        "problemSetUuid": {
+          "name": "problemSetUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userUuid": {
+          "name": "userUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "_LikedProblemSets_AB_unique": {
+          "name": "_LikedProblemSets_AB_unique",
+          "columns": [
+            "problemSetUuid",
+            "userUuid"
+          ],
+          "isUnique": true
+        },
+        "_LikedProblemSets_userUuid_index": {
+          "name": "_LikedProblemSets_userUuid_index",
+          "columns": [
+            "userUuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "_LikedProblemSets_problemSetUuid_ProblemSet_uuid_fk": {
+          "name": "_LikedProblemSets_problemSetUuid_ProblemSet_uuid_fk",
+          "tableFrom": "_LikedProblemSets",
+          "tableTo": "ProblemSet",
+          "columnsFrom": [
+            "problemSetUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "_LikedProblemSets_userUuid_User_uuid_fk": {
+          "name": "_LikedProblemSets_userUuid_User_uuid_fk",
+          "tableFrom": "_LikedProblemSets",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "Problem": {
+      "name": "Problem",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question": {
+          "name": "question",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "questionType": {
+          "name": "questionType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "imageUuid": {
+          "name": "imageUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "candidates": {
+          "name": "candidates",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "additionalView": {
+          "name": "additionalView",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "problemSetUuid": {
+          "name": "problemSetUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subjectiveAnswer": {
+          "name": "subjectiveAnswer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "userUuid": {
+          "name": "userUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isAnswerMultiple": {
+          "name": "isAnswerMultiple",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "Problem_uuid_key": {
+          "name": "Problem_uuid_key",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "Problem_imageUuid_Image_uuid_fk": {
+          "name": "Problem_imageUuid_Image_uuid_fk",
+          "tableFrom": "Problem",
+          "tableTo": "Image",
+          "columnsFrom": [
+            "imageUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        },
+        "Problem_problemSetUuid_ProblemSet_uuid_fk": {
+          "name": "Problem_problemSetUuid_ProblemSet_uuid_fk",
+          "tableFrom": "Problem",
+          "tableTo": "ProblemSet",
+          "columnsFrom": [
+            "problemSetUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "Problem_userUuid_User_uuid_fk": {
+          "name": "Problem_userUuid_User_uuid_fk",
+          "tableFrom": "Problem",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "ProblemResult": {
+      "name": "ProblemResult",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question": {
+          "name": "question",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "questionType": {
+          "name": "questionType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "additionalView": {
+          "name": "additionalView",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resultUuid": {
+          "name": "resultUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isCorrect": {
+          "name": "isCorrect",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "candidates": {
+          "name": "candidates",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isAnswerMultiple": {
+          "name": "isAnswerMultiple",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userUuId": {
+          "name": "userUuId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "imageUuid": {
+          "name": "imageUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subjectiveAnswered": {
+          "name": "subjectiveAnswered",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "correctSubjectiveAnswer": {
+          "name": "correctSubjectiveAnswer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "correctCandidates": {
+          "name": "correctCandidates",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "ProblemResult_uuid_key": {
+          "name": "ProblemResult_uuid_key",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "ProblemResult_resultUuid_Result_uuid_fk": {
+          "name": "ProblemResult_resultUuid_Result_uuid_fk",
+          "tableFrom": "ProblemResult",
+          "tableTo": "Result",
+          "columnsFrom": [
+            "resultUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "ProblemResult_userUuId_User_uuid_fk": {
+          "name": "ProblemResult_userUuId_User_uuid_fk",
+          "tableFrom": "ProblemResult",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userUuId"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "ProblemResult_imageUuid_Image_uuid_fk": {
+          "name": "ProblemResult_imageUuid_Image_uuid_fk",
+          "tableFrom": "ProblemResult",
+          "tableTo": "Image",
+          "columnsFrom": [
+            "imageUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "ProblemSet": {
+      "name": "ProblemSet",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userUuid": {
+          "name": "userUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isShareLinkPurposeSet": {
+          "name": "isShareLinkPurposeSet",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isPublic": {
+          "name": "isPublic",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "ProblemSet_uuid_key": {
+          "name": "ProblemSet_uuid_key",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "ProblemSet_userUuid_User_uuid_fk": {
+          "name": "ProblemSet_userUuid_User_uuid_fk",
+          "tableFrom": "ProblemSet",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "Result": {
+      "name": "Result",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "userUuid": {
+          "name": "userUuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "problemSetName": {
+          "name": "problemSetName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "Result_uuid_key": {
+          "name": "Result_uuid_key",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "Result_userUuid_User_uuid_fk": {
+          "name": "Result_userUuid_User_uuid_fk",
+          "tableFrom": "Result",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userUuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "User": {
+      "name": "User",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (6)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "User_uuid_key": {
+          "name": "User_uuid_key",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": true
+        },
+        "User_email_key": {
+          "name": "User_email_key",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

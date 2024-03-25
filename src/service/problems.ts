@@ -4,12 +4,12 @@ import {
   ExamProblem,
   ProblemSetWithPagination,
   Candidate,
-  PrismaTransaction,
+  DrizzleTransaction,
   ResultsWithPagination,
   problemsSchema,
   ProblemReplacedImageKey,
 } from "@/types/problems";
-import { getUserByEmail } from "./user";
+import { getUserUUIDbyEmail } from "./user";
 import {
   analyzeProblemsImagesAndDoCallback,
   generateFileHash,
@@ -26,20 +26,55 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 
-import prisma from "@/lib/prisma";
+import {
+  eq,
+  ne,
+  gt,
+  gte,
+  lt,
+  lte,
+  isNull,
+  isNotNull,
+  between,
+  notBetween,
+  like,
+  ilike,
+  notLike,
+  not,
+  and,
+  or,
+  inArray,
+  notInArray,
+  count,
+  desc,
+  asc,
+} from "drizzle-orm";
+
+import {
+  user,
+  image,
+  problem,
+  result,
+  problemSet,
+  problemResult,
+  imageToUser,
+  likedProblemSets,
+} from "@/db/schema";
+
 import { s3Client } from "@/utils/AWSs3Client";
+import drizzleSession from "@/db/drizzle";
 
 export async function postProblems(
   setName: string,
   userEmail: string,
-  problems: ProblemReplacedImageKey[],
+  toBePostedProblems: ProblemReplacedImageKey[],
   isShareLinkPurposeSet: boolean,
 ) {
   try {
-    const result = await prisma.$transaction(
-      async (pm) => {
+    const result = await drizzleSession.transaction(
+      async (drizzleTransaction) => {
         const createdImages = await analyzeProblemsImagesAndDoCallback({
-          problems,
+          problems: toBePostedProblems,
           flatResult: true,
           skipDuplicated: true,
           callback: async ({
@@ -56,7 +91,7 @@ export async function postProblems(
                 const uuid = await createImageOnDBIfNotExistByS3Key(
                   imageKey,
                   userEmail,
-                  pm,
+                  drizzleTransaction,
                 );
 
                 if (duplicateIndexes.length > 0) {
@@ -90,55 +125,48 @@ export async function postProblems(
           createdImages.toSorted((a, b) => a.index - b.index),
         );
 
-        const createdProblemSet = await pm.problemSet.create({
-          data: {
-            name: setName,
-            user: {
-              connect: {
-                email: userEmail,
-              },
-            },
-            problems: {
-              create: problems.map((problem, index) => {
-                if (!problem) throw new Error("문제가 null입니다!");
+        const userUuId = await getUserUUIDbyEmail(
+          userEmail,
+          drizzleTransaction,
+        );
 
-                return {
-                  questionType: problem.type,
-                  question: problem.question,
-                  candidates: problem.candidates ?? undefined,
-                  additionalView: problem.additionalView,
-                  subjectiveAnswer: problem.subAnswer,
-                  isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
-                  order: index + 1,
-                  image: problem.image
-                    ? {
-                        connect: {
-                          uuid:
-                            createdImages.find(
-                              (image) => image?.index === index,
-                            )?.uuid ?? undefined,
-                        },
-                      }
-                    : undefined,
-                  user: {
-                    connect: {
-                      email: userEmail,
-                    },
-                  },
-                };
-              }),
-            },
+        // 문제집 생성
+        const [createdProblemSet] = await drizzleTransaction
+          .insert(problemSet)
+          .values({
+            name: setName,
+            userUuid: userUuId,
             isShareLinkPurposeSet: isShareLinkPurposeSet,
-          },
-          select: {
-            uuid: true,
-          },
-        });
+            updatedAt: new Date(),
+            isPublic: false,
+          })
+          .returning({ uuid: problemSet.uuid });
+
+        if (!createdProblemSet) throw new Error("문제집 생성 중 오류 발생");
+
+        // 문제들 생성
+        await Promise.all(
+          toBePostedProblems.map(async (toBePostedProblem, index) => {
+            if (!toBePostedProblem) throw new Error("문제가 null입니다!");
+
+            return drizzleTransaction.insert(problem).values({
+              order: index + 1,
+              question: toBePostedProblem.question,
+              questionType: toBePostedProblem.type,
+              candidates: toBePostedProblem.candidates ?? undefined,
+              additionalView: toBePostedProblem.additionalView,
+              subjectiveAnswer: toBePostedProblem.subAnswer,
+              isAnswerMultiple: toBePostedProblem.isAnswerMultiple ?? undefined,
+              imageUuid:
+                createdImages.find((image) => image?.index === index)?.uuid ??
+                undefined,
+              userUuid: userUuId,
+              problemSetUuid: createdProblemSet.uuid,
+            });
+          }),
+        );
 
         return createdProblemSet ? "OK" : "FAIL";
-      },
-      {
-        timeout: 20000, // 20초
       },
     );
 
@@ -159,182 +187,165 @@ export async function updateProblems(
 
   try {
     console.log("문제 업데이트 트랜잭션 시작");
-    const result = await prisma.$transaction(
-      async (pm) => {
-        console.log("기존 문제 불러오기 시작");
-        const oldProblems = (
-          await pm.problem.findMany({
-            where: {
-              problemSet: {
-                uuid: problemSetUUID,
-              },
-            },
-            select: {
-              uuid: true,
-              image: true,
-              order: true,
-            },
-          })
-        ).map((problem) => ({
-          uuid: problem.uuid,
-          image: problem.image,
-          order: problem.order,
-        }));
-        console.log(
-          "oldProblems : ",
-          oldProblems.sort((a, b) => a.order - b.order),
-        );
+    const result = await drizzleSession.transaction(async (dt) => {
+      console.log("기존 문제 불러오기 시작");
 
-        const createdImages = await analyzeProblemsImagesAndDoCallback({
-          problems: replacingProblems,
-          flatResult: true,
-          skipDuplicated: true,
-          callback: async ({
-            index,
-            isNoImage,
-            duplicateIndexes,
-            isFirstImage,
-            imageKey,
-            toBeCallbacked,
-          }) => {
-            if (!isNoImage && isFirstImage) {
-              // 이미지가 있으면서 배열 내 처음 이미지인 경우
-              if (imageKey) {
-                const uuid = await createImageOnDBIfNotExistByS3Key(
-                  imageKey,
-                  userEmail,
-                  pm,
-                );
+      const oldProblems = await dt.query.problem.findMany({
+        where: eq(problem.problemSetUuid, problemSetUUID),
+        with: {
+          image: true,
+        },
+        columns: {
+          uuid: true,
+          order: true,
+        },
+      });
 
-                if (duplicateIndexes && duplicateIndexes.length > 0) {
-                  const result = duplicateIndexes.map((i) => {
-                    const imageKey = toBeCallbacked[i].imageKey;
-                    if (!imageKey)
-                      throw new Error("이미지가 올바르지 않습니다.");
-                    return {
-                      index: i,
-                      uuid: uuid,
-                    };
-                  });
-                  return result;
-                }
-                return {
-                  index,
-                  uuid,
-                };
+      console.log(
+        "oldProblems : ",
+        oldProblems.sort((a, b) => a.order - b.order),
+      );
+
+      const createdImages = await analyzeProblemsImagesAndDoCallback({
+        problems: replacingProblems,
+        flatResult: true,
+        skipDuplicated: true,
+        callback: async ({
+          index,
+          isNoImage,
+          duplicateIndexes,
+          isFirstImage,
+          imageKey,
+          toBeCallbacked,
+        }) => {
+          if (!isNoImage && isFirstImage) {
+            // 이미지가 있으면서 배열 내 처음 이미지인 경우
+            if (imageKey) {
+              const uuid = await createImageOnDBIfNotExistByS3Key(
+                imageKey,
+                userEmail,
+                dt,
+              );
+
+              if (duplicateIndexes && duplicateIndexes.length > 0) {
+                const result = duplicateIndexes.map((i) => {
+                  const imageKey = toBeCallbacked[i].imageKey;
+                  if (!imageKey) throw new Error("이미지가 올바르지 않습니다.");
+                  return {
+                    index: i,
+                    uuid: uuid,
+                  };
+                });
+                return result;
               }
+              return {
+                index,
+                uuid,
+              };
             }
+          }
 
-            return {
-              index,
-              uuid: null,
-            };
-          },
-        });
+          return {
+            index,
+            uuid: null,
+          };
+        },
+      });
 
-        console.log(
-          "createdImages :",
-          createdImages.toSorted((a, b) => a.index - b.index),
-        );
+      console.log(
+        "createdImages :",
+        createdImages.toSorted((a, b) => a.index - b.index),
+      );
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
-        const newProblems = await Promise.all(
-          replacingProblems.map(async (problem, index) => {
-            if (!problem) throw new Error("문제가 null입니다!");
+      const newProblems = await Promise.all(
+        replacingProblems.map(async (replacingProblem, index) => {
+          if (!replacingProblem) throw new Error("문제가 null입니다!");
 
-            console.log(`문제 ${index + 1} 생성 시작`);
+          console.log(`문제 ${index + 1} 생성 시작`);
 
-            const result = await pm.problem.create({
-              data: {
-                order: index + 1,
-                question: problem.question,
-                questionType: problem.type,
-                candidates: problem.candidates ?? undefined,
-                additionalView: problem.additionalView,
-                subjectiveAnswer: problem.subAnswer,
-                isAnswerMultiple: problem.isAnswerMultiple ?? undefined,
-                image: problem.image
-                  ? {
-                      connect: {
-                        uuid:
-                          createdImages.find((image) => image?.index === index)
-                            ?.uuid ?? undefined,
-                      },
-                    }
-                  : undefined,
-                user: {
-                  connect: {
-                    email: userEmail,
-                  },
-                },
-                problemSet: {
-                  connect: {
-                    uuid: problemSetUUID,
-                  },
-                },
-              },
-              include: {
-                image: true,
-              },
-            });
-            console.log(`문제 ${index + 1} 생성 완료,`, result);
-            return result;
-          }),
-        );
-        console.log("newProblems : ", newProblems);
+          const [createdProblem] = await dt
+            .insert(problem)
+            .values({
+              order: index + 1,
+              question: replacingProblem.question,
+              questionType: replacingProblem.type,
+              candidates: replacingProblem.candidates ?? undefined,
+              additionalView: replacingProblem.additionalView,
+              subjectiveAnswer: replacingProblem.subAnswer,
+              isAnswerMultiple: replacingProblem.isAnswerMultiple ?? undefined,
+              imageUuid:
+                createdImages.find((image) => image?.index === index)?.uuid ??
+                undefined,
+              userUuid: userUuid,
+              problemSetUuid: problemSetUUID,
+            })
+            .returning({ uuid: problem.uuid });
 
-        console.log(`기존 문제들 삭제 시작`);
+          const result = await dt.query.problem.findFirst({
+            where: eq(problem.uuid, createdProblem.uuid),
+            with: {
+              image: true,
+            },
+          });
 
-        //삭제할 이미지 키 중복 제거
-        const toBeDeletedImageKey = [
-          ...new Set(
-            oldProblems.reduce((acc, cur) => {
-              if (cur.image) acc.push(cur.image.key);
-              return acc;
-            }, [] as string[]),
-          ),
-        ].reduce((acc, cur) => {
-          const newProblemsImageKey = newProblems.reduce((acc, cur) => {
+          if (!result) {
+            throw new Error("문제를 생성하는 중 오류가 발생했습니다.");
+          }
+
+          console.log(`문제 ${index + 1} 생성 완료`);
+          return result;
+        }),
+      );
+
+      console.log("newProblems : ", newProblems);
+
+      console.log(`기존 문제들 삭제 시작`);
+
+      //삭제할 이미지 키 중복 제거
+      const toBeDeletedImageKey = [
+        ...new Set(
+          oldProblems.reduce((acc, cur) => {
             if (cur.image) acc.push(cur.image.key);
             return acc;
-          }, [] as string[]);
-
-          if (!newProblemsImageKey.includes(cur)) acc.push(cur);
+          }, [] as string[]),
+        ),
+      ].reduce((acc, cur) => {
+        const newProblemsImageKey = newProblems.reduce((acc, cur) => {
+          if (cur.image) acc.push(cur.image.key);
           return acc;
         }, [] as string[]);
 
-        console.log("toBeDeletedImageKey : ", toBeDeletedImageKey);
+        if (!newProblemsImageKey.includes(cur)) acc.push(cur);
+        return acc;
+      }, [] as string[]);
 
-        if (toBeDeletedImageKey.length > 0) {
-          await deleteImagesFromSet(toBeDeletedImageKey, userEmail, 1, pm);
-        }
+      console.log("toBeDeletedImageKey : ", toBeDeletedImageKey);
 
-        if (oldProblems.length > 0) {
-          console.log(`기존 문제들 삭제 시작`, oldProblems);
-          const result = await pm.problemSet.update({
-            where: {
-              uuid: problemSetUUID,
-            },
-            data: {
-              name: setName,
-              problems: {
-                deleteMany: {
-                  uuid: {
-                    in: oldProblems.map((problem) => problem.uuid),
-                  },
-                },
-              },
-            },
-          });
-          if (!result) throw new Error("문제 업데이트 중 오류 발생");
-        }
+      if (toBeDeletedImageKey.length > 0) {
+        await deleteImagesFromSet(toBeDeletedImageKey, userEmail, 1, dt);
+      }
 
-        console.log("기존 문제 삭제 완료");
-        return true;
-      },
-      {
-        timeout: 20000, // 20초
-      },
-    );
+      // 문제집 이름 업데이트
+      await dt
+        .update(problemSet)
+        .set({ name: setName })
+        .where(eq(problemSet.uuid, problemSetUUID));
+
+      if (oldProblems.length > 0) {
+        console.log(`기존 문제들 삭제 시작`, oldProblems);
+
+        // 기존 문제 삭제
+        await Promise.all(
+          oldProblems.map(async (oldProblem) => {
+            await dt.delete(problem).where(eq(problem.uuid, oldProblem.uuid));
+          }),
+        );
+      }
+
+      console.log("기존 문제 삭제 완료");
+      return true;
+    });
 
     return result;
   } catch (err) {
@@ -346,58 +357,53 @@ export async function updateProblems(
 export async function createImageOnDBIfNotExistByS3Key(
   imageKey: string,
   userEmail: string,
-  pm: PrismaTransaction,
+  dt: DrizzleTransaction,
 ) {
   console.log("createImageIfNotExist 함수 시작");
-  const prismaInstance = pm;
 
   try {
     if (imageKey) {
-      const imageUuid = await getImageUuidOnDBByImageKey(
-        imageKey,
-        prismaInstance,
-      );
-
+      const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
       if (imageUuid) {
-        await prismaInstance.image.update({
-          where: {
-            key: imageKey,
-          },
-          data: {
-            users: {
-              connect: {
-                email: userEmail,
-              },
-            },
-          },
-        });
+        await dt
+          .update(imageToUser)
+          .set({ imageUuid: imageUuid, userUuid: userUuid })
+          .where(eq(imageToUser.imageUuid, imageUuid));
 
         return imageUuid;
       } else {
         const file = await getImageFileOnS3ByImageKey(imageKey);
         const hash = await generateFileHash(file);
 
-        const result = await prismaInstance.image.upsert({
-          where: {
-            key: imageKey,
-          },
-          create: {
+        const images = await dt
+          .insert(image)
+          .values({
             filename: extractFileName(imageKey),
             hash: hash,
             url: `https://${process.env.AWS_CLOUDFRONT_DOMAIN}/${encodeURIComponent(imageKey)}`,
             key: imageKey,
-            users: {
-              connect: {
-                email: userEmail,
-              },
-            },
-          },
-          update: {},
-          select: {
-            uuid: true,
-          },
-        });
-        return result.uuid;
+          })
+          .returning({ uuid: image.uuid })
+          .onConflictDoNothing();
+
+        if (images.length > 0) {
+          // insert가 성공한 경우
+          const imageUuid = images[0].uuid;
+
+          await dt.insert(imageToUser).values({
+            imageUuid: imageUuid,
+            userUuid: userUuid,
+          });
+
+          return imageUuid;
+        } else {
+          // insert를 시도했지만 이미지가 이미 존재하는 경우
+
+          const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
+          if (!imageUuid) throw new Error("이미지를 찾을 수 없습니다.");
+          return imageUuid;
+        }
       }
     } else {
       throw new Error("이미지가 올바르지 않습니다.");
@@ -412,16 +418,19 @@ export async function createImageOnDBIfNotExistByS3Key(
 
 export async function checkProblemSetName(name: string, userEmail: string) {
   try {
-    const result = await prisma.problemSet.findMany({
-      where: {
-        name: name,
-        user: {
-          email: userEmail,
-        },
-      },
+    const result = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+      const result = await drizzleSession.query.problemSet.findFirst({
+        where: and(
+          eq(problemSet.name, name),
+          eq(problemSet.userUuid, userUuid),
+        ),
+      });
+
+      return result ? true : false;
     });
 
-    return result.length > 0 ? true : false;
+    return result;
   } catch (err) {
     console.log(err);
     throw new Error("문제집 이름을 확인하는 중 오류가 발생했습니다.");
@@ -430,14 +439,12 @@ export async function checkProblemSetName(name: string, userEmail: string) {
 
 export async function checkIfImageExistsOnDBByImageKey(
   imageKey: string,
-  pm?: PrismaTransaction,
+  dt?: DrizzleTransaction,
 ) {
-  const prismaInstance = pm ?? prisma;
+  const drizzle = dt ?? drizzleSession;
   try {
-    const result = await prismaInstance.image.findFirst({
-      where: {
-        key: imageKey,
-      },
+    const result = await drizzle.query.image.findFirst({
+      where: eq(image.key, imageKey),
     });
 
     return result ? true : false;
@@ -449,7 +456,7 @@ export async function checkIfImageExistsOnDBByImageKey(
 
 export async function checkIfImageExistsOnS3ByImageKey(imageKey: string) {
   try {
-    const result = await s3Client.send(
+    await s3Client.send(
       new HeadObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: imageKey,
@@ -467,56 +474,51 @@ export async function getProblemSets(
   pageSize: string,
 ) {
   try {
-    const [totalProblemSetsCount, problemSets] = await Promise.all([
-      prisma.problemSet.count({
-        where: {
-          user: {
-            email: userEmail,
-          },
-        },
-      }),
-      prisma.problemSet.findMany({
-        where: {
-          user: {
-            email: userEmail,
-          },
-        },
-        skip: (parseInt(page) - 1) * parseInt(pageSize),
-        take: parseInt(pageSize),
-        include: {
-          problems: {
-            orderBy: {
-              order: "asc",
-            },
-            include: {
-              image: true,
-            },
-          },
-        },
-        orderBy: {
-          updatedAt: "desc",
-        },
-      }),
-    ]);
+    const data = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
-    const returnData: ProblemSetWithPagination = {
-      data: problemSets.map((problemSet) => ({
-        uuid: problemSet.uuid,
-        name: problemSet.name,
-        createdAt: problemSet.createdAt,
-        updatedAt: problemSet.updatedAt,
-        isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
-        examProblemsCount: problemSet.problems.length,
-      })),
-      pagination: {
-        page: parseInt(page),
-        pageSize: parseInt(pageSize),
-        pageCount: Math.ceil(totalProblemSetsCount / parseInt(pageSize)),
-        total: problemSets.length,
-      },
-    };
+      const [[{ value: totalProblemSetsCount }], problemSets] =
+        await Promise.all([
+          drizzleSession
+            .select({ value: count() })
+            .from(problemSet)
+            .where(eq(problemSet.userUuid, userUuid)),
+          dt.query.problemSet.findMany({
+            where: eq(problemSet.userUuid, userUuid),
+            offset: (parseInt(page) - 1) * parseInt(pageSize),
+            limit: parseInt(pageSize),
+            orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
+            with: {
+              problems: {
+                orderBy: (problem, { asc }) => [asc(problem.order)],
+                with: {
+                  image: true,
+                },
+              },
+            },
+          }),
+        ]);
 
-    return returnData;
+      const returnData: ProblemSetWithPagination = {
+        data: problemSets.map((problemSet) => ({
+          uuid: problemSet.uuid,
+          name: problemSet.name,
+          createdAt: problemSet.createdAt,
+          updatedAt: problemSet.updatedAt,
+          isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
+          examProblemsCount: problemSet.problems.length,
+        })),
+        pagination: {
+          page: parseInt(page),
+          pageSize: parseInt(pageSize),
+          pageCount: Math.ceil(totalProblemSetsCount / parseInt(pageSize)),
+          total: problemSets.length,
+        },
+      };
+
+      return returnData;
+    });
+    return data;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
@@ -530,47 +532,49 @@ export async function getProblemSetsByName(
   pageSize: string,
 ) {
   try {
-    const problemSets = await prisma.problemSet.findMany({
-      where: {
-        name: {
-          contains: name,
-        },
-        user: {
-          email: userEmail,
-        },
-      },
-      skip: (parseInt(page) - 1) * parseInt(pageSize),
-      take: parseInt(pageSize),
-      include: {
-        problems: {
-          include: {
-            image: true,
+    const data = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+
+      const problemSets = await dt.query.problemSet.findMany({
+        where: (problemSet, { like, and, eq }) =>
+          and(
+            like(problemSet.name, `%${name}%`),
+            eq(problemSet.userUuid, userUuid),
+          ),
+        offset: (parseInt(page) - 1) * parseInt(pageSize),
+        limit: parseInt(pageSize),
+        orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
+        with: {
+          problems: {
+            orderBy: (problem, { asc }) => [asc(problem.order)],
+            with: {
+              image: true,
+            },
           },
         },
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
+      });
+
+      const returnData: ProblemSetWithPagination = {
+        data: problemSets.map((problemSet) => ({
+          uuid: problemSet.uuid,
+          name: problemSet.name,
+          createdAt: problemSet.createdAt,
+          updatedAt: problemSet.updatedAt,
+          isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
+          examProblemsCount: problemSet.problems.length,
+        })),
+        pagination: {
+          page: parseInt(page),
+          pageSize: parseInt(pageSize),
+          pageCount: Math.ceil(problemSets.length / parseInt(pageSize)),
+          total: problemSets.length,
+        },
+      };
+
+      return returnData;
     });
 
-    const returnData: ProblemSetWithPagination = {
-      data: problemSets.map((problemSet) => ({
-        uuid: problemSet.uuid,
-        name: problemSet.name,
-        createdAt: problemSet.createdAt,
-        updatedAt: problemSet.updatedAt,
-        isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
-        examProblemsCount: problemSet.problems.length,
-      })),
-      pagination: {
-        page: parseInt(page),
-        pageSize: parseInt(pageSize),
-        pageCount: Math.ceil(problemSets.length / parseInt(pageSize)),
-        total: problemSets.length,
-      },
-    };
-
-    return returnData;
+    return data;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
@@ -581,69 +585,68 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
   // filter 조건에 userEmail을 추가해서 해당 유저의 문제집만 가져오도록 했음
 
   try {
-    const problemSet = await prisma.problemSet.findFirst({
-      where: {
-        uuid: uuid,
-        user: {
-          email: userEmail,
-        },
-      },
-      include: {
-        problems: {
-          orderBy: {
-            order: "asc",
-          },
-          include: {
-            image: true,
+    const data = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+
+      const foundProblemSet = await dt.query.problemSet.findFirst({
+        where: (problemSet, { eq, and }) =>
+          and(eq(problemSet.uuid, uuid), eq(problemSet.userUuid, userUuid)),
+        with: {
+          problems: {
+            orderBy: (problem, { asc }) => [asc(problem.order)],
+            with: {
+              image: true,
+            },
           },
         },
-      },
+      });
+
+      if (!foundProblemSet) throw new Error("문제집을 찾을 수 없습니다.");
+
+      const returnData = {
+        uuid: foundProblemSet.uuid,
+        name: foundProblemSet.name,
+        createdAt: foundProblemSet.createdAt,
+        updatedAt: foundProblemSet.updatedAt,
+        isShareLinkPurposeSet: foundProblemSet.isShareLinkPurposeSet,
+        problems: foundProblemSet.problems.map((problem) => ({
+          uuid: problem.uuid,
+          question: problem.question,
+          additionalView: problem.additionalView ?? "",
+          candidates: problem.candidates as Candidate[],
+          image: problem.image,
+          isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
+          isAnswerMultiple: problem.isAnswerMultiple,
+          isImageButtonClicked: problem.image ? true : false,
+          subjectiveAnswer: problem.subjectiveAnswer,
+          subAnswer: problem.subjectiveAnswer,
+          type: problem.questionType as "obj" | "sub",
+        })),
+      };
+
+      return returnData;
     });
 
-    if (!problemSet) {
-      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
-    }
-
-    const returnData = {
-      uuid: problemSet.uuid,
-      name: problemSet.name,
-      createdAt: problemSet.createdAt,
-      updatedAt: problemSet.updatedAt,
-      isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
-      problems: problemSet.problems.map((problem) => ({
-        uuid: problem.uuid,
-        question: problem.question,
-        additionalView: problem.additionalView ?? "",
-        candidates: problem.candidates as Candidate[],
-        image: problem.image,
-        isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
-        isAnswerMultiple: problem.isAnswerMultiple,
-        isImageButtonClicked: problem.image ? true : false,
-        subjectiveAnswer: problem.subjectiveAnswer,
-        subAnswer: problem.subjectiveAnswer,
-        type: problem.questionType as "obj" | "sub",
-      })),
-    };
-
-    return returnData;
+    return data;
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
 
-async function getImageUuidOnDBByImageKey(
+export async function getImageUuidOnDBByImageKey(
   imageKey: string,
-  pm?: PrismaTransaction,
+  dt: DrizzleTransaction,
 ) {
   try {
-    const prismaInstance = pm ?? prisma;
-    const result = await prismaInstance.image.findFirst({
-      where: {
-        key: imageKey,
+    const drizzle = dt ?? drizzleSession;
+
+    const result = await drizzle.query.image.findFirst({
+      where: eq(image.key, imageKey),
+      columns: {
+        uuid: true,
       },
     });
-
     return result ? result.uuid : null;
   } catch (err) {
     console.error("오류 발생:", err);
@@ -689,16 +692,19 @@ export async function checkUserPermissionForProblemSet(
   userEmail: string,
 ) {
   try {
-    const result = await prisma.problemSet.findFirst({
-      where: {
-        uuid: problemSetUUID,
-        user: {
-          email: userEmail,
-        },
-      },
+    const result = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+      const result = await drizzleSession.query.problemSet.findFirst({
+        where: and(
+          eq(problemSet.uuid, problemSetUUID),
+          eq(problemSet.userUuid, userUuid),
+        ),
+      });
+
+      return result ? "OK" : "NO";
     });
 
-    return result ? "OK" : "NO";
+    return result;
   } catch (err) {
     console.log(err);
     throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
@@ -707,15 +713,13 @@ export async function checkUserPermissionForProblemSet(
 
 export async function getAnswerByProblemUuid(
   problemUuid: string,
-  pm?: PrismaTransaction,
+  dt?: DrizzleTransaction,
 ) {
-  const prismaInstance = pm ?? prisma;
+  const drizzle = dt ?? drizzleSession;
   try {
-    const problem = await prismaInstance.problem.findFirst({
-      where: {
-        uuid: problemUuid,
-      },
-      select: {
+    const problem = await drizzle.query.problem.findFirst({
+      where: (problem, { eq }) => eq(problem.uuid, problemUuid),
+      columns: {
         questionType: true,
         candidates: true,
         subjectiveAnswer: true,
@@ -824,25 +828,18 @@ export async function postProblemResult(
   result: boolean,
   answer: string | (number | null)[],
   userUuid: string,
-  pm: PrismaTransaction,
+  dt: DrizzleTransaction,
 ) {
   if (!problem || !problem.uuid) throw new Error("something is null");
 
   try {
-    const problemResult = await pm.problemResult.create({
-      data: {
+    const createdProblemResult = await dt
+      .insert(problemResult)
+      .values({
         order: order,
-        result: {
-          connect: {
-            uuid: resultsUuid,
-          },
-        },
+        resultUuid: resultsUuid,
         isCorrect: result,
-        user: {
-          connect: {
-            uuid: userUuid,
-          },
-        },
+        userUuId: userUuid,
         candidates: problem.candidates
           ? problem.candidates.map((candidate) => ({
               id: candidate.id,
@@ -888,20 +885,14 @@ export async function postProblemResult(
               })
           : undefined,
         correctSubjectiveAnswer: isAnswerString(answer) ? answer : null,
-        image: isImageUrlObject(problem.image)
-          ? {
-              connect: {
-                uuid: problem.image.uuid,
-              },
-            }
+        imageUuid: isImageUrlObject(problem.image)
+          ? problem.image.uuid
           : undefined,
-      },
-      select: {
-        uuid: true,
-      },
-    });
+        updatedAt: new Date(),
+      })
+      .returning({ uuid: problemResult.uuid });
 
-    if (!problemResult)
+    if (!createdProblemResult)
       throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
   } catch (err) {
     console.log(err);
@@ -909,26 +900,30 @@ export async function postProblemResult(
   }
 }
 
-export async function getExamResultsByUUID(uuid: string, userEmail: string) {
+export async function getExamResultsByUUID(
+  resultUuid: string,
+  userEmail: string,
+) {
   try {
-    const result = await prisma.result.findFirst({
-      where: {
-        uuid: uuid,
-        user: {
-          email: userEmail,
-        },
-      },
-      include: {
-        problem_results: {
-          orderBy: {
-            order: "asc",
-          },
-          include: {
-            image: true,
+    const result = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+
+      const result = await dt.query.result.findFirst({
+        where: (result, { eq, and }) =>
+          and(eq(result.uuid, resultUuid), eq(result.userUuid, userUuid)),
+        with: {
+          problemResults: {
+            orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
+            with: {
+              image: true,
+            },
           },
         },
-      },
+      });
+
+      return result;
     });
+
     if (!result)
       throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
 
@@ -943,44 +938,38 @@ export async function getExamResults(
   userEmail: string,
   page: string,
   pageSize: string,
+  dt: DrizzleTransaction,
 ) {
   try {
-    const [totalExamResultsCount, examResults] = await Promise.all([
-      prisma.result.count({
-        where: {
-          user: {
-            email: userEmail,
-          },
-        },
-      }),
-      prisma.result.findMany({
-        where: {
-          user: {
-            email: userEmail,
-          },
-        },
-        skip: (parseInt(page) - 1) * parseInt(pageSize),
-        take: parseInt(pageSize),
-        include: {
-          problem_results: {
-            orderBy: {
-              order: "asc",
-            },
-            include: {
-              image: true,
-            },
-          },
-        },
-        orderBy: {
-          updatedAt: "desc",
-        },
-      }),
-    ]);
+    const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
-    const result: ResultsWithPagination = {
+    const [[{ value: totalExamResultsCount }], examResults] = await Promise.all(
+      [
+        dt
+          .select({ value: count() })
+          .from(result)
+          .where(eq(result.userUuid, userUuid)),
+        dt.query.result.findMany({
+          where: eq(result.userUuid, userUuid),
+          offset: (parseInt(page) - 1) * parseInt(pageSize),
+          limit: parseInt(pageSize),
+          orderBy: (result, { desc }) => [desc(result.updatedAt)],
+          with: {
+            problemResults: {
+              orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
+              with: {
+                image: true,
+              },
+            },
+          },
+        }),
+      ],
+    );
+
+    const finalResult: ResultsWithPagination = {
       data: examResults.map((examResult) => ({
         uuid: examResult.uuid,
-        problemResultsCount: examResult.problem_results.length,
+        problemResultsCount: examResult.problemResults.length,
         problemSetName: examResult.problemSetName,
         createdAt: examResult.createdAt,
         updatedAt: examResult.updatedAt,
@@ -993,7 +982,7 @@ export async function getExamResults(
       },
     };
 
-    return result;
+    return finalResult;
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
@@ -1007,61 +996,59 @@ export async function getExamResultsByName(
   pageSize: string,
 ) {
   try {
-    const [totalExamResultsCount, examResults] = await Promise.all([
-      prisma.result.count({
-        where: {
-          user: {
-            email: userEmail,
-          },
-          problemSetName: {
-            contains: name,
-          },
-        },
-      }),
-      prisma.result.findMany({
-        where: {
-          user: {
-            email: userEmail,
-          },
-          problemSetName: {
-            contains: name,
-          },
-        },
-        skip: (parseInt(page) - 1) * parseInt(pageSize),
-        take: parseInt(pageSize),
-        include: {
-          problem_results: {
-            orderBy: {
-              order: "asc",
+    const transactionResult = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+      const [[{ value: totalExamResultsCount }], examResults] =
+        await Promise.all([
+          dt
+            .select({ value: count() })
+            .from(result)
+            .where(
+              and(
+                eq(result.userUuid, userUuid),
+                like(result.problemSetName, `%${name}%`),
+              ),
+            ),
+          dt.query.result.findMany({
+            where: (result, { and, like }) =>
+              and(
+                like(result.problemSetName, `%${name}%`),
+                eq(result.userUuid, userUuid),
+              ),
+            offset: (parseInt(page) - 1) * parseInt(pageSize),
+            limit: parseInt(pageSize),
+            orderBy: (result, { desc }) => [desc(result.updatedAt)],
+            with: {
+              problemResults: {
+                orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
+                with: {
+                  image: true,
+                },
+              },
             },
-            include: {
-              image: true,
-            },
-          },
-        },
-        orderBy: {
-          updatedAt: "desc",
-        },
-      }),
-    ]);
+          }),
+        ]);
 
-    const result: ResultsWithPagination = {
-      data: examResults.map((examResult) => ({
-        uuid: examResult.uuid,
-        problemResultsCount: examResult.problem_results.length,
-        problemSetName: examResult.problemSetName,
-        createdAt: examResult.createdAt,
-        updatedAt: examResult.updatedAt,
-      })),
-      pagination: {
-        page: parseInt(page),
-        pageSize: parseInt(pageSize),
-        pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
-        total: examResults.length,
-      },
-    };
+      const finalResult: ResultsWithPagination = {
+        data: examResults.map((examResult) => ({
+          uuid: examResult.uuid,
+          problemResultsCount: examResult.problemResults.length,
+          problemSetName: examResult.problemSetName,
+          createdAt: examResult.createdAt,
+          updatedAt: examResult.updatedAt,
+        })),
+        pagination: {
+          page: parseInt(page),
+          pageSize: parseInt(pageSize),
+          pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
+          total: examResults.length,
+        },
+      };
 
-    return result;
+      return finalResult;
+    });
+
+    return transactionResult;
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
@@ -1072,11 +1059,12 @@ export async function deleteImagesFromSet(
   images: string[],
   userEmail: string,
   deleteSetCount: number,
-  pm: PrismaTransaction,
+  dt: DrizzleTransaction,
 ) {
   let problemFileImages: ({ imageFile: File; imageKey: string } | null)[] = [];
-  const prismaInstance = pm;
   const s3 = s3Client;
+  const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+
   console.log("[deleteImagesFromSet] 이미지 삭제 시작");
 
   try {
@@ -1099,7 +1087,7 @@ export async function deleteImagesFromSet(
         if (imageKey) {
           const totalReference = await getReferecesOfImageByImageKey(
             imageKey,
-            prismaInstance,
+            dt,
           );
 
           console.log(
@@ -1107,10 +1095,7 @@ export async function deleteImagesFromSet(
             totalReference,
           );
 
-          const imageUuid = await getImageUuidOnDBByImageKey(
-            imageKey,
-            prismaInstance,
-          );
+          const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
 
           if (!imageUuid)
             throw new Error("이미지 uuid를 찾는 중 오류가 발생했습니다.");
@@ -1152,11 +1137,8 @@ export async function deleteImagesFromSet(
               `[deleteImagesFromSet] 이미지 ${imageKey} s3에서 삭제 성공`,
             );
 
-            await prismaInstance.image.delete({
-              where: {
-                uuid: imageUuid,
-              },
-            });
+            await dt.delete(image).where(eq(image.uuid, imageUuid));
+
             console.log(
               `[deleteImagesFromSet] 이미지 ${imageKey} image 테이블에서 삭제 성공`,
             );
@@ -1174,18 +1156,15 @@ export async function deleteImagesFromSet(
             console.log(
               `[deleteImagesFromSet] user테이블에서 image ${imageKey}연결 해제 시작`,
             );
-            await prismaInstance.user.update({
-              where: {
-                email: userEmail,
-              },
-              data: {
-                images: {
-                  disconnect: {
-                    uuid: imageUuid,
-                  },
-                },
-              },
-            });
+
+            await dt
+              .delete(imageToUser)
+              .where(
+                and(
+                  eq(imageToUser.imageUuid, imageUuid),
+                  eq(imageToUser.userUuid, userUuid),
+                ),
+              );
 
             console.log(
               `[deleteImagesFromSet] user테이블에서 image ${imageKey}연결 해제 성공`,
@@ -1242,25 +1221,25 @@ export async function deleteProblemSets(
 ) {
   console.log("[deleteProblemSets] 함수 시작");
   try {
-    const result = await prisma.$transaction(async (pm) => {
+    const result = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
       // 문제집 안의 문제들 찾기
-      const allProblemsSet = await pm.problemSet.findMany({
-        where: {
-          uuid: {
-            in: problemSetUUIDs,
-          },
-          user: {
-            email: userEmail,
-          },
-        },
-        select: {
+
+      const allProblemsSet = await dt.query.problemSet.findMany({
+        where: (problemSet, { inArray, and }) =>
+          and(
+            inArray(problemSet.uuid, problemSetUUIDs),
+            eq(problemSet.userUuid, userUuid),
+          ),
+        with: {
           problems: {
-            select: {
+            with: {
               image: true,
             },
           },
         },
       });
+
       if (allProblemsSet.length === 0)
         throw new Error("문제집들을 찾는 중 오류가 발생했습니다.");
 
@@ -1290,20 +1269,19 @@ export async function deleteProblemSets(
           toBeDeletedImage.imageKeys,
           userEmail,
           toBeDeletedImage.problemSetCount,
-          pm,
+          dt,
         );
       }
 
-      await pm.problemSet.deleteMany({
-        where: {
-          uuid: {
-            in: problemSetUUIDs,
-          },
-          user: {
-            email: userEmail,
-          },
-        },
-      });
+      await dt
+        .delete(problemSet)
+        .where(
+          and(
+            inArray(problemSet.uuid, problemSetUUIDs),
+            eq(problemSet.userUuid, userUuid),
+          ),
+        );
+
       console.log(`[deleteProblemSets] 문제집 ${problemSetUUIDs} 삭제 성공`);
       return true;
     });
@@ -1319,20 +1297,14 @@ export async function deleteProblemResults(
   userEmail: string,
 ) {
   try {
-    const result = await prisma.$transaction(async (pm) => {
-      const AllResults = await pm.result.findMany({
-        where: {
-          uuid: {
-            in: resultUUIDs,
-          },
-
-          user: {
-            email: userEmail,
-          },
-        },
-        select: {
-          problem_results: {
-            select: {
+    const transactionResult = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+      const AllResults = await dt.query.result.findMany({
+        where: (result, { inArray, and }) =>
+          and(inArray(result.uuid, resultUUIDs), eq(result.userUuid, userUuid)),
+        with: {
+          problemResults: {
+            with: {
               image: true,
             },
           },
@@ -1349,7 +1321,7 @@ export async function deleteProblemResults(
         imageKeys: [
           ...new Set(
             AllResults.reduce((acc, cur) => {
-              const imageKeys = cur.problem_results.reduce((acc, cur) => {
+              const imageKeys = cur.problemResults.reduce((acc, cur) => {
                 if (cur.image) {
                   acc.push(cur.image.key);
                 }
@@ -1371,22 +1343,20 @@ export async function deleteProblemResults(
           toBeDeletedImage.imageKeys,
           userEmail,
           toBeDeletedImage.resultsCount,
-          pm,
+          dt,
         );
       }
 
-      await pm.result.deleteMany({
-        where: {
-          uuid: {
-            in: resultUUIDs,
-          },
-        },
-      });
+      await dt
+        .delete(result)
+        .where(
+          and(inArray(result.uuid, resultUUIDs), eq(result.userUuid, userUuid)),
+        );
       console.log(`[deleteProblemResults] 시험 결과 ${resultUUIDs} 삭제 성공`);
       return true;
     });
 
-    return result;
+    return transactionResult;
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과를 삭제하는 중 오류가 발생했습니다.");
@@ -1428,28 +1398,25 @@ export async function validateExamProblem(
 
 export async function getTotalReferencesOfImageByImageUuid(
   imageUuid: string,
-  pm?: PrismaTransaction,
+  dt: DrizzleTransaction,
 ) {
-  const prismaInstance = pm ?? prisma;
   try {
-    const result = await prismaInstance.image.findFirst({
-      where: {
-        uuid: imageUuid,
-      },
-      select: {
+    const result = await dt.query.image.findFirst({
+      where: eq(image.uuid, imageUuid),
+      with: {
         problems: {
-          select: {
+          with: {
             problemSet: {
-              select: {
+              columns: {
                 uuid: true,
               },
             },
           },
         },
-        problem_results: {
-          select: {
+        problemResults: {
+          with: {
             result: {
-              select: {
+              columns: {
                 uuid: true,
               },
             },
@@ -1468,7 +1435,7 @@ export async function getTotalReferencesOfImageByImageUuid(
       return acc;
     }, [] as string[]).length;
 
-    const problemResultsCount = result.problem_results.reduce((acc, cur) => {
+    const problemResultsCount = result.problemResults.reduce((acc, cur) => {
       if (!acc.includes(cur.result.uuid)) {
         acc.push(cur.result.uuid);
       }
@@ -1486,37 +1453,38 @@ export async function getTotalReferencesOfImageByImageUuid(
 
 export async function getReferecesOfImageByImageKey(
   imageKey: string,
-  pm: PrismaTransaction,
+  dt: DrizzleTransaction,
 ) {
-  const prismaInstance = pm ?? prisma;
   try {
-    const users = await prismaInstance.user.findMany({
-      where: {
+    const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
+    if (!imageUuid)
+      throw new Error("이미지 uuid를 찾는 중 오류가 발생했습니다.");
+
+    const users = await dt.query.user.findMany({
+      with: {
         images: {
-          some: {
-            key: imageKey,
+          where: (image, { eq }) => eq(image.imageUuid, imageUuid),
+        },
+        problems: {
+          with: {
+            problemSet: {
+              columns: {
+                uuid: true,
+              },
+            },
+          },
+        },
+        problemResults: {
+          with: {
+            result: {
+              columns: {
+                uuid: true,
+              },
+            },
           },
         },
       },
-      select: {
-        problems: {
-          select: {
-            problemSet: {
-              select: {
-                uuid: true,
-              },
-            },
-          },
-        },
-        problem_results: {
-          select: {
-            result: {
-              select: {
-                uuid: true,
-              },
-            },
-          },
-        },
+      columns: {
         uuid: true,
         email: true,
       },
@@ -1534,7 +1502,7 @@ export async function getReferecesOfImageByImageKey(
           return acc;
         }, [] as string[]).length;
 
-        const problemResultsCount = user.problem_results.reduce((acc, cur) => {
+        const problemResultsCount = user.problemResults.reduce((acc, cur) => {
           if (!acc.includes(cur.result.uuid)) {
             acc.push(cur.result.uuid);
           }
@@ -1594,8 +1562,8 @@ export async function evaluateProblems(
   userEmail: string,
 ) {
   try {
-    const result = await prisma.$transaction(async (pm) => {
-      const { uuid: userUuid } = await getUserByEmail(userEmail, pm);
+    const transactionResult = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
       const validateResult = problemsSchema.safeParse(examProblems);
 
@@ -1603,16 +1571,14 @@ export async function evaluateProblems(
         throw new Error("인수로 전달된 문제들이 유효하지 않습니다.");
       }
 
-      const { uuid: resultsUuid } = await pm.result.create({
-        data: {
+      const [{ uuid: resultsUuid }] = await dt
+        .insert(result)
+        .values({
           problemSetName,
-          user: {
-            connect: {
-              uuid: userUuid,
-            },
-          },
-        },
-      });
+          userUuid,
+          updatedAt: new Date(),
+        })
+        .returning({ uuid: result.uuid });
 
       await Promise.all(
         examProblems.map(async (problem, index) => {
@@ -1636,7 +1602,7 @@ export async function evaluateProblems(
             throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
           }
 
-          const answer = await getAnswerByProblemUuid(problem.uuid, pm);
+          const answer = await getAnswerByProblemUuid(problem.uuid, dt);
 
           if (!answer) {
             throw new Error("result is null");
@@ -1651,7 +1617,7 @@ export async function evaluateProblems(
             evaluationResult,
             answer,
             userUuid,
-            pm,
+            dt,
           );
         }),
       );
@@ -1659,7 +1625,7 @@ export async function evaluateProblems(
       return resultsUuid;
     });
 
-    return result;
+    return transactionResult;
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(err.message);

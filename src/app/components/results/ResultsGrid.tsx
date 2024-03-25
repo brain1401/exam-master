@@ -1,7 +1,10 @@
 "use client";
 import ResultsCard from "./ResultsCard";
 import usePagenationState from "@/hooks/usePagenationState";
-import { ExamResultsWithCountResponse, ResultsWithPagination } from "@/types/problems";
+import {
+  ExamResultsWithCountResponse,
+  ResultsWithPagination,
+} from "@/types/problems";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import CustomLoading from "../ui/CustomLoading";
@@ -50,7 +53,13 @@ export default function ResultsGrid({
   }, [results]);
 
   const MainContent = () => {
-    if (results?.data.length === 0 && !isSearching) {
+    if (error) {
+      return (
+        <p className="mt-10 text-center text-xl font-semibold">
+          에러가 발생했습니다!
+        </p>
+      );
+    } else if (results?.data.length === 0 && !isSearching) {
       return (
         <p className="mt-10 text-center text-xl font-semibold">
           아직 시험을 치루지 않았습니다!

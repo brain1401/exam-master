@@ -36,6 +36,7 @@ jobs:
           ENV_GOOGLE_API: ${{ secrets.GOOGLE_API }}
           ENV_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           ENV_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          ENV_TZ: ${{ secrets.TZ }}
 
       - name: create .sentryclirc
         run: |

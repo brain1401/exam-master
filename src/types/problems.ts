@@ -1,7 +1,5 @@
-import { Nullable, Prettify } from "@/utils/type";
-import { PresignedPost } from "@aws-sdk/s3-presigned-post";
-import type { Prisma, PrismaClient } from "@prisma/client";
-import type { DefaultArgs } from "@prisma/client/runtime/library";
+import { Prettify } from "@/utils/type";
+import type drizzleSession from "@/db/drizzle";
 import { z } from "zod";
 
 export const ImageSchema = z.object({
@@ -211,12 +209,9 @@ export const ExamResultsSchema = z.array(ExamResultSchema);
 
 export type ExamResults = z.infer<typeof ExamResultsSchema>;
 
-export type PrismaTransaction = Prettify<
-  Omit<
-    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
-  >
->;
+type TransactionCallback = Parameters<typeof drizzleSession.transaction>[0];
+
+export type DrizzleTransaction = Parameters<TransactionCallback>[0];
 
 export type PresignedPostAlreadyExistsCallback<T> = (
   key: string,
