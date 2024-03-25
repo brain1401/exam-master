@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   if (!session || !session?.user?.email) {
     return NextResponse.json(
       { error: "로그인이 필요합니다." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -16,6 +16,14 @@ export async function GET(req: NextRequest) {
   const page = param.get("page");
   const pageSize = param.get("pageSize");
 
-  const data = await getProblemSets(session?.user?.email, page || "1", pageSize || "10");
-  return NextResponse.json(data);
+  try {
+    const data = await getProblemSets(
+      session?.user?.email,
+      page || "1",
+      pageSize || "10",
+    );
+    return NextResponse.json(data);
+  } catch (e) {
+    console.log(e);
+  }
 }
