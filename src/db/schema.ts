@@ -156,6 +156,7 @@ export const likedProblemSets = pgTable(
   "_LikedProblemSets",
   {
     uuid: uuid("uuid")
+      .primaryKey()
       .default(sql`uuid_generate_v4()`)
       .notNull(),
     problemSetUuid: uuid("problemSetUuid")
@@ -338,6 +339,7 @@ export const imageToUser = pgTable(
   "_ImageToUser",
   {
     uuid: uuid("uuid")
+      .primaryKey()
       .default(sql`uuid_generate_v4()`)
       .notNull(),
     imageUuid: uuid("imageUuid")
