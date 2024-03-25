@@ -71,104 +71,108 @@ export async function postProblems(
   isShareLinkPurposeSet: boolean,
 ) {
   try {
-    const result = await drizzleSession.transaction(
-      async (drizzleTransaction) => {
-        const createdImages = await analyzeProblemsImagesAndDoCallback({
-          problems: toBePostedProblems,
-          flatResult: true,
-          skipDuplicated: true,
-          callback: async ({
-            index,
-            isNoImage,
-            duplicateIndexes,
-            isFirstImage,
-            imageKey,
-            toBeCallbacked,
-          }) => {
-            if (!isNoImage && isFirstImage) {
-              // 이미지가 있으면서 배열 내 처음 이미지인 경우
-              if (imageKey) {
-                const uuid = await createImageOnDBIfNotExistByS3Key(
-                  imageKey,
-                  userEmail,
-                  drizzleTransaction,
-                );
+    const result = await drizzleSession.transaction(async (dt) => {
+      const createdImages = await analyzeProblemsImagesAndDoCallback({
+        problems: toBePostedProblems,
+        flatResult: true,
+        skipDuplicated: true,
+        callback: async ({
+          index,
+          isNoImage,
+          duplicateIndexes,
+          isFirstImage,
+          imageKey,
+          toBeCallbacked,
+        }) => {
+          if (!isNoImage && isFirstImage) {
+            // 이미지가 있으면서 배열 내 처음 이미지인 경우
+            if (imageKey) {
+              const uuid = await createImageOnDBIfNotExistByS3Key(
+                imageKey,
+                userEmail,
+                dt,
+              );
 
-                if (duplicateIndexes.length > 0) {
-                  const result = duplicateIndexes.map((i) => {
-                    const imageKey = toBeCallbacked[i].imageKey;
-                    if (!imageKey)
-                      throw new Error("이미지가 올바르지 않습니다.");
-                    return {
-                      index: i,
-                      uuid: uuid,
-                    };
-                  });
-                  return result;
-                }
-                return {
-                  index,
-                  uuid,
-                };
+              if (duplicateIndexes.length > 0) {
+                const result = duplicateIndexes.map((i) => {
+                  const imageKey = toBeCallbacked[i].imageKey;
+                  if (!imageKey) throw new Error("이미지가 올바르지 않습니다.");
+                  return {
+                    index: i,
+                    uuid: uuid,
+                  };
+                });
+                return result;
               }
+              return {
+                index,
+                uuid,
+              };
             }
+          }
 
-            return {
-              index,
-              uuid: null,
-            };
-          },
-        });
+          return {
+            index,
+            uuid: null,
+          };
+        },
+      });
 
-        console.log(
-          "createdImages :",
-          createdImages.toSorted((a, b) => a.index - b.index),
-        );
+      console.log(
+        "createdImages :",
+        createdImages.toSorted((a, b) => a.index - b.index),
+      );
 
-        const userUuId = await getUserUUIDbyEmail(
-          userEmail,
-          drizzleTransaction,
-        );
+      const userUuId = await getUserUUIDbyEmail(userEmail, dt);
 
-        // 문제집 생성
-        const [createdProblemSet] = await drizzleTransaction
-          .insert(problemSet)
-          .values({
-            name: setName,
+      // 문제집 생성
+      const [createdProblemSet] = await dt
+        .insert(problemSet)
+        .values({
+          name: setName,
+          userUuid: userUuId,
+          isShareLinkPurposeSet: isShareLinkPurposeSet,
+          updatedAt: new Date(),
+          isPublic: false,
+        })
+        .returning({ uuid: problemSet.uuid });
+
+      if (!createdProblemSet) throw new Error("문제집 생성 중 오류 발생");
+
+      // 문제들 생성
+      await Promise.all(
+        toBePostedProblems.map(async (toBePostedProblem, index) => {
+          if (!toBePostedProblem) throw new Error("문제가 null입니다!");
+          const currentImageUuid = createdImages.find(
+            (image) => image?.index === index,
+          )?.uuid;
+          await dt.insert(problem).values({
+            order: index + 1,
+            question: toBePostedProblem.question,
+            questionType: toBePostedProblem.type,
+            candidates: toBePostedProblem.candidates ?? undefined,
+            additionalView: toBePostedProblem.additionalView,
+            subjectiveAnswer: toBePostedProblem.subAnswer,
+            isAnswerMultiple: toBePostedProblem.isAnswerMultiple ?? undefined,
+            imageUuid: currentImageUuid ?? undefined,
             userUuid: userUuId,
-            isShareLinkPurposeSet: isShareLinkPurposeSet,
-            updatedAt: new Date(),
-            isPublic: false,
-          })
-          .returning({ uuid: problemSet.uuid });
+            problemSetUuid: createdProblemSet.uuid,
+          });
 
-        if (!createdProblemSet) throw new Error("문제집 생성 중 오류 발생");
+          if (currentImageUuid) {
+            await dt
+              .insert(imageToUser)
+              .values({
+                imageUuid: currentImageUuid,
+                userUuid: userUuId,
+              })
+              .onConflictDoNothing();
+          }
+        }),
+      );
 
-        // 문제들 생성
-        await Promise.all(
-          toBePostedProblems.map(async (toBePostedProblem, index) => {
-            if (!toBePostedProblem) throw new Error("문제가 null입니다!");
-
-            return drizzleTransaction.insert(problem).values({
-              order: index + 1,
-              question: toBePostedProblem.question,
-              questionType: toBePostedProblem.type,
-              candidates: toBePostedProblem.candidates ?? undefined,
-              additionalView: toBePostedProblem.additionalView,
-              subjectiveAnswer: toBePostedProblem.subAnswer,
-              isAnswerMultiple: toBePostedProblem.isAnswerMultiple ?? undefined,
-              imageUuid:
-                createdImages.find((image) => image?.index === index)?.uuid ??
-                undefined,
-              userUuid: userUuId,
-              problemSetUuid: createdProblemSet.uuid,
-            });
-          }),
-        );
-
-        return createdProblemSet ? "OK" : "FAIL";
-      },
-    );
+      return createdProblemSet ? "OK" : "FAIL";
+    });
 
     return result;
   } catch (err) {
@@ -264,6 +268,10 @@ export async function updateProblems(
 
           console.log(`문제 ${index + 1} 생성 시작`);
 
+          const currentImageUuid = createdImages.find(
+            (image) => image?.index === index,
+          )?.uuid;
+
           const [createdProblem] = await dt
             .insert(problem)
             .values({
@@ -274,13 +282,18 @@ export async function updateProblems(
               additionalView: replacingProblem.additionalView,
               subjectiveAnswer: replacingProblem.subAnswer,
               isAnswerMultiple: replacingProblem.isAnswerMultiple ?? undefined,
-              imageUuid:
-                createdImages.find((image) => image?.index === index)?.uuid ??
-                undefined,
+              imageUuid: currentImageUuid ?? undefined,
               userUuid: userUuid,
               problemSetUuid: problemSetUUID,
             })
             .returning({ uuid: problem.uuid });
+
+          if (currentImageUuid) {
+            await dt.insert(imageToUser).values({
+              imageUuid: currentImageUuid,
+              userUuid: userUuid,
+            });
+          }
 
           const result = await dt.query.problem.findFirst({
             where: eq(problem.uuid, createdProblem.uuid),
@@ -391,10 +404,13 @@ export async function createImageOnDBIfNotExistByS3Key(
           // insert가 성공한 경우
           const imageUuid = images[0].uuid;
 
-          await dt.insert(imageToUser).values({
-            imageUuid: imageUuid,
-            userUuid: userUuid,
-          });
+          await dt
+            .insert(imageToUser)
+            .values({
+              imageUuid: imageUuid,
+              userUuid: userUuid,
+            })
+            .onConflictDoNothing();
 
           return imageUuid;
         } else {
@@ -891,6 +907,16 @@ export async function postProblemResult(
         updatedAt: new Date(),
       })
       .returning({ uuid: problemResult.uuid });
+
+    if (isImageUrlObject(problem.image)) {
+      await dt
+        .insert(imageToUser)
+        .values({
+          imageUuid: problem.image.uuid,
+          userUuid: userUuid,
+        })
+        .onConflictDoNothing();
+    }
 
     if (!createdProblemResult)
       throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
