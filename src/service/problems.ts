@@ -306,20 +306,22 @@ export async function updateProblems(
             return acc;
           }, [] as string[]),
         ),
-      ].reduce((acc, cur) => {
-        const newProblemsImageKey = newProblems.reduce((acc, cur) => {
-          if (cur.image) acc.push(cur.image.key);
-          return acc;
-        }, [] as string[]);
+      ]
+        .reduce((acc, cur) => {
+          const newProblemsImageKey = newProblems.reduce((acc, cur) => {
+            if (cur.image) acc.push(cur.image.key);
+            return acc;
+          }, [] as string[]);
 
-        if (!newProblemsImageKey.includes(cur)) acc.push(cur);
-        return acc;
-      }, [] as string[]);
+          if (!newProblemsImageKey.includes(cur)) acc.push(cur);
+          return acc;
+        }, [] as string[])
+        .map((key) => ({ key, problemSetCount: 1 }));
 
       console.log("toBeDeletedImageKey : ", toBeDeletedImageKey);
 
       if (toBeDeletedImageKey.length > 0) {
-        await deleteImagesFromSet(toBeDeletedImageKey, userEmail, 1, dt);
+        await deleteImagesFromSet(toBeDeletedImageKey, userEmail, dt);
       }
 
       // 문제집 이름 업데이트
@@ -1052,9 +1054,11 @@ export async function getExamResultsByName(
 }
 
 export async function deleteImagesFromSet(
-  images: string[],
+  toBeDeletedImages: {
+    key: string;
+    problemSetCount: number;
+  }[],
   userEmail: string,
-  deleteSetCount: number,
   dt: DrizzleTransaction,
 ) {
   let problemFileImages: ({ imageFile: File; imageKey: string } | null)[] = [];
@@ -1067,11 +1071,11 @@ export async function deleteImagesFromSet(
     // 삭제 실패에 대비하여 이미지 파일 복사
     console.time("이미지 삭제 실패 대비 이미지 복사 시간");
     problemFileImages = await Promise.all(
-      images.map(async (imageKey) => {
-        if (!imageKey) return null;
+      toBeDeletedImages.map(async (image) => {
+        if (!image) return null;
         return {
-          imageFile: await getImageFileOnS3ByImageKey(imageKey),
-          imageKey: imageKey,
+          imageFile: await getImageFileOnS3ByImageKey(image.key),
+          imageKey: image.key,
         };
       }),
     );
@@ -1079,19 +1083,22 @@ export async function deleteImagesFromSet(
 
     // 이미지가 다른곳에서 참조되는지 확인하고 참조가 없으면 삭제
     await Promise.all(
-      images.map(async (imageKey) => {
-        if (imageKey) {
+      toBeDeletedImages.map(async (toBeDeletedImage) => {
+        if (toBeDeletedImage) {
           const totalReference = await getReferecesOfImageByImageKey(
-            imageKey,
+            toBeDeletedImage.key,
             dt,
           );
 
           console.log(
-            `[deleteImagesFromSet] 이미지 ${imageKey}\ntotalReference :`,
+            `[deleteImagesFromSet] 이미지 ${toBeDeletedImage.key}\ntotalReference :`,
             totalReference,
           );
 
-          const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
+          const imageUuid = await getImageUuidOnDBByImageKey(
+            toBeDeletedImage.key,
+            dt,
+          );
 
           if (!imageUuid)
             throw new Error("이미지 uuid를 찾는 중 오류가 발생했습니다.");
@@ -1106,22 +1113,21 @@ export async function deleteImagesFromSet(
             );
 
           console.log(
-            `\n[${imageKey}]\nif(totalRefercence.allUserCount.total) === deleteSetCount\nif(${totalReference.allUserCount.total} === ${deleteSetCount})`,
+            `\n[${toBeDeletedImage.key}]\nif(totalRefercence.allUserCount.total) === toBeDeletedImage.problemSetCount\nif(${totalReference.allUserCount.total} === ${toBeDeletedImage.problemSetCount})`,
           );
-          // 삭제 후 이미지 키를 검색해서 유저가 하나도 연결되어 있지 않으면 이미지 삭제 구현할 것
-          // await prismaInstance.image.findMany({
 
-          // })
-
-          if (totalReference.allUserCount.total === deleteSetCount) {
-            // 모든 유저의 이미지 참조가 삭제할 세트 숫자만큼인 경우 s3에서 이미지 삭제 (s3 삭제 대상)
+          if (
+            totalReference.allUserCount.total ===
+            toBeDeletedImage.problemSetCount
+          ) {
+            // 삭제할 이미지의 모든 유저의 이미지 참조가 삭제할 이미지의 세트 숫자만큼인 경우 s3에서 이미지 삭제 (s3 삭제 대상)
             console.log(
-              `[deleteImagesFromSet] 참조가 없어 이미지 ${imageKey} 삭제 시작`,
+              `[deleteImagesFromSet] 참조가 없어 이미지 ${toBeDeletedImage.key} 삭제 시작`,
             );
 
             const command = new DeleteObjectCommand({
               Bucket: process.env.AWS_S3_BUCKET_NAME,
-              Key: imageKey,
+              Key: toBeDeletedImage.key,
             });
 
             const response = await s3.send(command);
@@ -1130,27 +1136,29 @@ export async function deleteImagesFromSet(
                 "S3에서 이미지를 삭제하는 중 오류가 발생했습니다.",
               );
             console.log(
-              `[deleteImagesFromSet] 이미지 ${imageKey} s3에서 삭제 성공`,
+              `[deleteImagesFromSet] 이미지 ${toBeDeletedImage.key} s3에서 삭제 성공`,
             );
 
             await dt.delete(image).where(eq(image.uuid, imageUuid));
 
             console.log(
-              `[deleteImagesFromSet] 이미지 ${imageKey} image 테이블에서 삭제 성공`,
+              `[deleteImagesFromSet] 이미지 ${toBeDeletedImage.key} image 테이블에서 삭제 성공`,
             );
 
-            console.log(`[deleteImagesFromSet] 이미지 ${imageKey} 삭제 성공`);
+            console.log(
+              `[deleteImagesFromSet] 이미지 ${toBeDeletedImage.key} 삭제 성공`,
+            );
           }
 
           console.log(
-            `\n[${imageKey}]\nif(currentUserImageReference) === deleteSetCount\nif(${currentUserImageReference} === ${deleteSetCount})`,
+            `\n[${toBeDeletedImage.key}]\nif(currentUserImageReference) === toBeDeletedImage.problemSetCount\nif(${currentUserImageReference} === ${toBeDeletedImage.problemSetCount})`,
           );
 
-          if (currentUserImageReference === deleteSetCount) {
-            //해당하는 user테이블에서 problem테이블과 problem_result에 연결된 이미지가 삭제 대상이면 user테이블에서 이미지 연결 해제
+          if (currentUserImageReference === toBeDeletedImage.problemSetCount) {
+            // 삭제할 이미지의 현재 유저의 이미지 참조가 삭제할 이미지의 세트 숫자만큼인 경우 user 테이블에서 이미지 참조 삭제
 
             console.log(
-              `[deleteImagesFromSet] user테이블에서 image ${imageKey}연결 해제 시작`,
+              `[deleteImagesFromSet] user테이블에서 image ${toBeDeletedImage.key}연결 해제 시작`,
             );
 
             await dt
@@ -1163,7 +1171,7 @@ export async function deleteImagesFromSet(
               );
 
             console.log(
-              `[deleteImagesFromSet] user테이블에서 image ${imageKey}연결 해제 성공`,
+              `[deleteImagesFromSet] user테이블에서 image ${toBeDeletedImage.key}연결 해제 성공`,
             );
           }
         }
@@ -1239,36 +1247,38 @@ export async function deleteProblemSets(
       if (allProblemsSet.length === 0)
         throw new Error("문제집들을 찾는 중 오류가 발생했습니다.");
 
-      const toBeDeletedImage = {
-        problemSetCount: allProblemsSet.length,
-        imageKeys: [
-          ...new Set(
-            allProblemsSet.reduce((acc, cur) => {
-              const imageKeys = cur.problems.reduce((acc, cur) => {
-                if (cur.image) {
-                  acc.push(cur.image.key);
-                }
-                return acc;
-              }, [] as string[]);
-              acc.push(...imageKeys);
-              return acc;
-            }, [] as string[]),
-          ),
-        ],
-      };
+      const imageKeyCounts = allProblemsSet.reduce(
+        (acc, problemSet) => {
+          problemSet.problems.forEach((problem) => {
+            if (problem.image) {
+              const key = problem.image.key;
+              if (!acc[key]) {
+                acc[key] = 1;
+              } else {
+                acc[key]++;
+              }
+            }
+          });
+          return acc;
+        },
+        {} as { [key: string]: number },
+      );
+
+      const toBeDeletedImage = Object.entries(imageKeyCounts).map(
+        ([key, problemSetCount]) => ({
+          key,
+          problemSetCount,
+        }),
+      );
 
       console.log("[deleteProblemSets] toBeDeletedImage: ", toBeDeletedImage);
 
       // 문제집 안의 문제 이미지들 삭제
-      if (toBeDeletedImage.imageKeys.length > 0) {
-        await deleteImagesFromSet(
-          toBeDeletedImage.imageKeys,
-          userEmail,
-          toBeDeletedImage.problemSetCount,
-          dt,
-        );
+      if (toBeDeletedImage.length > 0) {
+        await deleteImagesFromSet(toBeDeletedImage, userEmail, dt);
       }
 
+      // 문제집 삭제
       await dt
         .delete(problemSet)
         .where(
@@ -1281,6 +1291,7 @@ export async function deleteProblemSets(
       console.log(`[deleteProblemSets] 문제집 ${problemSetUUIDs} 삭제 성공`);
       return true;
     });
+
     return result;
   } catch (err) {
     console.log(err);
@@ -1312,35 +1323,36 @@ export async function deleteProblemResults(
 
       console.log("[AllResults] : ", AllResults);
 
-      const toBeDeletedImage = {
-        resultsCount: AllResults.length,
-        imageKeys: [
-          ...new Set(
-            AllResults.reduce((acc, cur) => {
-              const imageKeys = cur.problemResults.reduce((acc, cur) => {
-                if (cur.image) {
-                  acc.push(cur.image.key);
-                }
-                return acc;
-              }, [] as string[]);
-              acc.push(...imageKeys);
-              return acc;
-            }, [] as string[]),
-          ),
-        ],
-      };
+      const imageKeyCounts = AllResults.reduce(
+        (acc, result) => {
+          result.problemResults.forEach((problemResult) => {
+            if (problemResult.image) {
+              const key = problemResult.image.key;
+              if (!acc[key]) {
+                acc[key] = 1;
+              } else {
+                acc[key]++;
+              }
+            }
+          });
+          return acc;
+        },
+        {} as { [key: string]: number },
+      );
+
+      const toBeDeletedImage = Object.entries(imageKeyCounts).map(
+        ([key, problemSetCount]) => ({
+          key,
+          problemSetCount,
+        }),
+      );
       console.log(
         "[deleteProblemResults] toBeDeletedImage : ",
         toBeDeletedImage,
       );
 
-      if (toBeDeletedImage.imageKeys.length > 0) {
-        await deleteImagesFromSet(
-          toBeDeletedImage.imageKeys,
-          userEmail,
-          toBeDeletedImage.resultsCount,
-          dt,
-        );
+      if (toBeDeletedImage.length > 0) {
+        await deleteImagesFromSet(toBeDeletedImage, userEmail, dt);
       }
 
       await dt
@@ -1456,12 +1468,27 @@ export async function getReferecesOfImageByImageKey(
     if (!imageUuid)
       throw new Error("이미지 uuid를 찾는 중 오류가 발생했습니다.");
 
-    const users = await dt.query.user.findMany({
-      with: {
-        images: {
-          where: (image, { eq }) => eq(image.imageUuid, imageUuid),
-        },
-        problems: {
+    const imageUsers = await dt
+      .select({ userUuid: imageToUser.userUuid })
+      .from(imageToUser)
+      .where(eq(imageToUser.imageUuid, imageUuid));
+
+    const users = await Promise.all(
+      imageUsers.map(async (imageUser) => {
+        const userEmail = await dt.query.user.findFirst({
+          where: (user_, { eq }) => eq(user_.uuid, imageUser.userUuid),
+          columns: {
+            email: true,
+          },
+        });
+        if (!userEmail) throw new Error("userEmail is null");
+
+        const problems = await dt.query.problem.findMany({
+          where: (problem, { eq, and }) =>
+            and(
+              eq(problem.imageUuid, imageUuid),
+              eq(problem.userUuid, imageUser.userUuid),
+            ),
           with: {
             problemSet: {
               columns: {
@@ -1469,8 +1496,14 @@ export async function getReferecesOfImageByImageKey(
               },
             },
           },
-        },
-        problemResults: {
+        });
+
+        const problemResults = await dt.query.problemResult.findMany({
+          where: (problemResult, { eq, and }) =>
+            and(
+              eq(problemResult.imageUuid, imageUuid),
+              eq(problemResult.userUuId, imageUser.userUuid),
+            ),
           with: {
             result: {
               columns: {
@@ -1478,13 +1511,18 @@ export async function getReferecesOfImageByImageKey(
               },
             },
           },
-        },
-      },
-      columns: {
-        uuid: true,
-        email: true,
-      },
-    });
+        });
+
+        return {
+          uuid: imageUser.userUuid,
+          email: userEmail.email,
+          problems,
+          problemResults,
+        };
+      }),
+    );
+
+    console.log("[getReferecesOfImageByImageKey] users : ", users);
 
     if (users.length === 0)
       throw new Error("해당하는 key를 가진 이미지가 존재하지 않습니다.");

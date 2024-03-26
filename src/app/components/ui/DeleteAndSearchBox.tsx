@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@nextui-org/react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import SearchBox from "./SearchBox";
@@ -93,6 +91,17 @@ export default function DeleteAndSearchBox({
         {isDeleteButtonClicked && (
           <Button className="" onClick={() => deleteProblem(toDeletedUuid)}>
             삭제
+          </Button>
+        )}
+        {isDeleteButtonClicked && (
+          <Button
+            className=""
+            onClick={() => {
+              resetToDeletedUuid();
+              setIsDeleteButtonClicked(false);
+            }}
+          >
+            취소
           </Button>
         )}
       </div>

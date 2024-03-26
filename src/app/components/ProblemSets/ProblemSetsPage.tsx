@@ -7,8 +7,6 @@ import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsGrid from "./ProblemSetsGrid";
 import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
-import DeleteAndSearchBox from "../ui/DeleteAndSearchBox";
-import SearchBox from "../ui/SearchBox";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
 import useUiState from "@/hooks/useUiState";
 
