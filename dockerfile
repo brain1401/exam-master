@@ -17,14 +17,14 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-ARG DATABASE_URL
+# ARG DATABASE_URL
 
-RUN npm install -g drizzle-kit 
-RUN npm install -g drizzle-orm
+# RUN npm install -g drizzle-kit 
+# RUN npm install -g drizzle-orm
 
-RUN \
-  drizzle-kit generate:pg --schema=./schema.ts && \
-  drizzle-kit push:pg --driver=pg --schema=./schema.ts --connectionString=$DATABASE_URL
+# RUN \
+#   drizzle-kit generate:pg --schema=./schema.ts && \
+#   drizzle-kit push:pg --driver=pg --schema=./schema.ts --connectionString=$DATABASE_URL
 
 
 # Rebuild the source code only when needed
