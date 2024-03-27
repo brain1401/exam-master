@@ -58,7 +58,7 @@ export default function MainPage() {
   }, [setPublicProblemSetsPage]);
 
   return (
-    <div className="mx-auto mt-[2rem] max-w-4xl">
+    <div className="px-8 py-4 mx-auto mt-[2rem] max-w-[58rem]">
       <h2 className="mb-4 text-[1.5rem] font-semibold text-gray-900 dark:text-gray-50">
         공개된 문제집
       </h2>

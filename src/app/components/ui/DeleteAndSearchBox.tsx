@@ -77,7 +77,7 @@ export default function DeleteAndSearchBox({
 
   return (
     <div className="flex justify-between">
-      <div className="flex items-center justify-center gap-x-[.2rem] md:gap-x-[1rem]">
+      <div className="flex flex-col gap-x-[.2rem] md:flex-row md:items-center md:justify-center md:gap-x-[1rem]">
         <Button
           variant="outline"
           size="icon"
@@ -89,21 +89,29 @@ export default function DeleteAndSearchBox({
         >
           <MdOutlineDeleteForever size={24} />
         </Button>
+
         {isDeleteButtonClicked && (
-          <Button className="" onClick={() => deleteProblem(toDeletedUuid)}>
-            삭제
-          </Button>
-        )}
-        {isDeleteButtonClicked && (
-          <Button
-            className=""
-            onClick={() => {
-              resetToDeletedUuid();
-              setIsDeleteButtonClicked(false);
-            }}
-          >
-            취소
-          </Button>
+          <div className="flex flex-row gap-x-[1rem] md:mt-0 mt-2">
+            {isDeleteButtonClicked && (
+              <Button
+                className="px-6 py-2"
+                onClick={() => deleteProblem(toDeletedUuid)}
+              >
+                삭제
+              </Button>
+            )}
+            {isDeleteButtonClicked && (
+              <Button
+                className="px-6 py-2"
+                onClick={() => {
+                  resetToDeletedUuid();
+                  setIsDeleteButtonClicked(false);
+                }}
+              >
+                취소
+              </Button>
+            )}
+          </div>
         )}
       </div>
 

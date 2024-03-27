@@ -3,8 +3,7 @@
 import useUiState from "@/hooks/useUiState";
 import { ProblemSet } from "@/types/problems";
 import Link from "next/link";
-import { twMerge } from "tailwind-merge";
-import { Checkbox } from "@nextui-org/react";
+import { Checkbox } from "../ui/checkbox";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -69,14 +68,15 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
       </div>
       {isDeleteButtonClicked && (
         <Checkbox
-          isSelected={isSelected}
-          onValueChange={(isSelected) => {
+          checked={isSelected}
+          onCheckedChange={(isSelected) => {
+            const isChecked = isSelected === "indeterminate" ? false : true;
             if (isSelected === true) {
               addToDeletedUuid(problemSet.uuid);
-              setIsSelected(isSelected);
+              setIsSelected(isChecked);
             } else {
               removeToDeletedUuid(problemSet.uuid);
-              setIsSelected(isSelected);
+              setIsSelected(isChecked);
             }
           }}
         />

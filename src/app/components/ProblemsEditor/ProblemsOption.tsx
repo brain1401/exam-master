@@ -147,7 +147,7 @@ export default function ProblemsOption() {
           확인
         </Button>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex items-center">
           <Label className="mr-2 text-[.9rem]">문제집 이름</Label>
           <Input
@@ -165,7 +165,7 @@ export default function ProblemsOption() {
             {isLoading ? "" : "확인"}
           </Button>
         </div>
-        <div className="flex items-center justify-center space-x-2 p-3">
+        <div className="mt-2 flex items-center justify-end space-x-2 p-3 md:mt-0 md:justify-center">
           <Switch
             checked={problemSetIsPublic}
             id="problemSetIsPublic"

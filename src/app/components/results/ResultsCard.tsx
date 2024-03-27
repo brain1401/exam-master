@@ -2,7 +2,7 @@
 
 import useUiState from "@/hooks/useUiState";
 import { ResultWithCount } from "@/types/problems";
-import { Checkbox } from "@nextui-org/react";
+import { Checkbox } from "../ui/checkbox";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 type Props = {
@@ -31,10 +31,9 @@ export default function ResultsCard({ result }: Props) {
     toDeletedUuid.find((uuid: string) => uuid === result.uuid) ? true : false,
   );
 
-
   // toDeletedUuid가 외부에서 변경되었을 때 isSelected 동기화
   useEffect(() => {
-    console.log(result.uuid)
+    console.log(result.uuid);
     setIsSelected(
       toDeletedUuid.find((uuid: string) => uuid === result.uuid) ? true : false,
     );
@@ -44,7 +43,7 @@ export default function ResultsCard({ result }: Props) {
     return (
       <div className="flex w-full flex-col items-center">
         <div
-          className="mx-auto my-2 flex w-full min-w-[9rem] max-w-[12rem] flex-col items-center justify-center rounded-lg border border-gray-600 p-5 cursor-pointer"
+          className="mx-auto my-2 flex w-full min-w-[9rem] max-w-[12rem] cursor-pointer flex-col items-center justify-center rounded-lg border border-gray-600 p-5"
           onClick={() => {
             if (isDeleteButtonClicked) {
               if (isSelected === false) {
@@ -67,14 +66,15 @@ export default function ResultsCard({ result }: Props) {
         </div>
         {isDeleteButtonClicked && (
           <Checkbox
-            isSelected={isSelected}
-            onValueChange={(isSelected) => {
+            checked={isSelected}
+            onCheckedChange={(selected) => {
+              const isChecked = selected === "indeterminate" ? true : selected;
               if (isSelected === true) {
                 addToDeletedUuid(result.uuid);
-                setIsSelected(isSelected);
+                setIsSelected(isChecked);
               } else {
                 removeToDeletedUuid(result.uuid);
-                setIsSelected(isSelected);
+                setIsSelected(isChecked);
               }
             }}
           />

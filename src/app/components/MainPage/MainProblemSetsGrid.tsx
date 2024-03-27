@@ -61,7 +61,7 @@ export default function MainProblemSetsGrid({
     } else {
       return (
         publicProblemSets?.data && (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-3">
             {publicProblemSets?.data.map((publicProblemSet) => (
               <Card key={publicProblemSet.uuid}>
                 <CardContent>
@@ -94,7 +94,7 @@ export default function MainProblemSetsGrid({
     }
   };
 
-  if (isLoading) return <PublicProblemSetsCardSkeleton pageSize={pageSize} />;
+  if (true) return <PublicProblemSetsCardSkeleton pageSize={pageSize} />;
 
   if (error)
     return (
