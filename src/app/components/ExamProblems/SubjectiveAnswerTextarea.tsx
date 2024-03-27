@@ -1,13 +1,12 @@
 "use client";
-import { Textarea } from "@nextui-org/react";;
+import { Textarea } from "../ui/textarea";
 import { ExamProblem } from "@/types/problems";
 import useExamProblems from "@/hooks/useExamProblems";
 
 export default function SubjectiveAnswerTextarea() {
-
   const { currentExamProblem, setCurrentExamProblem } = useExamProblems();
 
-  const onTextAreaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newCurrentExamProblems = { ...currentExamProblem };
 
     if (!newCurrentExamProblems) {
@@ -21,10 +20,7 @@ export default function SubjectiveAnswerTextarea() {
   return (
     <div>
       <Textarea
-        classNames={{
-          inputWrapper: "bg-nextUiBorder"
-        }}
-        radius="sm"
+        className="resize-none"
         placeholder="답을 입력하세요."
         onChange={onTextAreaChange}
         value={currentExamProblem.subAnswer ?? ""}
