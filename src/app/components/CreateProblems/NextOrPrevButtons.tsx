@@ -4,9 +4,9 @@ import useProblems from "@/hooks/useProblems";
 import useScrollEffect from "@/hooks/useScrollEffect";
 import { Candidate } from "@/types/problems";
 import { isCardOnBeingWrited } from "@/utils/problems";
-import { Button } from "@nextui-org/react";
+import { Button } from "../ui/button";
 
-const BUTTON_CLASSNAMES = "bg-secondary text-white px-3 py-1";
+const BUTTON_CLASSNAMES = "bg-[#454655] text-white px-[1.5rem] py-1";
 
 export default function NextOrPrevButtons() {
   const {
@@ -93,7 +93,6 @@ export default function NextOrPrevButtons() {
         onClick={() => {
           showPreviousCard();
         }}
-        radius="sm"
         className={BUTTON_CLASSNAMES}
       >
         이전
@@ -102,7 +101,6 @@ export default function NextOrPrevButtons() {
         onClick={() => {
           showNextCard();
         }}
-        radius="sm"
         className={BUTTON_CLASSNAMES}
       >
         다음

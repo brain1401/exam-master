@@ -8,8 +8,8 @@ import {
   HandleImageCallback,
   ProblemReplacedImageKeyAndFile,
   PresignedPostAlreadyExistsCallback,
-  toBeCallbacked,
   toBeCallbackedItSelf,
+  PublicProblemSetWithPagination,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
@@ -276,6 +276,96 @@ export async function getExamResultsMaxPage(
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function fetchPublicProblemSets(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  problemSetsPage: number,
+  pageSize: number,
+  setPublicProblemSetsMaxPage: (maxPage: number) => void,
+) {
+  try {
+    if (pageSize === 0) return null;
+
+    let res;
+    if (isSearching) {
+      if (debouncedSearchString.trim().length > 0) {
+        res = await axios.get("/api/getPublicProblemSetsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page: problemSetsPage,
+            pageSize,
+          },
+          timeout: 3000,
+        });
+      }
+    } else {
+      if (debouncedSearchString.trim().length === 0) {
+        res = await axios.get("/api/getPublicProblemSets", {
+          params: {
+            page: problemSetsPage,
+            pageSize,
+          },
+          timeout: 3000,
+        });
+      }
+    }
+
+    const data: PublicProblemSetWithPagination = res?.data;
+
+    if (data) {
+      setPublicProblemSetsMaxPage(data.pagination.pageCount || 1);
+      return data;
+    } else {
+      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(err);
+    }
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getPublicProblemSetsMaxPage(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  pageSize: number,
+) {
+  try {
+    if (pageSize === 0) return null;
+    let res;
+    if (isSearching) {
+      if (debouncedSearchString.trim().length > 0) {
+        res = await axios.get("/api/getPublicProblemSetsByName", {
+          params: {
+            name: debouncedSearchString.trim(),
+            page: 1,
+            pageSize,
+          },
+          timeout: 3000,
+        });
+      }
+    } else {
+      if (debouncedSearchString.trim().length === 0) {
+        res = await axios.get("/api/getPublicProblemSets", {
+          params: {
+            page: 1,
+            pageSize,
+          },
+        });
+      }
+    }
+    const data: PublicProblemSetWithPagination = res?.data;
+
+    if (data) {
+      return data.pagination.pageCount;
+    }
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
 

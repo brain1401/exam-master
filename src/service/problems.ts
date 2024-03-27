@@ -8,6 +8,7 @@ import {
   ResultsWithPagination,
   problemsSchema,
   ProblemReplacedImageKey,
+  PublicProblemSetWithPagination,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
@@ -1482,6 +1483,110 @@ export async function getTotalReferencesOfImageByImageUuid(
     throw new Error(
       "이미지를 참조하는 문제나 결과의 개수를 확인하는 중 오류가 발생했습니다.",
     );
+  }
+}
+
+export async function getPublicProblemSets(page: string, pageSize: string) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const [[{ value: totalProblemSetsCount }], problemSets] =
+        await Promise.all([
+          drizzleSession
+            .select({ value: count() })
+            .from(problemSet)
+            .where(eq(problemSet.isPublic, true)),
+          dt.query.problemSet.findMany({
+            where: eq(problemSet.isPublic, true),
+            offset: (parseInt(page) - 1) * parseInt(pageSize),
+            limit: parseInt(pageSize),
+            orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
+            with: {
+              problems: {
+                orderBy: (problem, { asc }) => [asc(problem.order)],
+                with: {
+                  image: true,
+                },
+              },
+              user: true,
+            },
+          }),
+        ]);
+
+      const returnData: PublicProblemSetWithPagination = {
+        data: problemSets.map((problemSet) => ({
+          uuid: problemSet.uuid,
+          name: problemSet.name,
+          updatedAt: problemSet.updatedAt,
+          examProblemsCount: problemSet.problems.length,
+          createdBy: problemSet.user.name,
+        })),
+        pagination: {
+          page: parseInt(page),
+          pageSize: parseInt(pageSize),
+          pageCount: Math.ceil(totalProblemSetsCount / parseInt(pageSize)),
+          total: problemSets.length,
+        },
+      };
+
+      return returnData;
+    });
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getPublicProblemSetsByName(
+  name: string,
+  page: string,
+  pageSize: string,
+) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const problemSets = await dt.query.problemSet.findMany({
+        where: (problemSet, { like, and, eq }) =>
+          and(
+            like(problemSet.name, `%${name}%`),
+            eq(problemSet.isPublic, true),
+          ),
+        offset: (parseInt(page) - 1) * parseInt(pageSize),
+        limit: parseInt(pageSize),
+        orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
+        with: {
+          problems: {
+            orderBy: (problem, { asc }) => [asc(problem.order)],
+            with: {
+              image: true,
+            },
+          },
+          user: true,
+        },
+      });
+
+      const returnData: PublicProblemSetWithPagination = {
+        data: problemSets.map((problemSet) => ({
+          uuid: problemSet.uuid,
+          name: problemSet.name,
+          updatedAt: problemSet.updatedAt,
+          examProblemsCount: problemSet.problems.length,
+          createdBy: problemSet.user.name,
+        })),
+        pagination: {
+          page: parseInt(page),
+          pageSize: parseInt(pageSize),
+          pageCount: Math.ceil(problemSets.length / parseInt(pageSize)),
+          total: problemSets.length,
+        },
+      };
+
+      return returnData;
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
 

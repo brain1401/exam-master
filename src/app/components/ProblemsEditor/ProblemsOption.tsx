@@ -1,12 +1,16 @@
 "use client";
+import type { Problem } from "@/types/problems";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
+
 import { useState } from "react";
-import { Problem } from "@/types/problems";
-import { Button, Checkbox, Input } from "@nextui-org/react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
 
-const BUTTON_CLASSNAMES =
-  "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
+const BUTTON_CLASSNAMES = "w-[4rem] rounded-lg";
+// "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
 
 export default function ProblemsOption() {
   const {
@@ -130,63 +134,53 @@ export default function ProblemsOption() {
   return (
     <div className="mb-5 flex w-full flex-col gap-2">
       <div className="flex items-center">
+        <Label className="mr-2 text-[.9rem]">최대 문제 수</Label>
         <Input
           id="maxIndex"
-          className="w-fit text-center"
-          classNames={{
-            inputWrapper: "px-[.5rem] w-[3rem]",
-            input: "text-center",
-            label: "text-sm md:text-md z-0",
-          }}
-          label="최대 문제 수"
-          labelPlacement="outside-left"
+          textCenter={true}
+          wrapperClassName=" mr-2"
+          inputClassName="w-[3rem] text-[.95rem] h-[2.2rem]"
           value={problemLength}
-          variant="bordered"
-          size="sm"
           onChange={handleProblemLengthChange}
         />
-        <Button
-          className={BUTTON_CLASSNAMES}
-          size="sm"
-          onClick={applyProblemLength}
-        >
+        <Button className={BUTTON_CLASSNAMES} onClick={applyProblemLength}>
           확인
         </Button>
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center">
+          <Label className="mr-2 text-[.9rem]">문제집 이름</Label>
           <Input
             id="problemSetName"
-            className="w-fit text-center"
-            classNames={{
-              inputWrapper: "px-[.5rem] w-[10rem]",
-              label: " text-sm md:text-md z-0",
-            }}
-            label="문제집 이름"
-            labelPlacement="outside-left"
-            variant="bordered"
-            size="sm"
+            wrapperClassName="mr-2"
+            inputClassName="w-[10rem] h-[2.2rem]"
             value={localProblemSetsName}
             onChange={(e) => setLocalProblemSetsName(e.target.value)}
           />
           <Button
             className={BUTTON_CLASSNAMES}
             onClick={applyProblemSetName}
-            size="sm"
             isLoading={isLoading}
           >
             {isLoading ? "" : "확인"}
           </Button>
         </div>
-        <div>
-          <Checkbox
-            isSelected={problemSetIsPublic}
-            onValueChange={() => {
+        <div className="flex items-center justify-center space-x-2 p-3">
+          <Switch
+            checked={problemSetIsPublic}
+            id="problemSetIsPublic"
+            onCheckedChange={() => {
               setProblemSetIsPublic(!problemSetIsPublic);
             }}
-          >
-            문제집 공개로 설정
-          </Checkbox>
+          />
+          <div className="flex items-center justify-center">
+            <Label
+              htmlFor="problemSetIsPublic"
+              className="select-none text-[1rem] peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              문제집 공개
+            </Label>
+          </div>
         </div>
       </div>
     </div>

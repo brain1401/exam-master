@@ -2,8 +2,8 @@
 
 import useProblemResults from "@/hooks/useProblemResults";
 import Image from "next/image";
-import WrongMark from "/public/images/wrong.png";
-import CorrectMark from "/public/images/correctCircle.png";
+import WrongMark from "../../../../public/images/wrong.png";
+import CorrectMark from "../../../..//public/images/correctCircle.png";
 
 export default function CurrentQuestion() {
   const {

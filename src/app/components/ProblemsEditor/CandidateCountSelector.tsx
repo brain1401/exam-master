@@ -1,10 +1,18 @@
-import { Select, SelectItem } from "@nextui-org/react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { ChangeEvent, useLayoutEffect } from "react";
 import useProblems from "@/hooks/useProblems";
+import { Label } from "../ui/label";
 export default function CandidateCountSelector() {
   const {
     candidatesCount,
-    problems,
     setCandidatesCount,
     currentProblem,
     currentProblemCandidates,
@@ -16,15 +24,14 @@ export default function CandidateCountSelector() {
   }, [currentProblem?.candidates?.length, setCandidatesCount, candidatesCount]);
 
 
-  const handleSelectedChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const { value: selectedValue } = event.target;
+  const handleSelectedChange = (value: string) => {
 
     if (!currentProblemCandidates) throw new Error("무언가가 잘못되었습니다.");
 
     let newValues = [...currentProblemCandidates];
     const prevLength = newValues.length;
 
-    const selectedIntValue = parseInt(selectedValue);
+    const selectedIntValue = parseInt(value);
     if (selectedIntValue < prevLength) {
       //선택지 수가 줄어들 때
       newValues = newValues.slice(0, selectedIntValue);
@@ -41,40 +48,31 @@ export default function CandidateCountSelector() {
       //선택지 수가 그대로일 때
       return;
     }
-    setCandidatesCount(selectedValue);
+    setCandidatesCount(value);
     setCurrentProblemCandidates(newValues);
   };
 
   return (
-    <>
+    <div className="flex">
+      <div className="flex justify-center items-center">
+        <Label className="block text-[1rem] mr-2">선택지 개수</Label>
+      </div>
+
       <Select
-        selectedKeys={candidatesCount}
-        onChange={handleSelectedChange}
-        classNames={{
-          base: "",
-          label: "text-md font-semibold justify-self-center self-center",
-          mainWrapper: `w-[3.5rem]`,
-          trigger: `border-nextUiBorder`,
-          value: "text-center",
-        }}
-        variant="bordered"
-        label="선택지 수"
-        labelPlacement="outside-left"
-        size="sm"
+        defaultValue={candidatesCount}
+        onValueChange={handleSelectedChange}
       >
-        {["2", "3", "4", "5", "6"].map((value) => (
-          <SelectItem
-            key={value}
-            value={value}
-            classNames={{
-              selectedIcon: "hidden",
-              title: "text-center",
-            }}
-          >
-            {value}
-          </SelectItem>
-        ))}
+        <SelectTrigger className="w-[4rem]">
+          <SelectValue placeholder="선택지 개수를 입력하세요" />
+        </SelectTrigger>
+        <SelectContent>
+          {["2", "3", "4", "5", "6"].map((value) => (
+            <SelectItem key={value} value={value}>
+              {value}
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
-    </>
+    </div>
   );
 }

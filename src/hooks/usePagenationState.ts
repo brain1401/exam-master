@@ -9,6 +9,10 @@ import {
   selectProblemSetsPage,
   setProblemSetsMaxPageAction,
   setProblemSetsPageAction,
+  setPublicProblemSetsMaxPageAction,
+  setPublicProblemSetsPageAction,
+  selectPublicProblemSetsMaxPage,
+  selectPublicProblemSetsPage,
   selectPageSize,
   setPageSizeAction,
 } from "@/slices/pagenation";
@@ -20,6 +24,8 @@ export default function usePagenationState() {
   const resultsMaxPage = useAppSelector(selectResultMaxPage);
   const problemSetsPage = useAppSelector(selectProblemSetsPage);
   const problemSetsMaxPage = useAppSelector(selectProblemSetsMaxPage);
+  const publicProblemSetsPage = useAppSelector(selectPublicProblemSetsPage);
+  const publicProblemSetsMaxPage = useAppSelector(selectPublicProblemSetsMaxPage);
   const pageSize = useAppSelector(selectPageSize);
 
   //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 useEffect등에서 사용할 때 제대로 작동하지 않는다.
@@ -51,6 +57,20 @@ export default function usePagenationState() {
     [dispatch],
   );
 
+  const setPublicProblemSetsPage = useCallback(
+    (page: number) => {
+      dispatch(setPublicProblemSetsPageAction(page));
+    },
+    [dispatch],
+  );
+
+  const setPublicProblemSetsMaxPage = useCallback(
+    (page: number) => {
+      dispatch(setPublicProblemSetsMaxPageAction(page));
+    },
+    [dispatch],
+  );
+
   const setPageSize = useCallback(
     (size: number) => {
       dispatch(setPageSizeAction(size));
@@ -68,11 +88,15 @@ export default function usePagenationState() {
     problemSetsPage,
     problemSetsMaxPage,
     pageSize,
+    publicProblemSetsPage,
+    publicProblemSetsMaxPage,
     setProblemSetsPage,
     setProblemSetsMaxPage,
     setResultsPage,
     setResultsMaxPage,
     setPageSize,
+    setPublicProblemSetsPage,
+    setPublicProblemSetsMaxPage,
     reset,
   };
 }

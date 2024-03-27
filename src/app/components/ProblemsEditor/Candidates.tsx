@@ -1,8 +1,11 @@
-import { Checkbox, Input } from "@nextui-org/react";
 import SimpleLabel from "../ui/SimpleLabel";
 import { ChangeEvent } from "react";
 import { twMerge } from "tailwind-merge";
 import useProblems from "@/hooks/useProblems";
+import { Input } from "../ui/input";
+import { Checkbox } from "../ui/checkbox";
+import { CheckedState } from "@radix-ui/react-checkbox";
+import { Label } from "../ui/label";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -40,11 +43,11 @@ export default function Candidates({ className }: Props) {
     setCurrentProblemCandidates(newCandidates);
   };
 
-  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    const index = parseInt(name.split("-")[1]);
+  const handleCheckboxChange = (index: number, check: CheckedState) => {
     if (!currentProblemCandidates || !currentProblem)
       throw new Error("무언가가 잘못되었습니다.");
+
+    const checked = check === "indeterminate" ? false : check;
 
     const newCandidates = [...currentProblemCandidates];
 
@@ -93,36 +96,30 @@ export default function Candidates({ className }: Props) {
     (_, index) => candidatePlaceholders[index] ?? "",
   ).map((value, index) => (
     <div key={index} className="my-2 flex flex-col">
-      <SimpleLabel
+      <Label
         htmlFor={`candidate-${index}-text`}
-        className="text-lg font-semibold"
+        className="block mb-1 font-bold text-[1.1rem]"
         preventDefault={true}
       >
         선택지 {index + 1}
-      </SimpleLabel>
+      </Label>
       <div className="flex items-center">
         <Input
           type="text"
+          wrapperClassName="flex-1"
+          inputClassName="h-[2.9rem]"
           id={`candidate-${index}-text`}
           value={currentProblemCandidates?.[index]?.text ?? ""}
-          variant="bordered"
-          classNames={{
-            inputWrapper: "border-nextUiBorder h-[3rem]",
-            input: "text-[.9rem]",
-          }}
-          size="sm"
           onChange={handleInputChange}
           placeholder={value}
         />
         <div className="flex w-[4rem] justify-center">
           <Checkbox
             name={`candidate-${index}-checkbox`}
-            isDisabled={!Boolean(currentProblemCandidates?.[index]?.text)}
-            isSelected={currentProblemCandidates?.[index]?.isAnswer ?? false}
-            classNames={{
-              wrapper: `mx-auto before:border-nextUiBorder`,
-            }}
-            onChange={handleCheckboxChange}
+            className="w-[1.15rem] h-[1.15rem]"
+            disabled={!Boolean(currentProblemCandidates?.[index]?.text)}
+            checked={currentProblemCandidates?.[index]?.isAnswer ?? false}
+            onCheckedChange={(checked) => handleCheckboxChange(index, checked)}
           />
         </div>
       </div>

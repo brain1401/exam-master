@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nextui-org/react";
+import { Button } from "./button";
 import { signIn, signOut } from "next-auth/react";
 
 type Props = {
@@ -11,7 +11,6 @@ export default function LoginButton({ type }: Props) {
     <Button
       onClick={() => (type === "login" ? signIn() : signOut())}
       color="primary"
-      radius="sm"
     >
       {type === "login" ? "로그인" : "로그아웃"}
     </Button>

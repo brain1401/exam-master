@@ -2,41 +2,42 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import usePagenationState from "./usePagenationState";
 import {
-  fetchExamResults,
-  fetchProblemSets,
-  getExamResultsMaxPage,
-  getProblemSetsMaxPage,
-} from "@/utils/problems";
-import {
+  PrefetchPaginationType,
   ProblemSetWithPagination,
+  PublicProblemSetWithPagination,
   ResultsWithPagination,
 } from "@/types/problems";
+import {
+  getFetchDataFunction,
+  getGetMaxPageFunction,
+  getSetMaxPageFunction,
+} from "@/utils/pagination";
 
 export default function usePrefetchPagination(
-  type: "manage" | "exam" | "results",
+  type: PrefetchPaginationType,
   isSearching: boolean,
   debouncedSearchString: string,
 ) {
   const queryClient = useQueryClient();
-  const { setProblemSetsMaxPage, setResultsMaxPage, pageSize } =
-    usePagenationState();
+  const {
+    setProblemSetsMaxPage,
+    setResultsMaxPage,
+    setPublicProblemSetsMaxPage,
+    pageSize,
+  } = usePagenationState();
   // 페이지네이션 데이터 prefetch
   useEffect(() => {
     const prefetch = async () => {
       if (pageSize === 0) return;
 
-      const getMaxPage =
-        type === "manage" || type === "exam"
-          ? getProblemSetsMaxPage
-          : getExamResultsMaxPage;
-      const fetchData =
-        type === "manage" || type === "exam"
-          ? fetchProblemSets
-          : fetchExamResults;
-      const setMaxPage =
-        type === "manage" || type === "exam"
-          ? setProblemSetsMaxPage
-          : setResultsMaxPage;
+      const getMaxPage = getGetMaxPageFunction(type);
+      const fetchData = getFetchDataFunction(type);
+      const setMaxPage = getSetMaxPageFunction({
+        type,
+        setProblemSetsMaxPage,
+        setResultsMaxPage,
+        setPublicProblemSetsMaxPage,
+      });
       const queryKey =
         type === "manage" || type === "exam" ? "problemSets" : "results";
 
@@ -50,7 +51,10 @@ export default function usePrefetchPagination(
       for (let i = 1; i <= maxPage; i++) {
         fetchs.push(
           queryClient.prefetchQuery<
-            ProblemSetWithPagination | ResultsWithPagination | null
+            | ProblemSetWithPagination
+            | PublicProblemSetWithPagination
+            | ResultsWithPagination
+            | null
           >({
             queryKey: [
               queryKey,
@@ -80,6 +84,7 @@ export default function usePrefetchPagination(
     pageSize,
     debouncedSearchString,
     queryClient,
+    setPublicProblemSetsMaxPage,
     setProblemSetsMaxPage,
     setResultsMaxPage,
     isSearching,

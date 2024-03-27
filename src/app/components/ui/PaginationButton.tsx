@@ -1,4 +1,12 @@
-import { Pagination } from "@nextui-org/react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "./pagination";
 
 type Props = {
   setPage: (page: number) => void;
@@ -13,22 +21,29 @@ export default function PaginationButton({
   page,
   className,
 }: Props) {
-  
   return (
     <>
-      <Pagination
-        className={className}
-        classNames={{
-          item: "bg-nextUiBorder",
-          next: "bg-nextUiBorder !text-black",
-          prev: "bg-nextUiBorder !text-black",
-        }}
-        total={maxPage}
-        page={page}
-        onChange={setPage}
-        showControls
-        size="sm"
-      />
+      <Pagination className={className}>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious href="#" />
+          </PaginationItem>
+          {Array.from({ length: maxPage }, (_, i) => i + 1).map((item) => (
+            <PaginationItem key={item}>
+              <PaginationLink
+                href="#"
+                onClick={() => setPage(item)}
+                isActive={item === page}
+              >
+                {item}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext href="#" />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </>
   );
 }

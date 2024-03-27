@@ -1,6 +1,6 @@
 "use client";
 import useProblemResults from "@/hooks/useProblemResults";
-import { Button } from "@nextui-org/react";
+import { Button } from "../ui/button";
 import useScrollEffect from "@/hooks/useScrollEffect";
 
 export default function NextOrPrevButton() {
@@ -26,8 +26,8 @@ export default function NextOrPrevButton() {
 
   return (
     <div className="mt-3 flex gap-x-3">
-      <Button onClick={onClickPrev}>이전</Button>
-      <Button onClick={onClickNext}>다음</Button>
+      <Button onClick={onClickPrev} className="px-6 py-2">이전</Button>
+      <Button onClick={onClickNext} className="px-6 py-2">다음</Button>
     </div>
   );
 }

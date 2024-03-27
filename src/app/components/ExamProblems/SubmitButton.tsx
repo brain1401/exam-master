@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nextui-org/react";
+import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import useExamProblems from "@/hooks/useExamProblems";
 import { isProblemAsnwered } from "@/utils/problems";
@@ -39,7 +39,7 @@ export default function SubmitButton() {
   };
   return (
     <>
-      <Button className="mt-3" onClick={onClick} isLoading={isLoading}>
+      <Button className="mt-3 px-6 py-2" onClick={onClick} isLoading={isLoading}>
         {isLoading ? "채점중..." : "제출하기"}
       </Button>
     </>

@@ -45,7 +45,7 @@ export default function ProblemsEditor() {
     let value = "";
 
     const BASIC_CLASS_NAME = "rounded-lg border border-gray-300 px-5 py-3";
-    const ON_CURRENT_TAB = "bg-secondary text-main";
+    const ON_CURRENT_TAB = "bg-[#454655] text-white";
 
     if (tab === "obj") {
       value = `mr-2 ${BASIC_CLASS_NAME} ${

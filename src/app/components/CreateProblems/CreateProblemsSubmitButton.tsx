@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@nextui-org/react";
+import { Button } from "../ui/button";
 import axios from "axios";
 import useProblems from "@/hooks/useProblems";
 
@@ -14,8 +14,13 @@ import {
 } from "@/utils/problems";
 
 export default function CreateProblemsSubmitButton() {
-  const { problems, problemSetsName, problemSetIsPublic, setProblemSetsName, resetProblems } =
-    useProblems();
+  const {
+    problems,
+    problemSetsName,
+    problemSetIsPublic,
+    setProblemSetsName,
+    resetProblems,
+  } = useProblems();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -117,7 +122,7 @@ export default function CreateProblemsSubmitButton() {
         formData.append(`data[${index}]`, JSON.stringify(problem));
       });
       formData.append("problemSetsName", problemSetsName);
-      formData.append("problemSetIsPublic", problemSetIsPublic.toString())
+      formData.append("problemSetIsPublic", problemSetIsPublic.toString());
 
       const response = await fetch("/api/postProblems", {
         method: "POST",
@@ -145,11 +150,9 @@ export default function CreateProblemsSubmitButton() {
   return (
     <div className="mt-3 flex justify-center">
       <Button
-        radius="sm"
         onClick={handleSubmit}
         isLoading={isLoading}
         className="w-[7rem] px-8 py-1"
-        color="primary"
       >
         {isLoading ? "제출 중..." : "최종제출"}
       </Button>

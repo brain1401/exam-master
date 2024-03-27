@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@nextui-org/react";
+import { Button } from "../ui/button";
 import useProblems from "@/hooks/useProblems";
 import {
   analyzeProblemsImagesAndDoCallback,
@@ -150,8 +150,6 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
         onClick={handleSubmit}
         isLoading={isLoading}
         className="w-[7rem] px-8 py-1"
-        radius="sm"
-        color="primary"
       >
         {isLoading ? "수정 중..." : "수정"}
       </Button>

@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { Textarea, Button } from "@nextui-org/react";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import useProblems from "@/hooks/useProblems";
 import { isImageFileObject, isImageUrlObject } from "@/utils/problems";
+import { Label } from "../ui/label";
 
 type Props = {
   className?: string;
@@ -14,7 +16,7 @@ export default function AddViewAndPhoto({ className }: Props) {
   const [imageURL, setImageURL] = useState<string | null>(null); // 이미지 URL을 관리하는 상태를 추가
 
   const { currentProblem, setCurrentProblem } = useProblems();
-  
+
   const {
     additionalView,
     isAdditiondalViewButtonClicked,
@@ -68,12 +70,13 @@ export default function AddViewAndPhoto({ className }: Props) {
   const getButtonsClassName = (type: "view" | "image") => {
     let value = "";
 
-    const BASIC_CLASS_NAME = "rounded-lg border border-gray-300 px-5 py-3";
+    const BASIC_CLASS_NAME =
+      "rounded-lg bg-[#d1d5db] text-black border border-gray-300 px-5 py-[1.4rem] hover:text-white";
     const condition =
       type === "view" ? isAdditiondalViewButtonClicked : isImageButtonClicked;
 
     if (condition) {
-      value = `${BASIC_CLASS_NAME} bg-secondary text-white`;
+      value = `${BASIC_CLASS_NAME} bg-[#454655] text-white`;
     } else {
       value = `${BASIC_CLASS_NAME}`;
     }
@@ -130,14 +133,14 @@ export default function AddViewAndPhoto({ className }: Props) {
 
       {(isImageButtonClicked || imageURL) && (
         <div className="mt-4">
-          <p
-            className="cursor-default text-lg font-semibold"
+          <Label
+            className="mb-1 block text-[1.1rem]"
             onClick={(e) => {
               e.preventDefault();
             }}
           >
             사진
-          </p>
+          </Label>
           <div className="my-2 flex items-center">
             <input
               type="file"
@@ -167,26 +170,20 @@ export default function AddViewAndPhoto({ className }: Props) {
       )}
       {(isAdditiondalViewButtonClicked || additionalView) && (
         <div className="mt-4">
-          <label
+          <Label
             htmlFor="additional-info"
-            className="mb-2 block text-lg font-semibold"
+            className="mb-1 block text-[1.1rem]"
             onClick={(e) => {
               e.preventDefault();
             }}
           >
             보기
-          </label>
+          </Label>
           <Textarea
             id="additional-info"
+            className="resize-none"
             placeholder="나 이번 시험 너무 못 봤어. 평균 99점이 조금 안 되네"
             value={additionalView}
-            variant="bordered"
-            classNames={{
-              inputWrapper: "w-full !h-[6rem]",
-              input: "text-[1rem]",
-              label: "text-md font-semibold text-lg",
-            }}
-            maxRows={3}
             onChange={(e) => {
               setCurrentProblem({
                 additionalView: e.target.value,

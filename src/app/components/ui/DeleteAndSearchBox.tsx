@@ -1,4 +1,4 @@
-import { Button } from "@nextui-org/react";
+import { Button } from "./button";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import SearchBox from "./SearchBox";
 import useUiState from "@/hooks/useUiState";
@@ -79,7 +79,8 @@ export default function DeleteAndSearchBox({
     <div className="flex justify-between">
       <div className="flex items-center justify-center gap-x-[.2rem] md:gap-x-[1rem]">
         <Button
-          isIconOnly
+          variant="outline"
+          size="icon"
           className={twMerge(
             `ml-[1rem] md:ml-[8vw]`,
             `${isDeleteButtonClicked && "brightness-[80%]"}`,

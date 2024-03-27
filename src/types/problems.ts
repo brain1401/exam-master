@@ -45,6 +45,12 @@ export type ProblemReplacedImageKeyAndFile = Prettify<
 
 export type ExamProblem = z.infer<typeof examProblemSchema>;
 
+export type PrefetchPaginationType =
+  | "manage"
+  | "exam"
+  | "results"
+  | "publicProblemSet";
+
 export type ProblemSet = {
   uuid: string;
   name: string;
@@ -54,6 +60,11 @@ export type ProblemSet = {
   problems?: Problem[];
   examProblemsCount?: number;
 };
+export type ProblemSetWithCreatedBy = Prettify<
+  Omit<ProblemSet, "isShareLinkPurposeSet" | "createdAt"> & {
+    createdBy: string;
+  }
+>;
 
 export type ProblemSetWithPagination = {
   data: ProblemSet[];
@@ -64,6 +75,12 @@ export type ProblemSetWithPagination = {
     total: number;
   };
 };
+
+export type PublicProblemSetWithPagination = Prettify<
+  Omit<ProblemSetWithPagination, "data"> & {
+    data: ProblemSetWithCreatedBy[];
+  }
+>;
 
 export type ProblemSetWithName = {
   id: string | undefined;
