@@ -11,7 +11,7 @@ export default function ExamProblemsNextOrPrevButtons() {
   return (
     <div className="mt-2 flex gap-4">
       <Button
-        className="py 2 px-6"
+        className="py-2 w-[4.9rem]"
         onClick={() => {
           if (currentExamProblemIndex > 0) {
             setCurrentExamProblemIndex(currentExamProblemIndex - 1);
@@ -21,7 +21,7 @@ export default function ExamProblemsNextOrPrevButtons() {
         이전
       </Button>
       <Button
-        className="py 2 px-6"
+        className="py-2 w-[4.9rem]"
         onClick={() => {
           if (currentExamProblemIndex < examProblems.problems.length - 1) {
             setCurrentExamProblemIndex(currentExamProblemIndex + 1);

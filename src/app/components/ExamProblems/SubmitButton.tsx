@@ -39,7 +39,7 @@ export default function SubmitButton() {
   };
   return (
     <>
-      <Button className="mt-3 px-6 py-2" onClick={onClick} isLoading={isLoading}>
+      <Button className="mt-3 px-6 w-[6.5rem]" onClick={onClick} isLoading={isLoading}>
         {isLoading ? "채점중..." : "제출하기"}
       </Button>
     </>

@@ -6,7 +6,7 @@ import { Candidate } from "@/types/problems";
 import { isCardOnBeingWrited } from "@/utils/problems";
 import { Button } from "../ui/button";
 
-const BUTTON_CLASSNAMES = "bg-[#454655] text-white px-[1.5rem] py-1";
+const BUTTON_CLASSNAMES = "bg-[#454655] text-white w-[4.9rem] py-1";
 
 export default function NextOrPrevButtons() {
   const {

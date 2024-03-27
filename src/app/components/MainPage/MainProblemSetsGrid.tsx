@@ -6,6 +6,7 @@ import usePagenationState from "@/hooks/usePagenationState";
 import { Card, CardContent } from "../ui/card";
 import { fetchPublicProblemSets } from "@/utils/problems";
 import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
+import Link from "next/link";
 
 type Props = {
   debouncedSearchString: string;
@@ -63,15 +64,27 @@ export default function MainProblemSetsGrid({
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {publicProblemSets?.data.map((publicProblemSet) => (
               <Card key={publicProblemSet.uuid}>
-                <CardContent className="flex flex-col items-start justify-center space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                    {publicProblemSet.name}
-                  </h3>
-                  <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                    <div>{publicProblemSet.createdBy}</div>
-                    <div>{new Date(publicProblemSet.updatedAt).toLocaleDateString("ko-KR")}</div>
-                    <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
-                  </div>
+                <CardContent>
+                  <Link
+                    href={"#"}
+                    onClick={() => {
+                      alert("준비중입니다.");
+                    }}
+                    className="flex flex-col items-start justify-center space-y-2"
+                  >
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                      {publicProblemSet.name}
+                    </h3>
+                    <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
+                      <div>{publicProblemSet.createdBy}</div>
+                      <div>
+                        {new Date(
+                          publicProblemSet.updatedAt,
+                        ).toLocaleDateString("ko-KR")}
+                      </div>
+                      <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
+                    </div>
+                  </Link>
                 </CardContent>
               </Card>
             ))}

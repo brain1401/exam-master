@@ -152,7 +152,7 @@ export default function CreateProblemsSubmitButton() {
       <Button
         onClick={handleSubmit}
         isLoading={isLoading}
-        className="w-[7rem] px-8 py-1"
+        className="w-[7rem]"
       >
         {isLoading ? "제출 중..." : "최종제출"}
       </Button>
