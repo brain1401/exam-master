@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
 
-  const { problemSetsName, problems } = getParsedProblems(formData, false);
+  const { problemSetsName, problems, problemSetIsPublic } = getParsedProblems(formData, false);
 
   if (!problemSetsName || !problems) {
     return NextResponse.json(
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
       session?.user?.email,
       problems,
       false,
+      problemSetIsPublic,
     );
 
 

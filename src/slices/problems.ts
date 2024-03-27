@@ -4,6 +4,7 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 type StateType = {
   problems: Problem[];
+  isPublic: boolean;
   currentProblemIndex: number;
   problemSetsName: string;
   localProblemSetsName: string;
@@ -18,6 +19,7 @@ const initialState: StateType = {
       ? {
           id: undefined,
           type: "obj",
+          isPublic: false,
           question: "",
           additionalView: "",
           isAdditiondalViewButtonClicked: false,
@@ -34,6 +36,7 @@ const initialState: StateType = {
         }
       : null,
   ),
+  isPublic: false,
   currentProblemIndex: 0,
   currentTab: "obj",
   problemSetsName: "",
@@ -54,6 +57,9 @@ export const problemsSlice = createSlice({
     },
     setProblemSetsNameAction: (state, action: PayloadAction<string>) => {
       state.problemSetsName = action.payload;
+    },
+    setPublicAction: (state, action: PayloadAction<boolean>) => {
+      state.isPublic = action.payload;
     },
     setCurrentTabAction: (state, action: PayloadAction<"obj" | "sub">) => {
       state.currentTab = action.payload;
@@ -123,6 +129,7 @@ export const {
   setCurrentProblemCandidatesAction,
   setCurrentProblemIndexAction,
   setCurrentTabAction,
+  setPublicAction,
   setProblemSetsNameAction,
   setProblemsAction,
   setLocalProblemSetsNameAction,

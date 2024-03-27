@@ -69,6 +69,7 @@ export async function postProblems(
   userEmail: string,
   toBePostedProblems: ProblemReplacedImageKey[],
   isShareLinkPurposeSet: boolean,
+  isPublic: boolean,
 ) {
   try {
     const result = await drizzleSession.transaction(async (dt) => {
@@ -133,7 +134,7 @@ export async function postProblems(
           userUuid: userUuId,
           isShareLinkPurposeSet: isShareLinkPurposeSet,
           updatedAt: new Date(),
-          isPublic: false,
+          isPublic,
         })
         .returning({ uuid: problemSet.uuid });
 
@@ -753,8 +754,18 @@ export function isCandidateArray(candidates: any): candidates is Candidate[] {
   );
 }
 
+function stringToBoolean(value: string): boolean {
+  if (value === "true") {
+    return true;
+  } else if (value === "false") {
+    return false;
+  }
+  throw new Error("Invalid input");
+}
+
 type ProblemsAndSetsName = {
   problemSetsName: string;
+  problemSetIsPublic: boolean;
   problems: ProblemReplacedImageKey[];
 };
 
@@ -771,10 +782,14 @@ export function getParsedProblems<T extends boolean>(
   const problems: NonNullable<ProblemReplacedImageKey>[] = [];
   let problemSetsName: string | undefined;
   let problemSetUUID: string | undefined;
-
+  let problemSetIsPublic: boolean | undefined;
   for (const [name, value] of entries) {
     if (name === "problemSetsName") {
       problemSetsName = value as string;
+      continue;
+    }
+    if (name === "problemSetIsPublic") {
+      problemSetIsPublic = stringToBoolean(value.toString());
       continue;
     }
     if (includeUuid && name === "uuid") {
@@ -809,11 +824,14 @@ export function getParsedProblems<T extends boolean>(
   }
 
   if (includeUuid) {
-    return { problemSetsName, problems, problemSetUUID } as T extends true
-      ? ProblemsAndSetsNameWithUUID
-      : ProblemsAndSetsName;
+    return {
+      problemSetsName,
+      problems,
+      problemSetIsPublic,
+      problemSetUUID,
+    } as T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetsName;
   } else {
-    return { problemSetsName, problems } as T extends true
+    return { problemSetsName, problems, problemSetIsPublic } as T extends true
       ? ProblemsAndSetsNameWithUUID
       : ProblemsAndSetsName;
   }

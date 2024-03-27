@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Problem } from "@/types/problems";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Checkbox, Input } from "@nextui-org/react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
 
@@ -17,6 +17,8 @@ export default function ProblemsOption() {
     setProblems,
     currentProblemIndex,
     setCurrentProblemIndex,
+    problemSetIsPublic,
+    setProblemSetIsPublic,
     problemLength,
     setProblemLength,
   } = useProblems();
@@ -151,29 +153,41 @@ export default function ProblemsOption() {
           확인
         </Button>
       </div>
-      <div className="flex items-center">
-        <Input
-          id="problemSetName"
-          className="w-fit text-center"
-          classNames={{
-            inputWrapper: "px-[.5rem] w-[10rem]",
-            label: " text-sm md:text-md z-0",
-          }}
-          label="문제집 이름"
-          labelPlacement="outside-left"
-          variant="bordered"
-          size="sm"
-          value={localProblemSetsName}
-          onChange={(e) => setLocalProblemSetsName(e.target.value)}
-        />
-        <Button
-          className={BUTTON_CLASSNAMES}
-          onClick={applyProblemSetName}
-          size="sm"
-          isLoading={isLoading}
-        >
-          {isLoading ? "" : "확인"}
-        </Button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            id="problemSetName"
+            className="w-fit text-center"
+            classNames={{
+              inputWrapper: "px-[.5rem] w-[10rem]",
+              label: " text-sm md:text-md z-0",
+            }}
+            label="문제집 이름"
+            labelPlacement="outside-left"
+            variant="bordered"
+            size="sm"
+            value={localProblemSetsName}
+            onChange={(e) => setLocalProblemSetsName(e.target.value)}
+          />
+          <Button
+            className={BUTTON_CLASSNAMES}
+            onClick={applyProblemSetName}
+            size="sm"
+            isLoading={isLoading}
+          >
+            {isLoading ? "" : "확인"}
+          </Button>
+        </div>
+        <div>
+          <Checkbox
+            isSelected={problemSetIsPublic}
+            onValueChange={() => {
+              setProblemSetIsPublic(!problemSetIsPublic);
+            }}
+          >
+            문제집 공개로 설정
+          </Checkbox>
+        </div>
       </div>
     </div>
   );

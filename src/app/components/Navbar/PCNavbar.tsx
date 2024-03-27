@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import Logo from "/public/images/Exam Master.svg";
+import logo from "../../../../public/images/Exam Master.svg";
 import { HiMenu } from "react-icons/hi";
 import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
 
@@ -23,7 +23,7 @@ export default function PCNavbar({ loginButton }: Props) {
         <div className="flex">
           <div className="ml-[1rem] px-5 py-2 text-xl font-bold md:ml-[3rem] md:text-2xl">
             <Link href="/">
-              <Image src={Logo} alt="logo" className="h-[2rem] w-[8rem]" />
+              <Image src={logo} alt="logo" className="h-[2rem] w-[8rem]" />
             </Link>
           </div>
           <ul className="flex items-center gap-3">

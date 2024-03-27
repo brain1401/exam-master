@@ -9,13 +9,21 @@ import useProblems from "@/hooks/useProblems";
 import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 
 export default function CreateProblems() {
-  const { resetProblems } = useProblems();
+  const { resetProblems, currentProblem, problemSetIsPublic } = useProblems();
 
   useEffect(() => {
     return () => {
       resetProblems();
     };
   }, [resetProblems]);
+
+  useEffect(() => {
+    console.log(currentProblem);
+  }, [currentProblem]);
+
+  useEffect(() => {
+    console.log("problemSetIsPublic :",problemSetIsPublic);
+  }, [problemSetIsPublic]);
 
   return (
     <ProblemEditorLayout>

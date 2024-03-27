@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import Logo from "/public/images/Exam Master.svg";
+import logo from "../../../../public/images/Exam Master.svg";
 import { useRef, useEffect } from "react";
 import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
 const MOBILE_LIST_ITEM = "py-2 w-full border-b border-gray-300 text-center";
@@ -42,7 +42,7 @@ export default function NavMobile({ loginButton }: Props) {
     >
       <ul className="flex w-full flex-col items-center justify-center">
         <li className="flex w-full items-center justify-center border-b border-gray-300 py-2 ">
-          <Image src={Logo} alt="logo" className="h-[2rem] w-[8rem]" />
+          <Image src={logo} alt="logo" className="h-[2rem] w-[8rem]" />
         </li>
         <li className={MOBILE_LIST_ITEM}>
           <Link href="/exam" onClick={() => setMobileMenuOpen(false)}>

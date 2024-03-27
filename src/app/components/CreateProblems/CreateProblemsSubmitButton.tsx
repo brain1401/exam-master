@@ -14,7 +14,7 @@ import {
 } from "@/utils/problems";
 
 export default function CreateProblemsSubmitButton() {
-  const { problems, problemSetsName, setProblemSetsName, resetProblems } =
+  const { problems, problemSetsName, problemSetIsPublic, setProblemSetsName, resetProblems } =
     useProblems();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -117,6 +117,7 @@ export default function CreateProblemsSubmitButton() {
         formData.append(`data[${index}]`, JSON.stringify(problem));
       });
       formData.append("problemSetsName", problemSetsName);
+      formData.append("problemSetIsPublic", problemSetIsPublic.toString())
 
       const response = await fetch("/api/postProblems", {
         method: "POST",
