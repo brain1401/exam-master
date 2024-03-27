@@ -94,7 +94,7 @@ export default function MainProblemSetsGrid({
     }
   };
 
-  if (true) return <PublicProblemSetsCardSkeleton pageSize={pageSize} />;
+  if (isLoading) return <PublicProblemSetsCardSkeleton pageSize={pageSize} />;
 
   if (error)
     return (
