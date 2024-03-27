@@ -31,6 +31,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
     setProblemSetsName,
     setProblemLength,
     setLocalProblemSetsName,
+    setProblemSetIsPublic,
     setCurrentTab,
   } = useProblems();
 
@@ -50,6 +51,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
         setCurrentTab(
           (res.data.problems[0] && res.data.problems[0].type) || "obj",
         );
+        setProblemSetIsPublic(res.data.isPublic);
       })
       .catch((err) => {
         setError(err.response?.data.error);
@@ -67,6 +69,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
     setProblemSetsName,
     setProblems,
     setLocalProblemSetsName,
+    setProblemSetIsPublic,
     setCurrentTab,
     setProblemLength,
   ]);

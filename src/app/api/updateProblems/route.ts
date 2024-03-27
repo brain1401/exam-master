@@ -18,7 +18,7 @@ export async function PUT(req: NextRequest) {
   }
   const formData = await req.formData();
 
-  const { problemSetsName, problems, problemSetUUID } = getParsedProblems(
+  const { problemSetsName, problems, problemSetIsPublic, problemSetUUID } = getParsedProblems(
     formData,
     true,
   );
@@ -65,6 +65,7 @@ export async function PUT(req: NextRequest) {
       problemSetsName,
       problems,
       problemSetUUID,
+      problemSetIsPublic,
       session.user.email,
     );
 

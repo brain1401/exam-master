@@ -68,6 +68,7 @@ export type ProblemSetWithPagination = {
 export type ProblemSetWithName = {
   id: string | undefined;
   name: string;
+  isPublic: boolean;
   problems: Problem[];
 };
 

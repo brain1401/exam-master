@@ -176,6 +176,7 @@ export async function updateProblems(
   setName: string,
   replacingProblems: ProblemReplacedImageKey[],
   problemSetUUID: string,
+  problemSetIsPublic: boolean,
   userEmail: string,
 ) {
   console.log("문제 업데이트 시작!");
@@ -325,11 +326,17 @@ export async function updateProblems(
         await deleteImagesFromSet(toBeDeletedImageKey, userEmail, dt);
       }
 
-      // 문제집 이름 업데이트
-      await dt
-        .update(problemSet)
-        .set({ name: setName })
-        .where(eq(problemSet.uuid, problemSetUUID));
+      await Promise.all([
+        // 문제집 이름 및 공개 여부 업데이트
+        dt
+          .update(problemSet)
+          .set({ name: setName })
+          .where(eq(problemSet.uuid, problemSetUUID)),
+        dt
+          .update(problemSet)
+          .set({ isPublic: problemSetIsPublic })
+          .where(eq(problemSet.uuid, problemSetUUID)),
+      ]);
 
       if (oldProblems.length > 0) {
         console.log(`기존 문제들 삭제 시작`, oldProblems);
@@ -608,6 +615,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         createdAt: foundProblemSet.createdAt,
         updatedAt: foundProblemSet.updatedAt,
         isShareLinkPurposeSet: foundProblemSet.isShareLinkPurposeSet,
+        isPublic: foundProblemSet.isPublic,
         problems: foundProblemSet.problems.map((problem) => ({
           uuid: problem.uuid,
           question: problem.question,
