@@ -4,10 +4,10 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
-
 import { useState } from "react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
+import { IoMdSettings } from "react-icons/io";
 import {
   Dialog,
   DialogClose,
@@ -157,7 +157,7 @@ export default function ProblemsOption({ type }: Props) {
 
   const onProblemSetDescriptionCancel = () => {
     setTextarea(description);
-  }
+  };
 
   return (
     <div className="mb-5 flex w-full flex-col gap-2">
@@ -194,8 +194,8 @@ export default function ProblemsOption({ type }: Props) {
               {isLoading ? "" : "확인"}
             </Button>
           </div>
-          <div className="absolute bottom-0 right-0 top-0 flex flex-col items-center justify-center md:justify-center">
-            <div className="flex">
+          <div className="absolute bottom-0 right-0 top-0 flex flex-col items-center justify-center max-[500px]:left-0 max-[500px]:right-auto max-[500px]:top-full max-[500px]:mt-3 md:justify-center">
+            <div className="relative flex">
               <Switch
                 className="mr-2"
                 checked={problemSetIsPublic}
@@ -216,12 +216,15 @@ export default function ProblemsOption({ type }: Props) {
               {problemSetIsPublic ? (
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger
-                    className="absolute left-0 right-0 top-full flex w-full justify-end md:block"
+                    className="absolute left-0 right-0 top-full mt-2 flex justify-end max-[500px]:w-[7rem] max-[500px]:justify-start md:block md:w-full"
                     asChild
                   >
                     <div>
-                      <Button className="w-auto md:w-full">
+                      <Button className="block w-full max-[500px]:hidden">
                         문제집 설명 설정
+                      </Button>
+                      <Button className="hidden w-fit max-[500px]:block">
+                        <IoMdSettings />
                       </Button>
                     </div>
                   </DialogTrigger>
@@ -243,7 +246,11 @@ export default function ProblemsOption({ type }: Props) {
                         확인
                       </Button>
                       <DialogClose asChild>
-                        <Button className="px-6 py-3" variant="outline" onClick={() => onProblemSetDescriptionCancel()}>
+                        <Button
+                          className="px-6 py-3"
+                          variant="outline"
+                          onClick={() => onProblemSetDescriptionCancel()}
+                        >
                           취소
                         </Button>
                       </DialogClose>

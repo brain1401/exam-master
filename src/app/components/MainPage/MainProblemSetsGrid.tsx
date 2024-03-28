@@ -106,7 +106,7 @@ export default function MainProblemSetsGrid({
                       <DialogDescription></DialogDescription>
                     </DialogHeader>
 
-                    <DialogFooter>
+                    <DialogFooter className="gap-y-2 sm:gap-y-0">
                       <Button>문제 가져오기</Button>
                       <Button>그냥 문제 풀기</Button>
                     </DialogFooter>
