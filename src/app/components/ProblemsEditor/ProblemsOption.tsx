@@ -160,7 +160,7 @@ export default function ProblemsOption({ type }: Props) {
   };
 
   return (
-    <div className="mb-5 flex w-full flex-col gap-2">
+    <div className="my-5 flex w-full flex-col gap-2">
       <div className="flex items-center">
         <Label className="mr-2 text-[.9rem]">최대 문제 수</Label>
         <Input

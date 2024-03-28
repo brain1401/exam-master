@@ -15,7 +15,14 @@ import { Button } from "../ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import usePagenationState from "@/hooks/usePagenationState";
-import { Card, CardContent } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardTitle,
+  CardHeader,
+  CardDescription,
+  CardFooter,
+} from "../ui/card";
 import { fetchPublicProblemSets } from "@/utils/problems";
 import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
 import Link from "next/link";
@@ -73,30 +80,41 @@ export default function MainProblemSetsGrid({
     } else {
       return (
         publicProblemSets?.data && (
-          <div className="grid grid-cols-1 gap-6 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-3">
-            {publicProblemSets?.data.map((publicProblemSet) => (
-              <>
-                <Dialog>
-                  <DialogTrigger>
-                    <Card key={publicProblemSet.uuid}>
-                      <CardContent className="hover:shadow-md">
-                        <div className="flex flex-col items-start justify-center space-y-2">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                            {publicProblemSet.name}
-                          </h3>
-                          <div className="space-y-1 text-start text-sm text-gray-500 dark:text-gray-400">
-                            <div>{publicProblemSet.createdBy}</div>
-                            <div>
-                              {new Date(
-                                publicProblemSet.updatedAt,
-                              ).toLocaleDateString("ko-KR")}
+          <div className="mx-auto flex w-full max-w-[70rem]">
+            <div className="flex min-w-0 flex-1 flex-row flex-wrap gap-y-[1rem]">
+              {publicProblemSets?.data.map((publicProblemSet) => (
+                <Dialog key={publicProblemSet.uuid}>
+                  <DialogTrigger asChild>
+                    <Card
+                      className="h-full cursor-pointer hover:shadow-md"
+                      wrapperClassName="px-2 max-w-[50%] basis-[50%] md:max-w-[25%] md:basis-[25%]"
+                    >
+                      <CardHeader>
+                        <CardTitle>{publicProblemSet.name}</CardTitle>
+                        {publicProblemSet.description ? (
+                          <CardDescription>
+                            {publicProblemSet.description}
+                          </CardDescription>
+                        ) : null}
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex w-full ">
+                          <div className="flex flex-col items-start justify-center space-y-2">
+                            <div className="space-y-1 text-start text-[.9rem] text-gray-500 dark:text-gray-400">
+                              <div>{publicProblemSet.createdBy}</div>
+                              <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
+                              <div>
+                                {new Date(
+                                  publicProblemSet.updatedAt,
+                                ).toLocaleDateString("ko-KR")}
+                              </div>
                             </div>
-                            <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   </DialogTrigger>
+
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{publicProblemSet.name}</DialogTitle>
@@ -112,8 +130,8 @@ export default function MainProblemSetsGrid({
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-              </>
-            ))}
+              ))}
+            </div>
           </div>
         )
       );

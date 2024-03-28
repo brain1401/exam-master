@@ -11,8 +11,6 @@ import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 import useProblems from "@/hooks/useProblems";
 import { Button } from "../ui/button";
 import { FiShare } from "react-icons/fi";
-import Modal from "../ui/Modal";
-import ShareLinkWindow from "../ui/ShareLinkWindow";
 import { ProblemSetWithName } from "@/types/problems";
 
 type Props = {
@@ -86,16 +84,6 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
     <ProblemEditorLayout>
       <div className="relative">
         <ProblemsOption type="manage" />
-
-        <Modal
-          Header={<h2 className="text-2xl">링크 공유</h2>}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          className="p-5"
-          kind="none"
-        >
-          <ShareLinkWindow setIsModalOpen={setIsModalOpen} UUID={UUID} />
-        </Modal>
 
         <div className="absolute right-0 top-0">
           <Button

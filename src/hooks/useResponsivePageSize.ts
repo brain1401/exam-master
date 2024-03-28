@@ -40,7 +40,7 @@ export default function useResponsivePageSize(
       }
     } else if (isSm) {
       if (type === "publicProblemSet") {
-        setPageSize(4);
+        setPageSize(6);
       } else {
         setPageSize(4);
       }

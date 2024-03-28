@@ -4,7 +4,6 @@ import { Viewport } from "next";
 import Navbar from "./components/Navbar/Navbar";
 import AuthContext from "@/context/AuthContext";
 import localFont from "next/font/local";
-import NextUIContext from "@/context/NextUIContext";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import ReduxProvider from "@/context/ReduxContext";
@@ -85,16 +84,14 @@ export default function RootLayout({
         `}
       </Script>
       <body
-        className={`${NotoSansKR.className} min-h-[100dvh] bg-main bg-cover bg-repeat antialiased`}
+        className={`${NotoSansKR.className} bg-background bg-cover bg-repeat antialiased`}
       >
         <AuthContext>
           <ReduxProvider>
-            <NextUIContext>
-              <ReactQueryContext>
-                <Navbar />
-                <main>{children}</main>
-              </ReactQueryContext>
-            </NextUIContext>
+            <ReactQueryContext>
+              <Navbar />
+              <main className="flex flex-col flex-1">{children}</main>
+            </ReactQueryContext>
           </ReduxProvider>
           <Analytics />
         </AuthContext>

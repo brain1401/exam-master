@@ -285,7 +285,7 @@ export async function fetchPublicProblemSets(
   debouncedSearchString: string,
   problemSetsPage: number,
   pageSize: number,
-  setPublicProblemSetsMaxPage: (maxPage: number) => void,
+  setPublicProblemSetsMaxPage?: (maxPage: number) => void,
 ) {
   try {
     if (pageSize === 0) return null;
@@ -317,7 +317,9 @@ export async function fetchPublicProblemSets(
     const data: PublicProblemSetWithPagination = res?.data;
 
     if (data) {
-      setPublicProblemSetsMaxPage(data.pagination.pageCount || 1);
+      setPublicProblemSetsMaxPage && setPublicProblemSetsMaxPage(
+        data.pagination.pageCount || 1,
+      );
       return data;
     } else {
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
@@ -724,6 +726,6 @@ export function getQueryKey(type: PrefetchPaginationType) {
   } else if (type === "results") {
     return "results";
   } else {
-    return "publicProblemSet";
+    return "publicProblemSets";
   }
 }
