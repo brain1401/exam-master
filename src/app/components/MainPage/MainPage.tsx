@@ -62,7 +62,7 @@ export default function MainPage() {
         <div className="mx-auto w-full max-w-[58rem] px-5">
           <div>{/* 광고 */}</div>
           <div>
-            <div className="flex w-full flex-col pt-2 md:pt-10">
+            <div className="flex w-full flex-col pt-10">
               <h2 className="mb-4 text-[1.5rem] font-semibold text-gray-900 dark:text-gray-50">
                 공개된 문제집
               </h2>
