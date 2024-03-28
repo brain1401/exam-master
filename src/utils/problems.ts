@@ -10,6 +10,7 @@ import {
   PresignedPostAlreadyExistsCallback,
   toBeCallbackedItSelf,
   PublicProblemSetWithPagination,
+  PrefetchPaginationType,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
@@ -715,4 +716,14 @@ export function isPresignedPost(
     typeof presignedPost.url === "string" &&
     typeof presignedPost.fields === "object"
   );
+}
+
+export function getQueryKey(type: PrefetchPaginationType) {
+  if (type === "manage" || type === "exam") {
+    return "problemSets";
+  } else if (type === "results") {
+    return "results";
+  } else {
+    return "publicProblemSet";
+  }
 }

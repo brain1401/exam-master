@@ -27,7 +27,7 @@ export default function CreateProblems() {
 
   return (
     <ProblemEditorLayout>
-      <ProblemsOption />
+      <ProblemsOption type="create"/>
 
       <CurrentProblemIndicator />
 

@@ -65,13 +65,21 @@ import {
 import { s3Client } from "@/utils/AWSs3Client";
 import drizzleSession from "@/db/drizzle";
 
-export async function postProblems(
-  setName: string,
-  userEmail: string,
-  toBePostedProblems: ProblemReplacedImageKey[],
-  isShareLinkPurposeSet: boolean,
-  isPublic: boolean,
-) {
+export async function postProblems({
+  problemSetName,
+  toBePostedProblems,
+  userEmail,
+  isPublic,
+  isShareLinkPurposeSet,
+  description,
+}: {
+  problemSetName: string;
+  userEmail: string;
+  toBePostedProblems: ProblemReplacedImageKey[];
+  isShareLinkPurposeSet: boolean;
+  isPublic: boolean;
+  description?: string;
+}) {
   try {
     const result = await drizzleSession.transaction(async (dt) => {
       const createdImages = await analyzeProblemsImagesAndDoCallback({
@@ -131,10 +139,11 @@ export async function postProblems(
       const [createdProblemSet] = await dt
         .insert(problemSet)
         .values({
-          name: setName,
+          name: problemSetName,
           userUuid: userUuId,
           isShareLinkPurposeSet: isShareLinkPurposeSet,
           updatedAt: new Date(),
+          description,
           isPublic,
         })
         .returning({ uuid: problemSet.uuid });
@@ -173,13 +182,21 @@ export async function postProblems(
   }
 }
 
-export async function updateProblems(
-  setName: string,
-  replacingProblems: ProblemReplacedImageKey[],
-  problemSetUUID: string,
-  problemSetIsPublic: boolean,
-  userEmail: string,
-) {
+export async function updateProblems({
+  problemSetName,
+  replacingProblems,
+  problemSetUUID,
+  description,
+  problemSetIsPublic,
+  userEmail,
+}: {
+  problemSetName: string;
+  replacingProblems: ProblemReplacedImageKey[];
+  problemSetUUID: string;
+  description: string | undefined;
+  problemSetIsPublic: boolean;
+  userEmail: string;
+}) {
   console.log("문제 업데이트 시작!");
 
   try {
@@ -331,11 +348,15 @@ export async function updateProblems(
         // 문제집 이름 및 공개 여부 업데이트
         dt
           .update(problemSet)
-          .set({ name: setName })
+          .set({ name: problemSetName })
           .where(eq(problemSet.uuid, problemSetUUID)),
         dt
           .update(problemSet)
           .set({ isPublic: problemSetIsPublic })
+          .where(eq(problemSet.uuid, problemSetUUID)),
+        dt
+          .update(problemSet)
+          .set({ description: description })
           .where(eq(problemSet.uuid, problemSetUUID)),
       ]);
 
@@ -772,33 +793,40 @@ function stringToBoolean(value: string): boolean {
   throw new Error("Invalid input");
 }
 
-type ProblemsAndSetsName = {
-  problemSetsName: string;
+type ProblemsAndSetName = {
+  problemSetName: string;
   problemSetIsPublic: boolean;
+  description?: string;
   problems: ProblemReplacedImageKey[];
 };
 
-type ProblemsAndSetsNameWithUUID = ProblemsAndSetsName & {
+type ProblemsAndSetsNameWithUUID = ProblemsAndSetName & {
   problemSetUUID: string;
 };
 
 export function getParsedProblems<T extends boolean>(
   formData: FormData,
   includeUuid: T,
-): T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetsName {
+): T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetName {
   const entries = Array.from(formData.entries());
 
   const problems: NonNullable<ProblemReplacedImageKey>[] = [];
-  let problemSetsName: string | undefined;
+  let problemSetName: string | undefined;
   let problemSetUUID: string | undefined;
   let problemSetIsPublic: boolean | undefined;
+  let description: string | undefined;
+
   for (const [name, value] of entries) {
     if (name === "problemSetsName") {
-      problemSetsName = value as string;
+      problemSetName = value as string;
       continue;
     }
     if (name === "problemSetIsPublic") {
       problemSetIsPublic = stringToBoolean(value.toString());
+      continue;
+    }
+    if (name === "description") {
+      description = value as string;
       continue;
     }
     if (includeUuid && name === "uuid") {
@@ -834,15 +862,19 @@ export function getParsedProblems<T extends boolean>(
 
   if (includeUuid) {
     return {
-      problemSetsName,
+      problemSetName,
       problems,
       problemSetIsPublic,
+      description,
       problemSetUUID,
-    } as T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetsName;
+    } as T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetName;
   } else {
-    return { problemSetsName, problems, problemSetIsPublic } as T extends true
-      ? ProblemsAndSetsNameWithUUID
-      : ProblemsAndSetsName;
+    return {
+      problemSetName,
+      problems,
+      description,
+      problemSetIsPublic,
+    } as T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetName;
   }
 }
 
@@ -1516,6 +1548,7 @@ export async function getPublicProblemSets(page: string, pageSize: string) {
         data: problemSets.map((problemSet) => ({
           uuid: problemSet.uuid,
           name: problemSet.name,
+          description: problemSet.description ?? undefined,
           updatedAt: problemSet.updatedAt,
           examProblemsCount: problemSet.problems.length,
           createdBy: problemSet.user.name,
@@ -1569,6 +1602,7 @@ export async function getPublicProblemSetsByName(
           uuid: problemSet.uuid,
           name: problemSet.name,
           updatedAt: problemSet.updatedAt,
+          description: problemSet.description ?? undefined,
           examProblemsCount: problemSet.problems.length,
           createdBy: problemSet.user.name,
         })),

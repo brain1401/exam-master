@@ -27,6 +27,7 @@ export const problemSet = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
+    description: text("description"),
     isShareLinkPurposeSet: boolean("isShareLinkPurposeSet")
       .default(false)
       .notNull(),
@@ -161,13 +162,22 @@ export const likedProblemSets = pgTable(
       .references(() => problemSet.uuid, {
         onDelete: "cascade",
         onUpdate: "cascade",
-      }),
+      })
+      .unique(),
     userUuid: uuid("userUuid")
       .notNull()
       .references(() => user.uuid, {
         onDelete: "cascade",
         onUpdate: "cascade",
-      }),
+      })
+      .unique(),
+    createdAt: timestamp("createdAt", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    })
+      .default(sql`now()`)
+      .notNull(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.problemSetUuid, t.userUuid] }),

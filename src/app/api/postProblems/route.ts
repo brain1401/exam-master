@@ -21,9 +21,10 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
 
-  const { problemSetsName, problems, problemSetIsPublic } = getParsedProblems(formData, false);
+  const { problemSetName, problems, problemSetIsPublic, description } =
+    getParsedProblems(formData, false);
 
-  if (!problemSetsName || !problems) {
+  if (!problemSetName || !problems) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
@@ -47,14 +48,14 @@ export async function POST(req: NextRequest) {
   // }
 
   try {
-    const response = await postProblems(
-      problemSetsName,
-      session?.user?.email,
-      problems,
-      false,
-      problemSetIsPublic,
-    );
-
+    const response = await postProblems({
+      isPublic: problemSetIsPublic,
+      isShareLinkPurposeSet: false,
+      problemSetName: problemSetName,
+      toBePostedProblems: problems,
+      description: description,
+      userEmail: session.user.email,
+    });
 
     return NextResponse.json({ success: response ? "OK" : "FAIL" });
   } catch (e) {

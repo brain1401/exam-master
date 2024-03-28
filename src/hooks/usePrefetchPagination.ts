@@ -12,6 +12,7 @@ import {
   getGetMaxPageFunction,
   getSetMaxPageFunction,
 } from "@/utils/pagination";
+import { getQueryKey } from "@/utils/problems";
 
 export default function usePrefetchPagination(
   type: PrefetchPaginationType,
@@ -38,8 +39,7 @@ export default function usePrefetchPagination(
         setResultsMaxPage,
         setPublicProblemSetsMaxPage,
       });
-      const queryKey =
-        type === "manage" || type === "exam" ? "problemSets" : "results";
+      const queryKey = getQueryKey(type);
 
       const fetchs: Promise<any>[] = [];
 

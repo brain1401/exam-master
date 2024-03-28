@@ -18,12 +18,15 @@ export async function PUT(req: NextRequest) {
   }
   const formData = await req.formData();
 
-  const { problemSetsName, problems, problemSetIsPublic, problemSetUUID } = getParsedProblems(
-    formData,
-    true,
-  );
+  const {
+    problemSetName,
+    problems,
+    problemSetIsPublic,
+    problemSetUUID,
+    description,
+  } = getParsedProblems(formData, true);
 
-  if (!problemSetsName || !problems || !problemSetUUID) {
+  if (!problemSetName || !problems || !problemSetUUID) {
     return NextResponse.json(
       { error: "서버로 전송된 데이터가 올바르지 않습니다." },
       { status: 400 },
@@ -59,15 +62,16 @@ export async function PUT(req: NextRequest) {
   }
 
   console.log("problems :", problems);
-  
+
   try {
-    const result = await updateProblems(
-      problemSetsName,
-      problems,
+    const result = await updateProblems({
+      problemSetName,
+      replacingProblems: problems,
       problemSetUUID,
+      description,
       problemSetIsPublic,
-      session.user.email,
-    );
+      userEmail: session.user.email,
+    });
 
     return NextResponse.json(
       result ? true : false,

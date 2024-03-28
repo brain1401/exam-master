@@ -8,11 +8,26 @@ import { Label } from "../ui/label";
 import { useState } from "react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Textarea } from "../ui/textarea";
 
 const BUTTON_CLASSNAMES = "w-[4rem] rounded-lg";
 // "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
 
-export default function ProblemsOption() {
+type Props = {
+  type: "manage" | "create";
+};
+export default function ProblemsOption({ type }: Props) {
   const {
     setProblemSetsName,
     localProblemSetsName,
@@ -25,9 +40,13 @@ export default function ProblemsOption() {
     setProblemSetIsPublic,
     problemLength,
     setProblemLength,
+    description,
+    setDescription,
   } = useProblems();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [textarea, setTextarea] = useState(description);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleProblemLengthChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -131,6 +150,15 @@ export default function ProblemsOption() {
     }
   };
 
+  const onProblemSetDescriptionOK = () => {
+    setDescription(textarea);
+    setIsDialogOpen(false);
+  };
+
+  const onProblemSetDescriptionCancel = () => {
+    setTextarea(description);
+  }
+
   return (
     <div className="mb-5 flex w-full flex-col gap-2">
       <div className="flex items-center">
@@ -147,39 +175,83 @@ export default function ProblemsOption() {
           확인
         </Button>
       </div>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center">
-          <Label className="mr-2 text-[.9rem]">문제집 이름</Label>
-          <Input
-            id="problemSetName"
-            wrapperClassName="mr-2"
-            inputClassName="w-[10rem] h-[2.2rem]"
-            value={localProblemSetsName}
-            onChange={(e) => setLocalProblemSetsName(e.target.value)}
-          />
-          <Button
-            className={BUTTON_CLASSNAMES}
-            onClick={applyProblemSetName}
-            isLoading={isLoading}
-          >
-            {isLoading ? "" : "확인"}
-          </Button>
-        </div>
-        <div className="mt-2 flex items-center justify-end space-x-2 p-3 md:mt-0 md:justify-center">
-          <Switch
-            checked={problemSetIsPublic}
-            id="problemSetIsPublic"
-            onCheckedChange={() => {
-              setProblemSetIsPublic(!problemSetIsPublic);
-            }}
-          />
-          <div className="flex items-center justify-center">
-            <Label
-              htmlFor="problemSetIsPublic"
-              className="select-none text-[1rem] peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      <div>
+        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center">
+            <Label className="mr-2 text-[.9rem]">문제집 이름</Label>
+            <Input
+              id="problemSetName"
+              wrapperClassName="mr-2"
+              inputClassName="w-[10rem] h-[2.2rem]"
+              value={localProblemSetsName}
+              onChange={(e) => setLocalProblemSetsName(e.target.value)}
+            />
+            <Button
+              className={BUTTON_CLASSNAMES}
+              onClick={applyProblemSetName}
+              isLoading={isLoading}
             >
-              문제집 공개
-            </Label>
+              {isLoading ? "" : "확인"}
+            </Button>
+          </div>
+          <div className="absolute bottom-0 right-0 top-0 flex flex-col items-center justify-center md:justify-center">
+            <div className="flex">
+              <Switch
+                className="mr-2"
+                checked={problemSetIsPublic}
+                id="problemSetIsPublic"
+                onCheckedChange={() => {
+                  setProblemSetIsPublic(!problemSetIsPublic);
+                }}
+              />
+              <div className="flex items-center justify-center">
+                <Label
+                  htmlFor="problemSetIsPublic"
+                  className="select-none text-[1rem] peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  문제집 공개
+                </Label>
+              </div>
+
+              {problemSetIsPublic ? (
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger
+                    className="absolute left-0 right-0 top-full flex w-full justify-end md:block"
+                    asChild
+                  >
+                    <div>
+                      <Button className="w-auto md:w-full">
+                        문제집 설명 설정
+                      </Button>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{`문제집 설명 ${type === "manage" ? "수정" : "설정"}`}</DialogTitle>
+                    </DialogHeader>
+                    <Textarea
+                      className="resize-none"
+                      value={textarea}
+                      placeholder="다른 사용자에게 문제집에 대한 설명을 남겨주세요."
+                      onChange={(e) => setTextarea(e.target.value)}
+                    />
+                    <DialogFooter>
+                      <Button
+                        className="px-6 py-3"
+                        onClick={() => onProblemSetDescriptionOK()}
+                      >
+                        확인
+                      </Button>
+                      <DialogClose asChild>
+                        <Button className="px-6 py-3" variant="outline" onClick={() => onProblemSetDescriptionCancel()}>
+                          취소
+                        </Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

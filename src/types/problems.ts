@@ -56,6 +56,7 @@ export type ProblemSet = {
   name: string;
   createdAt: Date;
   updatedAt: Date;
+  description?: string;
   isShareLinkPurposeSet: boolean;
   problems?: Problem[];
   examProblemsCount?: number;

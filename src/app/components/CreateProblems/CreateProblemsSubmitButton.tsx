@@ -18,6 +18,7 @@ export default function CreateProblemsSubmitButton() {
     problems,
     problemSetsName,
     problemSetIsPublic,
+    description,
     setProblemSetsName,
     resetProblems,
   } = useProblems();
@@ -122,6 +123,7 @@ export default function CreateProblemsSubmitButton() {
         formData.append(`data[${index}]`, JSON.stringify(problem));
       });
       formData.append("problemSetsName", problemSetsName);
+      formData.append("description", description);
       formData.append("problemSetIsPublic", problemSetIsPublic.toString());
 
       const response = await fetch("/api/postProblems", {
@@ -149,11 +151,7 @@ export default function CreateProblemsSubmitButton() {
 
   return (
     <div className="mt-3 flex justify-center">
-      <Button
-        onClick={handleSubmit}
-        isLoading={isLoading}
-        className="w-[7rem]"
-      >
+      <Button onClick={handleSubmit} isLoading={isLoading} className="w-[7rem]">
         {isLoading ? "제출 중..." : "최종제출"}
       </Button>
     </div>

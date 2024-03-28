@@ -1,5 +1,17 @@
 "use client";
 import { PublicProblemSetWithPagination } from "@/types/problems";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
+import { Button } from "../ui/button";
+
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import usePagenationState from "@/hooks/usePagenationState";
@@ -61,32 +73,46 @@ export default function MainProblemSetsGrid({
     } else {
       return (
         publicProblemSets?.data && (
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-3">
             {publicProblemSets?.data.map((publicProblemSet) => (
-              <Card key={publicProblemSet.uuid}>
-                <CardContent>
-                  <Link
-                    href={"#"}
-                    onClick={() => {
-                      alert("준비중입니다.");
-                    }}
-                    className="flex flex-col items-start justify-center space-y-2"
-                  >
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                      {publicProblemSet.name}
-                    </h3>
-                    <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                      <div>{publicProblemSet.createdBy}</div>
-                      <div>
-                        {new Date(
-                          publicProblemSet.updatedAt,
-                        ).toLocaleDateString("ko-KR")}
-                      </div>
-                      <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
-                    </div>
-                  </Link>
-                </CardContent>
-              </Card>
+              <>
+                <Dialog>
+                  <DialogTrigger>
+                    <Card key={publicProblemSet.uuid}>
+                      <CardContent className="hover:shadow-md">
+                        <div className="flex flex-col items-start justify-center space-y-2">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                            {publicProblemSet.name}
+                          </h3>
+                          <div className="space-y-1 text-start text-sm text-gray-500 dark:text-gray-400">
+                            <div>{publicProblemSet.createdBy}</div>
+                            <div>
+                              {new Date(
+                                publicProblemSet.updatedAt,
+                              ).toLocaleDateString("ko-KR")}
+                            </div>
+                            <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{publicProblemSet.name}</DialogTitle>
+                      <DialogDescription className="whitespace-pre-line">
+                        {`만든이 : ${publicProblemSet.createdBy}\n${publicProblemSet.description ? `문제집 설명 : ${publicProblemSet.description}\n` : "문제집 설명이 제공되지 않았습니다.\n"}${publicProblemSet.examProblemsCount}문제 \n ${new Date(publicProblemSet.updatedAt).toLocaleDateString("ko-KR")}\n`}
+                      </DialogDescription>
+                      <DialogDescription></DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter>
+                      <Button>문제 가져오기</Button>
+                      <Button>그냥 문제 풀기</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
             ))}
           </div>
         )

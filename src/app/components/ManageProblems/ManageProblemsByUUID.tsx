@@ -85,7 +85,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
   return (
     <ProblemEditorLayout>
       <div className="relative">
-        <ProblemsOption />
+        <ProblemsOption type="manage" />
 
         <Modal
           Header={<h2 className="text-2xl">링크 공유</h2>}
@@ -98,9 +98,11 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
         </Modal>
 
         <div className="absolute right-0 top-0">
-          <Button size="icon" 
+          <Button
+            size="icon"
             variant="outline"
-           onClick={() => setIsModalOpen((value) => !value)}>
+            onClick={() => setIsModalOpen((value) => !value)}
+          >
             <FiShare size={20} />
           </Button>
         </div>

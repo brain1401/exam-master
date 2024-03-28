@@ -7,6 +7,7 @@ type StateType = {
   isPublic: boolean;
   currentProblemIndex: number;
   problemSetsName: string;
+  description: string;
   localProblemSetsName: string;
   problemLength: string;
   candidatesCount: string;
@@ -40,6 +41,7 @@ const initialState: StateType = {
   currentProblemIndex: 0,
   currentTab: "obj",
   problemSetsName: "",
+  description: "",
   localProblemSetsName: "",
   problemLength: "10",
   candidatesCount: "4",
@@ -66,6 +68,9 @@ export const problemsSlice = createSlice({
     },
     setCandidateCountAction: (state, action: PayloadAction<string>) => {
       state.candidatesCount = action.payload;
+    },
+    setDescriptionAction: (state, action: PayloadAction<string>) => {
+      state.description = action.payload;
     },
     setProblemLengthAction: (state, action: PayloadAction<string>) => {
       state.problemLength = action.payload;
@@ -131,6 +136,7 @@ export const {
   setCurrentTabAction,
   setPublicAction,
   setProblemSetsNameAction,
+  setDescriptionAction,
   setProblemsAction,
   setLocalProblemSetsNameAction,
 } = problemsSlice.actions;
