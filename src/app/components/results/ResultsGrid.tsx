@@ -79,7 +79,7 @@ export default function ResultsGrid({
               {results.data.map((result) => (
                 <li
                   key={result.uuid}
-                  className="h-full max-w-[50%] basis-[50%] gap-y-[1rem] px-2 md:max-w-[25%] md:basis-[25%]"
+                  className="max-w-[50%] basis-[50%] gap-y-[1rem] px-2 md:max-w-[25%] md:basis-[25%]"
                 >
                   <ResultsCard result={result} />
                 </li>

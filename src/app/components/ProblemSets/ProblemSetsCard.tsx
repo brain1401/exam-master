@@ -58,7 +58,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
     },
   );
   const CustomCard = () => (
-    <Card className="h-[9rem] md:h-auto">
+    <Card>
       <CardHeader>
         <CardTitle>{problemSet.name}</CardTitle>
       </CardHeader>

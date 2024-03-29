@@ -85,9 +85,9 @@ export default function MainProblemSetsGrid({
               {publicProblemSets?.data.map((publicProblemSet) => (
                 <li
                   key={publicProblemSet.uuid}
-                  className="h-[9rem] max-w-[50%] basis-[50%] px-2 md:h-auto md:max-w-[25%] md:basis-[25%]"
+                  className="max-w-[50%] basis-[50%] px-2 md:h-auto md:max-w-[25%] md:basis-[25%]"
                 >
-                  <Card className="h-full">
+                  <Card>
                     <Link
                       href={`/problem/${publicProblemSet.uuid}`}
                       className="flex h-full w-full flex-col"

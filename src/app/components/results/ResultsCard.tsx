@@ -50,7 +50,7 @@ export default function ResultsCard({ result }: Props) {
 
   const CustomCard = () => {
     return (
-      <Card className="h-[9rem] md:h-auto">
+      <Card>
         <CardHeader>
           <CardTitle>{result.problemSetName}</CardTitle>
         </CardHeader>
