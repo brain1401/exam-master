@@ -165,15 +165,13 @@ export const likedProblemSets = pgTable(
       .references(() => problemSet.uuid, {
         onDelete: "cascade",
         onUpdate: "cascade",
-      })
-      .unique(),
+      }),
     userUuid: uuid("userUuid")
       .notNull()
       .references(() => user.uuid, {
         onDelete: "cascade",
         onUpdate: "cascade",
-      })
-      .unique(),
+      }),
     createdAt: timestamp("createdAt", {
       precision: 0,
       mode: "date",
@@ -411,13 +409,16 @@ export const problemSetComment = pgTable(
   },
 );
 
-export const problemSetCommentRelation = relations(problemSetComment, ({ one }) => ({
-  user: one(user, {
-    fields: [problemSetComment.userUuid],
-    references: [user.uuid],
+export const problemSetCommentRelation = relations(
+  problemSetComment,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [problemSetComment.userUuid],
+      references: [user.uuid],
+    }),
+    problemSet: one(problemSet, {
+      fields: [problemSetComment.problemSetUuid],
+      references: [problemSet.uuid],
+    }),
   }),
-  problemSet: one(problemSet, {
-    fields: [problemSetComment.problemSetUuid],
-    references: [problemSet.uuid],
-  }),
-}));
+);

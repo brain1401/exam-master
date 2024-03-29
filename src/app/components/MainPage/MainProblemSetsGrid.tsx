@@ -88,8 +88,8 @@ export default function MainProblemSetsGrid({
                   className="h-full cursor-pointer hover:shadow-md"
                   wrapperClassName="px-2 max-w-[50%] basis-[50%] md:max-w-[25%] md:basis-[25%]"
                 >
-                  <Link href={`/problem/${publicProblemSet.uuid}`}>
-                    <CardHeader>
+                  <Link href={`/problem/${publicProblemSet.uuid}`} className="flex flex-col w-full h-full">
+                    <CardHeader className="pb-0">
                       <CardTitle>{publicProblemSet.name}</CardTitle>
                       {publicProblemSet.description ? (
                         <CardDescription className="truncate">
