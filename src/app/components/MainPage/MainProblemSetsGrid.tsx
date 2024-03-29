@@ -93,9 +93,7 @@ export default function MainProblemSetsGrid({
                       className="flex h-full w-full flex-col"
                     >
                       <CardHeader>
-                        <CardTitle>
-                          {publicProblemSet.name}
-                        </CardTitle>
+                        <CardTitle>{publicProblemSet.name}</CardTitle>
                         <CardDescription>
                           {publicProblemSet.description ?? ""}
                         </CardDescription>
@@ -103,9 +101,11 @@ export default function MainProblemSetsGrid({
                       <CardContent>
                         <div className="flex flex-col items-start justify-center">
                           <div className="space-y-[.002rem] text-[.9rem] text-gray-500 dark:text-gray-400">
-                            <div>{publicProblemSet.createdBy}</div>
-                            <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
-                            <div>
+                            <div className="text-[.8rem]">
+                              {publicProblemSet.createdBy}
+                            </div>
+                            <div className="text-[.8rem]">{`${publicProblemSet.examProblemsCount}문제`}</div>
+                            <div className="text-[.8rem]">
                               {new Date(
                                 publicProblemSet.updatedAt,
                               ).toLocaleString("ko-KR", {
