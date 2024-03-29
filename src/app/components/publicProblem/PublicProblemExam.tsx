@@ -287,7 +287,7 @@ export default function PublicProblemExam({
         <Card>
           <CardHeader>
             <div className="relative">
-              <CardTitle>{publicProblemSet?.name}</CardTitle>
+              <CardTitle className="pr-[3.2rem]">{publicProblemSet?.name}</CardTitle>
               <CardDescription>{`${publicProblemSet?.creator ?? ""} 작성 | ${new Date(
                 publicProblemSet?.updatedAt ?? "",
               ).toLocaleString("ko-KR", {

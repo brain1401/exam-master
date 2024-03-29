@@ -78,7 +78,7 @@ export default function ProblemSetsPage({ type }: Props) {
         page={problemSetsPage}
         setPage={setProblemSetsPage}
         maxPage={problemSetsMaxPage}
-        className="mt-5 flex justify-center"
+        className="mt-5 flex justify-center pb-5"
       />
     </section>
   );

@@ -178,7 +178,7 @@ export default function ProblemsOption({ type }: Props) {
         </Button>
       </div>
       <div>
-        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between">
           <div className="flex items-center">
             <Label className="mr-2 text-[.9rem]">문제집 이름</Label>
             <Input
@@ -197,36 +197,38 @@ export default function ProblemsOption({ type }: Props) {
               {isLoading ? "" : "확인"}
             </Button>
           </div>
-          <div className="absolute bottom-0 right-0 top-0 flex flex-col items-center justify-center max-[500px]:left-0 max-[500px]:right-auto max-[500px]:top-full max-[500px]:mt-3 md:justify-center">
-            <div className="relative flex">
-              <Switch
-                className="mr-2"
-                checked={problemSetIsPublic}
-                id="problemSetIsPublic"
-                onCheckedChange={() => {
-                  setProblemSetIsPublic(!problemSetIsPublic);
-                }}
-              />
+          <div className="bottom-0 right-0 top-0 flex flex-col items-end justify-center max-[520px]:left-0 max-[520px]:right-auto max-[520px]:top-full max-[520px]:mt-3 max-[520px]:items-start md:justify-center">
+            <div className="relative flex flex-col justify-end">
               <div className="flex items-center justify-center">
-                <Label
-                  htmlFor="problemSetIsPublic"
-                  className="select-none text-[1rem] peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  문제집 공개
-                </Label>
+                <Switch
+                  className="mr-2"
+                  checked={problemSetIsPublic}
+                  id="problemSetIsPublic"
+                  onCheckedChange={() => {
+                    setProblemSetIsPublic(!problemSetIsPublic);
+                  }}
+                />
+                <div className="flex items-center justify-center">
+                  <Label
+                    htmlFor="problemSetIsPublic"
+                    className="select-none text-[1rem] peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    문제집 공개
+                  </Label>
+                </div>
               </div>
 
               {problemSetIsPublic ? (
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger
-                    className="absolute left-0 right-0 top-full mt-2 flex justify-end max-[500px]:w-[7rem] max-[500px]:justify-start md:block md:w-full"
+                    className="absolute left-0 right-0 top-full mt-2 flex justify-end max-[520px]:w-[7rem] max-[520px]:justify-start md:block md:w-full"
                     asChild
                   >
                     <div>
-                      <Button className="block w-full max-[500px]:hidden">
+                      <Button className="block max-[520px]:hidden">
                         문제집 설명 설정
                       </Button>
-                      <Button className="hidden w-fit max-[500px]:block">
+                      <Button className="hidden w-fit max-[520px]:block">
                         <IoMdSettings />
                       </Button>
                     </div>

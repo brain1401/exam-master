@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardDescription,
   CardFooter,
-} from "../ui/card";
+} from "../ui/problemGridCard";
 import { fetchPublicProblemSets } from "@/utils/problems";
 import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
 import Link from "next/link";
@@ -81,26 +81,28 @@ export default function MainProblemSetsGrid({
       return (
         publicProblemSets?.data && (
           <div className="mx-auto flex w-full max-w-[70rem]">
-            <div className="flex min-w-0 flex-1 flex-row flex-wrap gap-y-[1rem]">
+            <ul className="flex min-w-0 flex-1 flex-row flex-wrap gap-y-[1rem]">
               {publicProblemSets?.data.map((publicProblemSet) => (
-                <Card
+                <li
                   key={publicProblemSet.uuid}
-                  className="h-full cursor-pointer hover:shadow-md"
-                  wrapperClassName="px-2 max-w-[50%] basis-[50%] md:max-w-[25%] md:basis-[25%]"
+                  className="h-[9rem] max-w-[50%] basis-[50%] px-2 md:h-auto md:max-w-[25%] md:basis-[25%]"
                 >
-                  <Link href={`/problem/${publicProblemSet.uuid}`} className="flex flex-col w-full h-full">
-                    <CardHeader className="pb-0">
-                      <CardTitle className="truncate">{publicProblemSet.name}</CardTitle>
-                      {publicProblemSet.description ? (
-                        <CardDescription className="truncate">
-                          {publicProblemSet.description}
+                  <Card className="h-full">
+                    <Link
+                      href={`/problem/${publicProblemSet.uuid}`}
+                      className="flex h-full w-full flex-col"
+                    >
+                      <CardHeader>
+                        <CardTitle>
+                          {publicProblemSet.name}
+                        </CardTitle>
+                        <CardDescription>
+                          {publicProblemSet.description ?? ""}
                         </CardDescription>
-                      ) : null}
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex w-full ">
-                        <div className="flex flex-col items-start justify-center space-y-2">
-                          <div className="space-y-1 text-start text-[.9rem] text-gray-500 dark:text-gray-400">
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-col items-start justify-center">
+                          <div className="space-y-[.002rem] text-[.9rem] text-gray-500 dark:text-gray-400">
                             <div>{publicProblemSet.createdBy}</div>
                             <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
                             <div>
@@ -114,12 +116,12 @@ export default function MainProblemSetsGrid({
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Link>
-                </Card>
+                      </CardContent>
+                    </Link>
+                  </Card>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )
       );

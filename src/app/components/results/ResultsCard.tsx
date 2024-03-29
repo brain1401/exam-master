@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardProps,
   CardTitle,
-} from "../ui/card";
+} from "../ui/problemGridCard";
 import { useEffect, useState } from "react";
 type Props = {
   result: ResultWithCount;
@@ -50,9 +50,9 @@ export default function ResultsCard({ result }: Props) {
 
   const CustomCard = () => {
     return (
-      <Card className="h-full w-full cursor-pointer hover:shadow-md">
+      <Card >
         <CardHeader>
-          <CardTitle className="truncate">{result.problemSetName}</CardTitle>
+          <CardTitle>{result.problemSetName}</CardTitle>
         </CardHeader>
         <CardContent>
           <div
@@ -68,7 +68,7 @@ export default function ResultsCard({ result }: Props) {
               }
             }}
           >
-            <p className="text-sm font-semibold">{`${result.problemResultsCount} 문제`}</p>
+            <p className="text-sm">{`${result.problemResultsCount} 문제`}</p>
             <p className=" w-fit text-sm text-gray-500">{formattedDate}</p>
             <p className=" w-fit text-sm text-gray-500">{formattedTime}</p>
           </div>

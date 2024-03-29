@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import useDebounce from "@/hooks/useDebounce";
-import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
 import usePagenationState from "@/hooks/usePagenationState";
 import ResultsGrid from "./ResultsGrid";
@@ -71,7 +70,7 @@ export default function ResultsPage() {
           maxPage={resultsMaxPage}
           page={resultsPage}
           setPage={setResultsPage}
-          className="mt-5 flex justify-center"
+          className="mt-5 flex justify-center pb-5"
         />
       </section>
     </>

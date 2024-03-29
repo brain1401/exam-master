@@ -4,7 +4,7 @@ type Props = {
 
 export default function ProblemEditorLayout({ children }: Props) {
   return (
-    <section className="mx-auto flex-1 w-full max-w-[70rem] py-4 px-2 flex-col">
+    <section className="mx-auto flex-1 w-full max-w-[70rem] p-4 flex-col">
       {children}
     </section>
   );

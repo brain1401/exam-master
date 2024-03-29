@@ -61,8 +61,9 @@ export default function MainPage() {
               <h2 className="mb-4 text-[1.5rem] font-semibold text-gray-900 dark:text-gray-50">
                 공개된 문제집
               </h2>
-              <div className="mb-8 flex w-full items-center justify-between">
+              <div className="mb-8 flex w-full items-center">
                 <Input
+                  inputClassName="flex-1"
                   wrapperClassName="mr-4 flex-1"
                   placeholder="문제 세트 검색"
                   value={searchString}
@@ -74,7 +75,7 @@ export default function MainPage() {
                     setSort(value as "newest" | "popular")
                   }
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-[6rem] md:w-[8rem]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -96,7 +97,7 @@ export default function MainPage() {
           />
         </div>
         <PaginationButton
-          className="my-3"
+          className="mt-5 pb-8"
           maxPage={publicProblemSetsMaxPage}
           page={publicProblemSetsPage}
           setPage={setPublicProblemSetsPage}
