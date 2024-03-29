@@ -106,7 +106,8 @@ export type ProblemSetComment = {
   uuid: string;
   content: string;
   createdAt: Date;
-  user: string;
+  userUUID: string;
+  userName: string;
 };
 
 export const candidateSchema = z.object({

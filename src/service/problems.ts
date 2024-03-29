@@ -1701,17 +1701,19 @@ export async function getPublicProblemSetComments(problemSetUUID: string) {
                   eq(user.uuid, comment.problemSetComment.userUuid),
                 columns: {
                   name: true,
+                  uuid: true,
                 },
               })) ?? null;
 
-            return user?.name ?? null;
+            return user ?? null;
           }),
         );
         const result = comments.map((comment, i) => ({
           uuid: comment.problemSetComment.uuid,
           content: comment.problemSetComment.content,
           createdAt: comment.problemSetComment.createdAt,
-          user: user[i] ?? "탈퇴한 유저",
+          userName: user?.[i]?.name ?? "탈퇴한 유저",
+          userUUID: user?.[i]?.uuid ?? "",
         }));
 
         return result;

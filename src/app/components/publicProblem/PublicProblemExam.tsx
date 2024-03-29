@@ -21,7 +21,7 @@ import {
 } from "../../components/ui/dialog";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
-import { HeartIcon, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import { Textarea } from "../../components/ui/textarea";
 import type { ProblemSetComment, PublicExamProblemSet } from "@/types/problems";
 import { useEffect, useState } from "react";
@@ -31,11 +31,13 @@ import {
   fetchPublicProblemSetComments,
 } from "@/utils/problems";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "../ui/use-toast";
 
 type Props = {
   publicProblemSet: PublicExamProblemSet;
   userEmail: string | null | undefined;
   userName: string | null | undefined;
+  userUUID: string | null | undefined;
 };
 
 type Like = { likes: number; liked: boolean };
@@ -44,10 +46,11 @@ export default function PublicProblemExam({
   publicProblemSet,
   userEmail,
   userName,
+  userUUID,
 }: Props) {
   const [comment, setComment] = useState("");
   const queryClient = useQueryClient();
-
+  const { toast } = useToast();
   const {
     data: comments,
     isLoading,
@@ -131,7 +134,8 @@ export default function PublicProblemExam({
         (old) => {
           const tempComment = {
             uuid: "temp",
-            user: userName ?? "",
+            userName: userName ?? "",
+            userUUID: userUUID ?? "",
             content: newComment,
             createdAt: new Date(),
           };
@@ -198,10 +202,18 @@ export default function PublicProblemExam({
   });
 
   const onCommentSubmit = async () => {
+    if (!userUUID) {
+      toast({
+        title: "로그인 후 이용해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (comment.trim().length === 0) {
       alert("댓글을 입력하세요.");
       return;
     }
+
     // 댓글 작성 로직
     try {
       problemSetCommentsAddMutate(comment);
@@ -214,10 +226,42 @@ export default function PublicProblemExam({
 
   const onLikeClick = async () => {
     if (!like) return;
+    if (!userUUID) {
+      toast({
+        title: "로그인 후 이용해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       problemSetLikesMutate(like.liked);
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const onDeleteComment = async (
+    commentUserUUID: string,
+    commentUUID: string,
+  ) => {
+    if (commentUserUUID === userUUID) {
+      try {
+        problemSetCommentsDeleteMutate(commentUUID);
+      } catch (e) {
+        console.error(e);
+      }
+    } else if (!userUUID) {
+      toast({
+        title: "로그인 후 이용해주세요.",
+        variant: "destructive",
+      });
+      return;
+    } else {
+      toast({
+        title: "본인의 댓글만 삭제할 수 있습니다.",
+        variant: "destructive",
+      });
+      return;
     }
   };
 
@@ -310,7 +354,7 @@ export default function PublicProblemExam({
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-medium">{comment.user}</h3>
+                      <h3 className="font-medium">{comment.userName}</h3>
                       <p className="text-[1rem] dark:text-gray-400">
                         {comment.content}
                       </p>
@@ -329,7 +373,7 @@ export default function PublicProblemExam({
                       size="icon"
                       variant="ghost"
                       onClick={() =>
-                        problemSetCommentsDeleteMutate(comment.uuid)
+                        onDeleteComment(comment.userUUID, comment.uuid)
                       }
                     >
                       <TrashIcon className="h-4 w-4" />

@@ -4,6 +4,7 @@ import {
   getPublicProblemSetByUUID,
   getPublicProblemSetComments,
 } from "@/service/problems";
+import { getUserUUIDbyEmail } from "@/service/user";
 import {
   HydrationBoundary,
   QueryClient,
@@ -25,6 +26,8 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
 
   const queryClient = new QueryClient();
 
+  const userUUID =  session?.user?.email ? await getUserUUIDbyEmail(session.user.email) : null;
+
   await Promise.all([
     queryClient.prefetchQuery({
       queryKey: ["publicProblemLikes", UUID, session?.user?.email],
@@ -42,6 +45,7 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
         publicProblemSet={publicProblemSet}
         userEmail={session?.user?.email}
         userName={session?.user?.name}
+        userUUID={userUUID}
       />
     </HydrationBoundary>
   );
