@@ -50,7 +50,7 @@ export async function checkUser(email: string) {
 
 export async function getUserUUIDbyEmail(
   email: string,
-  dt: DrizzleTransaction,
+  dt?: DrizzleTransaction,
 ) {
   try {
     const user = await getUserByEmail(email, dt);

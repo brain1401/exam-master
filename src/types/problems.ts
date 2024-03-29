@@ -96,6 +96,19 @@ export type ExamProblemSet = {
   problems: ExamProblem[];
 };
 
+export type PublicExamProblemSet = ExamProblemSet & {
+  updatedAt: Date;
+  creator: string;
+  description: string;
+};
+
+export type ProblemSetComment = {
+  uuid: string;
+  content: string;
+  createdAt: Date;
+  user: string;
+};
+
 export const candidateSchema = z.object({
   id: z.number().nullable(),
   text: z.string(),

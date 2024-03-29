@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import ReduxProvider from "@/context/ReduxContext";
 import ReactQueryContext from "@/context/ReactQueryContext";
+import { getServerSession } from "next-auth";
 
 const NotoSansKR = localFont({
   src: [
@@ -64,7 +65,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -90,7 +91,7 @@ export default function RootLayout({
           <ReduxProvider>
             <ReactQueryContext>
               <Navbar />
-              <main className="flex flex-col flex-1">{children}</main>
+              <main className="flex flex-1 flex-col">{children}</main>
             </ReactQueryContext>
           </ReduxProvider>
           <Analytics />

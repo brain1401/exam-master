@@ -11,6 +11,7 @@ import {
   toBeCallbackedItSelf,
   PublicProblemSetWithPagination,
   PrefetchPaginationType,
+  ProblemSetComment,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
@@ -728,4 +729,24 @@ export function getQueryKey(type: PrefetchPaginationType) {
   } else {
     return "publicProblemSets";
   }
+}
+
+export async function fetchPublicProblemSetComments(problemUuid: string | undefined) {
+
+  const {data} = await axios.get(`/api/getPublicProblemSetComments/?problemSetUUID=${problemUuid}`);
+  const comments = data.comments as ProblemSetComment[];
+
+  console.log(comments);
+
+  return comments;
+}
+
+export async function fetchPublicProblemLikes(problemUuid: string | undefined) {
+  const {data} = await axios.get(`/api/getPublicProblemSetLikes/?problemSetUUID=${problemUuid}`);
+  const likes = data.likes as number;
+  const liked = data.liked as boolean;
+  return {
+    likes,
+    liked,
+  };
 }

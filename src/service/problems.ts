@@ -9,6 +9,9 @@ import {
   problemsSchema,
   ProblemReplacedImageKey,
   PublicProblemSetWithPagination,
+  ExamProblemSet,
+  PublicExamProblemSet,
+  ProblemSetComment,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
@@ -60,6 +63,7 @@ import {
   problemResult,
   likedProblemSets,
   imageToUser,
+  problemSetComment,
 } from "@/db/schema";
 
 import { s3Client } from "@/utils/AWSs3Client";
@@ -1621,6 +1625,255 @@ export async function getPublicProblemSetsByName(
   } catch (err) {
     console.log(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getPublicProblemSetByUUID(problemSetUUID: string) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const foundProblemSet = await dt.query.problemSet.findFirst({
+        where: and(
+          eq(problemSet.uuid, problemSetUUID),
+          eq(problemSet.isPublic, true),
+        ),
+        with: {
+          problems: {
+            orderBy: (problem, { asc }) => [asc(problem.order)],
+            with: {
+              image: true,
+            },
+          },
+          user: true,
+        },
+      });
+
+      if (!foundProblemSet)
+        throw new Error("해당하는 uuid를 가진 문제집이 존재하지 않습니다.");
+
+      const returnData: PublicExamProblemSet = {
+        uuid: foundProblemSet.uuid,
+        name: foundProblemSet.name,
+        updatedAt: foundProblemSet.updatedAt,
+        description: foundProblemSet.description ?? "",
+        creator: foundProblemSet.user.name,
+        problems: foundProblemSet.problems.map((problem) => ({
+          uuid: problem.uuid,
+          question: problem.question,
+          type: problem.questionType as "obj" | "sub",
+          candidates: problem.candidates ?? null,
+          subAnswer: problem.subjectiveAnswer ?? null,
+          image: problem.image ?? null,
+          additionalView: problem.additionalView ?? "",
+          isAnswerMultiple: problem.isAnswerMultiple ?? false,
+        })),
+      };
+
+      return returnData;
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+export async function getPublicProblemSetComments(problemSetUUID: string) {
+  try {
+    const data: ProblemSetComment[] = await drizzleSession.transaction(
+      async (dt) => {
+        const comments = await dt
+          .select({ problemSetComment })
+          .from(problemSetComment)
+          .innerJoin(
+            problemSet,
+            and(
+              eq(problemSet.uuid, problemSetUUID),
+              eq(problemSet.isPublic, true),
+            ),
+          )
+          .where(eq(problemSetComment.problemSetUuid, problemSetUUID));
+
+        const user = await Promise.all(
+          comments.map(async (comment) => {
+            const user =
+              (await dt.query.user.findFirst({
+                where: (user, { eq }) =>
+                  eq(user.uuid, comment.problemSetComment.userUuid),
+                columns: {
+                  name: true,
+                },
+              })) ?? null;
+
+            return user?.name ?? null;
+          }),
+        );
+        const result = comments.map((comment, i) => ({
+          uuid: comment.problemSetComment.uuid,
+          content: comment.problemSetComment.content,
+          createdAt: comment.problemSetComment.createdAt,
+          user: user[i] ?? "탈퇴한 유저",
+        }));
+
+        return result;
+      },
+    );
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 댓글을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+export async function getPublicProblemLikes(
+  problemSetUUID: string,
+  userEmail?: string | null,
+) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const [[likes], [liked]] = await Promise.all([
+        dt
+          .select({ count: count() })
+          .from(likedProblemSets)
+          .innerJoin(
+            problemSet,
+            eq(likedProblemSets.problemSetUuid, problemSet.uuid),
+          )
+          .where(
+            and(
+              eq(likedProblemSets.problemSetUuid, problemSetUUID),
+              eq(problemSet.isPublic, true),
+            ),
+          ),
+        dt
+          .select({ count: count() })
+          .from(likedProblemSets)
+          .innerJoin(user, eq(likedProblemSets.userUuid, user.uuid))
+          .where(
+            and(
+              eq(likedProblemSets.problemSetUuid, problemSetUUID),
+              eq(user.email, userEmail ?? ""),
+            ),
+          ),
+      ]);
+
+      console.log(liked);
+
+      return { likes: likes.count, liked: liked.count === 1 };
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 좋아요를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function insertCommentToProblemSetComment({
+  problemSetUUID,
+  userUUID,
+  comment,
+}: {
+  problemSetUUID: string;
+  userUUID: string;
+  comment: string;
+}) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const date = new Date();
+      const [{ uuid }] = await dt
+        .insert(problemSetComment)
+        .values({
+          content: comment,
+          problemSetUuid: problemSetUUID,
+          userUuid: userUUID,
+          createdAt: date,
+          updatedAt: date,
+        })
+        .returning({ uuid: problemSetComment.uuid });
+
+      return uuid;
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 댓글을 추가하는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function deleteCommentFromProblemSetComment({
+  commentUUID,
+  userUUID,
+}: {
+  commentUUID: string;
+  userUUID: string;
+}) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const [{ uuid }] = await dt
+        .delete(problemSetComment)
+        .where(
+          and(
+            eq(problemSetComment.uuid, commentUUID),
+            eq(problemSetComment.userUuid, userUUID),
+          ),
+        )
+        .returning({ uuid: problemSetComment.uuid });
+
+      return uuid;
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 댓글을 삭제하는 중 오류가 발생했습니다.");
+  }
+}
+
+
+export async function handlePublicProblemLikes({
+  problemSetUUID,
+  userUUID,
+  liked,
+}: {
+  problemSetUUID: string;
+  userUUID: string;
+  liked: boolean;
+}) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const date = new Date();
+
+      if (liked) {
+        const [{ createdAt }] = await dt
+          .delete(likedProblemSets)
+          .where(
+            and(
+              eq(likedProblemSets.problemSetUuid, problemSetUUID),
+              eq(likedProblemSets.userUuid, userUUID),
+            ),
+          )
+          .returning({ createdAt: likedProblemSets.createdAt });
+
+        return createdAt;
+      } else {
+        const [{ createdAt }] = await dt
+          .insert(likedProblemSets)
+          .values({
+            problemSetUuid: problemSetUUID,
+            userUuid: userUUID,
+            createdAt: date,
+          })
+          .returning({ createdAt: likedProblemSets.createdAt });
+
+        return createdAt;
+      }
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 좋아요를 추가하는 중 오류가 발생했습니다.");
   }
 }
 

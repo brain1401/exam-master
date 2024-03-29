@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
+import { Candidate } from "@/types/problems";
 
 export const problemSet = pgTable(
   "ProblemSet",
@@ -55,6 +56,7 @@ export const problemSet = pgTable(
 export const problemSetRelation = relations(problemSet, ({ many, one }) => ({
   likedProblemSets: many(likedProblemSets),
   problems: many(problem),
+  comments: many(problemSetComment),
   user: one(user, {
     fields: [problemSet.userUuid],
     references: [user.uuid],
@@ -75,7 +77,7 @@ export const problem = pgTable(
       onDelete: "set null",
       onUpdate: "cascade",
     }),
-    candidates: jsonb("candidates"),
+    candidates: jsonb("candidates").$type<Candidate[]>(),
     additionalView: text("additionalView"),
     problemSetUuid: uuid("problemSetUuid")
       .notNull()
@@ -147,6 +149,7 @@ export const user = pgTable(
 
 export const userRelation = relations(user, ({ many }) => ({
   likedProblemSets: many(likedProblemSets),
+  problemSetComments: many(problemSetComment),
   images: many(imageToUser),
   problems: many(problem),
   problemSets: many(problemSet),
@@ -365,5 +368,56 @@ export const imageToUserRelation = relations(imageToUser, ({ one }) => ({
   user: one(user, {
     fields: [imageToUser.userUuid],
     references: [user.uuid],
+  }),
+}));
+
+export const problemSetComment = pgTable(
+  "problemSetComment",
+  {
+    uuid: uuid("uuid")
+      .primaryKey()
+      .notNull()
+      .default(sql`uuid_generate_v4()`),
+    userUuid: uuid("userUuid")
+      .notNull()
+      .references(() => user.uuid, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    problemSetUuid: uuid("problemSetUuid")
+      .notNull()
+      .references(() => problemSet.uuid, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    content: text("content").notNull(),
+    createdAt: timestamp("createdAt", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp("updatedAt", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      uuidKey: uniqueIndex("Comment_uuid_key").on(table.uuid),
+    };
+  },
+);
+
+export const problemSetCommentRelation = relations(problemSetComment, ({ one }) => ({
+  user: one(user, {
+    fields: [problemSetComment.userUuid],
+    references: [user.uuid],
+  }),
+  problemSet: one(problemSet, {
+    fields: [problemSetComment.problemSetUuid],
+    references: [problemSet.uuid],
   }),
 }));

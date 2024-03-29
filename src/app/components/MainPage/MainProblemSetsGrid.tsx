@@ -83,53 +83,41 @@ export default function MainProblemSetsGrid({
           <div className="mx-auto flex w-full max-w-[70rem]">
             <div className="flex min-w-0 flex-1 flex-row flex-wrap gap-y-[1rem]">
               {publicProblemSets?.data.map((publicProblemSet) => (
-                <Dialog key={publicProblemSet.uuid}>
-                  <DialogTrigger asChild>
-                    <Card
-                      className="h-full cursor-pointer hover:shadow-md"
-                      wrapperClassName="px-2 max-w-[50%] basis-[50%] md:max-w-[25%] md:basis-[25%]"
-                    >
-                      <CardHeader>
-                        <CardTitle>{publicProblemSet.name}</CardTitle>
-                        {publicProblemSet.description ? (
-                          <CardDescription>
-                            {publicProblemSet.description}
-                          </CardDescription>
-                        ) : null}
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex w-full ">
-                          <div className="flex flex-col items-start justify-center space-y-2">
-                            <div className="space-y-1 text-start text-[.9rem] text-gray-500 dark:text-gray-400">
-                              <div>{publicProblemSet.createdBy}</div>
-                              <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
-                              <div>
-                                {new Date(
-                                  publicProblemSet.updatedAt,
-                                ).toLocaleDateString("ko-KR")}
-                              </div>
+                <Card
+                  key={publicProblemSet.uuid}
+                  className="h-full cursor-pointer hover:shadow-md"
+                  wrapperClassName="px-2 max-w-[50%] basis-[50%] md:max-w-[25%] md:basis-[25%]"
+                >
+                  <Link href={`/problem/${publicProblemSet.uuid}`}>
+                    <CardHeader>
+                      <CardTitle>{publicProblemSet.name}</CardTitle>
+                      {publicProblemSet.description ? (
+                        <CardDescription className="truncate">
+                          {publicProblemSet.description}
+                        </CardDescription>
+                      ) : null}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex w-full ">
+                        <div className="flex flex-col items-start justify-center space-y-2">
+                          <div className="space-y-1 text-start text-[.9rem] text-gray-500 dark:text-gray-400">
+                            <div>{publicProblemSet.createdBy}</div>
+                            <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
+                            <div>
+                              {new Date(
+                                publicProblemSet.updatedAt,
+                              ).toLocaleString("ko-KR", {
+                                year: "numeric",
+                                month: "long",
+                                day: "2-digit",
+                              })}
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </DialogTrigger>
-
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>{publicProblemSet.name}</DialogTitle>
-                      <DialogDescription className="whitespace-pre-line">
-                        {`만든이 : ${publicProblemSet.createdBy}\n${publicProblemSet.description ? `문제집 설명 : ${publicProblemSet.description}\n` : "문제집 설명이 제공되지 않았습니다.\n"}${publicProblemSet.examProblemsCount}문제 \n ${new Date(publicProblemSet.updatedAt).toLocaleDateString("ko-KR")}\n`}
-                      </DialogDescription>
-                      <DialogDescription></DialogDescription>
-                    </DialogHeader>
-
-                    <DialogFooter>
-                      <Button>문제 가져오기</Button>
-                      <Button>그냥 문제 풀기</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                      </div>
+                    </CardContent>
+                  </Link>
+                </Card>
               ))}
             </div>
           </div>
