@@ -155,6 +155,13 @@
       "when": 1711656792303,
       "tag": "0021_equal_proemial_gods",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1711680523285,
+      "tag": "0022_fresh_silver_sable",
+      "breakpoints": true
     }
   ]
 }
