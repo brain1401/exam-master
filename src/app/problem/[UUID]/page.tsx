@@ -18,17 +18,15 @@ type Props = {
   };
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function ProblemPage({ params: { UUID } }: Props) {
-  const [publicProblemSet, session] = await Promise.all([
-    getPublicProblemSetByUUID(UUID),
-    getServerSession(),
-  ]);
+  const [session] = await Promise.all([getServerSession()]);
 
   const queryClient = new QueryClient();
 
-  const userUUID =  session?.user?.email ? await getUserUUIDbyEmail(session.user.email) : null;
-
-  await Promise.all([
+  const [userUUID] = await Promise.all([
+    session?.user?.email ? await getUserUUIDbyEmail(session.user.email) : null,
     queryClient.prefetchQuery({
       queryKey: ["publicProblemLikes", UUID, session?.user?.email],
       queryFn: () => getPublicProblemLikes(UUID, session?.user?.email),
@@ -37,12 +35,16 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
       queryKey: ["problemSetComments", UUID],
       queryFn: () => getPublicProblemSetComments(UUID),
     }),
+    queryClient.prefetchQuery({
+      queryKey: ["publicProblemSet", UUID],
+      queryFn: () => getPublicProblemSetByUUID(UUID),
+    }),
   ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <PublicProblemExam
-        publicProblemSet={publicProblemSet}
+        publicSetUUID={UUID}
         userEmail={session?.user?.email}
         userName={session?.user?.name}
         userUUID={userUUID}

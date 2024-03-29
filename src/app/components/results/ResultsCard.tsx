@@ -4,6 +4,15 @@ import useUiState from "@/hooks/useUiState";
 import { ResultWithCount } from "@/types/problems";
 import { Checkbox } from "../ui/checkbox";
 import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardProps,
+  CardTitle,
+} from "../ui/card";
 import { useEffect, useState } from "react";
 type Props = {
   result: ResultWithCount;
@@ -39,57 +48,58 @@ export default function ResultsCard({ result }: Props) {
     );
   }, [toDeletedUuid, result.uuid]);
 
-  const Card = () => {
+  const CustomCard = () => {
     return (
-      <div className="flex w-full flex-col items-center">
-        <div
-          className="mx-auto my-2 flex w-full min-w-[9rem] max-w-[12rem] cursor-pointer flex-col items-center justify-center rounded-lg border border-gray-600 p-5"
-          onClick={() => {
-            if (isDeleteButtonClicked) {
-              if (isSelected === false) {
-                addToDeletedUuid(result.uuid);
-              } else {
-                removeToDeletedUuid(result.uuid);
-              }
-              setIsSelected(!isSelected);
-            }
-          }}
-        >
-          <h2 className="mb-1 truncate text-center text-xl">
-            {result.problemSetName}
-          </h2>
-          <p className="text-center text-sm font-semibold">{`${result.problemResultsCount} 문제`}</p>
-          <p className="mx-auto w-fit whitespace-pre-line text-center text-sm text-gray-500">
-            {formattedDate}
-          </p>
-          <p className="mx-auto w-fit text-sm text-gray-500">{formattedTime}</p>
-        </div>
-        {isDeleteButtonClicked && (
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={(selected) => {
-              const isChecked = selected === "indeterminate" ? true : selected;
-              if (isSelected === true) {
-                addToDeletedUuid(result.uuid);
-                setIsSelected(isChecked);
-              } else {
-                removeToDeletedUuid(result.uuid);
-                setIsSelected(isChecked);
+      <Card className="h-full w-full cursor-pointer hover:shadow-md">
+        <CardHeader>
+          <CardTitle className="truncate">{result.problemSetName}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div
+            className=""
+            onClick={() => {
+              if (isDeleteButtonClicked) {
+                if (isSelected === false) {
+                  addToDeletedUuid(result.uuid);
+                } else {
+                  removeToDeletedUuid(result.uuid);
+                }
+                setIsSelected(!isSelected);
               }
             }}
-          />
-        )}
-      </div>
+          >
+            <p className="text-sm font-semibold">{`${result.problemResultsCount} 문제`}</p>
+            <p className=" w-fit text-sm text-gray-500">{formattedDate}</p>
+            <p className=" w-fit text-sm text-gray-500">{formattedTime}</p>
+          </div>
+          {isDeleteButtonClicked && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(selected) => {
+                const isChecked =
+                  selected === "indeterminate" ? true : selected;
+                if (isSelected === true) {
+                  addToDeletedUuid(result.uuid);
+                  setIsSelected(isChecked);
+                } else {
+                  removeToDeletedUuid(result.uuid);
+                  setIsSelected(isChecked);
+                }
+              }}
+            />
+          )}
+        </CardContent>
+      </Card>
     );
   };
 
   return (
     <>
       {isDeleteButtonClicked ? (
-        <Card />
+        <CustomCard />
       ) : (
         <Link href={`/result/${result.uuid}`}>
-          <Card />
+          <CustomCard />
         </Link>
       )}
     </>

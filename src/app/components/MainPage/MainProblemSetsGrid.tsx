@@ -90,7 +90,7 @@ export default function MainProblemSetsGrid({
                 >
                   <Link href={`/problem/${publicProblemSet.uuid}`} className="flex flex-col w-full h-full">
                     <CardHeader className="pb-0">
-                      <CardTitle>{publicProblemSet.name}</CardTitle>
+                      <CardTitle className="truncate">{publicProblemSet.name}</CardTitle>
                       {publicProblemSet.description ? (
                         <CardDescription className="truncate">
                           {publicProblemSet.description}

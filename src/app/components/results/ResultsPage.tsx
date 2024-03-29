@@ -6,7 +6,6 @@ import SearchBox from "../ui/SearchBox";
 import PaginationButton from "../ui/PaginationButton";
 import usePagenationState from "@/hooks/usePagenationState";
 import ResultsGrid from "./ResultsGrid";
-import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
 import useUiState from "@/hooks/useUiState";
@@ -22,9 +21,6 @@ export default function ResultsPage() {
   const debouncedSearchString = useDebounce(searchString, 500);
 
   const [isSearching, setIsSearching] = useState(false);
-
-  // 화면 크기에 따라 페이지 사이즈 변경
-  useResponsivePageSize("results");
 
   //모든 페이지네이션 list prefetch
   usePrefetchPagination("results", isSearching, debouncedSearchString);
@@ -56,7 +52,7 @@ export default function ResultsPage() {
 
   return (
     <>
-      <section className="mx-auto mt-10 w-full max-w-[80rem] p-3">
+      <section className="mx-auto mt-10 w-full max-w-[70rem] p-3">
         <h1 className="mb-3 text-center text-3xl font-semibold">시험 기록</h1>
 
         <DynamicSearchBox

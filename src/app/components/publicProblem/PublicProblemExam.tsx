@@ -28,6 +28,7 @@ import { KeyboardEventHandler, useEffect, useState } from "react";
 import axios from "axios";
 import {
   fetchPublicProblemLikes,
+  fetchPublicProblemSetByUUID,
   fetchPublicProblemSetComments,
 } from "@/utils/problems";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -35,7 +36,7 @@ import { useToast } from "../ui/use-toast";
 import { handleEnterKeyPress } from "@/utils/keyboard";
 
 type Props = {
-  publicProblemSet: PublicExamProblemSet;
+  publicSetUUID: string;
   userEmail: string | null | undefined;
   userName: string | null | undefined;
   userUUID: string | null | undefined;
@@ -44,7 +45,7 @@ type Props = {
 type Like = { likes: number; liked: boolean };
 
 export default function PublicProblemExam({
-  publicProblemSet,
+  publicSetUUID,
   userEmail,
   userName,
   userUUID,
@@ -52,39 +53,45 @@ export default function PublicProblemExam({
   const [comment, setComment] = useState("");
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const { data: publicProblemSet } = useQuery<PublicExamProblemSet>({
+    queryKey: ["publicProblemSet", publicSetUUID],
+    queryFn: () => fetchPublicProblemSetByUUID(publicSetUUID),
+  });
+
   const {
     data: comments,
     isLoading,
     error,
   } = useQuery<ProblemSetComment[]>({
-    queryKey: ["problemSetComments", publicProblemSet.uuid],
-    queryFn: () => fetchPublicProblemSetComments(publicProblemSet.uuid),
+    queryKey: ["problemSetComments", publicSetUUID],
+    queryFn: () => fetchPublicProblemSetComments(publicSetUUID),
   });
 
   const { data: like } = useQuery<Like>({
-    queryKey: ["publicProblemLikes", publicProblemSet.uuid, userEmail],
-    queryFn: () => fetchPublicProblemLikes(publicProblemSet.uuid),
+    queryKey: ["publicProblemLikes", publicSetUUID, userEmail],
+    queryFn: () => fetchPublicProblemLikes(publicSetUUID),
   });
 
   const { mutate: problemSetLikesMutate } = useMutation({
     mutationFn: (liked: boolean) => {
       return axios.put("/api/handlePublicProblemSetLike", {
-        problemSetUUID: publicProblemSet.uuid,
+        problemSetUUID: publicSetUUID,
         liked,
       });
     },
     onMutate: async (liked: boolean) => {
       await queryClient.cancelQueries({
-        queryKey: ["publicProblemLikes", publicProblemSet.uuid],
+        queryKey: ["publicProblemLikes", publicSetUUID],
       });
 
       const previousLike = queryClient.getQueryData<Like>([
         "publicProblemLikes",
-        publicProblemSet.uuid,
+        publicSetUUID,
       ]);
 
       queryClient.setQueryData<Like>(
-        ["publicProblemLikes", publicProblemSet.uuid],
+        ["publicProblemLikes", publicSetUUID],
         (old) => {
           if (!old) return undefined;
 
@@ -101,37 +108,37 @@ export default function PublicProblemExam({
     },
     onError: (err, _, context) => {
       queryClient.setQueryData<Like>(
-        ["publicProblemLikes", publicProblemSet.uuid],
+        ["publicProblemLikes", publicSetUUID],
         context?.previousLike,
       );
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({
-        queryKey: ["publicProblemLikes", publicProblemSet.uuid],
+        queryKey: ["publicProblemLikes", publicSetUUID],
       });
     },
   });
 
   const { mutate: problemSetCommentsAddMutate } = useMutation({
     mutationFn: (newComment: string) => {
-      console.log(publicProblemSet.uuid);
+      console.log(publicSetUUID);
       return axios.post("/api/postProblemSetComment", {
-        problemSetUUID: publicProblemSet.uuid,
+        problemSetUUID: publicSetUUID,
         comment: newComment,
       });
     },
     onMutate: async (newComment: string) => {
       await queryClient.cancelQueries({
-        queryKey: ["problemSetComments", publicProblemSet.uuid],
+        queryKey: ["problemSetComments", publicSetUUID],
       });
 
       const previousComment = queryClient.getQueryData<ProblemSetComment[]>([
         "problemSetComments",
-        publicProblemSet.uuid,
+        publicSetUUID,
       ]);
 
       queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicProblemSet.uuid],
+        ["problemSetComments", publicSetUUID],
         (old) => {
           const tempComment = {
             uuid: "temp",
@@ -155,13 +162,13 @@ export default function PublicProblemExam({
     },
     onError: (err, newComment, context) => {
       queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicProblemSet.uuid],
+        ["problemSetComments", publicSetUUID],
         context?.previousComment,
       );
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({
-        queryKey: ["problemSetComments", publicProblemSet.uuid],
+        queryKey: ["problemSetComments", publicSetUUID],
       });
     },
   });
@@ -176,16 +183,16 @@ export default function PublicProblemExam({
     },
     onMutate: async (commentUUID: string) => {
       await queryClient.cancelQueries({
-        queryKey: ["problemSetComments", publicProblemSet.uuid],
+        queryKey: ["problemSetComments", publicSetUUID],
       });
 
       const previousComment = queryClient.getQueryData<ProblemSetComment[]>([
         "problemSetComments",
-        publicProblemSet.uuid,
+        publicSetUUID,
       ]);
 
       queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicProblemSet.uuid],
+        ["problemSetComments", publicSetUUID],
         (old) => {
           return old?.filter((comment) => comment.uuid !== commentUUID);
         },
@@ -195,13 +202,13 @@ export default function PublicProblemExam({
     },
     onError: (err, commentUUID, context) => {
       queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicProblemSet.uuid],
+        ["problemSetComments", publicSetUUID],
         context?.previousComment,
       );
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({
-        queryKey: ["problemSetComments", publicProblemSet.uuid],
+        queryKey: ["problemSetComments", publicSetUUID],
       });
     },
   });
@@ -280,22 +287,22 @@ export default function PublicProblemExam({
         <Card>
           <CardHeader>
             <div className="relative">
-              <CardTitle>{publicProblemSet.name}</CardTitle>
-              <CardDescription>{`${publicProblemSet.creator ?? ""} 작성 | ${new Date(
-                publicProblemSet.updatedAt,
+              <CardTitle>{publicProblemSet?.name}</CardTitle>
+              <CardDescription>{`${publicProblemSet?.creator ?? ""} 작성 | ${new Date(
+                publicProblemSet?.updatedAt ?? "",
               ).toLocaleString("ko-KR", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
               })}`}</CardDescription>
               <p className="absolute bottom-0 right-0 top-0 text-lg font-bold">
-                {`${publicProblemSet.problems.length} 문제`}
+                {`${publicProblemSet?.problems.length} 문제`}
               </p>
             </div>
           </CardHeader>
           <CardContent className="grid gap-4 border-y py-4">
             <p className="text-sm/relaxed">
-              {publicProblemSet.description ||
+              {publicProblemSet?.description ||
                 "만든이가 설명을 제공하지 않았습니다."}
             </p>
             <div className="flex items-center justify-between">

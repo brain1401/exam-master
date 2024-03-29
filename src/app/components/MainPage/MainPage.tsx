@@ -9,12 +9,10 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useEffect, useState } from "react";
-import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import useDebounce from "@/hooks/useDebounce";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import usePagenationState from "@/hooks/usePagenationState";
 import MainProblemSetsGrid from "./MainProblemSetsGrid";
-import Pagenation from "@/slices/pagenation";
 import PaginationButton from "../ui/PaginationButton";
 
 export default function MainPage() {
@@ -34,9 +32,6 @@ export default function MainPage() {
 
   //모든 페이지네이션 list prefetch
   usePrefetchPagination("publicProblemSet", isSearching, debouncedSearchString);
-
-  // 화면 크기에 따라 페이지 사이즈 변경
-  useResponsivePageSize("publicProblemSet");
 
   // 검색 시 페이지 초기화
   useEffect(() => {

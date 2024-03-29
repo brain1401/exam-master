@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
     id: data.uuid.toString(),
     name: data.name,
     isPublic: data.isPublic,
+    description: data.description ?? "",
     problems: data.problems,
   };
 

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import PaginationButton from "../ui/PaginationButton";
 import useDebounce from "@/hooks/useDebounce";
 import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsGrid from "./ProblemSetsGrid";
-import useResponsivePageSize from "@/hooks/useResponsivePageSize";
 import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
 import useUiState from "@/hooks/useUiState";
@@ -26,11 +25,7 @@ export default function ProblemSetsPage({ type }: Props) {
 
   const [isSearching, setIsSearching] = useState(false);
 
-  //모든 페이지네이션 list prefetch
   usePrefetchPagination(type, isSearching, debouncedSearchString);
-
-  // 화면 크기에 따라 페이지 사이즈 변경
-  useResponsivePageSize("problemSets");
 
   // 검색 시 페이지 초기화
   useEffect(() => {
@@ -57,10 +52,14 @@ export default function ProblemSetsPage({ type }: Props) {
     };
   }, [resetToDeletedUuid]);
 
+  useEffect(() => {
+    console.log("pageSize : ", pageSize);
+  }, [pageSize]);
+
   const title = type === "manage" ? "문제집 관리" : "풀 문제 선택";
 
   return (
-    <section className="mx-auto w-full max-w-[80rem] p-3">
+    <section className="mx-auto w-full max-w-[70rem] p-3">
       <h1 className="mb-3 mt-10 text-center text-[2rem]">{title}</h1>
 
       <DynamicSearchBox

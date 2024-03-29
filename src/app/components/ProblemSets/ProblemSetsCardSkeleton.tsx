@@ -1,4 +1,6 @@
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Skeleton } from "../ui/skeleton";
 
 type Props = {
   pageSize: number;
@@ -12,11 +14,21 @@ export default function ProblemSetsCardSkeleton({ pageSize }: Props) {
       {skeletonArray.map((_, i) => (
         <li
           key={i}
-          className="my-2 flex w-full animate-pulse flex-col items-center justify-center rounded-lg border border-gray-300 p-5"
+          className="h-full max-w-[50%] basis-[50%] px-2 md:max-w-[25%] md:basis-[25%]"
         >
-          <div className="h-[1.8rem] w-[10rem] rounded-md bg-gray-300 text-center text-lg font-bold text-gray-700" />
-          <div className="mt-3 h-[1.3rem] w-[8rem] rounded-md bg-gray-300 text-sm text-gray-500" />
-          <div className="mt-1 h-[1.3rem] w-[8rem] rounded-md bg-gray-300 text-sm text-gray-500" />
+          <Card className="h-full w-full">
+            <CardHeader>
+              <CardTitle>
+                <Skeleton className="h-[2rem] w-[10rem]" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-y-[.5rem]">
+                <Skeleton className="h-[1rem] w-[10rem]" />
+                <Skeleton className="h-[1rem] w-[10rem]" />
+              </div>
+            </CardContent>
+          </Card>
         </li>
       ))}
     </ProblemSetsGridLayout>

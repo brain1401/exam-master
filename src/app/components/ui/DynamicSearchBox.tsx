@@ -14,20 +14,11 @@ export default function DynamicSearchBox({
 }: Props) {
   return (
     <>
-      {type === "manage" || type === "result" ? (
-        <DeleteAndSearchBox
-          searchString={searchString}
-          setSearchString={setSearchString}
-          type={type}
-        />
-      ) : (
-        <div className="flex justify-end">
-          <SearchBox
-            searchString={searchString}
-            setSearchString={setSearchString}
-          />
-        </div>
-      )}
+      <DeleteAndSearchBox
+        searchString={searchString}
+        setSearchString={setSearchString}
+        type={type}
+      />
     </>
   );
 }

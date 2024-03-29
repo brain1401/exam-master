@@ -231,7 +231,7 @@ export default function ProblemsOption({ type }: Props) {
                       </Button>
                     </div>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                     <DialogHeader>
                       <DialogTitle>{`문제집 설명 ${type === "manage" ? "수정" : "설정"}`}</DialogTitle>
                     </DialogHeader>

@@ -12,6 +12,7 @@ import {
   PublicProblemSetWithPagination,
   PrefetchPaginationType,
   ProblemSetComment,
+  PublicExamProblemSet,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
@@ -749,4 +750,9 @@ export async function fetchPublicProblemLikes(problemUuid: string | undefined) {
     likes,
     liked,
   };
+}
+
+export async function fetchPublicProblemSetByUUID(problemUuid: string) {
+  const {data} = await axios.get(`/api/getPublicProblemSet/?problemSetUUID=${problemUuid}`);
+  return data as PublicExamProblemSet;
 }

@@ -68,7 +68,7 @@ export default function ProblemSetsGrid({
             {problemSets.data.map((problemSet: ProblemSet) => (
               <li
                 key={problemSet.uuid}
-                className="mx-auto flex w-full max-w-[13rem] items-center justify-center"
+                className="h-full max-w-[50%] basis-[50%] px-2 md:max-w-[25%] md:basis-[25%]"
               >
                 <ProblemSetsCard problemSet={problemSet} type={type} />
               </li>

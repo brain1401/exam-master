@@ -87,6 +87,7 @@ export type ProblemSetWithName = {
   id: string | undefined;
   name: string;
   isPublic: boolean;
+  description?: string;
   problems: Problem[];
 };
 

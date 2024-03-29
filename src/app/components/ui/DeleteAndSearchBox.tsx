@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   searchString: string;
@@ -81,9 +82,10 @@ export default function DeleteAndSearchBox({
         <Button
           variant="outline"
           size="icon"
-          className={twMerge(
+          className={cn(
             `ml-[1rem] md:ml-[8vw]`,
             `${isDeleteButtonClicked && "brightness-[80%]"}`,
+            `${type === "exam" && "pointer-events-none opacity-0"}`,
           )}
           onClick={onClick}
         >
@@ -91,7 +93,7 @@ export default function DeleteAndSearchBox({
         </Button>
 
         {isDeleteButtonClicked && (
-          <div className="flex flex-row gap-x-[1rem] md:mt-0 mt-2">
+          <div className="mt-2 flex flex-row gap-x-[1rem] md:mt-0">
             {isDeleteButtonClicked && (
               <Button
                 className="px-6 py-2"

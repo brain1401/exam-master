@@ -31,6 +31,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
     setLocalProblemSetsName,
     setProblemSetIsPublic,
     setCurrentTab,
+    setDescription,
   } = useProblems();
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
           (res.data.problems[0] && res.data.problems[0].type) || "obj",
         );
         setProblemSetIsPublic(res.data.isPublic);
+        setDescription(res.data.description || "");
       })
       .catch((err) => {
         setError(err.response?.data.error);
@@ -66,6 +68,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
     resetProblems,
     setProblemSetsName,
     setProblems,
+    setDescription,
     setLocalProblemSetsName,
     setProblemSetIsPublic,
     setCurrentTab,

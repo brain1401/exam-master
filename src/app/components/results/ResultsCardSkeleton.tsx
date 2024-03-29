@@ -1,4 +1,13 @@
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Skeleton } from "../ui/skeleton";
 
 type Props = {
   pageSize: number;
@@ -11,13 +20,23 @@ export default function ResultsCardSkeleton({ pageSize }: Props) {
     <ProblemSetsGridLayout>
       {skeletonArray.map((_, i) => (
         <li
-          className="mx-auto flex min-w-[9rem] max-w-[12rem] animate-pulse flex-col items-center justify-center rounded-lg border border-gray-600 p-5"
+          className="h-full max-w-[50%] basis-[50%] px-2 md:max-w-[25%] md:basis-[25%]"
           key={i}
         >
-          <div className="mb-1 h-[1.8rem] w-[10rem] rounded-md bg-gray-300 text-xl"></div>
-          <div className="mt-1 h-[1rem] w-[5rem] rounded-md bg-gray-300 "></div>
-          <div className="mx-auto mt-1 h-[1rem] w-[8rem] rounded-md bg-gray-300  text-sm text-gray-500"></div>
-          <div className="mx-auto mt-1 h-[1rem] w-[8rem] rounded-md bg-gray-300 text-sm text-gray-500"></div>
+          <Card className="h-full w-full cursor-pointer hover:shadow-md">
+            <CardHeader>
+              <CardTitle>
+                <Skeleton className="h-[2rem] w-[10rem] truncate" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-y-[.2rem]">
+                <Skeleton className="h-[1rem] w-[8rem] truncate" />
+                <Skeleton className="h-[1rem] w-[8rem] truncate" />
+                <Skeleton className="h-[1rem] w-[8rem] truncate" />
+              </div>
+            </CardContent>
+          </Card>
         </li>
       ))}
     </ProblemSetsGridLayout>

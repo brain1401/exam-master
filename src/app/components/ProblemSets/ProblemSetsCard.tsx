@@ -5,7 +5,14 @@ import { ProblemSet } from "@/types/problems";
 import Link from "next/link";
 import { Checkbox } from "../ui/checkbox";
 import { useEffect, useState } from "react";
-
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 type Props = {
   type: "manage" | "exam";
   problemSet: ProblemSet;
@@ -43,49 +50,51 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
     },
   );
 
-  const Card = () => (
-    <div className="flex w-full flex-col items-center">
-      <div
-        className="my-2 flex w-full cursor-pointer flex-col items-center rounded-lg border border-gray-300 p-5 transition-shadow duration-200 ease-in hover:shadow-lg"
-        onClick={() => {
-          if (isDeleteButtonClicked) {
-            if (isSelected === false) {
-              addToDeletedUuid(problemSet.uuid);
-            } else {
-              removeToDeletedUuid(problemSet.uuid);
-            }
-            setIsSelected(!isSelected);
-          }
-        }}
-      >
-        <p className="w-full truncate text-center text-lg font-bold text-gray-700">
-          {problemSet.name}
-        </p>
-        <p className="mt-3 text-sm text-gray-500">
-          {`${problemSet.examProblemsCount}문제` ?? 0}
-        </p>
-        <p className="mt-1 text-sm text-gray-500">{formattedDate}</p>
-      </div>
-      {isDeleteButtonClicked && (
-        <Checkbox
-          checked={isSelected}
-          onCheckedChange={(isSelected) => {
-            const isChecked = isSelected === "indeterminate" ? false : true;
-            if (isSelected === true) {
-              addToDeletedUuid(problemSet.uuid);
-              setIsSelected(isChecked);
-            } else {
-              removeToDeletedUuid(problemSet.uuid);
-              setIsSelected(isChecked);
+  const CustomCard = () => (
+    <Card className="h-full w-full cursor-pointer hover:shadow-md">
+      <CardHeader>
+        <CardTitle className="truncate">{problemSet.name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div
+          className=""
+          onClick={() => {
+            if (isDeleteButtonClicked) {
+              if (isSelected === false) {
+                addToDeletedUuid(problemSet.uuid);
+              } else {
+                removeToDeletedUuid(problemSet.uuid);
+              }
+              setIsSelected(!isSelected);
             }
           }}
-        />
-      )}
-    </div>
+        >
+          <p className="mt-3 text-sm text-gray-500">
+            {`${problemSet.examProblemsCount}문제` ?? 0}
+          </p>
+          <p className="mt-1 text-sm text-gray-500">{formattedDate}</p>
+        </div>
+        {isDeleteButtonClicked && (
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(isSelected) => {
+              const isChecked = isSelected === "indeterminate" ? false : true;
+              if (isSelected === true) {
+                addToDeletedUuid(problemSet.uuid);
+                setIsSelected(isChecked);
+              } else {
+                removeToDeletedUuid(problemSet.uuid);
+                setIsSelected(isChecked);
+              }
+            }}
+          />
+        )}
+      </CardContent>
+    </Card>
   );
 
   return isDeleteButtonClicked ? (
-    <Card />
+    <CustomCard />
   ) : (
     <Link
       href={
@@ -93,9 +102,9 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
           ? `/manage/${problemSet.uuid}`
           : `/exam/${problemSet.uuid}`
       }
-      className="flex w-full justify-center"
+      className="flex w-full h-full justify-center"
     >
-      <Card />
+      <CustomCard />
     </Link>
   );
 }

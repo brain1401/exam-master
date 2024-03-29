@@ -18,7 +18,7 @@ const initialState: StateType = {
   problemSetsMaxPage: 1,
   publicProblemSetsPage: 1,
   publicProblemSetsMaxPage: 1,
-  pageSize: 9,
+  pageSize: 8,
 };
 
 const pagenationSlice = createSlice({

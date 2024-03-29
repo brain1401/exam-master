@@ -65,7 +65,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -92,7 +92,7 @@ export default async function RootLayout({
             <ReactQueryContext>
               <Navbar />
               <main className="flex flex-1 flex-col">{children}</main>
-              <Toaster/>
+              <Toaster />
             </ReactQueryContext>
           </ReduxProvider>
           <Analytics />
