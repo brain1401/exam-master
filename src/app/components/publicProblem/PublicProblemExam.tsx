@@ -24,7 +24,7 @@ import { Input } from "../../components/ui/input";
 import { TrashIcon } from "lucide-react";
 import { Textarea } from "../../components/ui/textarea";
 import type { ProblemSetComment, PublicExamProblemSet } from "@/types/problems";
-import { useEffect, useState } from "react";
+import { KeyboardEventHandler, useEffect, useState } from "react";
 import axios from "axios";
 import {
   fetchPublicProblemLikes,
@@ -32,6 +32,7 @@ import {
 } from "@/utils/problems";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../ui/use-toast";
+import { handleEnterKeyPress } from "@/utils/keyboard";
 
 type Props = {
   publicProblemSet: PublicExamProblemSet;
@@ -143,7 +144,11 @@ export default function PublicProblemExam({
           if (!old) {
             return [tempComment];
           }
-          return [...old, tempComment];
+          return [...old, tempComment].sort((a, b) => {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          });
         },
       );
       return { previousComment };
@@ -298,7 +303,10 @@ export default function PublicProblemExam({
                 <DialogTrigger asChild>
                   <Button size="lg">문제 풀기 시작</Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent
+                  className="sm:max-w-[425px]"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
                   <DialogHeader>
                     <DialogTitle>제한 시간 설정</DialogTitle>
                     <DialogDescription>
@@ -307,8 +315,17 @@ export default function PublicProblemExam({
                   </DialogHeader>
                   <div className="flex items-center justify-center gap-4 py-4">
                     <div>
-                      <Label className="mb-2 block font-bold">제한 시간</Label>
-                      <Input className="w-[10rem]" id="time-limit" />
+                      <Label className="mb-3 block font-bold">
+                        제한 시간 (분)
+                      </Label>
+                      <Input
+                        onKeyDown={async (e) =>
+                          handleEnterKeyPress(e, () => {})
+                        }
+                        className="w-[10rem]"
+                        id="time-limit"
+                        type="number"
+                      />
                     </div>
                   </div>
                   <DialogFooter>
@@ -339,6 +356,7 @@ export default function PublicProblemExam({
               onChange={(e) => setComment(e.target.value)}
               className="resize-none"
               placeholder="댓글을 입력하세요."
+              onKeyDown={(e) => handleEnterKeyPress(e, onCommentSubmit)}
             />
             <div className="mt-2 flex justify-between">
               <Button onClick={onCommentSubmit}>댓글 작성</Button>

@@ -20,6 +20,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Textarea } from "../ui/textarea";
+import { handleEnterKeyPress } from "@/utils/keyboard";
 
 const BUTTON_CLASSNAMES = "w-[4rem] rounded-lg";
 // "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
@@ -170,6 +171,7 @@ export default function ProblemsOption({ type }: Props) {
           inputClassName="w-[3rem] text-[.95rem] h-[2.2rem]"
           value={problemLength}
           onChange={handleProblemLengthChange}
+          onKeyDown={(e) => handleEnterKeyPress(e, applyProblemLength)}
         />
         <Button className={BUTTON_CLASSNAMES} onClick={applyProblemLength}>
           확인
@@ -185,6 +187,7 @@ export default function ProblemsOption({ type }: Props) {
               inputClassName="w-[10rem] h-[2.2rem]"
               value={localProblemSetsName}
               onChange={(e) => setLocalProblemSetsName(e.target.value)}
+              onKeyDown={(e) => handleEnterKeyPress(e, applyProblemSetName)}
             />
             <Button
               className={BUTTON_CLASSNAMES}

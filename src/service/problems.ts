@@ -1691,7 +1691,8 @@ export async function getPublicProblemSetComments(problemSetUUID: string) {
               eq(problemSet.isPublic, true),
             ),
           )
-          .where(eq(problemSetComment.problemSetUuid, problemSetUUID));
+          .where(eq(problemSetComment.problemSetUuid, problemSetUUID))
+          .orderBy(desc(problemSetComment.createdAt));
 
         const user = await Promise.all(
           comments.map(async (comment) => {
@@ -1831,7 +1832,6 @@ export async function deleteCommentFromProblemSetComment({
     throw new Error("문제집 댓글을 삭제하는 중 오류가 발생했습니다.");
   }
 }
-
 
 export async function handlePublicProblemLikes({
   problemSetUUID,
