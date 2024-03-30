@@ -14,7 +14,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           <div
             ref={ref}
             className={cn(
-              "flex h-[9.5rem] cursor-pointer flex-col rounded-lg border bg-card text-card-foreground shadow-sm md:h-auto",
+              "flex h-[9.5rem] cursor-pointer flex-col rounded-lg border bg-card text-card-foreground shadow-sm md:h-full",
               className,
             )}
             {...props}
@@ -24,7 +24,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         <div
           ref={ref}
           className={cn(
-            "flex h-[9.5rem] flex-col rounded-lg border bg-card text-card-foreground shadow-sm md:h-auto",
+            "flex h-[9.5rem] flex-col rounded-lg border bg-card text-card-foreground shadow-sm md:h-full",
             className,
           )}
           {...props}
