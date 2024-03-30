@@ -11,9 +11,10 @@ import useUiState from "@/hooks/useUiState";
 
 type Props = {
   type: "manage" | "exam";
+  userEmail: string;
 };
 
-export default function ProblemSetsPage({ type }: Props) {
+export default function ProblemSetsPage({ type, userEmail }: Props) {
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const { setProblemSetsPage, problemSetsMaxPage, problemSetsPage, pageSize } =
     usePagenationState();
@@ -25,7 +26,7 @@ export default function ProblemSetsPage({ type }: Props) {
 
   const [isSearching, setIsSearching] = useState(false);
 
-  usePrefetchPagination(type, isSearching, debouncedSearchString);
+  usePrefetchPagination(type, isSearching, debouncedSearchString, userEmail);
 
   // 검색 시 페이지 초기화
   useEffect(() => {
@@ -73,6 +74,7 @@ export default function ProblemSetsPage({ type }: Props) {
         isSearching={isSearching}
         pageSize={pageSize}
         type={type}
+        userEmail={userEmail}
       />
       <PaginationButton
         page={problemSetsPage}

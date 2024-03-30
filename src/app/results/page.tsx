@@ -8,17 +8,18 @@ export const metadata: Metadata = {
   description: "결과를 확인하세요.",
 };
 
-
 export default async function Results() {
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || !session.user?.email) {
     return <LoginRequired />;
   }
 
+  const userEmail = session.user.email;
+
   return (
     <>
-      <ResultsPage />
+      <ResultsPage userEmail={userEmail} />
     </>
   );
 }

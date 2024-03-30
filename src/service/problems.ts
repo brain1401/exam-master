@@ -68,6 +68,7 @@ import {
 
 import { s3Client } from "@/utils/AWSs3Client";
 import drizzleSession from "@/db/drizzle";
+import { problemShuffle } from "@/utils/problemShuffle";
 
 export async function postProblems({
   problemSetName,
@@ -613,9 +614,46 @@ export async function getProblemSetsByName(
   }
 }
 
+export async function getExamProblemsByProblemSetUUID(
+  UUID: string,
+  userEmail: string,
+) {
+  const data = await getProblemsSetByUUID(UUID, userEmail);
+
+  const examProblems: ExamProblem[] = data.problems.map((problem) => {
+    if (!problem) throw new Error("문제가 없습니다.");
+
+    return {
+      uuid: problem.uuid,
+      type: problem.type as "obj" | "sub",
+      question: problem.question,
+      additionalView: problem.additionalView,
+      image: problem.image ? problem.image : null,
+      isAnswerMultiple: problem.isAnswerMultiple,
+      // 문제의 정답을 알 수 없게 함
+      candidates:
+        problem.candidates?.map((candidate) => ({
+          id: candidate.id,
+          text: candidate.text,
+          isAnswer: false,
+        })) ?? null,
+
+      // 문제의 정답을 알 수 없게 함
+      subAnswer: problem.type === "sub" ? "" : null,
+    };
+  });
+
+  const result: ExamProblemSet = {
+    uuid: data.uuid,
+    name: data.name,
+    problems: problemShuffle(examProblems),
+  };
+
+  return result;
+}
+
 export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
   // filter 조건에 userEmail을 추가해서 해당 유저의 문제집만 가져오도록 했음
-
   try {
     const data = await drizzleSession.transaction(async (dt) => {
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);

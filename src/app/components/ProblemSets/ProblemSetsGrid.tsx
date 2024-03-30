@@ -13,6 +13,7 @@ type Props = {
   debouncedSearchString: string;
   pageSize: number;
   isSearching: boolean;
+  userEmail: string;
 };
 
 export type IsSelected = { uuid: string; isSelected: boolean };
@@ -22,6 +23,7 @@ export default function ProblemSetsGrid({
   debouncedSearchString,
   isSearching,
   pageSize,
+  userEmail,
 }: Props) {
   const { setProblemSetsMaxPage, problemSetsPage } = usePagenationState();
 
@@ -37,6 +39,7 @@ export default function ProblemSetsGrid({
       isSearching,
       debouncedSearchString,
       setProblemSetsMaxPage,
+      userEmail,
     ],
     queryFn: () =>
       fetchProblemSets(

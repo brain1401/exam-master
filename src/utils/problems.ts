@@ -13,6 +13,7 @@ import {
   PrefetchPaginationType,
   ProblemSetComment,
   PublicExamProblemSet,
+  ExamProblemSet,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
@@ -319,9 +320,8 @@ export async function fetchPublicProblemSets(
     const data: PublicProblemSetWithPagination = res?.data;
 
     if (data) {
-      setPublicProblemSetsMaxPage && setPublicProblemSetsMaxPage(
-        data.pagination.pageCount || 1,
-      );
+      setPublicProblemSetsMaxPage &&
+        setPublicProblemSetsMaxPage(data.pagination.pageCount || 1);
       return data;
     } else {
       throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
@@ -331,6 +331,24 @@ export async function fetchPublicProblemSets(
       console.log(err);
     }
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function fetchExamProblems(problemSetUUID: string) {
+  try {
+    const { data } = await axios.get<ExamProblemSet>(
+      `/api/getExamProblemsByProblemSetUUID`,
+      {
+        params: {
+          UUID: problemSetUUID,
+        },
+      },
+    );
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제를 불러오는 중 오류가 발생했습니다.");
   }
 }
 
@@ -732,9 +750,12 @@ export function getQueryKey(type: PrefetchPaginationType) {
   }
 }
 
-export async function fetchPublicProblemSetComments(problemUuid: string | undefined) {
-
-  const {data} = await axios.get(`/api/getPublicProblemSetComments/?problemSetUUID=${problemUuid}`);
+export async function fetchPublicProblemSetComments(
+  problemUuid: string | undefined,
+) {
+  const { data } = await axios.get(
+    `/api/getPublicProblemSetComments/?problemSetUUID=${problemUuid}`,
+  );
   const comments = data.comments as ProblemSetComment[];
 
   console.log(comments);
@@ -743,7 +764,9 @@ export async function fetchPublicProblemSetComments(problemUuid: string | undefi
 }
 
 export async function fetchPublicProblemLikes(problemUuid: string | undefined) {
-  const {data} = await axios.get(`/api/getPublicProblemSetLikes/?problemSetUUID=${problemUuid}`);
+  const { data } = await axios.get(
+    `/api/getPublicProblemSetLikes/?problemSetUUID=${problemUuid}`,
+  );
   const likes = data.likes as number;
   const liked = data.liked as boolean;
   return {
@@ -753,6 +776,8 @@ export async function fetchPublicProblemLikes(problemUuid: string | undefined) {
 }
 
 export async function fetchPublicProblemSetByUUID(problemUuid: string) {
-  const {data} = await axios.get(`/api/getPublicProblemSet/?problemSetUUID=${problemUuid}`);
+  const { data } = await axios.get(
+    `/api/getPublicProblemSet/?problemSetUUID=${problemUuid}`,
+  );
   return data as PublicExamProblemSet;
 }

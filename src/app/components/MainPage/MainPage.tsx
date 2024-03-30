@@ -31,7 +31,12 @@ export default function MainPage() {
   const [isSearching, setIsSearching] = useState(false);
 
   //모든 페이지네이션 list prefetch
-  usePrefetchPagination("publicProblemSet", isSearching, debouncedSearchString);
+  usePrefetchPagination(
+    "publicProblemSet",
+    isSearching,
+    debouncedSearchString,
+    null,
+  );
 
   // 검색 시 페이지 초기화
   useEffect(() => {

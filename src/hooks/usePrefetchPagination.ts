@@ -18,6 +18,7 @@ export default function usePrefetchPagination(
   type: PrefetchPaginationType,
   isSearching: boolean,
   debouncedSearchString: string,
+  useremail: string | null,
 ) {
   const queryClient = useQueryClient();
   const {
@@ -63,6 +64,7 @@ export default function usePrefetchPagination(
               isSearching,
               debouncedSearchString,
               setMaxPage,
+              useremail,
             ],
             queryFn: () =>
               fetchData(
@@ -87,6 +89,7 @@ export default function usePrefetchPagination(
     setPublicProblemSetsMaxPage,
     setProblemSetsMaxPage,
     setResultsMaxPage,
+    useremail,
     isSearching,
     type,
   ]);

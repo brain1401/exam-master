@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 export default async function ManagePage() {
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || !session?.user?.email) {
     return <LoginRequired />;
   }
 
-  return <ProblemSetsPage type="manage" />;
+  return <ProblemSetsPage type="manage" userEmail={session.user.email} />;
 }

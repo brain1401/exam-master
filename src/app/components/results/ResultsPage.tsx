@@ -9,7 +9,10 @@ import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
 import useUiState from "@/hooks/useUiState";
 
-export default function ResultsPage() {
+type Props = {
+  userEmail: string;
+};
+export default function ResultsPage({ userEmail }: Props) {
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const { resultsPage, resultsMaxPage, pageSize, setResultsPage } =
     usePagenationState();
@@ -22,7 +25,7 @@ export default function ResultsPage() {
   const [isSearching, setIsSearching] = useState(false);
 
   //모든 페이지네이션 list prefetch
-  usePrefetchPagination("results", isSearching, debouncedSearchString);
+  usePrefetchPagination("results", isSearching, debouncedSearchString, userEmail);
 
   //검색 시 페이지 초기화
   useEffect(() => {

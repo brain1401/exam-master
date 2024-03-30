@@ -53,6 +53,7 @@ export default function MainProblemSetsGrid({
       isSearching,
       debouncedSearchString,
       setPublicProblemSetsMaxPage,
+      null,
     ],
     queryFn: () =>
       fetchPublicProblemSets(
