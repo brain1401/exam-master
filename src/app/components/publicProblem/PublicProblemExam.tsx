@@ -24,7 +24,7 @@ import { Input } from "../../components/ui/input";
 import { TrashIcon } from "lucide-react";
 import { Textarea } from "../../components/ui/textarea";
 import type { ProblemSetComment, PublicExamProblemSet } from "@/types/problems";
-import { KeyboardEventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   fetchPublicProblemLikes,
@@ -287,7 +287,9 @@ export default function PublicProblemExam({
         <Card>
           <CardHeader>
             <div className="relative">
-              <CardTitle className="pr-[3.2rem]">{publicProblemSet?.name}</CardTitle>
+              <CardTitle className="pr-[3.2rem]">
+                {publicProblemSet?.name}
+              </CardTitle>
               <CardDescription>{`${publicProblemSet?.creator ?? ""} 작성 | ${new Date(
                 publicProblemSet?.updatedAt ?? "",
               ).toLocaleString("ko-KR", {

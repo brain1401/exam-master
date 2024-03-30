@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import PublicProblemExam from "@/app/components/publicProblem/PublicProblemExam";
 import {
   getPublicProblemLikes,
@@ -17,6 +18,22 @@ type Props = {
     UUID: string;
   };
 };
+
+export async function generateMetadata({
+  params: { UUID },
+}: Props): Promise<Metadata> {
+  const publicProblemSet = await getPublicProblemSetByUUID(UUID);
+
+  return {
+    title: publicProblemSet.name,
+    description: publicProblemSet.description || "",
+    openGraph: {
+      title: publicProblemSet.name,
+      description: publicProblemSet.description || "",
+      siteName: "Exam Master",
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 

@@ -54,9 +54,19 @@ const NotoSansKR = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Exam Master",
+  title: {
+    template: "%s - Exam Master",
+    default: "Exam Master",
+  },
   description:
     "실제 시험을 보듯이 시험 문제를 외우는 것을 도와주는 서비스입니다.",
+  openGraph: {
+    title: "Exam Master",
+    description:
+      "실제 시험을 보듯이 시험 문제를 외우는 것을 도와주는 서비스입니다.",
+    type: "website",
+    locale: "ko_KR",
+  },
 };
 
 export const viewport: Viewport = {
