@@ -12,9 +12,10 @@ import useUiState from "@/hooks/useUiState";
 type Props = {
   type: "manage" | "exam";
   userEmail: string;
+  maxPage: number;
 };
 
-export default function ProblemSetsPage({ type, userEmail }: Props) {
+export default function ProblemSetsPage({ type, userEmail, maxPage }: Props) {
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const { setProblemSetsPage, problemSetsMaxPage, problemSetsPage, pageSize } =
     usePagenationState();
@@ -79,7 +80,7 @@ export default function ProblemSetsPage({ type, userEmail }: Props) {
       <PaginationButton
         page={problemSetsPage}
         setPage={setProblemSetsPage}
-        maxPage={problemSetsMaxPage}
+        maxPage={problemSetsMaxPage ?? maxPage}
         className="mt-5 flex justify-center pb-5"
       />
     </section>

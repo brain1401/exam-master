@@ -15,7 +15,10 @@ import usePagenationState from "@/hooks/usePagenationState";
 import MainProblemSetsGrid from "./MainProblemSetsGrid";
 import PaginationButton from "../ui/PaginationButton";
 
-export default function MainPage() {
+type Props = {
+  maxPage: number;
+}
+export default function MainPage({ maxPage }: Props) {
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const {
     setPublicProblemSetsPage,
@@ -103,7 +106,7 @@ export default function MainPage() {
         </div>
         <PaginationButton
           className="mt-5 pb-8"
-          maxPage={publicProblemSetsMaxPage}
+          maxPage={publicProblemSetsMaxPage ?? maxPage}
           page={publicProblemSetsPage}
           setPage={setPublicProblemSetsPage}
         />

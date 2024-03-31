@@ -4,7 +4,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import MainPage from "./components/MainPage/MainPage";
-import { getPublicProblemSets } from "@/service/problems";
+import { getPublicProblemSets, getPublicProblemSetsMaxPage } from "@/service/problems";
 
 export default async function Home() {
   const queryClient = new QueryClient();
@@ -14,9 +14,11 @@ export default async function Home() {
     queryFn: () => getPublicProblemSets("1", "8"),
   });
 
+  const maxPage = await getPublicProblemSetsMaxPage(false, "", 8);
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <MainPage />
+      <MainPage maxPage={maxPage}/>
     </HydrationBoundary>
   );
 }

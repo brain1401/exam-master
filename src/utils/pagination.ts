@@ -3,9 +3,9 @@ import {
   fetchExamResults,
   fetchProblemSets,
   fetchPublicProblemSets,
-  getExamResultsMaxPage,
-  getProblemSetsMaxPage,
-  getPublicProblemSetsMaxPage,
+  fetchExamResultsMaxPage,
+  fetchProblemSetsMaxPage,
+  fetchPublicProblemSetsMaxPage,
 } from "./problems";
 import { PrefetchPaginationType } from "@/types/problems";
 
@@ -60,15 +60,15 @@ export function getSetMaxPageFunction({
   }
 }
 
-export function getGetMaxPageFunction(type: PrefetchPaginationType) {
+export function getFetchMaxPageFunction(type: PrefetchPaginationType) {
   switch (type) {
     case "manage":
     case "exam":
-      return getProblemSetsMaxPage;
+      return fetchProblemSetsMaxPage;
     case "results":
-      return getExamResultsMaxPage;
+      return fetchExamResultsMaxPage;
     case "publicProblemSet":
-      return getPublicProblemSetsMaxPage;
+      return fetchPublicProblemSetsMaxPage;
     default:
       throw new Error("Invalid type");
   }

@@ -2176,3 +2176,89 @@ export async function evaluateProblems(
     throw err;
   }
 }
+
+export async function getProblemSetsMaxPage(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  pageSize: number,
+  userUUID: string,
+) {
+  try {
+    const totalProblemSetsCount = await drizzleSession.transaction(
+      async (dt) => {
+        if (isSearching) {
+          return dt
+            .select({ value: count() })
+            .from(problemSet)
+            .where(
+              and(
+                eq(problemSet.userUuid, userUUID),
+                like(problemSet.name, `%${debouncedSearchString}%`),
+              ),
+            );
+        }
+        return dt
+          .select({ value: count() })
+          .from(problemSet)
+          .where(eq(problemSet.userUuid, userUUID));
+      },
+    );
+
+    return Math.ceil(totalProblemSetsCount[0].value / pageSize);
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 페이지 수를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getResultsMaxPage(userEmail: string, pageSize: number) {
+  try {
+    const totalExamResultsCount = await drizzleSession.transaction(
+      async (dt) => {
+        const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+        return dt
+          .select({ value: count() })
+          .from(result)
+          .where(eq(result.userUuid, userUuid));
+      },
+    );
+
+    return Math.ceil(totalExamResultsCount[0].value / pageSize);
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과 페이지 수를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+export async function getPublicProblemSetsMaxPage(
+  isSearching: boolean,
+  debouncedSearchString: string,
+  pageSize: number,
+) {
+  try {
+    const totalProblemSetsCount = await drizzleSession.transaction(
+      async (dt) => {
+        if (isSearching) {
+          return dt
+            .select({ value: count() })
+            .from(problemSet)
+            .where(
+              and(
+                eq(problemSet.isPublic, true),
+                like(problemSet.name, `%${debouncedSearchString}%`),
+              ),
+            );
+        }
+        return dt
+          .select({ value: count() })
+          .from(problemSet)
+          .where(eq(problemSet.isPublic, true));
+      },
+    );
+
+    return Math.ceil(totalProblemSetsCount[0].value / pageSize);
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집 페이지 수를 불러오는 중 오류가 발생했습니다.");
+  }
+}

@@ -7,7 +7,8 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { getProblemSets } from "@/service/problems";
+import { getProblemSets, getProblemSetsMaxPage } from "@/service/problems";
+import { getUserUUIDbyEmail } from "@/service/user";
 
 export const metadata: Metadata = {
   title: "문제 풀기",
@@ -19,19 +20,25 @@ export default async function ExamPage() {
   if (!session || !session.user?.email) return <LoginRequired />;
 
   const userEmail = session.user.email;
-
+  const userUUID = await getUserUUIDbyEmail(userEmail);
   const queryClient = new QueryClient();
 
-  await Promise.all([
+  const [, maxPage] = await Promise.all([
     queryClient.prefetchQuery({
       queryKey: ["problemSets", 1, 8, false, "", null, userEmail],
       queryFn: () => getProblemSets(userEmail, "1", "8"),
     }),
+    getProblemSetsMaxPage(false, "", 8, userUUID),
   ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProblemSetsPage type="exam" userEmail={userEmail}/>;
+      <ProblemSetsPage
+        type="exam"
+        userEmail={userEmail}
+        maxPage={maxPage ?? 1}
+      />
+      ;
     </HydrationBoundary>
   );
 }

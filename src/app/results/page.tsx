@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import LoginRequired from "../components/ui/LoginRequired";
 import ResultsPage from "@/app/components/results/ResultsPage";
 import { Metadata } from "next";
+import { getResultsMaxPage } from "@/service/problems";
 
 export const metadata: Metadata = {
   title: "시험 결과",
@@ -17,9 +18,11 @@ export default async function Results() {
 
   const userEmail = session.user.email;
 
+  const maxPage = await getResultsMaxPage(userEmail, 8);
+
   return (
     <>
-      <ResultsPage userEmail={userEmail} />
+      <ResultsPage userEmail={userEmail} maxPage={maxPage} />
     </>
   );
 }

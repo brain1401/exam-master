@@ -9,7 +9,7 @@ import {
 } from "@/types/problems";
 import {
   getFetchDataFunction,
-  getGetMaxPageFunction,
+  getFetchMaxPageFunction,
   getSetMaxPageFunction,
 } from "@/utils/pagination";
 import { getQueryKey } from "@/utils/problems";
@@ -32,7 +32,7 @@ export default function usePrefetchPagination(
     const prefetch = async () => {
       if (pageSize === 0) return;
 
-      const getMaxPage = getGetMaxPageFunction(type);
+      const getMaxPage = getFetchMaxPageFunction(type);
       const fetchData = getFetchDataFunction(type);
       const setMaxPage = getSetMaxPageFunction({
         type,

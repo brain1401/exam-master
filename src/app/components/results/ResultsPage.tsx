@@ -11,8 +11,9 @@ import useUiState from "@/hooks/useUiState";
 
 type Props = {
   userEmail: string;
+  maxPage: number;
 };
-export default function ResultsPage({ userEmail }: Props) {
+export default function ResultsPage({ userEmail, maxPage }: Props) {
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const { resultsPage, resultsMaxPage, pageSize, setResultsPage } =
     usePagenationState();
@@ -70,7 +71,7 @@ export default function ResultsPage({ userEmail }: Props) {
         />
 
         <PaginationButton
-          maxPage={resultsMaxPage}
+          maxPage={resultsMaxPage ?? maxPage}
           page={resultsPage}
           setPage={setResultsPage}
           className="mt-5 flex justify-center pb-5"

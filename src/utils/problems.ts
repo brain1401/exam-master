@@ -155,7 +155,7 @@ export async function fetchProblemSets(
   }
 }
 
-export async function getProblemSetsMaxPage(
+export async function fetchProblemSetsMaxPage(
   isSearching: boolean,
   debouncedSearchString: string,
   pageSize: number,
@@ -244,7 +244,7 @@ export async function fetchExamResults(
   }
 }
 
-export async function getExamResultsMaxPage(
+export async function fetchExamResultsMaxPage(
   isSearching: boolean,
   debouncedSearchString: string,
   pageSize: number,
@@ -353,7 +353,7 @@ export async function fetchExamProblems(problemSetUUID: string) {
   }
 }
 
-export async function getPublicProblemSetsMaxPage(
+export async function fetchPublicProblemSetsMaxPage(
   isSearching: boolean,
   debouncedSearchString: string,
   pageSize: number,

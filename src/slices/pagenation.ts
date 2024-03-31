@@ -3,21 +3,21 @@ import { RootState } from "@/lib/store";
 
 type StateType = {
   resultPage: number;
-  resultMaxPage: number;
+  resultMaxPage: number | null;
   problemSetsPage: number;
-  problemSetsMaxPage: number;
+  problemSetsMaxPage: number | null;
   publicProblemSetsPage: number;
-  publicProblemSetsMaxPage: number;
+  publicProblemSetsMaxPage: number | null;
   pageSize: number;
 };
 
 const initialState: StateType = {
   resultPage: 1,
-  resultMaxPage: 1,
+  resultMaxPage: null,
   problemSetsPage: 1,
-  problemSetsMaxPage: 1,
+  problemSetsMaxPage: null,
   publicProblemSetsPage: 1,
-  publicProblemSetsMaxPage: 1,
+  publicProblemSetsMaxPage: null,
   pageSize: 8,
 };
 
@@ -75,6 +75,5 @@ export const selectPublicProblemSetsMaxPage = (state: RootState) =>
   state.pagenationReducer.publicProblemSetsMaxPage;
 export const selectPageSize = (state: RootState) =>
   state.pagenationReducer.pageSize;
-
 
 export default pagenationSlice.reducer;
