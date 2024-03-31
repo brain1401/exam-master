@@ -16,6 +16,7 @@ import ProblemGridLayout from "../layouts/ProblemGridLayout";
 import { isImageUrlObject } from "@/utils/problems";
 import { ExamProblemSet } from "@/types/problems";
 import { useEffect } from "react";
+import useRevalidate from "@/hooks/useRevalidate";
 
 type Props = {
   examProblemSet: ExamProblemSet;
@@ -23,12 +24,14 @@ type Props = {
 export default function ExamProblems({ examProblemSet }: Props) {
   const { currentExamProblemIndex, resetExamProblemAnswers } =
     useExamProblems();
+  const { revalidateAllPath } = useRevalidate();
 
   useEffect(() => {
     return () => {
+      revalidateAllPath();
       resetExamProblemAnswers();
     };
-  }, [resetExamProblemAnswers]);
+  }, [resetExamProblemAnswers, revalidateAllPath]);
 
   usePreventClose();
 
