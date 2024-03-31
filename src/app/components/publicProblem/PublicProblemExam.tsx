@@ -80,7 +80,7 @@ export default function PublicProblemExam({
         liked,
       });
     },
-    onMutate: async (liked: boolean) => {
+    onMutate: async (newLiked: boolean) => {
       await queryClient.cancelQueries({
         queryKey: ["publicProblemLikes", publicSetUUID],
       });
@@ -93,20 +93,19 @@ export default function PublicProblemExam({
       queryClient.setQueryData<Like>(
         ["publicProblemLikes", publicSetUUID],
         (old) => {
-          if (!old) return undefined;
+          if (!old) return { likes: newLiked ? 1 : 0, liked: newLiked };
 
-          return liked
-            ? { ...like, ...{ likes: old.likes - 1, liked: !liked as boolean } }
-            : {
-                ...like,
-                ...{ likes: old.likes + 1, liked: !liked as boolean },
-              };
+          return {
+            ...old,
+            likes: newLiked ? old.likes + 1 : old.likes - 1,
+            liked: newLiked,
+          };
         },
       );
 
       return { previousLike };
     },
-    onError: (err, _, context) => {
+    onError: (err, newLiked, context) => {
       queryClient.setQueryData<Like>(
         ["publicProblemLikes", publicSetUUID],
         context?.previousLike,
