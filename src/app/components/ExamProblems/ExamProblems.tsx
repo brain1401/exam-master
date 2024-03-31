@@ -1,84 +1,46 @@
 "use client";
 import usePreventClose from "@/hooks/usePreventClose";
-import { useEffect, useState } from "react";
 import NextOrPrevButtons from "./ExamProblemsNextOrPrevButtons";
 import CurrentExamImage from "./CurrentExamImage";
 import CurrentQuestion from "./CurrentQuestion";
 import AdditionalView from "./AdditionalView";
 import Candidates from "./Candidates";
 import SubjectiveAnswerTextarea from "./SubjectiveAnswerTextarea";
-import axios from "axios";
 import SubmitButton from "./SubmitButton";
 import ExamCardLayout from "../layouts/ExamCardLayout";
 import useExamProblems from "@/hooks/useExamProblems";
-import CustomLoading from "../ui/CustomLoading";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
 import Image from "next/image";
 import checkImage from "../../../../public/images/checkBlack.png";
 import ProblemGridLayout from "../layouts/ProblemGridLayout";
 import { isImageUrlObject } from "@/utils/problems";
 import { ExamProblemSet } from "@/types/problems";
+import { useEffect } from "react";
 
 type Props = {
-  UUID: string;
+  examProblemSet: ExamProblemSet;
 };
-export default function ExamProblems({ UUID }: Props) {
-  const {
-    setExamProblems,
-    resetExamProblems,
-    currentExamProblem,
-    examProblems: { problems },
-  } = useExamProblems();
+export default function ExamProblems({ examProblemSet }: Props) {
+  const { currentExamProblemIndex, resetExamProblemAnswers } =
+    useExamProblems();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    return () => {
+      resetExamProblemAnswers();
+    };
+  }, [resetExamProblemAnswers]);
 
   usePreventClose();
 
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get<ExamProblemSet>(`/api/getExamProblemsByProblemSetUUID`, {
-        params: {
-          UUID,
-        },
-      })
-      .then((res) => {
-        setExamProblems({
-          uuid: res.data.uuid,
-          name: res.data.name,
-          problems: res.data.problems,
-        });
-      })
-      .catch((err) => {
-        setError(err.response?.data.error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
-    return () => {
-      resetExamProblems();
-    };
-  }, [UUID, setExamProblems, resetExamProblems]);
-
-  if (error)
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center text-2xl">{error}</div>
-      </div>
-    );
-
-  if (loading) return <CustomLoading className="mt-20" />;
-
-  if (!currentExamProblem) return <div>문제가 없습니다.</div>;
+  const currentExamProblem = examProblemSet.problems[currentExamProblemIndex];
+  const examProblems = examProblemSet.problems;
 
   return (
     <ProblemGridLayout>
       <div>
         {/* preload images */}
-        {problems &&
-          problems.map((examProblem) => {
+        {examProblems &&
+          examProblems.map((examProblem) => {
             const image = examProblem.image;
             if (image && isImageUrlObject(image)) {
               return (
@@ -103,27 +65,35 @@ export default function ExamProblems({ UUID }: Props) {
           />
         )}
       </div>
-      <CurrentProblemIndicator />
+      <CurrentProblemIndicator
+        examProblemLength={examProblemSet.problems.length}
+      />
+
       <ExamCardLayout>
-        <CurrentQuestion />
+        <CurrentQuestion currentExamProblem={currentExamProblem} />
 
-        <CurrentExamImage />
+        <CurrentExamImage currentExamProblem={currentExamProblem} />
 
-        <AdditionalView />
+        <AdditionalView currentExamProblem={currentExamProblem} />
 
-        {Boolean(currentExamProblem.type === "obj") && <Candidates />}
+        {Boolean(currentExamProblem.type === "obj") && (
+          <Candidates currentExamProblem={currentExamProblem} />
+        )}
 
         {Boolean(currentExamProblem.type === "sub") && (
-          <SubjectiveAnswerTextarea />
+          <SubjectiveAnswerTextarea currentExamProblem={currentExamProblem} />
         )}
       </ExamCardLayout>
 
       <div className="flex items-center justify-center">
-        <NextOrPrevButtons />
+        <NextOrPrevButtons examProblemLength={examProblemSet.problems.length} />
       </div>
 
       <div className="flex items-center justify-center">
-        <SubmitButton />
+        <SubmitButton
+          examProblemSet={examProblemSet}
+          examProblems={examProblems}
+        />
       </div>
     </ProblemGridLayout>
   );

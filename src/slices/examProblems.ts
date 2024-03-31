@@ -1,18 +1,18 @@
 import { RootState } from "@/lib/store";
-import { ExamProblem, ExamProblemSet } from "@/types/problems";
+import {
+  ExamProblem,
+  ExamProblemAnswer,
+  ExamProblemSet,
+} from "@/types/problems";
 import { PayloadAction, createSlice, createSelector } from "@reduxjs/toolkit";
 
 type StateType = {
-  examProblems: ExamProblemSet;
+  examProblemAnswers: ExamProblemAnswer[];
   currentExamProblemIndex: number;
 };
 
 const initialState: StateType = {
-  examProblems: {
-    uuid: undefined,
-    name: "",
-    problems: [],
-  },
+  examProblemAnswers: [],
   currentExamProblemIndex: 0,
 };
 
@@ -21,8 +21,17 @@ export const examProblemSlice = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
-    setExamProblemsAction: (state, action: PayloadAction<ExamProblemSet>) => {
-      state.examProblems = action.payload;
+    setExamProblemAnswersAction: (
+      state,
+      action: PayloadAction<ExamProblemAnswer[]>,
+    ) => {
+      state.examProblemAnswers = action.payload;
+    },
+    setExamProblemAnswerAction: (
+      state,
+      action: PayloadAction<ExamProblemAnswer>,
+    ) => {
+      state.examProblemAnswers[state.currentExamProblemIndex] = action.payload;
     },
     setCurrentExamProblemIndexAction: (
       state,
@@ -30,41 +39,27 @@ export const examProblemSlice = createSlice({
     ) => {
       state.currentExamProblemIndex = action.payload;
     },
-    setCurrentExamProblemAction: (
-      state,
-      action: PayloadAction<ExamProblem>,
-    ) => {
-      state.examProblems.problems[state.currentExamProblemIndex] =
-        action.payload;
-    },
-    setExamProblemNameAction: (state, action: PayloadAction<string>) => {
-      state.examProblems.name = action.payload;
-    },
   },
 });
 
 export const {
   reset,
-  setExamProblemsAction,
+  setExamProblemAnswersAction,
   setCurrentExamProblemIndexAction,
-  setCurrentExamProblemAction,
-  setExamProblemNameAction,
+  setExamProblemAnswerAction,
 } = examProblemSlice.actions;
 
-export const selectCurrentExamProblem = createSelector(
-  (state: RootState) => state.examProblemReducer.examProblems,
-  (state: RootState) => state.examProblemReducer.currentExamProblemIndex,
-  (examProblems, currentExamProblemIndex) =>
-    examProblems.problems?.[currentExamProblemIndex],
-);
+export const selectExamProblemAnswers = (state: RootState) =>
+  state.examProblemReducer.examProblemAnswers;
 
 export const selectCurrentExamProblemIndex = (state: RootState) =>
   state.examProblemReducer.currentExamProblemIndex;
 
-export const selectExamProblems = (state: RootState) =>
-  state.examProblemReducer.examProblems;
-
-export const selectExamProblemName = (state: RootState) =>
-  state.examProblemReducer.examProblems.name;
+export const selectCurrentExamProblemAnswer = createSelector(
+  (state: RootState) => state.examProblemReducer.examProblemAnswers,
+  (state: RootState) => state.examProblemReducer.currentExamProblemIndex,
+  (examProblemAnswers, currentExamProblemIndex) =>
+    examProblemAnswers[currentExamProblemIndex],
+);
 
 export default examProblemSlice.reducer;

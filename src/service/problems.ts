@@ -12,6 +12,10 @@ import {
   ExamProblemSet,
   PublicExamProblemSet,
   ProblemSetComment,
+  ExamProblemAnswer,
+  examProblemSchema,
+  CorrectAnswer,
+  examProblemsSchema,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
@@ -921,18 +925,36 @@ export function getParsedProblems<T extends boolean>(
   }
 }
 
-export async function postProblemResult(
-  order: number,
-  problem: ExamProblem,
-  resultsUuid: string,
-  result: boolean,
-  answer: string | (number | null)[],
-  userUuid: string,
-  dt: DrizzleTransaction,
-) {
-  if (!problem || !problem.uuid) throw new Error("something is null");
+export async function postProblemResult({
+  order,
+  examProblemAnswer,
+  examProblem,
+  resultsUuid,
+  result,
+  answer,
+  userUuid,
+  dt,
+}: {
+  order: number;
+  examProblemAnswer: ExamProblemAnswer;
+  examProblem: ExamProblem;
+  resultsUuid: string;
+  result: boolean;
+  answer: CorrectAnswer;
+  userUuid: string;
+  dt: DrizzleTransaction;
+}) {
+  if (
+    !examProblemAnswer ||
+    !examProblemAnswer.uuid ||
+    !examProblem ||
+    !examProblem.uuid
+  )
+    throw new Error("something is null");
 
   try {
+    const date = new Date();
+
     const createdProblemResult = await dt
       .insert(problemResult)
       .values({
@@ -940,43 +962,47 @@ export async function postProblemResult(
         resultUuid: resultsUuid,
         isCorrect: result,
         userUuId: userUuid,
-        candidates: problem.candidates
-          ? problem.candidates.map((candidate) => ({
+        candidates: Array.isArray(examProblemAnswer.answer)
+          ? examProblemAnswer.answer.map((candidate) => ({
               id: candidate.id,
               text: candidate.text,
               isSelected: candidate.isAnswer,
             }))
           : undefined,
-        subjectiveAnswered: problem.subAnswer,
-        question: problem.question,
-        additionalView: problem.additionalView ?? null,
-        questionType: problem.type,
-        isAnswerMultiple: problem.isAnswerMultiple ?? false,
-        correctCandidates: isAnswerArray(answer)
+        subjectiveAnswered:
+          typeof examProblemAnswer.answer === "string"
+            ? examProblemAnswer.answer
+            : null,
+        question: examProblem.question,
+        additionalView: examProblem.additionalView ?? null,
+        questionType: examProblem.type,
+        isAnswerMultiple: examProblem.isAnswerMultiple ?? false,
+        correctCandidates: Array.isArray(answer)
           ? answer
               .map((id) => ({
                 id,
                 text:
-                  problem.candidates?.find((candidate) => candidate.id === id)
-                    ?.text ?? "",
+                  examProblem.candidates?.find(
+                    (candidate) => candidate.id === id,
+                  )?.text ?? "",
               }))
               .toSorted((a, b) => {
-                if (!problem.candidates)
-                  throw new Error("problem.candidates is null");
+                if (!examProblem.candidates)
+                  throw new Error("examProblem.candidates is null");
                 if (
-                  problem.candidates.findIndex(
+                  examProblem.candidates.findIndex(
                     (candidate) => candidate.id === a.id,
                   ) >
-                  problem.candidates.findIndex(
+                  examProblem.candidates.findIndex(
                     (candidate) => candidate.id === b.id,
                   )
                 )
                   return 1;
                 if (
-                  problem.candidates.findIndex(
+                  examProblem.candidates.findIndex(
                     (candidate) => candidate.id === a.id,
                   ) <
-                  problem.candidates.findIndex(
+                  examProblem.candidates.findIndex(
                     (candidate) => candidate.id === b.id,
                   )
                 )
@@ -984,11 +1010,12 @@ export async function postProblemResult(
                 return 0;
               })
           : undefined,
-        correctSubjectiveAnswer: isAnswerString(answer) ? answer : null,
-        imageUuid: isImageUrlObject(problem.image)
-          ? problem.image.uuid
+        correctSubjectiveAnswer: typeof answer === "string" ? answer : null,
+        imageUuid: isImageUrlObject(examProblem.image)
+          ? examProblem.image.uuid
           : undefined,
-        updatedAt: new Date(),
+        createdAt: date,
+        updatedAt: date,
       })
       .returning({ uuid: problemResult.uuid });
 
@@ -1473,35 +1500,39 @@ export async function deleteProblemResults(
   }
 }
 
-export async function validateExamProblem(
-  problem: ExamProblem,
-  answer: string | (number | null)[],
+export async function validateExamProblemAnswer(
+  examProblemAnswer: ExamProblemAnswer,
+  answer: CorrectAnswer,
 ) {
   let finalResult: boolean | null = null;
 
-  if (!problem || !problem.uuid) throw new Error("something is null");
+  if (!examProblemAnswer || !examProblemAnswer.uuid) {
+    throw new Error("something is null");
+  }
 
-  if (problem.type === "obj") {
-    if (!problem.candidates) throw new Error("candidates is null");
+  if (Array.isArray(examProblemAnswer.answer)) {
+    if (!Array.isArray(answer)) {
+      throw new Error("Answer is not an array");
+    }
 
-    const answeredId = problem.candidates
+    const userAnswer = examProblemAnswer.answer
       .filter((candidate) => candidate.isAnswer)
       .map((candidate) => candidate.id);
 
-    const isCorrect = isAnswerArray(answer)
-      ? answer.every((id) => answeredId.includes(id))
-      : null;
+    finalResult = answer.every((id) => userAnswer.includes(id));
+  } else if (typeof examProblemAnswer.answer === "string") {
+    if (typeof answer !== "string") {
+      throw new Error("Answer is not a string");
+    }
 
-    finalResult = isCorrect;
-  } else if (problem.type === "sub") {
-    if (!problem.subAnswer) throw new Error("subAnswer is null");
-
-    const isCorrect = problem.subAnswer === answer;
-
-    finalResult = isCorrect;
+    finalResult = examProblemAnswer.answer === answer;
+  } else {
+    throw new Error("Invalid user answer");
   }
 
-  if (finalResult === null) throw new Error("finalResult is null");
+  if (finalResult === null) {
+    throw new Error("finalResult is null");
+  }
 
   return finalResult;
 }
@@ -2050,6 +2081,7 @@ export function validateS3Key(fileName: string): boolean {
 }
 
 export async function evaluateProblems(
+  examProblemAnswers: ExamProblemAnswer[],
   examProblems: ExamProblem[],
   problemSetName: string,
   userEmail: string,
@@ -2058,30 +2090,43 @@ export async function evaluateProblems(
     const transactionResult = await drizzleSession.transaction(async (dt) => {
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
-      const validateResult = problemsSchema.safeParse(examProblems);
+      const validateResult = examProblemsSchema.safeParse(examProblems);
 
       if (!validateResult.success) {
-        throw new Error("인수로 전달된 문제들이 유효하지 않습니다.");
+        throw new Error("인수로 전달된 답안들이 유효하지 않습니다.");
       }
+      const date = new Date();
 
       const [{ uuid: resultsUuid }] = await dt
         .insert(result)
         .values({
           problemSetName,
           userUuid,
-          updatedAt: new Date(),
+          createdAt: date,
+          updatedAt: date,
         })
         .returning({ uuid: result.uuid });
 
       await Promise.all(
-        examProblems.map(async (problem, index) => {
-          if (!problem || !problem.uuid) throw new Error("something is null");
+        examProblemAnswers.map(async (examProblemAnswer, index) => {
+          if (!examProblemAnswer || !examProblemAnswer.uuid) {
+            throw new Error("something is null");
+          }
 
-          if (!isProblemAsnwered(problem))
-            throw new Error("모든 정답을 입력해주세요.");
+          const problem = examProblems.find(
+            (problem) => problem.uuid === examProblemAnswer.uuid,
+          );
+
+          if (!problem) {
+            throw new Error("Problem not found");
+          }
 
           if (problem.type === "obj" && problem.isAnswerMultiple === false) {
-            if (isAnsweredMoreThanOne(problem)) {
+            if (
+              Array.isArray(examProblemAnswer.answer) &&
+              examProblemAnswer.answer.filter((candidate) => candidate.isAnswer)
+                .length > 1
+            ) {
               throw new Error(
                 "단일 선택 문제입니다. 하나의 정답만 선택해주세요.",
               );
@@ -2090,28 +2135,36 @@ export async function evaluateProblems(
 
           if (
             problem.type === "sub" &&
-            (problem.subAnswer === "" || problem.subAnswer === null)
+            (typeof examProblemAnswer.answer !== "string" ||
+              examProblemAnswer.answer.trim() === "")
           ) {
             throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
           }
 
-          const answer = await getAnswerByProblemUuid(problem.uuid, dt);
-
-          if (!answer) {
-            throw new Error("result is null");
-          }
-
-          const evaluationResult = await validateExamProblem(problem, answer);
-
-          await postProblemResult(
-            index + 1,
-            problem,
-            resultsUuid,
-            evaluationResult,
-            answer,
-            userUuid,
+          const answer: CorrectAnswer = await getAnswerByProblemUuid(
+            problem.uuid,
             dt,
           );
+
+          if (!answer) {
+            throw new Error("Answer not found");
+          }
+
+          const evaluationResult = await validateExamProblemAnswer(
+            examProblemAnswer,
+            answer,
+          );
+
+          await postProblemResult({
+            order: index,
+            userUuid: userUuid,
+            dt,
+            answer: answer,
+            examProblem: problem,
+            examProblemAnswer: examProblemAnswer,
+            result: evaluationResult,
+            resultsUuid: resultsUuid,
+          });
         }),
       );
 
@@ -2120,8 +2173,6 @@ export async function evaluateProblems(
 
     return transactionResult;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    }
+    throw err;
   }
 }

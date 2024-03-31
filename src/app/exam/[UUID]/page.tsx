@@ -1,6 +1,11 @@
 import ExamProblems from "@/app/components/ExamProblems/ExamProblems";
 import LoginRequired from "@/app/components/ui/LoginRequired";
-import { getProblemsSetByUUID } from "@/service/problems";
+import {
+  checkUserPermissionForProblemSet,
+  getExamProblemsByProblemSetUUID,
+  getProblemsSetByUUID,
+} from "@/service/problems";
+import { uuidSchema } from "@/types/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
@@ -31,11 +36,31 @@ export async function generateMetadata({
 }
 
 export default async function DetailedExamPage({ params: { UUID } }: Props) {
+  
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || !session.user?.email) {
     return <LoginRequired />;
   }
 
-  return <ExamProblems UUID={UUID} />;
+  const isUUIDValidated = uuidSchema.safeParse(UUID);
+  if (!isUUIDValidated.success) {
+    return <div>문제 세트 UUID가 올바르지 않습니다.</div>;
+  }
+
+  const validateResult = await checkUserPermissionForProblemSet(
+    UUID,
+    session.user.email,
+  );
+
+  if (validateResult === "NO") {
+    return <div>본인의 문제만 가져올 수 있습니다.</div>;
+  }
+
+  const examProblemSet = await getExamProblemsByProblemSetUUID(
+    UUID,
+    session.user.email,
+  );
+
+  return <ExamProblems examProblemSet={examProblemSet} />;
 }

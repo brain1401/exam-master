@@ -1,36 +1,36 @@
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
-  selectCurrentExamProblem,
+  selectCurrentExamProblemAnswer,
+  selectExamProblemAnswers,
+  setExamProblemAnswersAction,
+  setExamProblemAnswerAction,
   selectCurrentExamProblemIndex,
-  selectExamProblemName,
-  selectExamProblems,
-  setExamProblemsAction,
-  setCurrentExamProblemAction,
   setCurrentExamProblemIndexAction,
-  setExamProblemNameAction,
   reset,
 } from "@/slices/examProblems";
-import { ExamProblem, ExamProblemSet } from "@/types/problems";
+import { ExamProblemAnswer } from "@/types/problems";
 import { useCallback } from "react";
 
 export default function useExamProblems() {
   const dispatch = useAppDispatch();
-  const examProblems = useAppSelector(selectExamProblems);
   const currentExamProblemIndex = useAppSelector(selectCurrentExamProblemIndex);
-  const currentExamProblem = useAppSelector(selectCurrentExamProblem);
-  const examProblemName = useAppSelector(selectExamProblemName);
+  const examProblemAnswers = useAppSelector(selectExamProblemAnswers);
+  const currentExamProblemAnswer = useAppSelector(
+    selectCurrentExamProblemAnswer,
+  );
 
   //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 useEffect등에서 사용할 때 제대로 작동하지 않는다.
-  const setExamProblems = useCallback(
-    (examProblems: ExamProblemSet) => {
-      dispatch(setExamProblemsAction(examProblems));
+
+  const setExamProblemAnswers = useCallback(
+    (examProblemAnswers: ExamProblemAnswer[]) => {
+      dispatch(setExamProblemAnswersAction(examProblemAnswers));
     },
     [dispatch],
   );
 
-  const setCurrentExamProblem = useCallback(
-    (currentExamProblem: ExamProblem) => {
-      dispatch(setCurrentExamProblemAction(currentExamProblem));
+  const setCurrentExamProblemAnswer = useCallback(
+    (examProblemAnswer: ExamProblemAnswer) => {
+      dispatch(setExamProblemAnswerAction(examProblemAnswer));
     },
     [dispatch],
   );
@@ -42,26 +42,17 @@ export default function useExamProblems() {
     [dispatch],
   );
 
-  const setExamProblemName = useCallback(
-    (examProblemName: string) => {
-      dispatch(setExamProblemNameAction(examProblemName));
-    },
-    [dispatch],
-  );
-
-  const resetExamProblems = useCallback(() => {
+  const resetExamProblemAnswers = useCallback(() => {
     dispatch(reset());
   }, [dispatch]);
 
   return {
-    examProblems,
-    setExamProblems,
-    currentExamProblem,
-    setCurrentExamProblem,
     currentExamProblemIndex,
+    examProblemAnswers,
+    currentExamProblemAnswer,
+    setExamProblemAnswers,
+    setCurrentExamProblemAnswer,
     setCurrentExamProblemIndex,
-    examProblemName,
-    setExamProblemName,
-    resetExamProblems,
+    resetExamProblemAnswers,
   };
 }

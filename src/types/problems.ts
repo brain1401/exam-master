@@ -142,7 +142,7 @@ export const problemSchema = z
   .nullable();
 
 export const examProblemSchema = z.object({
-  uuid: z.string().optional(),
+  uuid: z.string(),
   type: z.union([z.literal("obj"), z.literal("sub")]),
   question: z.string(),
   additionalView: z.string(),
@@ -151,6 +151,8 @@ export const examProblemSchema = z.object({
   candidates: z.array(candidateSchema).nullable(),
   subAnswer: z.string().nullable(),
 });
+
+export const examProblemsSchema = z.array(examProblemSchema);
 
 export const problemsSchema = z.array(problemSchema);
 
@@ -210,6 +212,7 @@ export type ResultsWithPagination = {
   data: ResultWithCount[];
   pagination: Pagination;
 };
+export type CorrectAnswer = string | (number | null)[] | null;
 
 export type ExamResult = z.infer<typeof ExamResultSchema>;
 
@@ -250,6 +253,11 @@ export type DrizzleTransaction = Parameters<TransactionCallback>[0];
 export type PresignedPostAlreadyExistsCallback<T> = (
   key: string,
 ) => Promise<T> | T;
+
+export type ExamProblemAnswer = {
+  uuid: string;
+  answer: ExamProblem["candidates"] | ExamProblem["subAnswer"];
+};
 
 export type toBeCallbacked = {
   index: number;

@@ -2,44 +2,62 @@
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import useExamProblems from "@/hooks/useExamProblems";
-import { isProblemAsnwered } from "@/utils/problems";
+import { isExamProblemAnswersAnswered } from "@/utils/problems";
 import axios from "axios";
 import { useState } from "react";
+import { ExamProblem, ExamProblemSet } from "@/types/problems";
 
-export default function SubmitButton() {
+type Props = {
+  examProblemSet: ExamProblemSet;
+  examProblems: ExamProblem[];
+};
+
+export default function SubmitButton({ examProblemSet, examProblems }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-
-  const {
-    examProblems: { problems, name: problemSetName },
-  } = useExamProblems();
-
   const router = useRouter();
 
+  const { examProblemAnswers, setExamProblemAnswers } = useExamProblems();
+
   const onClick = async () => {
-    if (problems.some((problem) => !isProblemAsnwered(problem)))
+    if (
+      !isExamProblemAnswersAnswered(
+        examProblemAnswers,
+        examProblemSet.problems.length,
+      )
+    ) {
       return alert("모든 문제에 답을 입력해주세요.");
+    }
 
     setIsLoading(true);
     let uuid = "";
+
     try {
       const { data } = await axios.post("/api/evaluateProblems", {
-        examProblems: problems,
-        problemSetName,
+        examProblemAnswers,
+        examProblems,
+        problemSetName: examProblemSet.name,
       });
       uuid = data.uuid;
+      router.push(`/result/${uuid}`);
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message);
+        console.error(e);
       }
     } finally {
       setIsLoading(false);
+      setExamProblemAnswers([]); // 제출 후 답안 초기화
     }
 
-    router.push(`/result/${uuid}`);
+  
   };
+
   return (
     <>
-      <Button className="mt-3 px-6 w-[6.5rem]" onClick={onClick} isLoading={isLoading}>
+      <Button
+        className="mt-3 w-[6.5rem] px-6"
+        onClick={onClick}
+        isLoading={isLoading}
+      >
         {isLoading ? "채점중..." : "제출하기"}
       </Button>
     </>

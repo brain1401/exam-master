@@ -14,6 +14,7 @@ import {
   ProblemSetComment,
   PublicExamProblemSet,
   ExamProblemSet,
+  ExamProblemAnswer,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
@@ -761,6 +762,24 @@ export async function fetchPublicProblemSetComments(
   console.log(comments);
 
   return comments;
+}
+
+export function isExamProblemAnswersAnswered(
+  examProblemAnswers: ExamProblemAnswer[],
+  totalProblems: number,
+) {
+  if (!examProblemAnswers || examProblemAnswers.length !== totalProblems) {
+    return false;
+  }
+
+  return examProblemAnswers.every((examProblemAnswer) => {
+    if (Array.isArray(examProblemAnswer.answer)) {
+      return examProblemAnswer.answer.some((candidate) => candidate.isAnswer);
+    } else if (typeof examProblemAnswer.answer === "string") {
+      return examProblemAnswer.answer.trim() !== "";
+    }
+    return false;
+  });
 }
 
 export async function fetchPublicProblemLikes(problemUuid: string | undefined) {

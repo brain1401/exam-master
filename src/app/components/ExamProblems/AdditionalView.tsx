@@ -1,16 +1,17 @@
 "use client";
 
-import useExamProblems from "@/hooks/useExamProblems";
+import { ExamProblem } from "@/types/problems";
 
-export default function AdditionalView() {
-  const { currentExamProblem } = useExamProblems();
-  
+type Props = {
+  currentExamProblem: ExamProblem;
+};
+export default function AdditionalView({
+  currentExamProblem: { additionalView },
+}: Props) {
   return (
     <>
-      {currentExamProblem?.additionalView && (
-        <div className="mb-5 border border-black p-3">
-          {currentExamProblem.additionalView}
-        </div>
+      {additionalView && (
+        <div className="mb-5 border border-black p-3">{additionalView}</div>
       )}
     </>
   );

@@ -2,8 +2,14 @@
 import useExamProblems from "@/hooks/useExamProblems";
 import { Button } from "../ui/button";
 import useScrollEffect from "@/hooks/useScrollEffect";
-export default function ExamProblemsNextOrPrevButtons() {
-  const { examProblems, currentExamProblemIndex, setCurrentExamProblemIndex } =
+
+type Props = {
+  examProblemLength: number;
+};
+export default function ExamProblemsNextOrPrevButtons({
+  examProblemLength,
+}: Props) {
+  const { currentExamProblemIndex, setCurrentExamProblemIndex } =
     useExamProblems();
 
   useScrollEffect([currentExamProblemIndex]);
@@ -11,7 +17,7 @@ export default function ExamProblemsNextOrPrevButtons() {
   return (
     <div className="mt-2 flex gap-4">
       <Button
-        className="py-2 w-[4.9rem]"
+        className="w-[4.9rem] py-2"
         onClick={() => {
           if (currentExamProblemIndex > 0) {
             setCurrentExamProblemIndex(currentExamProblemIndex - 1);
@@ -21,9 +27,9 @@ export default function ExamProblemsNextOrPrevButtons() {
         이전
       </Button>
       <Button
-        className="py-2 w-[4.9rem]"
+        className="w-[4.9rem] py-2"
         onClick={() => {
-          if (currentExamProblemIndex < examProblems.problems.length - 1) {
+          if (currentExamProblemIndex < examProblemLength - 1) {
             setCurrentExamProblemIndex(currentExamProblemIndex + 1);
           }
         }}
