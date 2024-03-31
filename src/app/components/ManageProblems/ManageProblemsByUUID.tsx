@@ -46,41 +46,7 @@ export default function ManageProblemsByUUID({ UUID, problemSet }: Props) {
 
   const {
     resetProblems,
-    setProblems,
-    setProblemSetIsPublic,
-    setDescription,
-    setProblemSetsName,
-    setLocalProblemSetsName,
-    setCurrentTab,
-    setCurrentProblemIndex,
-    setCandidatesCount,
   } = useProblems();
-
-  useEffect(() => {
-    setProblems(problemSet.problems);
-    setProblemSetIsPublic(problemSet.isPublic);
-    setDescription(problemSet.description ?? "");
-    setProblemSetsName(problemSet.name);
-    setLocalProblemSetsName(problemSet.name);
-    setCurrentTab(problemSet.problems[0]?.type as "obj" | "sub");
-    setCurrentProblemIndex(0);
-    setCandidatesCount(
-      problemSet.problems[0]?.candidates?.length.toString() ?? "4",
-    );
-  }, [
-    problemSet.problems,
-    problemSet.isPublic,
-    problemSet.description,
-    problemSet.name,
-    setCurrentTab,
-    setCurrentProblemIndex,
-    setCandidatesCount,
-    setProblems,
-    setProblemSetIsPublic,
-    setDescription,
-    setProblemSetsName,
-    setLocalProblemSetsName,
-  ]);
 
   useEffect(() => {
     () => resetProblems();

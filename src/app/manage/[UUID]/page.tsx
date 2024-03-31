@@ -3,8 +3,8 @@ import LoginRequired from "@/app/components/ui/LoginRequired";
 import { getProblemsSetByUUID } from "@/service/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import { createStore } from "jotai";
 import JotaiProvider from "@/context/JotaiContext";
+import { revalidatePath } from "next/cache";
 type Props = {
   params: {
     UUID: string;

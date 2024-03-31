@@ -7,6 +7,7 @@ import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+import useRevalidate from "@/hooks/useRevalidate";
 
 type Props = {
   searchString: string;
@@ -20,7 +21,7 @@ export default function DeleteAndSearchBox({
   type,
 }: Props) {
   const queryClient = useQueryClient();
-
+  const { revalidateAllPath } = useRevalidate();
   const {
     isDeleteButtonClicked,
     setIsDeleteButtonClicked,
@@ -97,7 +98,10 @@ export default function DeleteAndSearchBox({
             {isDeleteButtonClicked && (
               <Button
                 className="px-6 py-2"
-                onClick={() => deleteProblem(toDeletedUuid)}
+                onClick={() => {
+                  deleteProblem(toDeletedUuid);
+                  revalidateAllPath();
+                }}
               >
                 삭제
               </Button>

@@ -6,6 +6,7 @@ import { isExamProblemAnswersAnswered } from "@/utils/problems";
 import axios from "axios";
 import { useState } from "react";
 import { ExamProblem, ExamProblemSet } from "@/types/problems";
+import useRevalidate from "@/hooks/useRevalidate";
 
 type Props = {
   examProblemSet: ExamProblemSet;
@@ -14,6 +15,7 @@ type Props = {
 
 export default function SubmitButton({ examProblemSet, examProblems }: Props) {
   const [isLoading, setIsLoading] = useState(false);
+  const { revalidateAllPath } = useRevalidate();
   const router = useRouter();
 
   const { examProblemAnswers, setExamProblemAnswers } = useExamProblems();
@@ -45,10 +47,10 @@ export default function SubmitButton({ examProblemSet, examProblems }: Props) {
       }
     } finally {
       setIsLoading(false);
+      // 서버 컴포넌트 캐시 무효화
+      revalidateAllPath();
       setExamProblemAnswers([]); // 제출 후 답안 초기화
     }
-
-  
   };
 
   return (

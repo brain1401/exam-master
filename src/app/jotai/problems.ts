@@ -68,6 +68,14 @@ export const resetProblemsAtom = atom(null, (get, set) => {
         : null,
     ),
   );
+  set(isPublicAtom, false);
+  set(currentProblemIndexAtom, 0);
+  set(currentTabAtom, "obj");
+  set(problemSetsNameAtom, "");
+  set(descriptionAtom, "");
+  set(localProblemSetsNameAtom, "");
+  set(problemLengthAtom, "10");
+  set(candidatesCountAtom, "4");
 });
 
 export const initCurrentProblemAtom = atom(null, (get, set) => {

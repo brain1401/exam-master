@@ -11,14 +11,15 @@ import {
   isProblemEmpty,
 } from "@/utils/problems";
 import axios from "axios";
-
+import useRevalidate from "@/hooks/useRevalidate";
 type Props = {
   uuid: string;
 };
 export default function ManageProblemSubmitButton({ uuid }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-
-  const { problems, problemSetsName, problemSetIsPublic, description } = useProblems();
+  const { revalidateAllPath } = useRevalidate();
+  const { problems, problemSetsName, problemSetIsPublic, description } =
+    useProblems();
 
   const handleSubmit = async () => {
     if (problems.some((problem) => isProblemEmpty(problem))) {
@@ -118,7 +119,7 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
       });
       formData.append("problemSetsName", problemSetsName);
       formData.append("problemSetIsPublic", problemSetIsPublic.toString());
-      formData.append("description", description)
+      formData.append("description", description);
       formData.append("uuid", uuid);
 
       try {
@@ -143,6 +144,9 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
       throw err;
     } finally {
       setIsLoading(false); // 로딩 완료
+      
+      // 서버 컴포넌트 캐시 무효화
+      revalidateAllPath();
     }
   };
   return (
