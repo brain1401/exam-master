@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import LoginRequired from "../components/ui/LoginRequired";
 import ProblemSetsPage from "../components/ProblemSets/ProblemSetsPage";
 import type { Metadata } from "next";
-import { getFetchMaxPageFunction } from "@/utils/pagination";
 import { getProblemSetsMaxPage } from "@/service/problems";
 import { getUserUUIDbyEmail } from "@/service/user";
 
