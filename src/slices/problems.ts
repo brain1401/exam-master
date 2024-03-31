@@ -99,6 +99,7 @@ export const problemsSlice = createSlice({
         };
       }
     },
+    
     setCurrentProblemAction: (
       state,
       action: PayloadAction<Partial<Problem>>,

@@ -20,7 +20,7 @@ import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
 import { Flatten, Prettify } from "./type";
 
-export const isCardOnBeingWrited = (problem: Problem) => {
+export const isCardOnBeingWrited = (problem: Problem | undefined) => {
   if (!problem) {
     return false;
   }
