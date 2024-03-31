@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/problemGridCard";
+import { cn } from "@/lib/utils";
 type Props = {
   type: "manage" | "exam";
   problemSet: ProblemSet;
@@ -63,19 +64,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
         <CardTitle>{problemSet.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div
-          className=""
-          onClick={() => {
-            if (isDeleteButtonClicked) {
-              if (isSelected === false) {
-                addToDeletedUuid(problemSet.uuid);
-              } else {
-                removeToDeletedUuid(problemSet.uuid);
-              }
-              setIsSelected(!isSelected);
-            }
-          }}
-        >
+        <div className="">
           <p className="mt-3 text-sm text-gray-500">
             {`${problemSet.examProblemsCount ?? 0}문제`}
           </p>
@@ -87,10 +76,23 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
   );
 
   return isDeleteButtonClicked ? (
-    <>
+    <button
+      className="relative flex w-full cursor-pointer flex-col items-center"
+      onClick={() => {
+        if (isDeleteButtonClicked) {
+          if (isSelected === false) {
+            addToDeletedUuid(problemSet.uuid);
+          } else {
+            removeToDeletedUuid(problemSet.uuid);
+          }
+          setIsSelected(!isSelected);
+        }
+      }}
+    >
       <CustomCard />
       {isDeleteButtonClicked && (
         <Checkbox
+          className="absolute top-[calc(100%+.8rem)]"
           checked={isSelected}
           onCheckedChange={(isSelected) => {
             const isChecked = isSelected === "indeterminate" ? false : true;
@@ -104,7 +106,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
           }}
         />
       )}
-    </>
+    </button>
   ) : (
     <Link
       href={

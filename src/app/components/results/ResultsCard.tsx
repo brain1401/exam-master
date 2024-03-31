@@ -55,29 +55,39 @@ export default function ResultsCard({ result }: Props) {
           <CardTitle>{result.problemSetName}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div
-            className=""
-            onClick={() => {
-              if (isDeleteButtonClicked) {
-                if (isSelected === false) {
-                  addToDeletedUuid(result.uuid);
-                } else {
-                  removeToDeletedUuid(result.uuid);
-                }
-                setIsSelected(!isSelected);
-              }
-            }}
-          >
+          <div>
             <p className="text-sm">{`${result.problemResultsCount} 문제`}</p>
             <p className=" w-fit text-sm text-gray-500">{formattedDate}</p>
             <p className=" w-fit text-sm text-gray-500">{formattedTime}</p>
           </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  return (
+    <>
+      {isDeleteButtonClicked ? (
+        <button
+          className="relative flex w-full cursor-pointer flex-col items-center"
+          onClick={() => {
+            if (isDeleteButtonClicked) {
+              if (isSelected === false) {
+                addToDeletedUuid(result.uuid);
+              } else {
+                removeToDeletedUuid(result.uuid);
+              }
+              setIsSelected(!isSelected);
+            }
+          }}
+        >
+          <CustomCard />
           {isDeleteButtonClicked && (
             <Checkbox
+              className="absolute top-[calc(100%+.8rem)]"
               checked={isSelected}
-              onCheckedChange={(selected) => {
-                const isChecked =
-                  selected === "indeterminate" ? true : selected;
+              onCheckedChange={(isSelected) => {
+                const isChecked = isSelected === "indeterminate" ? false : true;
                 if (isSelected === true) {
                   addToDeletedUuid(result.uuid);
                   setIsSelected(isChecked);
@@ -88,15 +98,7 @@ export default function ResultsCard({ result }: Props) {
               }}
             />
           )}
-        </CardContent>
-      </Card>
-    );
-  };
-
-  return (
-    <>
-      {isDeleteButtonClicked ? (
-        <CustomCard />
+        </button>
       ) : (
         <Link href={`/result/${result.uuid}`}>
           <CustomCard />
