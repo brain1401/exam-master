@@ -21,6 +21,14 @@ export async function generateMetadata({
   const session = await getServerSession();
 
   if (session?.user?.email) {
+    const isUUIDValidated = uuidSchema.safeParse(UUID);
+    if (!isUUIDValidated.success) {
+      return {
+        title: "시험 문제",
+        description: "시험 문제를 풀어보세요.",
+      };
+    }
+
     const data = await getProblemsSetByUUID(UUID, session?.user?.email);
 
     return {
@@ -36,7 +44,6 @@ export async function generateMetadata({
 }
 
 export default async function DetailedExamPage({ params: { UUID } }: Props) {
-  
   const session = await getServerSession();
 
   if (!session || !session.user?.email) {
