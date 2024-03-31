@@ -40,7 +40,6 @@ export default function SubmitButton({ examProblemSet, examProblems }: Props) {
         problemSetName: examProblemSet.name,
       });
       uuid = data.uuid;
-      router.push(`/result/${uuid}`);
     } catch (e) {
       if (e instanceof Error) {
         console.error(e);
@@ -50,6 +49,7 @@ export default function SubmitButton({ examProblemSet, examProblems }: Props) {
       // 서버 컴포넌트 캐시 무효화
       revalidateAllPath();
       setExamProblemAnswers([]); // 제출 후 답안 초기화
+      router.push(`/result/${uuid}`);
     }
   };
 
