@@ -1,87 +1,90 @@
 "use client";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import ProblemsEditor from "@/app/components/ProblemsEditor/ProblemsEditor";
 import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
 import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
 import ProblemsOption from "@/app/components/ProblemsEditor/ProblemsOption";
 import ManageProblemSubmitButton from "@/app/components/ManageProblems/ManageProblemSubmitButton";
-import CustomLoading from "../ui/CustomLoading";
 import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 import useProblems from "@/hooks/useProblems";
 import { Button } from "../ui/button";
 import { FiShare } from "react-icons/fi";
 import { ProblemSetWithName } from "@/types/problems";
+import { useHydrateAtoms } from "jotai/utils";
+import {
+  problemsAtom,
+  candidatesCountAtom,
+  currentProblemIndexAtom,
+  currentTabAtom,
+  descriptionAtom,
+  isPublicAtom,
+  localProblemSetsNameAtom,
+  problemLengthAtom,
+  problemSetsNameAtom,
+} from "@/app/jotai/problems";
+import { useEffect } from "react";
 
 type Props = {
   UUID: string;
+  problemSet: ProblemSetWithName;
 };
 
-export default function ManageProblemsByUUID({ UUID }: Props) {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function ManageProblemsByUUID({ UUID, problemSet }: Props) {
+  useHydrateAtoms([
+    [problemsAtom, problemSet.problems],
+    [isPublicAtom, problemSet.isPublic],
+    [descriptionAtom, problemSet.description ?? ""],
+    [problemSetsNameAtom, problemSet.name],
+    [problemLengthAtom, problemSet.problems.length.toString()],
+    [localProblemSetsNameAtom, problemSet.name],
+    [currentTabAtom, problemSet.problems[0]?.type as "obj" | "sub"],
+    [currentProblemIndexAtom, 0],
+    [
+      candidatesCountAtom,
+      problemSet.problems[0]?.candidates?.length.toString() ?? "4",
+    ],
+  ]);
 
   const {
     resetProblems,
     setProblems,
-    setProblemSetsName,
-    setProblemLength,
-    setLocalProblemSetsName,
     setProblemSetIsPublic,
-    setCurrentTab,
     setDescription,
+    setProblemSetsName,
+    setLocalProblemSetsName,
+    setCurrentTab,
+    setCurrentProblemIndex,
+    setCandidatesCount,
   } = useProblems();
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get<ProblemSetWithName>(`/api/getProblemsByUUID`, {
-        params: {
-          UUID,
-        },
-      })
-      .then((res) => {
-        setProblems(res.data.problems);
-        setProblemSetsName(res.data.name);
-        setProblemLength(res.data.problems.length.toString());
-        setLocalProblemSetsName(res.data.name);
-        setCurrentTab(
-          (res.data.problems[0] && res.data.problems[0].type) || "obj",
-        );
-        setProblemSetIsPublic(res.data.isPublic);
-        setDescription(res.data.description || "");
-      })
-      .catch((err) => {
-        setError(err.response?.data.error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
-    return () => {
-      resetProblems();
-    };
+    setProblems(problemSet.problems);
+    setProblemSetIsPublic(problemSet.isPublic);
+    setDescription(problemSet.description ?? "");
+    setProblemSetsName(problemSet.name);
+    setLocalProblemSetsName(problemSet.name);
+    setCurrentTab(problemSet.problems[0]?.type as "obj" | "sub");
+    setCurrentProblemIndex(0);
+    setCandidatesCount(
+      problemSet.problems[0]?.candidates?.length.toString() ?? "4",
+    );
   }, [
-    UUID,
-    resetProblems,
-    setProblemSetsName,
-    setProblems,
-    setDescription,
-    setLocalProblemSetsName,
-    setProblemSetIsPublic,
+    problemSet.problems,
+    problemSet.isPublic,
+    problemSet.description,
+    problemSet.name,
     setCurrentTab,
-    setProblemLength,
+    setCurrentProblemIndex,
+    setCandidatesCount,
+    setProblems,
+    setProblemSetIsPublic,
+    setDescription,
+    setProblemSetsName,
+    setLocalProblemSetsName,
   ]);
 
-  if (error) {
-    return <h1 className="mt-10 text-center text-2xl">{error}</h1>;
-  }
-
-  if (loading) {
-    return <CustomLoading className="mt-20" />;
-  }
+  useEffect(() => {
+    () => resetProblems();
+  }, [resetProblems]);
 
   return (
     <ProblemEditorLayout>
@@ -89,11 +92,7 @@ export default function ManageProblemsByUUID({ UUID }: Props) {
         <ProblemsOption type="manage" />
 
         <div className="absolute right-0 top-0">
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => setIsModalOpen((value) => !value)}
-          >
+          <Button size="icon" variant="outline">
             <FiShare size={20} />
           </Button>
         </div>

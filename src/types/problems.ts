@@ -84,7 +84,7 @@ export type PublicProblemSetWithPagination = Prettify<
 >;
 
 export type ProblemSetWithName = {
-  id: string | undefined;
+  uuid: string | undefined;
   name: string;
   isPublic: boolean;
   description?: string;

@@ -1,144 +1,40 @@
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
-  selectProblems,
-  setProblemsAction,
-  initCurrentProblemAction,
-  resetProblemsAction,
-  selectCurrentProblem,
-  selectCurrentProblemCandidates,
-  setCandidateCountAction,
-  setCurrentProblemAction,
-  setCurrentProblemCandidatesAction,
-  setCurrentProblemIndexAction,
-  setCurrentTabAction,
-  setProblemLengthAction,
-  setDescriptionAction,
-  setProblemSetsNameAction,
-  setLocalProblemSetsNameAction,
-  setPublicAction,
-} from "@/slices/problems";
-import { Problem, Candidate } from "@/types/problems";
-import { useCallback } from "react";
+  problemsAtom,
+  candidatesCountAtom,
+  currentProblemIndexAtom,
+  currentTabAtom,
+  descriptionAtom,
+  initCurrentProblemAtom,
+  isPublicAtom,
+  localProblemSetsNameAtom,
+  problemLengthAtom,
+  problemSetsNameAtom,
+  resetProblemsAtom,
+  currentProblemAtom,
+  currentProblemCandidatesAtom,
+} from "@/app/jotai/problems";
+import { useAtom, useSetAtom, useAtomValue } from "jotai";
 
 export default function useProblems() {
-  const dispatch = useAppDispatch();
-
-  const problems = useAppSelector(selectProblems);
-  const currentProblem = useAppSelector(selectCurrentProblem);
-  const currentProblemCandidates = useAppSelector(
-    selectCurrentProblemCandidates,
+  const [problems, setProblems] = useAtom(problemsAtom);
+  const [candidatesCount, setCandidatesCount] = useAtom(candidatesCountAtom);
+  const [description, setDescription] = useAtom(descriptionAtom);
+  const [currentProblem, setCurrentProblem] = useAtom(currentProblemAtom);
+  const [currentProblemCandidates, setCurrentProblemCandidates] = useAtom(
+    currentProblemCandidatesAtom,
   );
-  const candidatesCount = currentProblemCandidates?.length.toString() ?? "4";
-
-  const currentProblemIndex = useAppSelector(
-    (state) => state.problemsReducer.currentProblemIndex,
+  const [currentProblemIndex, setCurrentProblemIndex] = useAtom(
+    currentProblemIndexAtom,
   );
-  const currentTab = useAppSelector(
-    (state) => state.problemsReducer.currentTab,
+  const [currentTab, setCurrentTab] = useAtom(currentTabAtom);
+  const initCurrentProblem = useSetAtom(initCurrentProblemAtom);
+  const [localProblemSetsName, setLocalProblemSetsName] = useAtom(
+    localProblemSetsNameAtom,
   );
-  const problemLength = useAppSelector(
-    (state) => state.problemsReducer.problemLength,
-  );
-  const problemSetsName = useAppSelector(
-    (state) => state.problemsReducer.problemSetsName,
-  );
-  const localProblemSetsName = useAppSelector(
-    (state) => state.problemsReducer.localProblemSetsName,
-  );
-  const problemSetIsPublic = useAppSelector(
-    (state) => state.problemsReducer.isPublic,
-  );
-  const description = useAppSelector(
-    (state) => state.problemsReducer.description,
-  );
-
-
-
-  //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 useEffect등에서 사용할 때 제대로 작동하지 않는다.
-  const setLocalProblemSetsName = useCallback(
-    (name: string) => {
-      dispatch(setLocalProblemSetsNameAction(name));
-    },
-    [dispatch],
-  );
-
-  const setProblems = useCallback(
-    (problems: Problem[]) => {
-      dispatch(setProblemsAction(problems));
-    },
-    [dispatch],
-  );
-
-  const initCurrentProblem = useCallback(() => {
-    dispatch(initCurrentProblemAction());
-  }, [dispatch]);
-
-  const resetProblems = useCallback(() => {
-    dispatch(resetProblemsAction());
-  }, [dispatch]);
-
-  const setCandidatesCount = useCallback(
-    (count: string) => {
-      dispatch(setCandidateCountAction(count));
-    },
-    [dispatch],
-  );
-
-  const setProblemLength = useCallback(
-    (length: string) => {
-      dispatch(setProblemLengthAction(length));
-    },
-    [dispatch],
-  );
-
-  const setCurrentProblem = useCallback(
-    (problem: Partial<Problem>) => {
-      dispatch(setCurrentProblemAction(problem));
-    },
-    [dispatch],
-  );
-
-  const setCurrentProblemCandidates = useCallback(
-    (candidates: Candidate[]) => {
-      dispatch(setCurrentProblemCandidatesAction(candidates));
-    },
-    [dispatch],
-  );
-
-  const setCurrentProblemIndex = useCallback(
-    (index: number) => {
-      dispatch(setCurrentProblemIndexAction(index));
-    },
-    [dispatch],
-  );
-
-  const setCurrentTab = useCallback(
-    (tab: "obj" | "sub") => {
-      dispatch(setCurrentTabAction(tab));
-    },
-    [dispatch],
-  );
-
-  const setProblemSetsName = useCallback(
-    (name: string) => {
-      dispatch(setProblemSetsNameAction(name));
-    },
-    [dispatch],
-  );
-
-  const setProblemSetIsPublic = useCallback(
-    (isPublic: boolean) => {
-      dispatch(setPublicAction(isPublic));
-    },
-    [dispatch],
-  );
-
-  const setDescription = useCallback(
-    (description: string) => {
-      dispatch(setDescriptionAction(description));
-    },
-    [dispatch],
-  );
+  const [problemLength, setProblemLength] = useAtom(problemLengthAtom);
+  const [problemSetsName, setProblemSetsName] = useAtom(problemSetsNameAtom);
+  const [problemSetIsPublic, setProblemSetIsPublic] = useAtom(isPublicAtom);
+  const resetProblems = useSetAtom(resetProblemsAtom);
 
   return {
     problems,

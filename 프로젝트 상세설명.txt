@@ -1,0 +1,1 @@
+Redux는 아직 Nextjs의 App Router에서 Hydrate 함수의 미지원으로 인해 서버 컴포넌트에서 받아온 값을 초기 HTML로 전달시킬 수 없음.

@@ -3,7 +3,8 @@ import LoginRequired from "@/app/components/ui/LoginRequired";
 import { getProblemsSetByUUID } from "@/service/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
-
+import { createStore } from "jotai";
+import JotaiProvider from "@/context/JotaiContext";
 type Props = {
   params: {
     UUID: string;
@@ -33,8 +34,15 @@ export async function generateMetadata({
 export default async function ManageProblem({ params: { UUID } }: Props) {
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || !session.user?.email) {
     return <LoginRequired />;
   }
-  return <ManageProblemsByUUID UUID={UUID} />;
+
+  const problemSet = await getProblemsSetByUUID(UUID, session?.user?.email);
+
+  return (
+    <JotaiProvider>
+      <ManageProblemsByUUID UUID={UUID} problemSet={problemSet} />
+    </JotaiProvider>
+  );
 }

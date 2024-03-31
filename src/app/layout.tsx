@@ -9,6 +9,7 @@ import Script from "next/script";
 import ReduxProvider from "@/context/ReduxContext";
 import ReactQueryContext from "@/context/ReactQueryContext";
 import { Toaster } from "./components/ui/toaster";
+import JotaiProvider from "@/context/JotaiContext";
 
 const NotoSansKR = localFont({
   src: [
@@ -100,9 +101,11 @@ export default function RootLayout({
         <AuthContext>
           <ReduxProvider>
             <ReactQueryContext>
-              <Navbar />
-              <main className="flex flex-1 flex-col">{children}</main>
-              <Toaster />
+              <JotaiProvider>
+                <Navbar />
+                <main className="flex flex-1 flex-col">{children}</main>
+                <Toaster />
+              </JotaiProvider>
             </ReactQueryContext>
           </ReduxProvider>
           <Analytics />

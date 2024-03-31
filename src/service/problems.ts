@@ -684,7 +684,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         updatedAt: foundProblemSet.updatedAt,
         isShareLinkPurposeSet: foundProblemSet.isShareLinkPurposeSet,
         isPublic: foundProblemSet.isPublic,
-        description: foundProblemSet.description,
+        description: foundProblemSet.description ?? "",
         problems: foundProblemSet.problems.map((problem) => ({
           uuid: problem.uuid,
           question: problem.question,

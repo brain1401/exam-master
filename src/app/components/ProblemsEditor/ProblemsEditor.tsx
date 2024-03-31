@@ -17,7 +17,7 @@ export default function ProblemsEditor() {
   } = useProblems();
 
   usePreventClose();
-  
+
   const onTabChange = (tab: "obj" | "sub") => {
     if (isCardOnBeingWrited(currentProblem)) {
       const value = confirm(
