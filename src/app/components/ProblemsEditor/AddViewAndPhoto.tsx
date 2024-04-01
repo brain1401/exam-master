@@ -4,10 +4,10 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { useEffect, useState } from "react";
-import { twMerge } from "tailwind-merge";
 import useProblems from "@/hooks/useProblems";
 import { isImageFileObject, isImageUrlObject } from "@/utils/problems";
 import { Label } from "../ui/label";
+import { cn } from "@/lib/utils";
 
 type Props = {
   className?: string;
@@ -86,7 +86,7 @@ export default function AddViewAndPhoto({ className }: Props) {
 
   return (
     <>
-      <div className={twMerge("flex gap-2", className)}>
+      <div className={cn("flex gap-2", className)}>
         <Button
           className={getButtonsClassName("view")}
           onClick={() => {

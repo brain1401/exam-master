@@ -4,8 +4,8 @@ import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
 import checkImage from "../../../../public/images/checkBlack.png";
 import useProblemResults from "@/hooks/useProblemResults";
-import { twMerge } from "tailwind-merge";
 import { checkMarkClassName } from "@/classnames/checkMark";
+import { cn } from "@/lib/utils";
 
 export default function CurrentCandidates() {
   const {
@@ -20,7 +20,7 @@ export default function CurrentCandidates() {
           {candidates?.map((candidate, index) => (
             <li key={index} className="relative">
               <div
-                className={twMerge(
+                className={cn(
                   `${candidate.isSelected ? "" : "opacity-0"}`,
                   checkMarkClassName,
                 )}

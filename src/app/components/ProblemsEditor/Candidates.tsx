@@ -1,11 +1,11 @@
 import SimpleLabel from "../ui/SimpleLabel";
 import { ChangeEvent } from "react";
-import { twMerge } from "tailwind-merge";
 import useProblems from "@/hooks/useProblems";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Label } from "../ui/label";
+import { cn } from "@/lib/utils";
 
 const candidatePlaceholders = [
   "네가 내 손에 죽고 싶구나?",
@@ -127,7 +127,7 @@ export default function Candidates({ className }: Props) {
   ));
 
   return (
-    <div className={twMerge("relative flex flex-col gap-y-1", className)}>
+    <div className={cn("relative flex flex-col gap-y-1", className)}>
       <SimpleLabel
         className="absolute mt-2 w-[4rem] self-end text-center"
         margin={false}

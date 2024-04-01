@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 type Props = {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ export default function SimpleLabel({
 }: Props) {
   return (
     <label
-      className={twMerge(
+      className={cn(
         `text-md ${margin ? "mb-2" : ""} select-none font-semibold `,
         className,
       )}

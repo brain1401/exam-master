@@ -2,7 +2,6 @@ import { Button } from "./button";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import SearchBox from "./SearchBox";
 import useUiState from "@/hooks/useUiState";
-import { twMerge } from "tailwind-merge";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";

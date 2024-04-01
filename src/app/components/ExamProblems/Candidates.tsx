@@ -3,9 +3,9 @@ import { ExamProblem, ExamProblemAnswer } from "@/types/problems";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
 import checkImage from "../../../../public/images/checkBlack.png";
-import { twMerge } from "tailwind-merge";
 import { checkMarkClassName } from "@/classnames/checkMark";
 import useExamProblems from "@/hooks/useExamProblems";
+import { cn } from "@/lib/utils";
 
 type Props = {
   currentExamProblem: ExamProblem;
@@ -71,7 +71,7 @@ export default function Candidates({ currentExamProblem }: Props) {
                   }
                 >
                   <div
-                    className={twMerge(
+                    className={cn(
                       `${
                         Array.isArray(currentExamProblemAnswer?.answer) &&
                         currentExamProblemAnswer.answer[i]?.isAnswer
