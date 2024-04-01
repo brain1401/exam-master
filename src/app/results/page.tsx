@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
-import LoginRequired from "../components/ui/LoginRequired";
-import ResultsPage from "@/app/components/results/ResultsPage";
+import LoginRequired from "@/components/ui/LoginRequired";
+import ResultsPage from "@/components/results/ResultsPage";
 import { Metadata } from "next";
 import { getResultsMaxPage } from "@/service/problems";
 

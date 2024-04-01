@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "../../../../public/images/Exam Master.svg";
+import logo from "../../../public/images/Exam Master.svg";
 import { useRef, useEffect } from "react";
 import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
 const MOBILE_LIST_ITEM = "py-2 w-full border-b border-gray-300 text-center";

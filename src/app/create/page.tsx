@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
-import CreateProblems from "../components/CreateProblems/CreateProblems";
-import LoginRequired from "../components/ui/LoginRequired";
+import CreateProblems from "@/components/CreateProblems/CreateProblems";
+import LoginRequired from "@/components/ui/LoginRequired";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

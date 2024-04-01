@@ -2,7 +2,7 @@
 import { ExamProblem, ExamProblemAnswer } from "@/types/problems";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
-import checkImage from "../../../../public/images/checkBlack.png";
+import checkImage from "../../../public/images/checkBlack.png";
 import { checkMarkClassName } from "@/classnames/checkMark";
 import useExamProblems from "@/hooks/useExamProblems";
 import { cn } from "@/lib/utils";

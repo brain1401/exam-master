@@ -1,9 +1,9 @@
 "use client";
-import ProblemsEditor from "@/app/components/ProblemsEditor/ProblemsEditor";
-import NextOrPrevButtons from "@/app/components/CreateProblems/NextOrPrevButtons";
-import CurrentProblemIndicator from "@/app/components/CreateProblems/CurrentCardIndicator";
-import ProblemsOption from "@/app/components/ProblemsEditor/ProblemsOption";
-import ManageProblemSubmitButton from "@/app/components/ManageProblems/ManageProblemSubmitButton";
+import ProblemsEditor from "@/components/ProblemsEditor/ProblemsEditor";
+import NextOrPrevButtons from "@/components/CreateProblems/NextOrPrevButtons";
+import CurrentProblemIndicator from "@/components/CreateProblems/CurrentCardIndicator";
+import ProblemsOption from "@/components/ProblemsEditor/ProblemsOption";
+import ManageProblemSubmitButton from "@/components/ManageProblems/ManageProblemSubmitButton";
 import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 import useProblems from "@/hooks/useProblems";
 import { Button } from "../ui/button";
@@ -44,9 +44,7 @@ export default function ManageProblemsByUUID({ UUID, problemSet }: Props) {
     ],
   ]);
 
-  const {
-    resetProblems,
-  } = useProblems();
+  const { resetProblems } = useProblems();
 
   useEffect(() => {
     () => resetProblems();

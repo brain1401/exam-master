@@ -11,7 +11,7 @@ import ExamCardLayout from "../layouts/ExamCardLayout";
 import useExamProblems from "@/hooks/useExamProblems";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
 import Image from "next/image";
-import checkImage from "../../../../public/images/checkBlack.png";
+import checkImage from "../../../public/images/checkBlack.png";
 import ProblemGridLayout from "../layouts/ProblemGridLayout";
 import { isImageUrlObject } from "@/utils/problems";
 import { ExamProblemSet } from "@/types/problems";

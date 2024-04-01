@@ -1,5 +1,5 @@
-import ExamProblems from "@/app/components/ExamProblems/ExamProblems";
-import LoginRequired from "@/app/components/ui/LoginRequired";
+import ExamProblems from "@/components/ExamProblems/ExamProblems";
+import LoginRequired from "@/components/ui/LoginRequired";
 import {
   checkUserPermissionForProblemSet,
   getExamProblemsByProblemSetUUID,

@@ -1,4 +1,4 @@
-import { revalidate } from "@/app/actions/revalidates";
+import { revalidate } from "@/actions/revalidates";
 import { useTransition } from "react";
 import { useCallback } from "react";
 

@@ -1,17 +1,5 @@
 "use client";
 import { PublicProblemSetWithPagination } from "@/types/problems";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/app/components/ui/dialog";
-import { Button } from "../ui/button";
-
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import usePagenationState from "@/hooks/usePagenationState";

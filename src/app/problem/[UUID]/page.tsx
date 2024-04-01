@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import PublicProblemExam from "@/app/components/publicProblem/PublicProblemExam";
+import PublicProblemExam from "@/components/publicProblem/PublicProblemExam";
 import {
   getPublicProblemLikes,
   getPublicProblemSetByUUID,

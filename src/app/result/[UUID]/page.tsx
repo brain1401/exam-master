@@ -1,5 +1,5 @@
-import ResultPage from "@/app/components/result/ResultPage";
-import LoginRequired from "@/app/components/ui/LoginRequired";
+import ResultPage from "@/components/result/ResultPage";
+import LoginRequired from "@/components/ui/LoginRequired";
 import { getExamResultsByUUID } from "@/service/problems";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";

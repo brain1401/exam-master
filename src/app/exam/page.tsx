@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
-import LoginRequired from "../components/ui/LoginRequired";
-import ProblemSetsPage from "../components/ProblemSets/ProblemSetsPage";
+import LoginRequired from "@/components/ui/LoginRequired";
+import ProblemSetsPage from "@/components/ProblemSets/ProblemSetsPage";
 import type { Metadata } from "next";
 import {
   HydrationBoundary,

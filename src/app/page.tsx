@@ -3,7 +3,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import MainPage from "./components/MainPage/MainPage";
+import MainPage from "@/components/MainPage/MainPage";
 import { getPublicProblemSets, getPublicProblemSetsMaxPage } from "@/service/problems";
 
 export default async function Home() {

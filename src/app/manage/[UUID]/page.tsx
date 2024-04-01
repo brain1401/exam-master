@@ -1,5 +1,5 @@
-import ManageProblemsByUUID from "@/app/components/ManageProblems/ManageProblemsByUUID";
-import LoginRequired from "@/app/components/ui/LoginRequired";
+import ManageProblemsByUUID from "@/components/ManageProblems/ManageProblemsByUUID";
+import LoginRequired from "@/components/ui/LoginRequired";
 import { getProblemsSetByUUID } from "@/service/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";

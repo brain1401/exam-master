@@ -1,14 +1,14 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Viewport } from "next";
-import Navbar from "./components/Navbar/Navbar";
+import Navbar from "@/components/Navbar/Navbar";
 import AuthContext from "@/context/AuthContext";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import ReduxProvider from "@/context/ReduxContext";
 import ReactQueryContext from "@/context/ReactQueryContext";
-import { Toaster } from "./components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
 import JotaiProvider from "@/context/JotaiContext";
 
 const NotoSansKR = localFont({
