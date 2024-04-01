@@ -97,10 +97,10 @@ export default function DeleteAndSearchBox({
             {isDeleteButtonClicked && (
               <Button
                 className="px-6 py-2"
-                onClick={() => {
+                onClick={async () => {
                   deleteProblem(toDeletedUuid);
                   // 서버 컴포넌트 캐시 무효화
-                  revalidateAllPath();
+                  await revalidateAllPath();
                 }}
               >
                 삭제

@@ -15,10 +15,10 @@ type Props = {
 
 export default function SubmitButton({ examProblemSet, examProblems }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidateAllPathAndRedirect } = useRevalidate();
   const router = useRouter();
 
-  const { examProblemAnswers, setExamProblemAnswers } = useExamProblems();
+  const { examProblemAnswers } = useExamProblems();
 
   const onClick = async () => {
     if (
@@ -46,10 +46,8 @@ export default function SubmitButton({ examProblemSet, examProblems }: Props) {
       }
     } finally {
       setIsLoading(false);
-      // 서버 컴포넌트 캐시 무효화
-      revalidateAllPath();
-      setExamProblemAnswers([]); // 제출 후 답안 초기화
-      router.push(`/result/${uuid}`);
+      // 서버 컴포넌트 캐시 무효화 및 결과 페이지로 리다이렉트
+      await revalidateAllPathAndRedirect(`/result/${uuid}`);
     }
   };
 

@@ -146,7 +146,7 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
       setIsLoading(false); // 로딩 완료
       
       // 서버 컴포넌트 캐시 무효화
-      revalidateAllPath();
+      await revalidateAllPath();
     }
   };
   return (
