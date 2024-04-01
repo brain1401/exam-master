@@ -24,14 +24,16 @@ type Props = {
 export default function ExamProblems({ examProblemSet }: Props) {
   const { currentExamProblemIndex, resetExamProblemAnswers } =
     useExamProblems();
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidatePath } = useRevalidate();
 
   useEffect(() => {
     return () => {
-      revalidateAllPath();
+      // 뒤로가기 했다가 다시 해당 컴포넌트로 진입했을 때 서버 컴포넌트에서 받아온 데이터가 캐시되어있기 때문에
+      // 컴포넌트 언마운트시 revalidatePath() 커스텀 훅 함수를 통해 서버 컴포넌트 캐시 무효화
+      revalidatePath("/exam/[UUID]", "page");
       resetExamProblemAnswers();
     };
-  }, [resetExamProblemAnswers, revalidateAllPath]);
+  }, [resetExamProblemAnswers, revalidatePath]);
 
   usePreventClose();
 
