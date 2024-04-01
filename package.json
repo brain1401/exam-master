@@ -43,7 +43,6 @@
     "next-auth": "^4.24.7",
     "next-build-id": "^3.0.0",
     "pg": "^8.11.4",
-    "postgres": "^3.4.4",
     "react": "^18.2.0",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.2.0",
@@ -63,6 +62,7 @@
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.28.6",
+    "@types/pg": "^8.11.4",
     "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.4.19",
     "drizzle-kit": "^0.20.14",
