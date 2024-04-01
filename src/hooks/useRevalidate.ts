@@ -1,26 +1,61 @@
 import { revalidate } from "@/actions/revalidates";
+import { redirect } from "next/navigation";
 import { useTransition } from "react";
 import { useCallback } from "react";
 
 type RevalidateType = Parameters<typeof revalidate>;
 
 export default function useRevalidate() {
-  const [isPending, startTransition] = useTransition();
+  const [isPendinAllPath, startTransitionAllPath] = useTransition();
+  const [isPending, startTransitionPath] = useTransition();
 
-  const revalidateAllPath = useCallback(() => {
-    startTransition(async () => {
+  const revalidateAllPath = useCallback(async () => {
+    startTransitionAllPath(async () => {
       await revalidate("/");
     });
-  }, [startTransition]);
+  }, [startTransitionAllPath]);
 
   const revalidatePath = useCallback(
-    (path: RevalidateType[0], type?: RevalidateType[1]) => {
-      startTransition(async () => {
+    async (path: RevalidateType[0], type?: RevalidateType[1]) => {
+      startTransitionPath(async () => {
         await revalidate(path, type);
       });
     },
-    [startTransition],
+    [startTransitionPath],
   );
 
-  return { isPending, revalidateAllPath, revalidatePath };
+  const revalidateAllPathAndRedirect = useCallback(
+    async (redirectPath: string) => {
+      startTransitionAllPath(async () => {
+        await revalidate("/");
+        redirect(redirectPath);
+      });
+    },
+    [startTransitionAllPath],
+  );
+
+  const revalidatePathAndRedirect = useCallback(
+    async ({
+      path,
+      type,
+      redirectPath,
+    }: {
+      path: RevalidateType[0];
+      type?: RevalidateType[1];
+      redirectPath: string;
+    }) => {
+      startTransitionPath(async () => {
+        await revalidate(path, type);
+        redirect(redirectPath);
+      });
+    },
+    [startTransitionPath],
+  );
+
+  return {
+    revalidateAllPath,
+    revalidatePath,
+    revalidateAllPathAndRedirect,
+    revalidatePathAndRedirect,
+  };
 }
