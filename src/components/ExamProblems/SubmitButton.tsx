@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
 import useExamProblems from "@/hooks/useExamProblems";
 import { isExamProblemAnswersAnswered } from "@/utils/problems";
 import axios from "axios";
@@ -16,7 +15,6 @@ type Props = {
 export default function SubmitButton({ examProblemSet, examProblems }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { revalidateAllPathAndRedirect } = useRevalidate();
-  const router = useRouter();
 
   const { examProblemAnswers } = useExamProblems();
 
