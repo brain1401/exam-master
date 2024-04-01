@@ -4,7 +4,6 @@ import { getProblemsSetByUUID } from "@/service/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import JotaiProvider from "@/context/JotaiContext";
-import { revalidatePath } from "next/cache";
 type Props = {
   params: {
     UUID: string;

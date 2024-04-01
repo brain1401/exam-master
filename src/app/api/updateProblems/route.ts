@@ -6,7 +6,6 @@ import {
   checkUserPermissionForProblemSet,
 } from "@/service/problems";
 import { problemsSchema, uuidSchema } from "@/types/problems";
-import { revalidatePath } from "next/cache";
 
 export async function PUT(req: NextRequest) {
   const session = await getServerSession();
