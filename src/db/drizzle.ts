@@ -25,13 +25,11 @@ try {
       global._pgPool = createDrizzle();
       drizzleSession = global._pgPool;
 
-      console.log("Database session created");
     } else {
       drizzleSession = global._pgPool;
     }
   } else {
     drizzleSession = createDrizzle();
-    console.log("Database session created");
   }
 } catch (error) {
   console.error("Failed to create database session:", error);
