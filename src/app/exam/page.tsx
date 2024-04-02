@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { getProblemSets, getProblemSetsMaxPage } from "@/service/problems";
 import { getUserUUIDbyEmail } from "@/service/user";
+import { defaultPageSize } from "@/const/pageSize";
 
 export const metadata: Metadata = {
   title: "문제 풀기",
@@ -25,10 +26,10 @@ export default async function ExamPage() {
 
   const [, maxPage] = await Promise.all([
     queryClient.prefetchQuery({
-      queryKey: ["problemSets", 1, 8, false, "", null, userEmail],
-      queryFn: () => getProblemSets(userEmail, "1", "8"),
+      queryKey: ["problemSets", 1, defaultPageSize, false, "", null, userEmail],
+      queryFn: () => getProblemSets(userEmail, "1", defaultPageSize.toString()),
     }),
-    getProblemSetsMaxPage(false, "", 8, userUUID),
+    getProblemSetsMaxPage(false, "", defaultPageSize, userUUID),
   ]);
 
   return (

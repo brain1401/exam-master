@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "@/lib/store";
+import { defaultPageSize } from "@/const/pageSize";
 
 type StateType = {
   resultPage: number;
@@ -18,7 +19,7 @@ const initialState: StateType = {
   problemSetsMaxPage: null,
   publicProblemSetsPage: 1,
   publicProblemSetsMaxPage: null,
-  pageSize: 8,
+  pageSize: defaultPageSize,
 };
 
 const pagenationSlice = createSlice({

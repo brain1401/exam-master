@@ -3,6 +3,7 @@ import LoginRequired from "@/components/ui/LoginRequired";
 import ResultsPage from "@/components/results/ResultsPage";
 import { Metadata } from "next";
 import { getResultsMaxPage } from "@/service/problems";
+import { defaultPageSize } from "@/const/pageSize";
 
 export const metadata: Metadata = {
   title: "시험 결과",
@@ -18,7 +19,7 @@ export default async function Results() {
 
   const userEmail = session.user.email;
 
-  const maxPage = await getResultsMaxPage(userEmail, 8);
+  const maxPage = await getResultsMaxPage(userEmail, defaultPageSize);
 
   return (
     <>

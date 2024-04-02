@@ -9,6 +9,7 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { defaultPageSize } from "@/const/pageSize";
 
 export const metadata: Metadata = {
   title: "문제 관리",
@@ -26,12 +27,12 @@ export default async function ManagePage() {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ["problemSets", 1, 8, false, "", null, userEmail],
-    queryFn: () => getProblemSets(userEmail, "1", "8"),
+    queryKey: ["problemSets", 1, defaultPageSize, false, "", null, userEmail],
+    queryFn: () => getProblemSets(userEmail, "1", defaultPageSize.toString()),
   });
 
   const userUUID = await getUserUUIDbyEmail(userEmail);
-  const maxPage = await getProblemSetsMaxPage(false, "", 8, userUUID);
+  const maxPage = await getProblemSetsMaxPage(false, "", defaultPageSize, userUUID);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

@@ -1,3 +1,5 @@
+import { defaultPageSize } from "@/const/pageSize";
+
 export default function getPageSizeByObj({
   isXxs,
   isXs,
@@ -23,7 +25,7 @@ export default function getPageSizeByObj({
   } else if (isMd) {
     result = 6;
   } else if (isLg) {
-    result = 8;
+    result = defaultPageSize;
   } else if (isXl) {
     result = 10;
   }
