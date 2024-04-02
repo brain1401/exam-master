@@ -44,6 +44,12 @@ export async function GET(req: NextRequest) {
 
   const data = await getProblemsSetByUUID(UUID, session?.user?.email);
 
+  if (!data) {
+    return NextResponse.json(
+      { error: "문제 세트를 찾을 수 없습니다." },
+      { status: 404 },
+    );
+  }
 
   const result: ProblemSetWithName = {
     uuid: data.uuid.toString(),

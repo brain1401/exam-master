@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 
   const data = await getProblemsSetByUUID(UUID, session?.user?.email);
 
-  if (data.problems === undefined)
+  if (data?.problems === undefined)
     return NextResponse.json(
       { error: "문제집을 불러오는 중 오류가 발생했습니다." },
       { status: 500 },
