@@ -17,28 +17,32 @@ import { isImageUrlObject } from "@/utils/problems";
 import { ExamProblemSet } from "@/types/problems";
 import { useEffect } from "react";
 import useRevalidate from "@/hooks/useRevalidate";
-
+import { useHydrateAtoms } from "jotai/utils";
+import { examProblemSetAtom } from "@/jotai/examProblems";
 type Props = {
   examProblemSet: ExamProblemSet;
 };
 export default function ExamProblems({ examProblemSet }: Props) {
-  const { currentExamProblemIndex, resetExamProblemAnswers } =
+  useHydrateAtoms([[examProblemSetAtom, examProblemSet]]);
+
+  const { currentExamProblem, examProblems, resetExamProblems } =
     useExamProblems();
   const { revalidatePath } = useRevalidate();
 
   useEffect(() => {
+    console.log("examProblemSet", examProblemSet);
+  }, [examProblemSet]);
+
+  useEffect(() => {
     return () => {
-      resetExamProblemAnswers();
+      resetExamProblems();
       // 뒤로가기 했다가 다시 해당 컴포넌트로 진입했을 때 서버 컴포넌트에서 받아온 데이터가 캐시되어있기 때문에
       // 컴포넌트 언마운트시 revalidatePath() 커스텀 훅 함수를 통해 서버 컴포넌트 캐시 무효화
       revalidatePath("/exam/[UUID]", "page");
     };
-  }, [resetExamProblemAnswers, revalidatePath]);
+  }, [resetExamProblems, revalidatePath]);
 
   usePreventClose();
-
-  const currentExamProblem = examProblemSet.problems[currentExamProblemIndex];
-  const examProblems = examProblemSet.problems;
 
   return (
     <ProblemGridLayout>
@@ -70,35 +74,28 @@ export default function ExamProblems({ examProblemSet }: Props) {
           />
         )}
       </div>
-      <CurrentProblemIndicator
-        examProblemLength={examProblemSet.problems.length}
-      />
+      <CurrentProblemIndicator />
 
       <ExamCardLayout>
-        <CurrentQuestion currentExamProblem={currentExamProblem} />
+        <CurrentQuestion />
 
-        <CurrentExamImage currentExamProblem={currentExamProblem} />
+        <CurrentExamImage />
 
-        <AdditionalView currentExamProblem={currentExamProblem} />
+        <AdditionalView />
 
-        {Boolean(currentExamProblem.type === "obj") && (
-          <Candidates currentExamProblem={currentExamProblem} />
-        )}
+        {Boolean(currentExamProblem.type === "obj") && <Candidates />}
 
         {Boolean(currentExamProblem.type === "sub") && (
-          <SubjectiveAnswerTextarea currentExamProblem={currentExamProblem} />
+          <SubjectiveAnswerTextarea />
         )}
       </ExamCardLayout>
 
       <div className="flex items-center justify-center">
-        <NextOrPrevButtons examProblemLength={examProblemSet.problems.length} />
+        <NextOrPrevButtons />
       </div>
 
       <div className="flex items-center justify-center">
-        <SubmitButton
-          examProblemSet={examProblemSet}
-          examProblems={examProblems}
-        />
+        <SubmitButton />
       </div>
     </ProblemGridLayout>
   );

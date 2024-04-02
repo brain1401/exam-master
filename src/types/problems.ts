@@ -23,7 +23,7 @@ export type Problem = {
   additionalView: string;
   isAnswerMultiple: boolean | null;
   image: File | z.infer<typeof ImageSchema> | { key: string } | null;
-  isAdditiondalViewButtonClicked: boolean;
+  isAdditionalViewButtonClicked: boolean;
   isImageButtonClicked: boolean;
   candidates: Candidate[] | null;
   subAnswer: string | null;
@@ -134,7 +134,7 @@ export const problemSchema = z
         ImageSchema.nullable(),
       ])
       .nullable(),
-    isAdditiondalViewButtonClicked: z.boolean().optional(),
+    isAdditionalViewButtonClicked: z.boolean().optional(),
     isImageButtonClicked: z.boolean().optional(),
     candidates: z.array(candidateSchema).nullable(),
     subAnswer: z.string().nullable(),

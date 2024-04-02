@@ -25,7 +25,7 @@ import {
   isAnswerString,
   isAnsweredMoreThanOne,
   isImageUrlObject,
-  isProblemAsnwered,
+  isExamProblemAsnwered,
 } from "@/utils/problems";
 import {
   DeleteObjectCommand,
@@ -691,7 +691,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
           additionalView: problem.additionalView ?? "",
           candidates: problem.candidates as Candidate[],
           image: problem.image,
-          isAdditiondalViewButtonClicked: problem.additionalView ? true : false,
+          isAdditionalViewButtonClicked: problem.additionalView ? true : false,
           isAnswerMultiple: problem.isAnswerMultiple,
           isImageButtonClicked: problem.image ? true : false,
           subjectiveAnswer: problem.subjectiveAnswer,
@@ -927,51 +927,44 @@ export function getParsedProblems<T extends boolean>(
 
 export async function postProblemResult({
   order,
-  examProblemAnswer,
   examProblem,
   resultsUuid,
-  result,
+  evaluationResult,
   answer,
   userUuid,
   dt,
 }: {
   order: number;
-  examProblemAnswer: ExamProblemAnswer;
   examProblem: ExamProblem;
   resultsUuid: string;
-  result: boolean;
+  evaluationResult: boolean;
   answer: CorrectAnswer;
   userUuid: string;
   dt: DrizzleTransaction;
 }) {
-  if (
-    !examProblemAnswer ||
-    !examProblemAnswer.uuid ||
-    !examProblem ||
-    !examProblem.uuid
-  )
-    throw new Error("something is null");
+  if (!examProblem || !examProblem.uuid) throw new Error("something is null");
 
   try {
     const date = new Date();
 
-    const createdProblemResult = await dt
+    const [{ uuid: createdProblemResult }] = await dt
       .insert(problemResult)
       .values({
         order: order,
         resultUuid: resultsUuid,
-        isCorrect: result,
+        isCorrect: evaluationResult,
         userUuId: userUuid,
-        candidates: Array.isArray(examProblemAnswer.answer)
-          ? examProblemAnswer.answer.map((candidate) => ({
-              id: candidate.id,
-              text: candidate.text,
-              isSelected: candidate.isAnswer,
-            }))
-          : undefined,
+        candidates:
+          examProblem && examProblem.candidates
+            ? examProblem.candidates.map((candidate) => ({
+                id: candidate.id ?? 0,
+                text: candidate.text,
+                isSelected: candidate.isAnswer,
+              }))
+            : undefined,
         subjectiveAnswered:
-          typeof examProblemAnswer.answer === "string"
-            ? examProblemAnswer.answer
+          typeof examProblem.subAnswer === "string"
+            ? examProblem.subAnswer
             : null,
         question: examProblem.question,
         additionalView: examProblem.additionalView ?? null,
@@ -980,7 +973,7 @@ export async function postProblemResult({
         correctCandidates: Array.isArray(answer)
           ? answer
               .map((id) => ({
-                id,
+                id: id ?? 0,
                 text:
                   examProblem.candidates?.find(
                     (candidate) => candidate.id === id,
@@ -1019,6 +1012,7 @@ export async function postProblemResult({
       })
       .returning({ uuid: problemResult.uuid });
 
+    console.log("createdProblemResult :", createdProblemResult);
     if (!createdProblemResult)
       throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
   } catch (err) {
@@ -1501,33 +1495,34 @@ export async function deleteProblemResults(
 }
 
 export async function validateExamProblemAnswer(
-  examProblemAnswer: ExamProblemAnswer,
+  examProblem: ExamProblem,
   answer: CorrectAnswer,
 ) {
   let finalResult: boolean | null = null;
 
-  if (!examProblemAnswer || !examProblemAnswer.uuid) {
+  if (!examProblem || !examProblem.uuid) {
     throw new Error("something is null");
   }
 
-  if (Array.isArray(examProblemAnswer.answer)) {
+  if (examProblem.type === "obj") {
     if (!Array.isArray(answer)) {
       throw new Error("Answer is not an array");
     }
 
-    const userAnswer = examProblemAnswer.answer
-      .filter((candidate) => candidate.isAnswer)
+    const userAnswer = examProblem.candidates
+      ?.filter((candidate) => candidate.isAnswer)
       .map((candidate) => candidate.id);
 
-    finalResult = answer.every((id) => userAnswer.includes(id));
-  } else if (typeof examProblemAnswer.answer === "string") {
+    finalResult =
+      (userAnswer && answer.every((id) => userAnswer.includes(id))) ?? null;
+  } else if (examProblem.type === "sub") {
     if (typeof answer !== "string") {
       throw new Error("Answer is not a string");
     }
 
-    finalResult = examProblemAnswer.answer === answer;
+    finalResult = examProblem.subAnswer === answer;
   } else {
-    throw new Error("Invalid user answer");
+    throw new Error("Invalid problem type");
   }
 
   if (finalResult === null) {
@@ -2081,7 +2076,6 @@ export function validateS3Key(fileName: string): boolean {
 }
 
 export async function evaluateProblems(
-  examProblemAnswers: ExamProblemAnswer[],
   examProblems: ExamProblem[],
   problemSetName: string,
   userEmail: string,
@@ -2107,24 +2101,21 @@ export async function evaluateProblems(
         })
         .returning({ uuid: result.uuid });
 
+      console.log("resultsUuid :", resultsUuid);
+
       await Promise.all(
-        examProblemAnswers.map(async (examProblemAnswer, index) => {
-          if (!examProblemAnswer || !examProblemAnswer.uuid) {
+        examProblems.map(async (examProblem, index) => {
+          if (!examProblem || !examProblem.uuid) {
             throw new Error("something is null");
           }
 
-          const problem = examProblems.find(
-            (problem) => problem.uuid === examProblemAnswer.uuid,
-          );
-
-          if (!problem) {
-            throw new Error("Problem not found");
-          }
-
-          if (problem.type === "obj" && problem.isAnswerMultiple === false) {
+          if (
+            examProblem.type === "obj" &&
+            examProblem.isAnswerMultiple === false
+          ) {
             if (
-              Array.isArray(examProblemAnswer.answer) &&
-              examProblemAnswer.answer.filter((candidate) => candidate.isAnswer)
+              Array.isArray(examProblem.candidates) &&
+              examProblem.candidates.filter((candidate) => candidate.isAnswer)
                 .length > 1
             ) {
               throw new Error(
@@ -2134,15 +2125,15 @@ export async function evaluateProblems(
           }
 
           if (
-            problem.type === "sub" &&
-            (typeof examProblemAnswer.answer !== "string" ||
-              examProblemAnswer.answer.trim() === "")
+            examProblem.type === "sub" &&
+            (typeof examProblem.subAnswer !== "string" ||
+              examProblem.subAnswer.trim() === "")
           ) {
             throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
           }
 
           const answer: CorrectAnswer = await getAnswerByProblemUuid(
-            problem.uuid,
+            examProblem.uuid,
             dt,
           );
 
@@ -2151,19 +2142,18 @@ export async function evaluateProblems(
           }
 
           const evaluationResult = await validateExamProblemAnswer(
-            examProblemAnswer,
+            examProblem,
             answer,
           );
 
           await postProblemResult({
             order: index,
-            userUuid: userUuid,
+            userUuid,
             dt,
-            answer: answer,
-            examProblem: problem,
-            examProblemAnswer: examProblemAnswer,
-            result: evaluationResult,
-            resultsUuid: resultsUuid,
+            answer,
+            examProblem,
+            evaluationResult,
+            resultsUuid,
           });
         }),
       );
@@ -2173,6 +2163,7 @@ export async function evaluateProblems(
 
     return transactionResult;
   } catch (err) {
+    console.log(err);
     throw err;
   }
 }

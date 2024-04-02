@@ -1,5 +1,5 @@
 import { Problem, Candidate } from "@/types/problems";
-import { createStore, atom } from "jotai";
+import { atom } from "jotai";
 
 export const problemsAtom = atom<Problem[]>(
   Array.from(Array<Problem>(10), (_, i) =>
@@ -10,7 +10,7 @@ export const problemsAtom = atom<Problem[]>(
           isPublic: false,
           question: "",
           additionalView: "",
-          isAdditiondalViewButtonClicked: false,
+          isAdditionalViewButtonClicked: false,
           isImageButtonClicked: false,
           image: null,
           isAnswerMultiple: false,
@@ -53,7 +53,7 @@ export const resetProblemsAtom = atom(null, (get, set) => {
             isPublic: false,
             question: "",
             additionalView: "",
-            isAdditiondalViewButtonClicked: false,
+            isAdditionalViewButtonClicked: false,
             isImageButtonClicked: false,
             image: null,
             isAnswerMultiple: false,
@@ -89,7 +89,7 @@ export const initCurrentProblemAtom = atom(null, (get, set) => {
       type: currentTab,
       question: "",
       additionalView: "",
-      isAdditiondalViewButtonClicked: false,
+      isAdditionalViewButtonClicked: false,
       isImageButtonClicked: false,
       image: null,
       isAnswerMultiple: false,

@@ -3,13 +3,8 @@ import useExamProblems from "@/hooks/useExamProblems";
 import { Button } from "../ui/button";
 import useScrollEffect from "@/hooks/useScrollEffect";
 
-type Props = {
-  examProblemLength: number;
-};
-export default function ExamProblemsNextOrPrevButtons({
-  examProblemLength,
-}: Props) {
-  const { currentExamProblemIndex, setCurrentExamProblemIndex } =
+export default function ExamProblemsNextOrPrevButtons() {
+  const { currentExamProblemIndex, setCurrentExamProblemIndex, examProblems } =
     useExamProblems();
 
   useScrollEffect([currentExamProblemIndex]);
@@ -29,7 +24,7 @@ export default function ExamProblemsNextOrPrevButtons({
       <Button
         className="w-[4.9rem] py-2"
         onClick={() => {
-          if (currentExamProblemIndex < examProblemLength - 1) {
+          if (currentExamProblemIndex < examProblems.length - 1) {
             setCurrentExamProblemIndex(currentExamProblemIndex + 1);
           }
         }}

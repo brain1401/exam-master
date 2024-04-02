@@ -12,7 +12,7 @@ import {
   resetProblemsAtom,
   currentProblemAtom,
   currentProblemCandidatesAtom,
-} from "@/app/jotai/problems";
+} from "@/jotai/problems";
 import { useAtom, useSetAtom, useAtomValue } from "jotai";
 
 export default function useProblems() {

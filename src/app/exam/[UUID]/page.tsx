@@ -1,5 +1,6 @@
 import ExamProblems from "@/components/ExamProblems/ExamProblems";
 import LoginRequired from "@/components/ui/LoginRequired";
+import JotaiProvider from "@/context/JotaiContext";
 import {
   checkUserPermissionForProblemSet,
   getExamProblemsByProblemSetUUID,
@@ -68,6 +69,10 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
     UUID,
     session.user.email,
   );
-
-  return <ExamProblems examProblemSet={examProblemSet} />;
+  
+  return (
+    <JotaiProvider>
+      <ExamProblems examProblemSet={examProblemSet} />
+    </JotaiProvider>
+  );
 }

@@ -20,7 +20,7 @@ import {
   localProblemSetsNameAtom,
   problemLengthAtom,
   problemSetsNameAtom,
-} from "@/app/jotai/problems";
+} from "@/jotai/problems";
 import { useEffect } from "react";
 
 type Props = {
@@ -29,6 +29,7 @@ type Props = {
 };
 
 export default function ManageProblemsByUUID({ UUID, problemSet }: Props) {
+  // useHydrateAtoms를 통해 서버 컴포넌트에서 받아온 값을 jotai atom에 초기값으로 설정
   useHydrateAtoms([
     [problemsAtom, problemSet.problems],
     [isPublicAtom, problemSet.isPublic],

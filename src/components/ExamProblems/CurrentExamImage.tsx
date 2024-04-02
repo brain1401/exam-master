@@ -1,14 +1,12 @@
 "use client";
 import Image from "next/image";
 import { isImageUrlObject } from "@/utils/problems";
-import { ExamProblem } from "@/types/problems";
+import useExamProblems from "@/hooks/useExamProblems";
 
-type Props = {
-  currentExamProblem: ExamProblem;
-};
-export default function CurrentExamImage({
-  currentExamProblem: { image },
-}: Props) {
+export default function CurrentExamImage() {
+  const {
+    currentExamProblem: { image },
+  } = useExamProblems();
   return (
     <>
       {image && isImageUrlObject(image) && (

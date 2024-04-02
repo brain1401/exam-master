@@ -20,20 +20,17 @@ export async function POST(req: NextRequest) {
     );
 
   const {
-    examProblemAnswers,
     examProblems,
-    problemSetName,
+    examProblemSetName,
   }: {
-    examProblemAnswers: ExamProblemAnswer[];
     examProblems: ExamProblem[];
-    problemSetName: string;
+    examProblemSetName: string;
   } = await req.json();
 
-  console.log("examProblemAnswers", examProblemAnswers);
   console.log("examProblems", examProblems);
-  console.log("problemSetName", problemSetName);
+  console.log("problemSetName", examProblemSetName);
 
-  if (!examProblemAnswers || !problemSetName) {
+  if (!examProblems || !examProblemSetName) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
@@ -42,9 +39,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const uuid = await evaluateProblems(
-      examProblemAnswers,
       examProblems,
-      problemSetName,
+      examProblemSetName,
       session.user.email,
     );
     return NextResponse.json({ uuid });

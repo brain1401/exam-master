@@ -1,13 +1,11 @@
 "use client";
 
-import { ExamProblem } from "@/types/problems";
+import useExamProblems from "@/hooks/useExamProblems";
 
-type Props = {
-  currentExamProblem: ExamProblem;
-};
-export default function AdditionalView({
-  currentExamProblem: { additionalView },
-}: Props) {
+export default function AdditionalView() {
+  const {
+    currentExamProblem: { additionalView },
+  } = useExamProblems();
   return (
     <>
       {additionalView && (

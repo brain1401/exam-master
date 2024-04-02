@@ -1,5 +1,5 @@
 "use client";
-import { ExamProblem, ExamProblemAnswer } from "@/types/problems";
+import { ExamProblem } from "@/types/problems";
 import candidateNumber from "@/utils/candidateNumber";
 import Image from "next/image";
 import checkImage from "../../../public/images/checkBlack.png";
@@ -7,51 +7,29 @@ import { checkMarkClassName } from "@/classnames/checkMark";
 import useExamProblems from "@/hooks/useExamProblems";
 import { cn } from "@/lib/utils";
 
-type Props = {
-  currentExamProblem: ExamProblem;
-};
-
-export default function Candidates({ currentExamProblem }: Props) {
-  const { currentExamProblemAnswer, setCurrentExamProblemAnswer } =
-    useExamProblems();
+export default function Candidates() {
+  const { currentExamProblem, setCurrentExamProblem } = useExamProblems();
 
   const onClickCandidate = (i: number, isMultipleAnswer: boolean) => {
     if (!currentExamProblem || !currentExamProblem.candidates) {
       throw new Error("무언가가 잘못되었습니다.");
     }
 
-    const newCurrentExamProblemAnswer: ExamProblemAnswer = {
-      uuid: currentExamProblem.uuid ?? "",
-      answer: Array.isArray(currentExamProblemAnswer?.answer)
-        ? [...currentExamProblemAnswer.answer]
-        : currentExamProblem.candidates.map((candidate) => ({
-            ...candidate,
-            isAnswer: false,
-          })),
+    const newCurrentExamProblem: ExamProblem = {
+      ...currentExamProblem,
+      candidates: currentExamProblem.candidates.map((candidate, index) => ({
+        ...candidate,
+        isAnswer: Array.isArray(currentExamProblem.candidates)
+          ? index === i
+            ? !candidate.isAnswer
+            : isMultipleAnswer
+              ? candidate.isAnswer
+              : false
+          : false,
+      })),
     };
 
-    const candidate = currentExamProblem.candidates[i];
-
-    // 현재 문제가 다중 선택지이면
-    if (isMultipleAnswer) {
-      if (Array.isArray(newCurrentExamProblemAnswer.answer)) {
-        newCurrentExamProblemAnswer.answer[i] = {
-          ...candidate,
-          isAnswer: !newCurrentExamProblemAnswer.answer[i]?.isAnswer,
-        };
-      }
-    } else {
-      // 현재 문제가 단일 선택지이면
-      if (Array.isArray(newCurrentExamProblemAnswer.answer)) {
-        newCurrentExamProblemAnswer.answer =
-          newCurrentExamProblemAnswer.answer.map((answer, index) => ({
-            ...answer,
-            isAnswer: index === i,
-          }));
-      }
-    }
-
-    setCurrentExamProblemAnswer(newCurrentExamProblemAnswer);
+    setCurrentExamProblem(newCurrentExamProblem);
   };
 
   return (
@@ -72,12 +50,7 @@ export default function Candidates({ currentExamProblem }: Props) {
                 >
                   <div
                     className={cn(
-                      `${
-                        Array.isArray(currentExamProblemAnswer?.answer) &&
-                        currentExamProblemAnswer.answer[i]?.isAnswer
-                          ? ""
-                          : "opacity-0"
-                      }`,
+                      `${candidate.isAnswer ? "" : "opacity-0"}`,
                       checkMarkClassName,
                     )}
                   >

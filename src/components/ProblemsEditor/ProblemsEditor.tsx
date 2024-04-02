@@ -31,7 +31,7 @@ export default function ProblemsEditor() {
       type: tab,
       question: "",
       additionalView: "",
-      isAdditiondalViewButtonClicked: false,
+      isAdditionalViewButtonClicked: false,
       isImageButtonClicked: false,
       isAnswerMultiple: false,
       image: null,

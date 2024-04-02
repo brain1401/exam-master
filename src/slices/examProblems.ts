@@ -1,8 +1,6 @@
 import { RootState } from "@/lib/store";
 import {
-  ExamProblem,
   ExamProblemAnswer,
-  ExamProblemSet,
 } from "@/types/problems";
 import { PayloadAction, createSlice, createSelector } from "@reduxjs/toolkit";
 

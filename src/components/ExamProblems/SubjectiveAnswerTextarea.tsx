@@ -1,25 +1,18 @@
 "use client";
 import useExamProblems from "@/hooks/useExamProblems";
 import { Textarea } from "../ui/textarea";
-import { ExamProblem, ExamProblemAnswer } from "@/types/problems";
 
-type Props = {
-  currentExamProblem: ExamProblem;
-};
-export default function SubjectiveAnswerTextarea({ currentExamProblem }: Props) {
-  const {
-    currentExamProblemAnswer,
-    setCurrentExamProblemAnswer,
-  } = useExamProblems();
+export default function SubjectiveAnswerTextarea() {
+  const { currentExamProblem, setCurrentExamProblem } = useExamProblems();
 
   const onTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newAnswer = e.target.value;
+    console.log(newAnswer);
+    console.log(currentExamProblem);
 
-    const updatedExamProblemAnswer: ExamProblemAnswer = {
-      uuid: currentExamProblem.uuid,
-      answer: newAnswer,
-    };
-    setCurrentExamProblemAnswer(updatedExamProblemAnswer);
+    if (currentExamProblem) {
+      setCurrentExamProblem({ subAnswer: newAnswer });
+    }
   };
 
   return (
@@ -28,12 +21,7 @@ export default function SubjectiveAnswerTextarea({ currentExamProblem }: Props) 
         className="resize-none"
         placeholder="답을 입력하세요."
         onChange={onTextAreaChange}
-        value={
-          currentExamProblemAnswer?.uuid === currentExamProblem.uuid &&
-          typeof currentExamProblemAnswer.answer === "string"
-            ? currentExamProblemAnswer.answer
-            : ""
-        }
+        value={currentExamProblem.subAnswer || ""}
       />
     </div>
   );

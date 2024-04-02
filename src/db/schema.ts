@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
-import { Candidate } from "@/types/problems";
+import { Candidate, CorrectCandidate, ExamResultCandidate } from "@/types/problems";
 
 export const problemSet = pgTable(
   "ProblemSet",
@@ -287,7 +287,7 @@ export const problemResult = pgTable(
         onUpdate: "cascade",
       }),
     isCorrect: boolean("isCorrect").notNull(),
-    candidates: jsonb("candidates"),
+    candidates: jsonb("candidates").$type<ExamResultCandidate[]>(),
     isAnswerMultiple: boolean("isAnswerMultiple").notNull(),
     userUuId: uuid("userUuId")
       .notNull()
@@ -301,7 +301,7 @@ export const problemResult = pgTable(
     }),
     subjectiveAnswered: text("subjectiveAnswered"),
     correctSubjectiveAnswer: text("correctSubjectiveAnswer"),
-    correctCandidates: jsonb("correctCandidates"),
+    correctCandidates: jsonb("correctCandidates").$type<CorrectCandidate[]>(),
     createdAt: timestamp("createdAt", {
       precision: 0,
       mode: "date",

@@ -83,7 +83,7 @@ export const isProblemEmpty = (problem: Problem) => {
   ) {
     return true;
   }
-  if (problem.isAdditiondalViewButtonClicked && problem.additionalView === "") {
+  if (problem.isAdditionalViewButtonClicked && problem.additionalView === "") {
     return true;
   }
 
@@ -407,7 +407,7 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
-export function isProblemAsnwered(problem: ExamProblem) {
+export function isExamProblemAsnwered(problem: ExamProblem) {
   if (!problem) {
     throw new Error("something is null");
   }

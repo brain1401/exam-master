@@ -19,7 +19,7 @@ export default function AddViewAndPhoto({ className }: Props) {
 
   const {
     additionalView,
-    isAdditiondalViewButtonClicked,
+    isAdditionalViewButtonClicked,
     isImageButtonClicked,
     image,
   } = currentProblem ?? {};
@@ -73,7 +73,7 @@ export default function AddViewAndPhoto({ className }: Props) {
     const BASIC_CLASS_NAME =
       "rounded-lg bg-[#d1d5db] text-black border border-gray-300 px-5 py-[1.4rem] hover:text-white";
     const condition =
-      type === "view" ? isAdditiondalViewButtonClicked : isImageButtonClicked;
+      type === "view" ? isAdditionalViewButtonClicked : isImageButtonClicked;
 
     if (condition) {
       value = `${BASIC_CLASS_NAME} bg-[#454655] text-white`;
@@ -90,17 +90,17 @@ export default function AddViewAndPhoto({ className }: Props) {
         <Button
           className={getButtonsClassName("view")}
           onClick={() => {
-            if (isAdditiondalViewButtonClicked && additionalView !== "") {
+            if (isAdditionalViewButtonClicked && additionalView !== "") {
               if (!confirm("보기를 지우시겠습니까?")) return;
               setCurrentProblem({
                 additionalView: "",
               });
               setCurrentProblem({
-                isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
+                isAdditionalViewButtonClicked: !isAdditionalViewButtonClicked,
               });
             } else {
               setCurrentProblem({
-                isAdditiondalViewButtonClicked: !isAdditiondalViewButtonClicked,
+                isAdditionalViewButtonClicked: !isAdditionalViewButtonClicked,
               });
             }
           }}
@@ -168,7 +168,7 @@ export default function AddViewAndPhoto({ className }: Props) {
           )}
         </div>
       )}
-      {(isAdditiondalViewButtonClicked || additionalView) && (
+      {(isAdditionalViewButtonClicked || additionalView) && (
         <div className="mt-4">
           <Label
             htmlFor="additional-info"

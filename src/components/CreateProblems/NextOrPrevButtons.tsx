@@ -41,7 +41,7 @@ export default function NextOrPrevButtons() {
       type: currentTab === "obj" ? "obj" : "sub",
       question: "",
       additionalView: "",
-      isAdditiondalViewButtonClicked: false,
+      isAdditionalViewButtonClicked: false,
       isImageButtonClicked: false,
       image: null,
       isAnswerMultiple: false,
