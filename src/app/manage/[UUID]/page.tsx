@@ -4,6 +4,7 @@ import { getProblemsSetByUUID } from "@/service/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import JotaiProvider from "@/context/JotaiContext";
+import { isValidUUID } from "@/utils/problems";
 type Props = {
   params: {
     UUID: string;
@@ -16,7 +17,21 @@ export async function generateMetadata({
   const session = await getServerSession();
 
   if (session?.user?.email) {
+    if (!isValidUUID(UUID)) {
+      return {
+        title: "해당하는 문제집이 없습니다.",
+        description: "해당하는 문제집이 없습니다",
+      };
+    }
+
     const data = await getProblemsSetByUUID(UUID, session?.user?.email);
+
+    if (!data) {
+      return {
+        title: "해당하는 문제집이 없습니다.",
+        description: "해당하는 문제집이 없습니다",
+      };
+    }
 
     return {
       title: `${data.name} 문제집 관리`,
@@ -38,6 +53,11 @@ export default async function ManageProblem({ params: { UUID } }: Props) {
   }
 
   const problemSet = await getProblemsSetByUUID(UUID, session?.user?.email);
+
+  if (!problemSet) {
+    // 에러 페이지로 리다이렉트 필요
+    return <div>문제집을 찾을 수 없습니다.</div>;
+  }
 
   return (
     <JotaiProvider>

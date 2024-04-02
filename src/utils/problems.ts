@@ -15,10 +15,12 @@ import {
   PublicExamProblemSet,
   ExamProblemSet,
   ExamProblemAnswer,
+  uuidSchema,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
 import { Flatten, Prettify } from "./type";
+import { Like } from "@/components/publicProblem/PublicProblemExam";
 
 export const isCardOnBeingWrited = (problem: Problem | undefined) => {
   if (!problem) {
@@ -757,7 +759,7 @@ export async function fetchPublicProblemSetComments(
   const { data } = await axios.get(
     `/api/getPublicProblemSetComments/?problemSetUUID=${problemUuid}`,
   );
-  const comments = data.comments as ProblemSetComment[];
+  const comments = data.comments as ProblemSetComment[] | null;
 
   console.log(comments);
 
@@ -783,9 +785,12 @@ export function isExamProblemAnswersAnswered(
 }
 
 export async function fetchPublicProblemLikes(problemUuid: string | undefined) {
-  const { data } = await axios.get(
+  const { data } = await axios.get<Like | null>(
     `/api/getPublicProblemSetLikes/?problemSetUUID=${problemUuid}`,
   );
+  if (!data) {
+    return null;
+  }
   const likes = data.likes as number;
   const liked = data.liked as boolean;
   return {
@@ -795,8 +800,12 @@ export async function fetchPublicProblemLikes(problemUuid: string | undefined) {
 }
 
 export async function fetchPublicProblemSetByUUID(problemUuid: string) {
-  const { data } = await axios.get(
+  const { data } = await axios.get<PublicExamProblemSet | null>(
     `/api/getPublicProblemSet/?problemSetUUID=${problemUuid}`,
   );
-  return data as PublicExamProblemSet;
+  return data as PublicExamProblemSet | null;
+}
+
+export function isValidUUID(UUID: string) {
+  return uuidSchema.safeParse(UUID).success;
 }

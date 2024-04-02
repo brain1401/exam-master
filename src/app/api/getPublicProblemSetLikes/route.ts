@@ -13,10 +13,20 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
   }
-  const { liked, likes } = await getPublicProblemLikes(
+  const result = await getPublicProblemLikes(
     problemSetUUID,
     session?.user?.email,
   );
 
-  return NextResponse.json({ liked, likes });
+  if (!result) {
+    return NextResponse.json(
+      {
+        liked: null,
+        likes: null,
+      },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.json({ liked: result.liked, likes: result.likes });
 }

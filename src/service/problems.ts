@@ -6,26 +6,21 @@ import {
   Candidate,
   DrizzleTransaction,
   ResultsWithPagination,
-  problemsSchema,
   ProblemReplacedImageKey,
   PublicProblemSetWithPagination,
   ExamProblemSet,
   PublicExamProblemSet,
   ProblemSetComment,
-  ExamProblemAnswer,
-  examProblemSchema,
   CorrectAnswer,
   examProblemsSchema,
+  uuidSchema,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
   analyzeProblemsImagesAndDoCallback,
   generateFileHash,
-  isAnswerArray,
-  isAnswerString,
-  isAnsweredMoreThanOne,
   isImageUrlObject,
-  isExamProblemAsnwered,
+  isValidUUID,
 } from "@/utils/problems";
 import {
   DeleteObjectCommand,
@@ -622,7 +617,14 @@ export async function getExamProblemsByProblemSetUUID(
   UUID: string,
   userEmail: string,
 ) {
+  if (!isValidUUID(UUID)) {
+    return null;
+  }
   const data = await getProblemsSetByUUID(UUID, userEmail);
+
+  if (!data) {
+    throw null;
+  }
 
   const examProblems: ExamProblem[] = data.problems.map((problem) => {
     if (!problem) throw new Error("문제가 없습니다.");
@@ -657,7 +659,10 @@ export async function getExamProblemsByProblemSetUUID(
 }
 
 export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
-  // filter 조건에 userEmail을 추가해서 해당 유저의 문제집만 가져오도록 했음
+  if (!isValidUUID(uuid)) {
+    return null;
+  }
+
   try {
     const data = await drizzleSession.transaction(async (dt) => {
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);
@@ -675,7 +680,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         },
       });
 
-      if (!foundProblemSet) throw new Error("문제집을 찾을 수 없습니다.");
+      if (!foundProblemSet) return null;
 
       const returnData = {
         uuid: foundProblemSet.uuid,
@@ -1693,6 +1698,28 @@ export async function getPublicProblemSetsByName(
   }
 }
 
+export async function checkIfPublicProblemSetExists(problemSetUUID: string) {
+  const isUUIDValidated = isValidUUID(problemSetUUID);
+
+  if (!isUUIDValidated) {
+    return false;
+  }
+
+  try {
+    const result = await drizzleSession.query.problemSet.findFirst({
+      where: and(
+        eq(problemSet.uuid, problemSetUUID),
+        eq(problemSet.isPublic, true),
+      ),
+    });
+
+    return result ? true : false;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
 export async function getPublicProblemSetByUUID(problemSetUUID: string) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
@@ -1712,8 +1739,7 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
         },
       });
 
-      if (!foundProblemSet)
-        throw new Error("해당하는 uuid를 가진 문제집이 존재하지 않습니다.");
+      if (!foundProblemSet) return null;
 
       const returnData: PublicExamProblemSet = {
         uuid: foundProblemSet.uuid,
@@ -1743,6 +1769,11 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
   }
 }
 export async function getPublicProblemSetComments(problemSetUUID: string) {
+  const isUUIDValidated = uuidSchema.safeParse(problemSetUUID);
+  if (!isUUIDValidated.success) {
+    return null;
+  }
+
   try {
     const data: ProblemSetComment[] = await drizzleSession.transaction(
       async (dt) => {
@@ -1796,6 +1827,11 @@ export async function getPublicProblemLikes(
   problemSetUUID: string,
   userEmail?: string | null,
 ) {
+  const isUUIDValidated = uuidSchema.safeParse(problemSetUUID);
+  if (!isUUIDValidated.success) {
+    return null;
+  }
+
   try {
     const data = await drizzleSession.transaction(async (dt) => {
       const [[likes], [liked]] = await Promise.all([

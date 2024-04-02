@@ -42,7 +42,7 @@ type Props = {
   userUUID: string | null | undefined;
 };
 
-type Like = { likes: number; liked: boolean };
+export type Like = { likes: number; liked: boolean };
 
 export default function PublicProblemExam({
   publicSetUUID,
@@ -51,24 +51,22 @@ export default function PublicProblemExam({
   userUUID,
 }: Props) {
   const [comment, setComment] = useState("");
+
   const queryClient = useQueryClient();
+
   const { toast } = useToast();
 
-  const { data: publicProblemSet } = useQuery<PublicExamProblemSet>({
+  const { data: publicProblemSet } = useQuery<PublicExamProblemSet | null>({
     queryKey: ["publicProblemSet", publicSetUUID],
     queryFn: () => fetchPublicProblemSetByUUID(publicSetUUID),
   });
 
-  const {
-    data: comments,
-    isLoading,
-    error,
-  } = useQuery<ProblemSetComment[]>({
+  const { data: comments } = useQuery<ProblemSetComment[] | null>({
     queryKey: ["problemSetComments", publicSetUUID],
     queryFn: () => fetchPublicProblemSetComments(publicSetUUID),
   });
 
-  const { data: like } = useQuery<Like>({
+  const { data: like } = useQuery<Like | null>({
     queryKey: ["publicProblemLikes", publicSetUUID, userEmail],
     queryFn: () => fetchPublicProblemLikes(publicSetUUID),
   });

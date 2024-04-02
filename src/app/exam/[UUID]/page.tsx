@@ -6,7 +6,7 @@ import {
   getExamProblemsByProblemSetUUID,
   getProblemsSetByUUID,
 } from "@/service/problems";
-import { uuidSchema } from "@/types/problems";
+import { isValidUUID } from "@/utils/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
@@ -22,8 +22,7 @@ export async function generateMetadata({
   const session = await getServerSession();
 
   if (session?.user?.email) {
-    const isUUIDValidated = uuidSchema.safeParse(UUID);
-    if (!isUUIDValidated.success) {
+    if (!isValidUUID(UUID)) {
       return {
         title: "시험 문제",
         description: "시험 문제를 풀어보세요.",
@@ -32,6 +31,12 @@ export async function generateMetadata({
 
     const data = await getProblemsSetByUUID(UUID, session?.user?.email);
 
+    if (!data) {
+      return {
+        title: "시험 문제를 찾을 수 없습니다.",
+        description: "시험 문제를 찾을 수 없습니다.",
+      };
+    }
     return {
       title: `${data.name} 문제 풀기`,
       description: data.description || "",
@@ -39,8 +44,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: "시험 문제",
-    description: "시험 문제를 풀어보세요.",
+    title: "시험 문제를 찾을 수 없습니다.",
+    description: "시험 문제를 찾을 수 없습니다.",
   };
 }
 
@@ -51,8 +56,7 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
     return <LoginRequired />;
   }
 
-  const isUUIDValidated = uuidSchema.safeParse(UUID);
-  if (!isUUIDValidated.success) {
+  if (!isValidUUID(UUID)) {
     return <div>문제 세트 UUID가 올바르지 않습니다.</div>;
   }
 
@@ -62,6 +66,7 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
   );
 
   if (validateResult === "NO") {
+    // 에러 페이지로 리다이렉트 필요
     return <div>본인의 문제만 가져올 수 있습니다.</div>;
   }
 
@@ -69,7 +74,12 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
     UUID,
     session.user.email,
   );
-  
+
+  if (!examProblemSet) {
+    // 에러 페이지로 리다이렉트 필요
+    return <div>문제 세트를 찾을 수 없습니다.</div>;
+  }
+
   return (
     <JotaiProvider>
       <ExamProblems examProblemSet={examProblemSet} />
