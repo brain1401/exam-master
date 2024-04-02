@@ -68,6 +68,7 @@ export default function ResultsPage({ userEmail, maxPage }: Props) {
           debouncedSearchString={debouncedSearchString}
           isSearching={isSearching}
           pageSize={pageSize}
+          userEmail={userEmail}
         />
 
         <PaginationButton

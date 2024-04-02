@@ -4,7 +4,7 @@ import useProblemResults from "@/hooks/useProblemResults";
 
 export default function AdditionalView() {
   const {
-    currentExamProblemResult: { additionalView },
+    currentExamResult: { additionalView },
   } = useProblemResults();
 
   return (

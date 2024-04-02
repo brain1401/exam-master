@@ -17,61 +17,38 @@ import WrongMark from "../../../public/images/wrong.png";
 import checkImage from "../../../public/images/checkBlack.png";
 import Image from "next/image";
 import { isImageUrlObject } from "@/utils/problems";
-import { ExamResults, ProblemResult } from "@/types/problems";
+import { ExamResultsSet, ProblemResult } from "@/types/problems";
+import { useHydrateAtoms } from "jotai/utils";
+import { examResultsSetAtom } from "@/jotai/examResult";
 type Props = {
-  UUID: string;
+  _examResultsSet: ExamResultsSet;
 };
 
-export default function ResultPage({ UUID }: Props) {
-  const { setExamProblemResults, resetExamProblemResults, examProblemResults } =
+export default function ResultPage({ _examResultsSet }: Props) {
+  useHydrateAtoms([[examResultsSetAtom, _examResultsSet]]);
+
+  const { resetExamProblemResults, examResults } =
     useProblemResults();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{ error: string } | null>(null);
-
-  const imagesRef = useRef([CorrectMark, WrongMark, checkImage]);
-
   useEffect(() => {
-    setLoading(true);
-    const fetchData = async () => {
-      try {
-        const res = await axios.get<ProblemResult[]>(`/api/getExamResultByUUID`, {
-          params: {
-            uuid: UUID,
-          },
-        });
-        setExamProblemResults(res.data);
-      } catch (err) {
-        if (isAxiosError(err)) {
-          setError(err.response?.data);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
     return () => {
       resetExamProblemResults();
     };
-  }, [UUID, setExamProblemResults, resetExamProblemResults]);
+  }, [resetExamProblemResults]);
 
-  if (loading) return <CustomLoading className="mt-20" />;
-
-  if (error)
-    return <h1 className="mt-10 text-center text-2xl">{error.error}</h1>;
+  const imagesRef = useRef([CorrectMark, WrongMark, checkImage]);
 
   return (
     <section className="mx-auto flex w-full max-w-[70rem] flex-col p-3 pb-8 pt-10">
       <div>
         {/* preload images */}
-        {examProblemResults &&
-          examProblemResults.map((examProblem) => {
-            const image = examProblem?.image;
+        {examResults &&
+          examResults.map((examResult) => {
+            const image = examResult?.image;
             if (image && isImageUrlObject(image)) {
               return (
                 <Image
-                  key={examProblem.uuid + "preload"}
+                  key={examResult.uuid + "preload"}
                   src={image.url}
                   alt="preload image"
                   width={400}

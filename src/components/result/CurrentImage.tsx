@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function CurrentImage() {
   const {
-    currentExamProblemResult: { image },
+    currentExamResult: { image },
   } = useProblemResults();
   
   return (

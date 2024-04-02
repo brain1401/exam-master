@@ -1,57 +1,34 @@
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
-  reset,
-  selectCurrentProblemResult,
-  selectProblemResults,
-  selectProblemResultsIndex,
-  setCurrentProblemResultAction,
-  setProblemResultsAction,
-  setProblemResultsIndexAction,
-} from "@/slices/problemResults";
-import { ProblemResult } from "@/types/problems";
-import { useCallback } from "react";
+  currentExamResultIndexAtom,
+  examResultsSetAtom,
+  currentExamResultAtom,
+  examResultsAtom,
+  resetExamProblemResultsAtom,
+} from "@/jotai/examResult";
+import { useAtom, useSetAtom } from "jotai";
 
 export default function useProblemResults() {
-  const dispatch = useAppDispatch();
-  const examProblemResults = useAppSelector(selectProblemResults);
-  const examProblemResultsIndex = useAppSelector(selectProblemResultsIndex);
-  const currentExamProblemResult = useAppSelector(
-    selectCurrentProblemResult,
+  const [examResultsSet, setExamResultsSet] = useAtom(examResultsSetAtom);
+  const [currentExamResultIndex, setCurrentExamResultIndex] = useAtom(
+    currentExamResultIndexAtom,
+  );
+  const [currentExamResult, setCurrentExamResult] = useAtom(
+    currentExamResultAtom,
   );
 
-  //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 useEffect등에서 사용할 때 제대로 작동하지 않는다.
-  const setExamProblemResults = useCallback(
-    (examProblemResults: ProblemResult[]) => {
-      dispatch(setProblemResultsAction(examProblemResults));
-    },
-    [dispatch],
-  );
+  const [examResults, setExamResults] = useAtom(examResultsAtom);
 
-  const setExamProblemResultsIndex = useCallback(
-    (examProblemResultsIndex: number) => {
-      dispatch(setProblemResultsIndexAction(examProblemResultsIndex));
-    },
-    [dispatch],
-  );
-
-  const setCurrentExamProblemResult = useCallback(
-    (examProblemResult: ProblemResult) => {
-      dispatch(setCurrentProblemResultAction(examProblemResult));
-    },
-    [dispatch],
-  );
-
-  const resetExamProblemResults = useCallback(() => {
-    dispatch(reset());
-  }, [dispatch]);
+  const resetExamProblemResults = useSetAtom(resetExamProblemResultsAtom);
 
   return {
-    examProblemResults,
-    setExamProblemResults,
-    examProblemResultsIndex,
-    setExamProblemResultsIndex,
-    currentExamProblemResult,
-    setCurrentExamProblemResult,
+    examResultsSet,
+    setExamResultsSet,
+    currentExamResultIndex,
+    setCurrentExamResultIndex,
+    examResults,
+    setExamResults,
+    currentExamResult,
+    setCurrentExamResult,
     resetExamProblemResults,
   };
 }

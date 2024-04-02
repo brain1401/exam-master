@@ -16,12 +16,14 @@ type Props = {
   pageSize: number;
   debouncedSearchString: string;
   isSearching: boolean;
+  userEmail: string;
 };
 
 export default function ResultsGrid({
   pageSize,
   debouncedSearchString,
   isSearching,
+  userEmail,
 }: Props) {
   const { setResultsMaxPage, resultsPage } = usePagenationState();
 
@@ -37,6 +39,7 @@ export default function ResultsGrid({
       isSearching,
       debouncedSearchString,
       setResultsMaxPage,
+      userEmail,
     ],
     queryFn: () =>
       fetchExamResults(

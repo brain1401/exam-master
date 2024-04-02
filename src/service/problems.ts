@@ -14,6 +14,7 @@ import {
   CorrectAnswer,
   examProblemsSchema,
   uuidSchema,
+  ExamResultsSet,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
@@ -1047,11 +1048,34 @@ export async function getExamResultsByUUID(
         },
       });
 
-      return result;
+      if (!result) return null;
+
+      const returnData: ExamResultsSet = {
+        ...result,
+        problemResults: result.problemResults.map((problemResult) => ({
+          uuid: problemResult.uuid,
+          order: problemResult.order,
+          isCorrect: problemResult.isCorrect,
+          candidates: problemResult.candidates,
+          subjectiveAnswered: problemResult.subjectiveAnswered,
+          question: problemResult.question,
+          additionalView: problemResult.additionalView,
+          questionType: problemResult.questionType as "obj" | "sub",
+          isAnswerMultiple: problemResult.isAnswerMultiple,
+          correctCandidates: problemResult.correctCandidates,
+          correctSubjectiveAnswer: problemResult.correctSubjectiveAnswer,
+          image: problemResult.image,
+          createdAt: problemResult.createdAt,
+          updatedAt: problemResult.updatedAt,
+        })),
+      };
+
+      return returnData;
     });
 
-    if (!result)
-      throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+    if (!result) {
+      return null;
+    }
 
     return result;
   } catch (err) {
@@ -1064,51 +1088,53 @@ export async function getExamResults(
   userEmail: string,
   page: string,
   pageSize: string,
-  dt: DrizzleTransaction,
 ) {
   try {
-    const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+    const transactionResult = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
-    const [[{ value: totalExamResultsCount }], examResults] = await Promise.all(
-      [
-        dt
-          .select({ value: count() })
-          .from(result)
-          .where(eq(result.userUuid, userUuid)),
-        dt.query.result.findMany({
-          where: eq(result.userUuid, userUuid),
-          offset: (parseInt(page) - 1) * parseInt(pageSize),
-          limit: parseInt(pageSize),
-          orderBy: (result, { desc }) => [desc(result.updatedAt)],
-          with: {
-            problemResults: {
-              orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
-              with: {
-                image: true,
+      const [[{ value: totalExamResultsCount }], examResults] =
+        await Promise.all([
+          dt
+            .select({ value: count() })
+            .from(result)
+            .where(eq(result.userUuid, userUuid)),
+          dt.query.result.findMany({
+            where: eq(result.userUuid, userUuid),
+            offset: (parseInt(page) - 1) * parseInt(pageSize),
+            limit: parseInt(pageSize),
+            orderBy: (result, { desc }) => [desc(result.updatedAt)],
+            with: {
+              problemResults: {
+                orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
+                with: {
+                  image: true,
+                },
               },
             },
-          },
-        }),
-      ],
-    );
+          }),
+        ]);
 
-    const finalResult: ResultsWithPagination = {
-      data: examResults.map((examResult) => ({
-        uuid: examResult.uuid,
-        problemResultsCount: examResult.problemResults.length,
-        problemSetName: examResult.problemSetName,
-        createdAt: examResult.createdAt,
-        updatedAt: examResult.updatedAt,
-      })),
-      pagination: {
-        page: parseInt(page),
-        pageSize: parseInt(pageSize),
-        pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
-        total: examResults.length,
-      },
-    };
+      const finalResult: ResultsWithPagination = {
+        data: examResults.map((examResult) => ({
+          uuid: examResult.uuid,
+          problemResultsCount: examResult.problemResults.length,
+          problemSetName: examResult.problemSetName,
+          createdAt: examResult.createdAt,
+          updatedAt: examResult.updatedAt,
+        })),
+        pagination: {
+          page: parseInt(page),
+          pageSize: parseInt(pageSize),
+          pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
+          total: examResults.length,
+        },
+      };
 
-    return finalResult;
+      return finalResult;
+    });
+
+    return transactionResult;
   } catch (err) {
     console.log(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");

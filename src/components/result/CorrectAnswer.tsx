@@ -5,7 +5,7 @@ import candidateNumber from "@/utils/candidateNumber";
 
 export default function CorrectAnswer() {
   const {
-    currentExamProblemResult: {
+    currentExamResult: {
       candidates,
       correctCandidates,
       correctSubjectiveAnswer,

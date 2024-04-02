@@ -4,7 +4,7 @@ import useProblemResults from "@/hooks/useProblemResults";
 
 export default function SubjectiveAnswered() {
   const {
-    currentExamProblemResult: { subjectiveAnswered },
+    currentExamResult: { subjectiveAnswered },
   } = useProblemResults();
 
   return (

@@ -1,5 +1,5 @@
 import { Prettify } from "@/utils/type";
-import type drizzleSession from "@/db/drizzle";
+import drizzleSession from "@/db/drizzle";
 import { z } from "zod";
 
 export const ImageSchema = z.object({
@@ -188,14 +188,13 @@ export const ProblemResultSchema = z.object({
 });
 export type ProblemResult = Prettify<z.infer<typeof ProblemResultSchema>>;
 
-export const ExamResultSchema = z.object({
+export const ExamResultsSetSchema = z.object({
   uuid: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  publishedAt: z.coerce.date(),
   problemSetName: z.string(),
-  user: z.string(),
-  problem_results: z.array(ProblemResultSchema).optional(),
+  userUuid: z.string().uuid(),
+  problemResults: z.array(ProblemResultSchema),
 });
 
 export const ResultWithCountSchema = z.object({
@@ -214,7 +213,7 @@ export type ResultsWithPagination = {
 };
 export type CorrectAnswer = string | (number | null)[] | null;
 
-export type ExamResult = z.infer<typeof ExamResultSchema>;
+export type ExamResultsSet = z.infer<typeof ExamResultsSetSchema>;
 
 export const QuestionTypeSchema = z.enum(["obj", "sub"]);
 
@@ -242,9 +241,7 @@ export type ExamResultsWithCountResponse = z.infer<
   typeof ExamResultsWithCountResponseSchema
 >;
 
-export const ExamResultsSchema = z.array(ExamResultSchema);
 
-export type ExamResults = z.infer<typeof ExamResultsSchema>;
 
 type TransactionCallback = Parameters<typeof drizzleSession.transaction>[0];
 

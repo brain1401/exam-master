@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 export default function CurrentCandidates() {
   const {
-    currentExamProblemResult: { candidates },
+    currentExamResult: { candidates },
   } = useProblemResults();
 
 

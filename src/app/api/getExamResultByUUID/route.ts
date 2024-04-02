@@ -31,6 +31,13 @@ export async function GET(req: NextRequest) {
   try {
     const result = await getExamResultsByUUID(uuid, userEmail);
 
+    if (!result) {
+      return NextResponse.json(
+        { error: "해당 문제를 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    }
+
     const finalResult: ProblemResult[] = result.problemResults.map((r) => {
       return {
         uuid: r.uuid,

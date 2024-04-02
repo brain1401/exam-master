@@ -5,9 +5,9 @@ import useScrollEffect from "@/hooks/useScrollEffect";
 
 export default function NextOrPrevButton() {
   const {
-    examProblemResultsIndex,
-    setExamProblemResultsIndex,
-    examProblemResults,
+    currentExamResultIndex: examProblemResultsIndex,
+    setCurrentExamResultIndex: setExamProblemResultsIndex,
+    examResults,
   } = useProblemResults();
 
   useScrollEffect([examProblemResultsIndex]);
@@ -19,15 +19,19 @@ export default function NextOrPrevButton() {
   };
 
   const onClickNext = () => {
-    if (examProblemResults.length - 1 > examProblemResultsIndex) {
+    if (examResults.length - 1 > examProblemResultsIndex) {
       setExamProblemResultsIndex(examProblemResultsIndex + 1);
     }
   };
 
   return (
     <div className="mt-3 flex gap-x-3">
-      <Button onClick={onClickPrev} className="px-6 py-2">이전</Button>
-      <Button onClick={onClickNext} className="px-6 py-2">다음</Button>
+      <Button onClick={onClickPrev} className="px-6 py-2">
+        이전
+      </Button>
+      <Button onClick={onClickNext} className="px-6 py-2">
+        다음
+      </Button>
     </div>
   );
 }

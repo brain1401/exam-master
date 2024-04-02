@@ -7,8 +7,8 @@ import CorrectMark from "../../../public/images/correctCircle.png";
 
 export default function CurrentQuestion() {
   const {
-    currentExamProblemResult: { question, isCorrect },
-    examProblemResultsIndex: index,
+    currentExamResult: { question, isCorrect },
+    currentExamResultIndex: index,
   } = useProblemResults();
 
   return (
