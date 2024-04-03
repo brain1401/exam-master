@@ -16,7 +16,7 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <CustomError />
+        <CustomError title={error.name} />
       </body>
     </html>
   );
