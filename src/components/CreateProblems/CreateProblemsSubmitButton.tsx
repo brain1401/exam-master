@@ -12,7 +12,7 @@ import {
   isProblemEmpty,
   analyzeProblemsImagesAndDoCallback,
 } from "@/utils/problems";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 
 export default function CreateProblemsSubmitButton() {
   const {
@@ -24,7 +24,7 @@ export default function CreateProblemsSubmitButton() {
     resetProblems,
   } = useProblems();
 
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidateAllPath } = useRevalidation();
 
   const [isLoading, setIsLoading] = useState(false);
 

@@ -6,7 +6,7 @@ import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 import usePagenationState from "@/hooks/usePagenationState";
 import { useRouter } from "next/navigation";
 import { fetchExamResults, fetchProblemSets } from "@/utils/problems";
@@ -24,7 +24,7 @@ export default function DeleteAndSearchBox({
   type,
 }: Props) {
   const queryClient = useQueryClient();
-  const { revalidateAllPath, revalidateAllPathAndRedirect } = useRevalidate();
+  const { revalidateAllPath, revalidateAllPathAndRedirect } = useRevalidation();
   const {
     isDeleteButtonClicked,
     setIsDeleteButtonClicked,

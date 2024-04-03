@@ -7,7 +7,7 @@ import ResultsGrid from "./ResultsGrid";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
 import { useHydrateAtoms } from "jotai/utils";
 import { resultMaxPageAtom, resultPageAtom } from "@/jotai/pagination";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 
 type Props = {
   userEmail: string;
@@ -30,7 +30,7 @@ export default function ResultsPage({
   const { resultPage, resultMaxPage, pageSize, setResultsPage } =
     usePagenationState();
 
-    const {revalidateAllPath} = useRevalidate();
+    const {revalidateAllPath} = useRevalidation();
 
   const [localSearchString, setLocalSearchString] = useState(
     searchString ?? "",

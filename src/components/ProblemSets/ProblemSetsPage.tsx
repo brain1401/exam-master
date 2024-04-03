@@ -11,7 +11,7 @@ import {
   problemSetsMaxPageAtom,
   problemSetsPageAtom,
 } from "@/jotai/pagination";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 
 type Props = {
   type: "manage" | "exam";
@@ -37,7 +37,7 @@ export default function ProblemSetsPage({
   const { setProblemSetsPage, problemSetsMaxPage, problemSetsPage, pageSize } =
     usePagenationState();
 
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidateAllPath } = useRevalidation();
 
   const [localSearchString, setLocalSearchString] = useState(
     searchString ?? "",

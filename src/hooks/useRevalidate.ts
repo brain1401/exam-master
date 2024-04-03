@@ -5,7 +5,7 @@ import { useCallback } from "react";
 
 type RevalidateType = Parameters<typeof revalidate>;
 
-export default function useRevalidate() {
+export default function useRevalidation() {
   const [isPendinAllPath, startTransitionAllPath] = useTransition();
   const [isPending, startTransitionPath] = useTransition();
 

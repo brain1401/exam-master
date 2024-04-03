@@ -18,7 +18,7 @@ import {
   publicProblemSetsPageAtom,
 } from "@/jotai/pagination";
 import { IoSearchOutline } from "react-icons/io5";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 import Link from "next/link";
 
 type Props = {
@@ -40,7 +40,7 @@ export default function PublicProblemsPage({
   const { setPublicProblemSetsPage, publicProblemSetsPage } =
     usePagenationState();
 
-  const { revalidatePathAndRedirect, revalidateAllPath } = useRevalidate();
+  const { revalidatePathAndRedirect, revalidateAllPath } = useRevalidation();
 
   const [sort, setSort] = useState<"newest" | "popular">("newest");
   const [localSearchString, setLocalSearchString] = useState(

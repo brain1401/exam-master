@@ -11,13 +11,13 @@ import {
   isProblemEmpty,
 } from "@/utils/problems";
 import axios from "axios";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 type Props = {
   uuid: string;
 };
 export default function ManageProblemSubmitButton({ uuid }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidateAllPath } = useRevalidation();
   const { problems, problemSetsName, problemSetIsPublic, description } =
     useProblems();
 

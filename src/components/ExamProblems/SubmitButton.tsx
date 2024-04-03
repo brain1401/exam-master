@@ -3,12 +3,12 @@ import { Button } from "../ui/button";
 import useExamProblems from "@/hooks/useExamProblems";
 import axios from "axios";
 import { useState } from "react";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 import { isExamProblemAsnwered } from "@/utils/problems";
 
 export default function SubmitButton() {
   const [isLoading, setIsLoading] = useState(false);
-  const { revalidateAllPathAndRedirect } = useRevalidate();
+  const { revalidateAllPathAndRedirect } = useRevalidation();
 
   const { examProblems, examProblemSetName } = useExamProblems();
 

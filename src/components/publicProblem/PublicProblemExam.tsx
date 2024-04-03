@@ -34,7 +34,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../ui/use-toast";
 import { handleEnterKeyPress } from "@/utils/keyboard";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 
 type Props = {
   publicSetUUID: string;
@@ -52,7 +52,7 @@ export default function PublicProblemExam({
   userUUID,
 }: Props) {
   const [comment, setComment] = useState("");
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidateAllPath } = useRevalidation();
   const queryClient = useQueryClient();
 
   const { toast } = useToast();

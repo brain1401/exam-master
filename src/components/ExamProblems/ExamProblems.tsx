@@ -16,7 +16,7 @@ import ProblemGridLayout from "../layouts/ProblemGridLayout";
 import { isImageUrlObject } from "@/utils/problems";
 import { ExamProblemSet } from "@/types/problems";
 import { useEffect } from "react";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 import { useHydrateAtoms } from "jotai/utils";
 import { examProblemSetAtom } from "@/jotai/examProblems";
 type Props = {
@@ -27,7 +27,7 @@ export default function ExamProblems({ examProblemSet }: Props) {
 
   const { currentExamProblem, examProblems, resetExamProblems } =
     useExamProblems();
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidateAllPath } = useRevalidation();
 
   useEffect(() => {
     console.log("examProblemSet", examProblemSet);

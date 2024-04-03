@@ -1,7 +1,7 @@
 import usePagenationState from "@/hooks/usePagenationState";
 import { Input } from "./input";
 import { BsSearch } from "react-icons/bs";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 import Link from "next/link";
 
 type Props = {
@@ -16,7 +16,7 @@ export default function SearchBox({
   type,
 }: Props) {
   const { setProblemSetsPage } = usePagenationState();
-  const { revalidatePathAndRedirect } = useRevalidate();
+  const { revalidatePathAndRedirect } = useRevalidation();
 
   const handleSearch = () => {
     if (searchString.length === 0) {

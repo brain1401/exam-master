@@ -7,12 +7,12 @@ import CreateProblemsSubmitButton from "./CreateProblemsSubmitButton";
 import { useEffect } from "react";
 import useProblems from "@/hooks/useProblems";
 import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
-import useRevalidate from "@/hooks/useRevalidate";
+import useRevalidation from "@/hooks/useRevalidate";
 
 export default function CreateProblems() {
   const { resetProblems, currentProblem, problemSetIsPublic } = useProblems();
 
-  const { revalidateAllPath } = useRevalidate();
+  const { revalidateAllPath } = useRevalidation();
   useEffect(() => {
     return () => {
       resetProblems();
