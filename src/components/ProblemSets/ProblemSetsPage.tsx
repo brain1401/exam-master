@@ -46,7 +46,7 @@ export default function ProblemSetsPage({
   const [latestSearchString] = useState(localSearchString);
 
   useEffect(() => {
-    // 다음 네비게이션 시 서버 컴포넌트 캐싱 무효화
+    // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
     revalidateAllPath();
   }, [revalidateAllPath]);
 

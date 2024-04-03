@@ -26,7 +26,7 @@ export default function SubmitButton() {
         examProblemSetName,
       });
       uuid = data.uuid;
-      // 서버 컴포넌트 캐시 무효화 및 결과 페이지로 리다이렉트
+      // // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화 및 결과 페이지로 리다이렉트
       await revalidateAllPathAndRedirect(`/result/${uuid}`);
     } catch (e) {
       if (e instanceof Error) {

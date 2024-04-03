@@ -30,18 +30,17 @@ export default function ResultsPage({
   const { resultPage, resultMaxPage, pageSize, setResultsPage } =
     usePagenationState();
 
-    const {revalidateAllPath} = useRevalidation();
+  const { revalidateAllPath } = useRevalidation();
 
   const [localSearchString, setLocalSearchString] = useState(
     searchString ?? "",
   );
   const [latestSearchString] = useState(localSearchString);
 
-  //다음 네비게이션 시 서버 컴포넌트 캐싱 무효화
+  // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
   useEffect(() => {
     revalidateAllPath();
-  },[revalidateAllPath]);
-
+  }, [revalidateAllPath]);
 
   //언마운트 시 페이지 초기화
   useEffect(() => {

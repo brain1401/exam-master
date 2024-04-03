@@ -275,7 +275,7 @@ export default function PublicProblemExam({
     }
   };
 
-  // 다음 네비게이션시 서버 컴포넌트 캐시 무효화
+  // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
   useEffect(() => {
     revalidateAllPath();
   }, [revalidateAllPath]);
