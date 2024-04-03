@@ -49,10 +49,10 @@ export async function generateMetadata({
     };
   }
   return {
-    title: publicProblemSet.name,
+    title: `문제집 ${publicProblemSet.name}`,
     description: publicProblemSet.description || "",
     openGraph: {
-      title: publicProblemSet.name,
+      title: `문제집 ${publicProblemSet.name}`,
       description: publicProblemSet.description || "",
       siteName: "Exam Master",
     },

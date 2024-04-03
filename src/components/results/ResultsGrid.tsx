@@ -14,18 +14,16 @@ import { fetchExamResults } from "@/utils/problems";
 
 type Props = {
   pageSize: number;
-  debouncedSearchString: string;
-  isSearching: boolean;
+  searchString: string;
   userEmail: string;
 };
 
 export default function ResultsGrid({
   pageSize,
-  debouncedSearchString,
-  isSearching,
+  searchString,
   userEmail,
 }: Props) {
-  const { setResultsMaxPage, resultsPage } = usePagenationState();
+  const { setResultsMaxPage, resultPage } = usePagenationState();
 
   const {
     data: results,
@@ -34,21 +32,14 @@ export default function ResultsGrid({
   } = useQuery<ResultsWithPagination | null>({
     queryKey: [
       "results",
-      resultsPage,
+      resultPage,
       pageSize,
-      isSearching,
-      debouncedSearchString,
+      searchString,
       setResultsMaxPage,
       userEmail,
     ],
     queryFn: () =>
-      fetchExamResults(
-        isSearching,
-        debouncedSearchString,
-        resultsPage,
-        pageSize,
-        setResultsMaxPage,
-      ),
+      fetchExamResults(searchString, resultPage, pageSize, setResultsMaxPage),
   });
 
   useEffect(() => {
@@ -62,13 +53,13 @@ export default function ResultsGrid({
           에러가 발생했습니다!
         </p>
       );
-    } else if (results?.data.length === 0 && !isSearching) {
+    } else if (results?.data.length === 0) {
       return (
         <p className="mt-10 text-center text-xl font-semibold">
           아직 시험을 치루지 않았습니다!
         </p>
       );
-    } else if (results?.data.length === 0 && isSearching) {
+    } else if (results?.data.length === 0 && searchString !== "") {
       return (
         <p className="mt-10 text-center text-xl font-semibold">
           검색 결과가 없습니다!

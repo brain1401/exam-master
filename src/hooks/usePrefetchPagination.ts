@@ -16,7 +16,6 @@ import { getQueryKey } from "@/utils/problems";
 
 export default function usePrefetchPagination(
   type: PrefetchPaginationType,
-  isSearching: boolean,
   debouncedSearchString: string,
   useremail: string | null,
 ) {
@@ -45,7 +44,7 @@ export default function usePrefetchPagination(
       const fetchs: Promise<any>[] = [];
 
       let maxPage =
-        (await getMaxPage(isSearching, debouncedSearchString, pageSize)) || 1;
+        (await getMaxPage(debouncedSearchString, pageSize)) || 1;
 
       console.log("maxPage", maxPage);
 
@@ -61,19 +60,12 @@ export default function usePrefetchPagination(
               queryKey,
               i,
               pageSize,
-              isSearching,
               debouncedSearchString,
               setMaxPage,
               useremail,
             ],
             queryFn: () =>
-              fetchData(
-                isSearching,
-                debouncedSearchString,
-                i,
-                pageSize,
-                setMaxPage,
-              ),
+              fetchData(debouncedSearchString, i, pageSize, setMaxPage),
           }),
         );
       }
@@ -90,7 +82,6 @@ export default function usePrefetchPagination(
     setProblemSetsMaxPage,
     setResultsMaxPage,
     useremail,
-    isSearching,
     type,
   ]);
 

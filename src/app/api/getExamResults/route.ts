@@ -1,6 +1,7 @@
 import { getExamResults } from "@/service/problems";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { defaultPageSize } from "@/const/pageSize";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession();
@@ -10,16 +11,16 @@ export async function GET(req: NextRequest) {
   }
 
   const params = req.nextUrl.searchParams;
-  const page = params.get("page");
-  const pageSize = params.get("pageSize");
+  const page = Number(params.get("page"));
+  const pageSize = Number(params.get("pageSize"));
 
   try {
     if (!session.user?.email) throw new Error("로그인을 해주세요!");
 
     const results = await getExamResults(
       session.user.email,
-      page ?? "1",
-      pageSize ?? "10",
+      page || 1,
+      pageSize || defaultPageSize,
     );
 
     return NextResponse.json(results);

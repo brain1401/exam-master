@@ -34,6 +34,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../ui/use-toast";
 import { handleEnterKeyPress } from "@/utils/keyboard";
+import useRevalidate from "@/hooks/useRevalidate";
 
 type Props = {
   publicSetUUID: string;
@@ -51,7 +52,7 @@ export default function PublicProblemExam({
   userUUID,
 }: Props) {
   const [comment, setComment] = useState("");
-
+  const { revalidateAllPath } = useRevalidate();
   const queryClient = useQueryClient();
 
   const { toast } = useToast();
@@ -273,6 +274,11 @@ export default function PublicProblemExam({
       return;
     }
   };
+
+  // 다음 네비게이션시 서버 컴포넌트 캐시 무효화
+  useEffect(() => {
+    revalidateAllPath();
+  }, [revalidateAllPath]);
 
   useEffect(() => {
     console.log(like);

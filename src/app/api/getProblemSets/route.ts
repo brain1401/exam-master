@@ -1,3 +1,4 @@
+import { defaultPageSize } from "@/const/pageSize";
 import { getProblemSets } from "@/service/problems";
 import { getServerSession } from "next-auth";
 import { NextResponse, NextRequest } from "next/server";
@@ -13,14 +14,14 @@ export async function GET(req: NextRequest) {
   }
 
   const param = req.nextUrl.searchParams;
-  const page = param.get("page");
-  const pageSize = param.get("pageSize");
+  const page = Number(param.get("page"));
+  const pageSize = Number(param.get("pageSize"));
 
   try {
     const data = await getProblemSets(
       session?.user?.email,
-      page || "1",
-      pageSize || "10",
+      page || 1,
+      pageSize || defaultPageSize,
     );
     return NextResponse.json(data);
   } catch (e) {

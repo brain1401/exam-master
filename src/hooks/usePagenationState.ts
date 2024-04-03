@@ -1,90 +1,34 @@
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
+  pageSizeAtom,
+  problemSetsMaxPageAtom,
+  problemSetsPageAtom,
+  publicProblemSetsMaxPageAtom,
+  publicProblemSetsPageAtom,
   resetAction,
-  selectResultMaxPage,
-  selectResultPage,
-  setResultMaxPageAction,
-  setResultPageAction,
-  selectProblemSetsMaxPage,
-  selectProblemSetsPage,
-  setProblemSetsMaxPageAction,
-  setProblemSetsPageAction,
-  setPublicProblemSetsMaxPageAction,
-  setPublicProblemSetsPageAction,
-  selectPublicProblemSetsMaxPage,
-  selectPublicProblemSetsPage,
-  selectPageSize,
-  setPageSizeAction,
-} from "@/slices/pagenation";
-import { useCallback } from "react";
+  resultMaxPageAtom,
+  resultPageAtom,
+} from "@/jotai/pagination";
+
+import { useAtom, useSetAtom } from "jotai";
 export default function usePagenationState() {
-  const dispatch = useAppDispatch();
-
-  const resultsPage = useAppSelector(selectResultPage);
-  const resultsMaxPage = useAppSelector(selectResultMaxPage);
-  const problemSetsPage = useAppSelector(selectProblemSetsPage);
-  const problemSetsMaxPage = useAppSelector(selectProblemSetsMaxPage);
-  const publicProblemSetsPage = useAppSelector(selectPublicProblemSetsPage);
-  const publicProblemSetsMaxPage = useAppSelector(selectPublicProblemSetsMaxPage);
-  const pageSize = useAppSelector(selectPageSize);
-
-  //useCallback을 사용하지 않으면 렌더링 될 때마다 새로운 함수가 생성되어 바깥에서 useEffect등에서 사용할 때 제대로 작동하지 않는다.
-  const setResultsPage = useCallback(
-    (page: number) => {
-      dispatch(setResultPageAction(page));
-    },
-    [dispatch],
+  const [pageSize, setPageSize] = useAtom(pageSizeAtom);
+  const [problemSetsPage, setProblemSetsPage] = useAtom(problemSetsPageAtom);
+  const [problemSetsMaxPage, setProblemSetsMaxPage] = useAtom(
+    problemSetsMaxPageAtom,
   );
-
-  const setResultsMaxPage = useCallback(
-    (page: number) => {
-      dispatch(setResultMaxPageAction(page));
-    },
-    [dispatch],
+  const [resultPage, setResultsPage] = useAtom(resultPageAtom);
+  const [resultMaxPage, setResultsMaxPage] = useAtom(resultMaxPageAtom);
+  const [publicProblemSetsPage, setPublicProblemSetsPage] = useAtom(
+    publicProblemSetsPageAtom,
   );
-
-  const setProblemSetsPage = useCallback(
-    (page: number) => {
-      dispatch(setProblemSetsPageAction(page));
-    },
-    [dispatch],
+  const [publicProblemSetsMaxPage, setPublicProblemSetsMaxPage] = useAtom(
+    publicProblemSetsMaxPageAtom,
   );
-
-  const setProblemSetsMaxPage = useCallback(
-    (page: number) => {
-      dispatch(setProblemSetsMaxPageAction(page));
-    },
-    [dispatch],
-  );
-
-  const setPublicProblemSetsPage = useCallback(
-    (page: number) => {
-      dispatch(setPublicProblemSetsPageAction(page));
-    },
-    [dispatch],
-  );
-
-  const setPublicProblemSetsMaxPage = useCallback(
-    (page: number) => {
-      dispatch(setPublicProblemSetsMaxPageAction(page));
-    },
-    [dispatch],
-  );
-
-  const setPageSize = useCallback(
-    (size: number) => {
-      dispatch(setPageSizeAction(size));
-    },
-    [dispatch],
-  );
-
-  const reset = useCallback(() => {
-    dispatch(resetAction());
-  }, [dispatch]);
+  const reset = useSetAtom(resetAction);
 
   return {
-    resultsPage,
-    resultsMaxPage,
+    resultPage,
+    resultMaxPage,
     problemSetsPage,
     problemSetsMaxPage,
     pageSize,

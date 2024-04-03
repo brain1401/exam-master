@@ -10,9 +10,8 @@ import { fetchProblemSets } from "@/utils/problems";
 
 type Props = {
   type: "manage" | "exam";
-  debouncedSearchString: string;
+  searchString: string;
   pageSize: number;
-  isSearching: boolean;
   userEmail: string;
 };
 
@@ -20,8 +19,7 @@ export type IsSelected = { uuid: string; isSelected: boolean };
 
 export default function ProblemSetsGrid({
   type,
-  debouncedSearchString,
-  isSearching,
+  searchString,
   pageSize,
   userEmail,
 }: Props) {
@@ -36,15 +34,13 @@ export default function ProblemSetsGrid({
       "problemSets",
       problemSetsPage,
       pageSize,
-      isSearching,
-      debouncedSearchString,
+      searchString,
       setProblemSetsMaxPage,
       userEmail,
     ],
     queryFn: () =>
       fetchProblemSets(
-        isSearching,
-        debouncedSearchString,
+        searchString,
         problemSetsPage,
         pageSize,
         setProblemSetsMaxPage,

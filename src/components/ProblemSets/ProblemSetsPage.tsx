@@ -1,44 +1,54 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PaginationButton from "../ui/PaginationButton";
-import useDebounce from "@/hooks/useDebounce";
 import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsGrid from "./ProblemSetsGrid";
-import usePrefetchPagination from "@/hooks/usePrefetchPagination";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
 import useUiState from "@/hooks/useUiState";
+import { useHydrateAtoms } from "jotai/utils";
+import {
+  problemSetsMaxPageAtom,
+  problemSetsPageAtom,
+} from "@/jotai/pagination";
+import useRevalidate from "@/hooks/useRevalidate";
 
 type Props = {
   type: "manage" | "exam";
+  searchString?: string;
   userEmail: string;
   maxPage: number;
+  page: number;
 };
 
-export default function ProblemSetsPage({ type, userEmail, maxPage }: Props) {
+export default function ProblemSetsPage({
+  type,
+  searchString,
+  userEmail,
+  maxPage,
+  page,
+}: Props) {
+  useHydrateAtoms([
+    [problemSetsPageAtom, page],
+    [problemSetsMaxPageAtom, maxPage],
+  ]);
+
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const { setProblemSetsPage, problemSetsMaxPage, problemSetsPage, pageSize } =
     usePagenationState();
 
-  const { resetToDeletedUuid } = useUiState();
+  const { revalidateAllPath } = useRevalidate();
 
-  const [searchString, setSearchString] = useState("");
-  const debouncedSearchString = useDebounce(searchString, 500);
+  const [localSearchString, setLocalSearchString] = useState(
+    searchString ?? "",
+  );
 
-  const [isSearching, setIsSearching] = useState(false);
+  const [latestSearchString] = useState(localSearchString);
 
-  usePrefetchPagination(type, isSearching, debouncedSearchString, userEmail);
-
-  // 검색 시 페이지 초기화
   useEffect(() => {
-    if (debouncedSearchString.length > 0) {
-      setProblemSetsPage(1);
-      setIsSearching(true);
-    } else {
-      setProblemSetsPage(1);
-      setIsSearching(false);
-    }
-  }, [debouncedSearchString, setProblemSetsPage]);
+    // 다음 네비게이션 시 서버 컴포넌트 캐싱 무효화
+    revalidateAllPath();
+  }, [revalidateAllPath]);
 
   // 언마운트 시 페이지 초기화
   useEffect(() => {
@@ -47,16 +57,13 @@ export default function ProblemSetsPage({ type, userEmail, maxPage }: Props) {
     };
   }, [setProblemSetsPage]);
 
-  // 언마운트 시 선택된 삭제할 문제집 초기화
   useEffect(() => {
-    return () => {
-      resetToDeletedUuid();
-    };
-  }, [resetToDeletedUuid]);
+    console.log("maxPage :", maxPage);
+  }, [maxPage]);
 
   useEffect(() => {
-    console.log("pageSize : ", pageSize);
-  }, [pageSize]);
+    console.log("problemSetsPage :", problemSetsPage);
+  }, [problemSetsPage]);
 
   const title = type === "manage" ? "문제집 관리" : "풀 문제 선택";
 
@@ -65,23 +72,23 @@ export default function ProblemSetsPage({ type, userEmail, maxPage }: Props) {
       <h1 className="mb-3 mt-10 text-center text-[2rem]">{title}</h1>
 
       <DynamicSearchBox
-        searchString={searchString}
-        setSearchString={setSearchString}
+        searchString={localSearchString}
+        setSearchString={setLocalSearchString}
         type={type}
       />
 
       <ProblemSetsGrid
-        debouncedSearchString={debouncedSearchString}
-        isSearching={isSearching}
+        searchString={latestSearchString}
         pageSize={pageSize}
         type={type}
         userEmail={userEmail}
       />
       <PaginationButton
         page={problemSetsPage}
-        setPage={setProblemSetsPage}
-        maxPage={problemSetsMaxPage ?? maxPage}
-        className="mt-5 flex justify-center pb-5"
+        type={type}
+        maxPage={maxPage}
+        searchString={searchString}
+        className="mt-10 flex justify-center pb-5"
       />
     </section>
   );

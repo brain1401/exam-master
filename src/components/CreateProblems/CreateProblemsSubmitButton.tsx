@@ -24,7 +24,7 @@ export default function CreateProblemsSubmitButton() {
     resetProblems,
   } = useProblems();
 
-  const {revalidateAllPath} = useRevalidate();
+  const { revalidateAllPath } = useRevalidate();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -149,7 +149,7 @@ export default function CreateProblemsSubmitButton() {
       alert("문제집 등록에 실패했습니다.");
     } finally {
       setIsLoading(false); // 로딩 완료
-      // 서버 컴포넌트 캐시 무효화
+      // 다음 navigation 시 서버 컴포넌트 캐시 무효화
       await revalidateAllPath();
     }
   };

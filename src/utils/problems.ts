@@ -108,7 +108,6 @@ export const isProblemEmpty = (problem: Problem) => {
 };
 
 export async function fetchProblemSets(
-  isSearching: boolean,
   debouncedSearchString: string,
   problemSetsPage: number,
   pageSize: number,
@@ -118,27 +117,24 @@ export async function fetchProblemSets(
     if (pageSize === 0) return null;
 
     let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: problemSetsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getProblemSets", {
-          params: {
-            page: problemSetsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
+
+    if (debouncedSearchString.trim().length > 0) {
+      res = await axios.get("/api/getProblemSetsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: problemSetsPage,
+          pageSize,
+        },
+        timeout: 3000,
+      });
+    } else if (debouncedSearchString.trim().length === 0) {
+      res = await axios.get("/api/getProblemSets", {
+        params: {
+          page: problemSetsPage,
+          pageSize,
+        },
+        timeout: 3000,
+      });
     }
 
     const data: ProblemSetWithPagination = res?.data;
@@ -147,7 +143,7 @@ export async function fetchProblemSets(
       setProblemSetsMaxPage(data.pagination.pageCount || 1);
       return data;
     } else {
-      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+      return null;
     }
   } catch (err) {
     if (err instanceof Error) {
@@ -158,38 +154,37 @@ export async function fetchProblemSets(
 }
 
 export async function fetchProblemSetsMaxPage(
-  isSearching: boolean,
   debouncedSearchString: string,
   pageSize: number,
 ) {
   try {
     if (pageSize === 0) return null;
     let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: 1,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getProblemSets", {
-          params: {
-            page: 1,
-            pageSize,
-          },
-        });
-      }
+
+    if (debouncedSearchString.trim().length > 0) {
+      res = await axios.get("/api/getProblemSetsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: 1,
+          pageSize,
+        },
+        timeout: 3000,
+      });
+    } else if (debouncedSearchString.trim().length === 0) {
+      res = await axios.get("/api/getProblemSets", {
+        params: {
+          page: 1,
+          pageSize,
+        },
+      });
     }
+
     const data: ProblemSetWithPagination = res?.data;
 
     if (data) {
       return data.pagination.pageCount;
+    } else {
+      return null;
     }
   } catch (err) {
     console.log(err);
@@ -198,7 +193,6 @@ export async function fetchProblemSetsMaxPage(
 }
 
 export async function fetchExamResults(
-  isSearching: boolean,
   debouncedSearchString: string,
   resultsPage: number,
   pageSize: number,
@@ -208,28 +202,25 @@ export async function fetchExamResults(
     if (pageSize === 0) return null;
     let res;
 
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getExamResultsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: resultsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getExamResults", {
-          params: {
-            page: resultsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
+    if (debouncedSearchString.trim().length > 0) {
+      res = await axios.get("/api/getExamResultsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: resultsPage,
+          pageSize,
+        },
+        timeout: 3000,
+      });
+    } else if (debouncedSearchString.trim().length === 0) {
+      res = await axios.get("/api/getExamResults", {
+        params: {
+          page: resultsPage,
+          pageSize,
+        },
+        timeout: 3000,
+      });
     }
+
     const data: ResultsWithPagination = res?.data;
 
     console.log(data);
@@ -238,7 +229,7 @@ export async function fetchExamResults(
       setResultsMaxPage(data.pagination.pageCount || 1);
       return data;
     } else {
-      throw new Error("시험 결과들을 불러오는 중 오류가 발생했습니다.");
+      return null;
     }
   } catch (err) {
     console.log(err);
@@ -247,38 +238,36 @@ export async function fetchExamResults(
 }
 
 export async function fetchExamResultsMaxPage(
-  isSearching: boolean,
   debouncedSearchString: string,
   pageSize: number,
 ) {
   try {
     if (pageSize === 0) return null;
     let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getExamResultsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: 1,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getExamResults", {
-          params: {
-            page: 1,
-            pageSize,
-          },
-        });
-      }
+    if (debouncedSearchString.trim().length > 0) {
+      res = await axios.get("/api/getExamResultsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: 1,
+          pageSize,
+        },
+        timeout: 3000,
+      });
+    } else if (debouncedSearchString.trim().length === 0) {
+      res = await axios.get("/api/getExamResults", {
+        params: {
+          page: 1,
+          pageSize,
+        },
+      });
     }
+
     const data: ResultsWithPagination = res?.data;
 
     if (data) {
       return data.pagination.pageCount;
+    } else {
+      return null;
     }
   } catch (err) {
     console.log(err);
@@ -287,7 +276,6 @@ export async function fetchExamResultsMaxPage(
 }
 
 export async function fetchPublicProblemSets(
-  isSearching: boolean,
   debouncedSearchString: string,
   problemSetsPage: number,
   pageSize: number,
@@ -297,27 +285,24 @@ export async function fetchPublicProblemSets(
     if (pageSize === 0) return null;
 
     let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getPublicProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: problemSetsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getPublicProblemSets", {
-          params: {
-            page: problemSetsPage,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
+
+    if (debouncedSearchString.trim().length > 0) {
+      res = await axios.get("/api/getPublicProblemSetsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: problemSetsPage,
+          pageSize,
+        },
+        timeout: 3000,
+      });
+    } else if (debouncedSearchString.trim().length === 0) {
+      res = await axios.get("/api/getPublicProblemSets", {
+        params: {
+          page: problemSetsPage,
+          pageSize,
+        },
+        timeout: 3000,
+      });
     }
 
     const data: PublicProblemSetWithPagination = res?.data;
@@ -327,7 +312,7 @@ export async function fetchPublicProblemSets(
         setPublicProblemSetsMaxPage(data.pagination.pageCount || 1);
       return data;
     } else {
-      throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+      return null;
     }
   } catch (err) {
     if (err instanceof Error) {
@@ -356,38 +341,37 @@ export async function fetchExamProblems(problemSetUUID: string) {
 }
 
 export async function fetchPublicProblemSetsMaxPage(
-  isSearching: boolean,
   debouncedSearchString: string,
   pageSize: number,
 ) {
   try {
     if (pageSize === 0) return null;
     let res;
-    if (isSearching) {
-      if (debouncedSearchString.trim().length > 0) {
-        res = await axios.get("/api/getPublicProblemSetsByName", {
-          params: {
-            name: debouncedSearchString.trim(),
-            page: 1,
-            pageSize,
-          },
-          timeout: 3000,
-        });
-      }
-    } else {
-      if (debouncedSearchString.trim().length === 0) {
-        res = await axios.get("/api/getPublicProblemSets", {
-          params: {
-            page: 1,
-            pageSize,
-          },
-        });
-      }
+    if (debouncedSearchString.trim().length > 0) {
+      res = await axios.get("/api/getPublicProblemSetsByName", {
+        params: {
+          name: debouncedSearchString.trim(),
+          page: 1,
+          pageSize,
+        },
+        timeout: 3000,
+      });
+    } else if (debouncedSearchString.trim().length === 0) {
+      res = await axios.get("/api/getPublicProblemSets", {
+        params: {
+          page: 1,
+          pageSize,
+        },
+      });
     }
+
     const data: PublicProblemSetWithPagination = res?.data;
 
     if (data) {
       return data.pagination.pageCount;
+    }
+    else {
+      return null;
     }
   } catch (err) {
     console.log(err);

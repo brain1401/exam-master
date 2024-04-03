@@ -503,8 +503,8 @@ export async function checkIfImageExistsOnS3ByImageKey(imageKey: string) {
 }
 export async function getProblemSets(
   userEmail: string,
-  page: string,
-  pageSize: string,
+  page: number,
+  pageSize: number,
 ) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
@@ -518,8 +518,8 @@ export async function getProblemSets(
             .where(eq(problemSet.userUuid, userUuid)),
           dt.query.problemSet.findMany({
             where: eq(problemSet.userUuid, userUuid),
-            offset: (parseInt(page) - 1) * parseInt(pageSize),
-            limit: parseInt(pageSize),
+            offset: (page - 1) * pageSize,
+            limit: pageSize,
             orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
             with: {
               problems: {
@@ -542,9 +542,9 @@ export async function getProblemSets(
           examProblemsCount: problemSet.problems.length,
         })),
         pagination: {
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
-          pageCount: Math.ceil(totalProblemSetsCount / parseInt(pageSize)),
+          page: page,
+          pageSize: pageSize,
+          pageCount: Math.ceil(totalProblemSetsCount / pageSize),
           total: problemSets.length,
         },
       };
@@ -561,31 +561,42 @@ export async function getProblemSets(
 export async function getProblemSetsByName(
   userEmail: string,
   name: string,
-  page: string,
-  pageSize: string,
+  page: number,
+  pageSize: number,
 ) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
-      const problemSets = await dt.query.problemSet.findMany({
-        where: (problemSet, { like, and, eq }) =>
-          and(
-            like(problemSet.name, `%${name}%`),
-            eq(problemSet.userUuid, userUuid),
-          ),
-        offset: (parseInt(page) - 1) * parseInt(pageSize),
-        limit: parseInt(pageSize),
-        orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
-        with: {
-          problems: {
-            orderBy: (problem, { asc }) => [asc(problem.order)],
-            with: {
-              image: true,
+      const [problemSets, [{ totalCount }]] = await Promise.all([
+        dt.query.problemSet.findMany({
+          where: (problemSet, { like, and, eq }) =>
+            and(
+              like(problemSet.name, `%${name}%`),
+              eq(problemSet.userUuid, userUuid),
+            ),
+          offset: (page - 1) * pageSize,
+          limit: pageSize,
+          orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
+          with: {
+            problems: {
+              orderBy: (problem, { asc }) => [asc(problem.order)],
+              with: {
+                image: true,
+              },
             },
           },
-        },
-      });
+        }),
+        dt
+          .select({ totalCount: count() })
+          .from(problemSet)
+          .where(
+            and(
+              eq(problemSet.userUuid, userUuid),
+              like(problemSet.name, `%${name}%`),
+            ),
+          ),
+      ]);
 
       const returnData: ProblemSetWithPagination = {
         data: problemSets.map((problemSet) => ({
@@ -597,10 +608,10 @@ export async function getProblemSetsByName(
           examProblemsCount: problemSet.problems.length,
         })),
         pagination: {
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
-          pageCount: Math.ceil(problemSets.length / parseInt(pageSize)),
-          total: problemSets.length,
+          page: page,
+          pageSize: pageSize,
+          pageCount: Math.ceil(totalCount / pageSize),
+          total: totalCount,
         },
       };
 
@@ -609,7 +620,7 @@ export async function getProblemSetsByName(
 
     return data;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
@@ -1086,8 +1097,8 @@ export async function getExamResultsByUUID(
 
 export async function getExamResults(
   userEmail: string,
-  page: string,
-  pageSize: string,
+  page: number,
+  pageSize: number,
 ) {
   try {
     const transactionResult = await drizzleSession.transaction(async (dt) => {
@@ -1101,8 +1112,8 @@ export async function getExamResults(
             .where(eq(result.userUuid, userUuid)),
           dt.query.result.findMany({
             where: eq(result.userUuid, userUuid),
-            offset: (parseInt(page) - 1) * parseInt(pageSize),
-            limit: parseInt(pageSize),
+            offset: (page - 1) * pageSize,
+            limit: pageSize,
             orderBy: (result, { desc }) => [desc(result.updatedAt)],
             with: {
               problemResults: {
@@ -1124,9 +1135,9 @@ export async function getExamResults(
           updatedAt: examResult.updatedAt,
         })),
         pagination: {
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
-          pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
+          page,
+          pageSize: pageSize,
+          pageCount: Math.ceil(totalExamResultsCount / pageSize),
           total: examResults.length,
         },
       };
@@ -1144,42 +1155,41 @@ export async function getExamResults(
 export async function getExamResultsByName(
   userEmail: string,
   name: string,
-  page: string,
-  pageSize: string,
+  page: number,
+  pageSize: number,
 ) {
   try {
     const transactionResult = await drizzleSession.transaction(async (dt) => {
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);
-      const [[{ value: totalExamResultsCount }], examResults] =
-        await Promise.all([
-          dt
-            .select({ value: count() })
-            .from(result)
-            .where(
-              and(
-                eq(result.userUuid, userUuid),
-                like(result.problemSetName, `%${name}%`),
-              ),
+      const [[{ totalExamResultsCount }], examResults] = await Promise.all([
+        dt
+          .select({ totalExamResultsCount: count() })
+          .from(result)
+          .where(
+            and(
+              eq(result.userUuid, userUuid),
+              like(result.problemSetName, `%${name}%`),
             ),
-          dt.query.result.findMany({
-            where: (result, { and, like }) =>
-              and(
-                like(result.problemSetName, `%${name}%`),
-                eq(result.userUuid, userUuid),
-              ),
-            offset: (parseInt(page) - 1) * parseInt(pageSize),
-            limit: parseInt(pageSize),
-            orderBy: (result, { desc }) => [desc(result.updatedAt)],
-            with: {
-              problemResults: {
-                orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
-                with: {
-                  image: true,
-                },
+          ),
+        dt.query.result.findMany({
+          where: (result, { and, like }) =>
+            and(
+              like(result.problemSetName, `%${name}%`),
+              eq(result.userUuid, userUuid),
+            ),
+          offset: (page - 1) * pageSize,
+          limit: pageSize,
+          orderBy: (result, { desc }) => [desc(result.updatedAt)],
+          with: {
+            problemResults: {
+              orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
+              with: {
+                image: true,
               },
             },
-          }),
-        ]);
+          },
+        }),
+      ]);
 
       const finalResult: ResultsWithPagination = {
         data: examResults.map((examResult) => ({
@@ -1190,10 +1200,10 @@ export async function getExamResultsByName(
           updatedAt: examResult.updatedAt,
         })),
         pagination: {
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
-          pageCount: Math.ceil(totalExamResultsCount / parseInt(pageSize)),
-          total: examResults.length,
+          page: page,
+          pageSize: pageSize,
+          pageCount: Math.ceil(totalExamResultsCount / pageSize),
+          total: totalExamResultsCount,
         },
       };
 
@@ -1202,7 +1212,7 @@ export async function getExamResultsByName(
 
     return transactionResult;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
   }
 }
@@ -1618,7 +1628,7 @@ export async function getTotalReferencesOfImageByImageUuid(
   }
 }
 
-export async function getPublicProblemSets(page: string, pageSize: string) {
+export async function getPublicProblemSets(page: number, pageSize: number) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
       const [[{ value: totalProblemSetsCount }], problemSets] =
@@ -1629,8 +1639,8 @@ export async function getPublicProblemSets(page: string, pageSize: string) {
             .where(eq(problemSet.isPublic, true)),
           dt.query.problemSet.findMany({
             where: eq(problemSet.isPublic, true),
-            offset: (parseInt(page) - 1) * parseInt(pageSize),
-            limit: parseInt(pageSize),
+            offset: (page - 1) * pageSize,
+            limit: pageSize,
             orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
             with: {
               problems: {
@@ -1654,9 +1664,9 @@ export async function getPublicProblemSets(page: string, pageSize: string) {
           createdBy: problemSet.user.name,
         })),
         pagination: {
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
-          pageCount: Math.ceil(totalProblemSetsCount / parseInt(pageSize)),
+          page: page,
+          pageSize: pageSize,
+          pageCount: Math.ceil(totalProblemSetsCount / pageSize),
           total: problemSets.length,
         },
       };
@@ -1672,30 +1682,39 @@ export async function getPublicProblemSets(page: string, pageSize: string) {
 
 export async function getPublicProblemSetsByName(
   name: string,
-  page: string,
-  pageSize: string,
+  page: number,
+  pageSize: number,
 ) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
-      const problemSets = await dt.query.problemSet.findMany({
-        where: (problemSet, { like, and, eq }) =>
-          and(
-            like(problemSet.name, `%${name}%`),
-            eq(problemSet.isPublic, true),
-          ),
-        offset: (parseInt(page) - 1) * parseInt(pageSize),
-        limit: parseInt(pageSize),
-        orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
-        with: {
-          problems: {
-            orderBy: (problem, { asc }) => [asc(problem.order)],
-            with: {
-              image: true,
+      const [problemSets, [{ totalCount }]] = await Promise.all([
+        dt.query.problemSet.findMany({
+          where: (problemSet, { like, and, eq }) =>
+            and(
+              like(problemSet.name, `%${name}%`),
+              eq(problemSet.isPublic, true),
+            ),
+          offset: (page - 1) * pageSize,
+          limit: pageSize,
+          orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
+          with: {
+            problems: {
+              orderBy: (problem, { asc }) => [asc(problem.order)],
+              with: { image: true },
             },
+            user: true,
           },
-          user: true,
-        },
-      });
+        }),
+        dt
+          .select({ totalCount: count() })
+          .from(problemSet)
+          .where(
+            and(
+              eq(problemSet.isPublic, true),
+              like(problemSet.name, `%${name}%`),
+            ),
+          ),
+      ]);
 
       const returnData: PublicProblemSetWithPagination = {
         data: problemSets.map((problemSet) => ({
@@ -1707,19 +1726,20 @@ export async function getPublicProblemSetsByName(
           createdBy: problemSet.user.name,
         })),
         pagination: {
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
-          pageCount: Math.ceil(problemSets.length / parseInt(pageSize)),
-          total: problemSets.length,
+          page: page,
+          pageSize: pageSize,
+          pageCount: Math.ceil(totalCount / pageSize),
+          total: totalCount,
         },
       };
 
+      console.log(returnData);
       return returnData;
     });
 
     return data;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
@@ -2231,22 +2251,21 @@ export async function evaluateProblems(
 }
 
 export async function getProblemSetsMaxPage(
-  isSearching: boolean,
-  debouncedSearchString: string,
+  searchString: string,
   pageSize: number,
   userUUID: string,
 ) {
   try {
     const totalProblemSetsCount = await drizzleSession.transaction(
       async (dt) => {
-        if (isSearching) {
+        if (searchString !== "") {
           return dt
             .select({ value: count() })
             .from(problemSet)
             .where(
               and(
                 eq(problemSet.userUuid, userUUID),
-                like(problemSet.name, `%${debouncedSearchString}%`),
+                like(problemSet.name, `%${searchString}%`),
               ),
             );
         }
@@ -2264,10 +2283,26 @@ export async function getProblemSetsMaxPage(
   }
 }
 
-export async function getResultsMaxPage(userEmail: string, pageSize: number) {
+export async function getResultsMaxPage(
+  userEmail: string,
+  pageSize: number,
+  seachString: string,
+) {
   try {
     const totalExamResultsCount = await drizzleSession.transaction(
       async (dt) => {
+        if (seachString !== "") {
+          const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+          return dt
+            .select({ value: count() })
+            .from(result)
+            .where(
+              and(
+                eq(result.userUuid, userUuid),
+                like(result.problemSetName, `%${seachString}%`),
+              ),
+            );
+        }
         const userUuid = await getUserUUIDbyEmail(userEmail, dt);
         return dt
           .select({ value: count() })
@@ -2284,21 +2319,20 @@ export async function getResultsMaxPage(userEmail: string, pageSize: number) {
 }
 
 export async function getPublicProblemSetsMaxPage(
-  isSearching: boolean,
-  debouncedSearchString: string,
+  searchString: string,
   pageSize: number,
 ) {
   try {
     const totalProblemSetsCount = await drizzleSession.transaction(
       async (dt) => {
-        if (isSearching) {
+        if (searchString) {
           return dt
             .select({ value: count() })
             .from(problemSet)
             .where(
               and(
                 eq(problemSet.isPublic, true),
-                like(problemSet.name, `%${debouncedSearchString}%`),
+                like(problemSet.name, `%${searchString}%`),
               ),
             );
         }

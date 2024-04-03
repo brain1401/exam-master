@@ -1,4 +1,4 @@
-import { revalidate } from "@/actions/revalidates";
+import { revalidate, revalidateAllPathAction, revalidateAndRedirect } from "@/actions/revalidates";
 import { redirect } from "next/navigation";
 import { useTransition } from "react";
 import { useCallback } from "react";
@@ -11,7 +11,7 @@ export default function useRevalidate() {
 
   const revalidateAllPath = useCallback(async () => {
     startTransitionAllPath(async () => {
-      await revalidate("/");
+      await revalidateAllPathAction();
     });
   }, [startTransitionAllPath]);
 
@@ -27,8 +27,7 @@ export default function useRevalidate() {
   const revalidateAllPathAndRedirect = useCallback(
     async (redirectPath: string) => {
       startTransitionAllPath(async () => {
-        await revalidate("/");
-        redirect(redirectPath);
+        await revalidateAndRedirect(redirectPath, "/");
       });
     },
     [startTransitionAllPath],
@@ -45,8 +44,7 @@ export default function useRevalidate() {
       redirectPath: string;
     }) => {
       startTransitionPath(async () => {
-        await revalidate(path, type);
-        redirect(redirectPath);
+        await revalidateAndRedirect(redirectPath, path, type);
       });
     },
     [startTransitionPath],

@@ -1,10 +1,9 @@
 import DeleteAndSearchBox from "./DeleteAndSearchBox";
-import SearchBox from "./SearchBox";
 
 type Props = {
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
-  type: "manage" | "exam" | "result";
+  type: "manage" | "exam" | "results";
 };
 
 export default function DynamicSearchBox({
