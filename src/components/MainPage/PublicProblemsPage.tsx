@@ -113,7 +113,7 @@ export default function PublicProblemsPage({
                   <SelectTrigger className="w-[6rem] md:w-[8rem]">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-20">
                     <SelectItem value="popular">인기순</SelectItem>
                     <SelectItem value="newest">최신순</SelectItem>
                   </SelectContent>

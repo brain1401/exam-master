@@ -3,8 +3,6 @@ import { MdOutlineDeleteForever } from "react-icons/md";
 import SearchBox from "./SearchBox";
 import useUiState from "@/hooks/useUiState";
 import axios from "axios";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import useRevalidation from "@/hooks/useRevalidate";
 import usePagenationState from "@/hooks/usePagenationState";
@@ -23,7 +21,6 @@ export default function DeleteAndSearchBox({
   setSearchString,
   type,
 }: Props) {
-  const queryClient = useQueryClient();
   const { revalidateAllPath, revalidateAllPathAndRedirect } = useRevalidation();
   const {
     isDeleteButtonClicked,
@@ -111,7 +108,7 @@ export default function DeleteAndSearchBox({
 
   return (
     <div className="flex justify-between">
-      <div className="flex flex-col gap-x-[.2rem] md:flex-row md:items-center md:justify-center md:gap-x-[1rem]">
+      <div className="relative flex flex-col gap-x-[.2rem] md:flex-row md:items-center md:justify-center md:gap-x-[1rem]">
         <Button
           variant="outline"
           size="icon"
@@ -126,7 +123,7 @@ export default function DeleteAndSearchBox({
         </Button>
 
         {isDeleteButtonClicked && (
-          <div className="mt-2 flex flex-row gap-x-[1rem] md:mt-0">
+          <div className="absolute top-full mt-2 flex flex-row gap-x-[1rem] md:static md:mt-0">
             {isDeleteButtonClicked && (
               <Button
                 className="px-6 py-2"
