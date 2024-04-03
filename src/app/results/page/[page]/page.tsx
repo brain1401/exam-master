@@ -1,5 +1,5 @@
 
-import ResultsPaginationPage from "@/components/pagination/results/ResultsPaginationPage";
+import ResultsPaginationPage from "@/components/pagination/ResultsPaginationPage";
 import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {

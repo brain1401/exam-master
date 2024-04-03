@@ -1,4 +1,4 @@
-import ExamPaginationPage from "@/components/pagination/exam/ExamPaginationPage";
+import ExamPaginationPage from "@/components/pagination/ExamPaginationPage";
 import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {

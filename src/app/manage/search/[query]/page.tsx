@@ -1,4 +1,4 @@
-import ManagePaginationPage from "@/components/pagination/manage/ManagePaginationPage";
+import ManagePaginationPage from "@/components/pagination/ManagePaginationPage";
 import JotaiProvider from "@/context/JotaiContext";
 import type { Metadata } from "next";
 
