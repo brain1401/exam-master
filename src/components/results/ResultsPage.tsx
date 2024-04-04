@@ -69,7 +69,7 @@ export default function ResultsPage({
         <PaginationButton
           maxPage={maxPage}
           page={resultPage}
-          searchString={searchString}
+          searchString={searchString ?? ""}
           type="results"
           className="mt-10 flex justify-center pb-5"
         />

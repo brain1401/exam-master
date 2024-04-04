@@ -75,7 +75,13 @@ export default function PublicProblemsPage({
         <div className="px-2">
           <MainProblemSetsGrid />
         </div>
-        <PaginationButton className="mt-5 pb-8" type="public" />
+        <PaginationButton
+          maxPage={publicProblemSetsMaxPage || 1}
+          page={publicProblemSetsPage || 1}
+          searchString={search}
+          type="public"
+          className="mt-5 pb-8"
+        />
       </div>
 
       <div>{/*광고*/}</div>

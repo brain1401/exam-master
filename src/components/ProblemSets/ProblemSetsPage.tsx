@@ -87,7 +87,7 @@ export default function ProblemSetsPage({
         page={problemSetsPage}
         type={type}
         maxPage={maxPage}
-        searchString={searchString}
+        searchString={searchString ?? ""}
         className="mt-10 flex justify-center pb-5"
       />
     </section>

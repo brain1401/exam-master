@@ -67,17 +67,22 @@ export function getPaginationLink(
 }
 
 type Props = {
-  className?: string;
+  page: number;
   type: TypeType;
+  maxPage: number;
+  searchString: string;
+  className?: string;
 };
 
-export default function PaginationButton({ className, type }: Props) {
+export default function PaginationButton({
+  className,
+  type,
+  maxPage,
+  page,
+  searchString,
+}: Props) {
   const { publicProblemSetsMaxPage, publicProblemSetsPage } =
     usePagenationState();
-  const { searchString } = usePublicProblem();
-
-  const maxPage = publicProblemSetsMaxPage || 1;
-  const page = publicProblemSetsPage || 1;
 
   const getVisiblePages = () => {
     if (maxPage <= 5) {
