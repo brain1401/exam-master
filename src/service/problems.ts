@@ -75,13 +75,11 @@ export async function postProblems({
   toBePostedProblems,
   userEmail,
   isPublic,
-  isShareLinkPurposeSet,
   description,
 }: {
   problemSetName: string;
   userEmail: string;
   toBePostedProblems: ProblemReplacedImageKey[];
-  isShareLinkPurposeSet: boolean;
   isPublic: boolean;
   description?: string;
 }) {
@@ -146,7 +144,6 @@ export async function postProblems({
         .values({
           name: problemSetName,
           userUuid: userUuId,
-          isShareLinkPurposeSet: isShareLinkPurposeSet,
           updatedAt: new Date(),
           description,
           isPublic,
@@ -538,7 +535,6 @@ export async function getProblemSets(
           name: problemSet.name,
           createdAt: problemSet.createdAt,
           updatedAt: problemSet.updatedAt,
-          isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
           examProblemsCount: problemSet.problems.length,
         })),
         pagination: {
@@ -604,7 +600,6 @@ export async function getProblemSetsByName(
           name: problemSet.name,
           createdAt: problemSet.createdAt,
           updatedAt: problemSet.updatedAt,
-          isShareLinkPurposeSet: problemSet.isShareLinkPurposeSet,
           examProblemsCount: problemSet.problems.length,
         })),
         pagination: {
@@ -699,7 +694,6 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         name: foundProblemSet.name,
         createdAt: foundProblemSet.createdAt,
         updatedAt: foundProblemSet.updatedAt,
-        isShareLinkPurposeSet: foundProblemSet.isShareLinkPurposeSet,
         isPublic: foundProblemSet.isPublic,
         description: foundProblemSet.description ?? "",
         problems: foundProblemSet.problems.map((problem) => ({

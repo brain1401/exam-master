@@ -50,7 +50,6 @@ export async function POST(req: NextRequest) {
   try {
     const response = await postProblems({
       isPublic: problemSetIsPublic,
-      isShareLinkPurposeSet: false,
       problemSetName: problemSetName,
       toBePostedProblems: problems,
       description: description,

@@ -12,7 +12,11 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
-import { Candidate, CorrectCandidate, ExamResultCandidate } from "@/types/problems";
+import {
+  Candidate,
+  CorrectCandidate,
+  ExamResultCandidate,
+} from "@/types/problems";
 
 export const problemSet = pgTable(
   "ProblemSet",
@@ -29,9 +33,7 @@ export const problemSet = pgTable(
         onUpdate: "cascade",
       }),
     description: text("description"),
-    isShareLinkPurposeSet: boolean("isShareLinkPurposeSet")
-      .default(false)
-      .notNull(),
+    timeLimit: integer("timeLimit"),
     createdAt: timestamp("createdAt", {
       precision: 0,
       mode: "date",

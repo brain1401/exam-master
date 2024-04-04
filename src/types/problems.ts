@@ -57,12 +57,11 @@ export type ProblemSet = {
   createdAt: Date;
   updatedAt: Date;
   description?: string;
-  isShareLinkPurposeSet: boolean;
   problems?: Problem[];
   examProblemsCount?: number;
 };
 export type ProblemSetWithCreatedBy = Prettify<
-  Omit<ProblemSet, "isShareLinkPurposeSet" | "createdAt"> & {
+  Omit<ProblemSet, "createdAt"> & {
     createdBy: string;
   }
 >;
@@ -240,8 +239,6 @@ export const ExamResultsWithCountResponseSchema = z.object({
 export type ExamResultsWithCountResponse = z.infer<
   typeof ExamResultsWithCountResponseSchema
 >;
-
-
 
 type TransactionCallback = Parameters<typeof drizzleSession.transaction>[0];
 

@@ -162,6 +162,13 @@
       "when": 1711680523285,
       "tag": "0022_fresh_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1712212101226,
+      "tag": "0023_famous_avengers",
+      "breakpoints": true
     }
   ]
 }
