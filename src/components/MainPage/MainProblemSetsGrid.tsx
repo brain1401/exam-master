@@ -15,6 +15,7 @@ import { fetchPublicProblemSets } from "@/utils/problems";
 import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
 import Link from "next/link";
 import usePublicProblem from "@/hooks/usePublicProblem";
+import ProblemGridCardLayout from "../layouts/ProblemGridCardLayout";
 
 export default function MainProblemSetsGrid() {
   const { setPublicProblemSetsMaxPage, publicProblemSetsPage, pageSize } =
@@ -61,49 +62,44 @@ export default function MainProblemSetsGrid() {
     } else {
       return (
         publicProblemSets?.data && (
-          <div className="mx-auto flex w-full max-w-[70rem]">
-            <ul className="flex min-w-0 flex-1 flex-row flex-wrap gap-y-[1rem]">
-              {publicProblemSets?.data.map((publicProblemSet) => (
-                <li
-                  key={publicProblemSet.uuid}
-                  className="max-w-[50%] basis-[50%] px-2 md:h-auto md:max-w-[25%] md:basis-[25%]"
-                >
-                  <Card>
-                    <Link
-                      href={`/problem/${publicProblemSet.uuid}`}
-                      className="flex h-full w-full flex-col"
-                    >
-                      <CardHeader>
-                        <CardTitle>{publicProblemSet.name}</CardTitle>
-                        <CardDescription>
-                          {publicProblemSet.description ?? ""}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex flex-col items-start justify-center">
-                          <div className="space-y-[.002rem] text-[.9rem] text-gray-500 dark:text-gray-400">
-                            <div className="text-[.8rem]">
-                              {publicProblemSet.createdBy}
-                            </div>
-                            <div className="text-[.8rem]">{`${publicProblemSet.examProblemsCount}문제`}</div>
-                            <div className="text-[.8rem]">
-                              {new Date(
-                                publicProblemSet.updatedAt,
-                              ).toLocaleString("ko-KR", {
-                                year: "numeric",
-                                month: "long",
-                                day: "2-digit",
-                              })}
-                            </div>
+          <ul className="flex w-full flex-1 flex-row justify-between flex-wrap gap-y-[1rem]">
+            {publicProblemSets?.data.map((publicProblemSet, i) => (
+              <ProblemGridCardLayout key={publicProblemSet.uuid}>
+                <Card>
+                  <Link
+                    href={`/problem/${publicProblemSet.uuid}`}
+                    className="flex h-full w-full flex-col"
+                  >
+                    <CardHeader>
+                      <CardTitle>{publicProblemSet.name}</CardTitle>
+                      <CardDescription>
+                        {publicProblemSet.description ?? ""}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col items-start justify-center">
+                        <div className="space-y-[.002rem] text-[.9rem] text-gray-500 dark:text-gray-400">
+                          <div className="text-[.8rem]">
+                            {publicProblemSet.createdBy}
+                          </div>
+                          <div className="text-[.8rem]">{`${publicProblemSet.examProblemsCount}문제`}</div>
+                          <div className="text-[.8rem]">
+                            {new Date(
+                              publicProblemSet.updatedAt,
+                            ).toLocaleString("ko-KR", {
+                              year: "numeric",
+                              month: "long",
+                              day: "2-digit",
+                            })}
                           </div>
                         </div>
-                      </CardContent>
-                    </Link>
-                  </Card>
-                </li>
-              ))}
-            </ul>
-          </div>
+                      </div>
+                    </CardContent>
+                  </Link>
+                </Card>
+              </ProblemGridCardLayout>
+            ))}
+          </ul>
         )
       );
     }

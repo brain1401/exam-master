@@ -11,6 +11,7 @@ import CustomLoading from "../ui/CustomLoading";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 import ResultsCardSkeleton from "./ResultsCardSkeleton";
 import { fetchExamResults } from "@/utils/problems";
+import ProblemGridCardLayout from "../layouts/ProblemGridCardLayout";
 
 type Props = {
   pageSize: number;
@@ -71,12 +72,9 @@ export default function ResultsGrid({
           {results?.data && (
             <ProblemSetsGridLayout>
               {results.data.map((result) => (
-                <li
-                  key={result.uuid}
-                  className="max-w-[50%] basis-[50%] gap-y-[1rem] px-2 md:max-w-[25%] md:basis-[25%]"
-                >
+                <ProblemGridCardLayout key={result.uuid}>
                   <ResultsCard result={result} />
-                </li>
+                </ProblemGridCardLayout>
               ))}
             </ProblemSetsGridLayout>
           )}

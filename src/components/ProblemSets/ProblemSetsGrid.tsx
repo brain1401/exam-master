@@ -7,6 +7,7 @@ import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsCardSkeleton from "./ProblemSetsCardSkeleton";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 import { fetchProblemSets } from "@/utils/problems";
+import ProblemGridCardLayout from "../layouts/ProblemGridCardLayout";
 
 type Props = {
   type: "manage" | "exam";
@@ -65,12 +66,9 @@ export default function ProblemSetsGrid({
         problemSets?.data && (
           <ProblemSetsGridLayout>
             {problemSets.data.map((problemSet: ProblemSet) => (
-              <li
-                key={problemSet.uuid}
-                className="h-full max-w-[50%] basis-[50%] px-2 md:max-w-[25%] md:basis-[25%]"
-              >
+              <ProblemGridCardLayout key={problemSet.uuid}>
                 <ProblemSetsCard problemSet={problemSet} type={type} />
-              </li>
+              </ProblemGridCardLayout>
             ))}
           </ProblemSetsGridLayout>
         )

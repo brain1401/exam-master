@@ -1,3 +1,4 @@
+import ProblemGridCardLayout from "../layouts/ProblemGridCardLayout";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
@@ -12,10 +13,7 @@ export default function ProblemSetsCardSkeleton({ pageSize }: Props) {
   return (
     <ProblemSetsGridLayout>
       {skeletonArray.map((_, i) => (
-        <li
-          key={i}
-          className="h-full max-w-[50%] basis-[50%] px-2 md:max-w-[25%] md:basis-[25%]"
-        >
+        <ProblemGridCardLayout key={i}>
           <Card className="h-full w-full">
             <CardHeader>
               <CardTitle>
@@ -29,7 +27,7 @@ export default function ProblemSetsCardSkeleton({ pageSize }: Props) {
               </div>
             </CardContent>
           </Card>
-        </li>
+        </ProblemGridCardLayout>
       ))}
     </ProblemSetsGridLayout>
   );

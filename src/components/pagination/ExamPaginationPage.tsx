@@ -63,7 +63,6 @@ export default async function ExamPaginationPage({
         userEmail={userEmail}
         maxPage={maxPage || 1}
       />
-      ;
     </HydrationBoundary>
   );
 }

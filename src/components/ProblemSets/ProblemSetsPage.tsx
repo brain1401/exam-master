@@ -34,7 +34,7 @@ export default function ProblemSetsPage({
   ]);
 
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
-  const { setProblemSetsPage, problemSetsMaxPage, problemSetsPage, pageSize } =
+  const { problemSetsPage, pageSize } =
     usePagenationState();
 
   const { revalidateAllPath } = useRevalidation();
@@ -49,13 +49,6 @@ export default function ProblemSetsPage({
     // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
     revalidateAllPath();
   }, [revalidateAllPath]);
-
-  // 언마운트 시 페이지 초기화
-  useEffect(() => {
-    return () => {
-      setProblemSetsPage(1);
-    };
-  }, [setProblemSetsPage]);
 
   useEffect(() => {
     console.log("maxPage :", maxPage);

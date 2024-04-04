@@ -70,7 +70,7 @@ export default function PublicProblemsPage({
   }, [publicProblemSetsMaxPage]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[60rem] justify-center px-5">
+    <div className="mx-auto flex w-full max-w-[70rem] justify-center px-5">
       <div>{/* 광고 */}</div>
       <div className="flex-1">
         <div>
@@ -83,7 +83,7 @@ export default function PublicProblemsPage({
             </div>
           </div>
         </div>
-        <div className="px-2">
+        <div>
           <MainProblemSetsGrid />
         </div>
         <PaginationButton
