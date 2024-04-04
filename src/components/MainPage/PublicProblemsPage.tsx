@@ -27,20 +27,31 @@ export default function PublicProblemsPage({
   page,
   searchString,
 }: Props) {
-  useHydrateAtoms(
-    [
-      [publicProblemSetsPageAtom, page],
-      [publicProblemSetsMaxPageAtom, maxPage],
-      [publicProblemSetSearchStringAtom, searchString ?? ""],
-    ],
-    {
-      dangerouslyForceHydrate: true,
-    },
-  );
+  useHydrateAtoms([
+    [publicProblemSetsPageAtom, page],
+    [publicProblemSetsMaxPageAtom, maxPage],
+    [publicProblemSetSearchStringAtom, searchString ?? ""],
+  ]);
 
-  const { publicProblemSetsPage, publicProblemSetsMaxPage } =
-    usePagenationState();
-  const { searchString: search, sort } = usePublicProblem();
+  const {
+    publicProblemSetsPage,
+    publicProblemSetsMaxPage,
+    setPublicProblemSetsMaxPage,
+    setPublicProblemSetsPage,
+  } = usePagenationState();
+  const { searchString: search, sort, setSearchString } = usePublicProblem();
+
+  useEffect(() => {
+    setSearchString(searchString ?? "");
+  }, [searchString, setSearchString]);
+
+  useEffect(() => {
+    setPublicProblemSetsPage(page);
+  }, [page, setPublicProblemSetsPage]);
+
+  useEffect(() => {
+    setPublicProblemSetsMaxPage(maxPage);
+  }, [maxPage, setPublicProblemSetsMaxPage]);
 
   useEffect(() => {
     console.log("searchString :", search);
