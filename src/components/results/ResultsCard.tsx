@@ -55,10 +55,12 @@ export default function ResultsCard({ result }: Props) {
           <CardTitle>{result.problemSetName}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div>
-            <p className="text-sm">{`${result.problemResultsCount} 문제`}</p>
-            <p className=" w-fit text-sm text-gray-500">{formattedDate}</p>
-            <p className=" w-fit text-sm text-gray-500">{formattedTime}</p>
+          <div className="">
+            <p className="mt-3 text-sm text-gray-500">
+              {`${result.problemResultsCount ?? 0}문제`}
+            </p>
+            <p className="mt-1 text-sm text-gray-500">{formattedDate}</p>
+            <p className="text-sm text-gray-500">{formattedTime}</p>
           </div>
         </CardContent>
       </Card>
