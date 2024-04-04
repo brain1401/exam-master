@@ -1,5 +1,4 @@
 import PublicPaginationPage from "@/components/pagination/PublicPaginationPage";
-import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   params: {
@@ -20,9 +19,5 @@ export async function generateMetadata({ params: { page } }: Props) {
 }
 
 export default async function PublicPage({ params: { page } }: Props) {
-  return (
-    <JotaiProvider>
-      <PublicPaginationPage page={Number(page)} />
-    </JotaiProvider>
-  );
+  return <PublicPaginationPage page={Number(page)} />;
 }

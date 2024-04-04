@@ -51,6 +51,8 @@ export type PrefetchPaginationType =
   | "results"
   | "publicProblemSet";
 
+export type SortType = "popular" | "newest";
+
 export type ProblemSet = {
   uuid: string;
   name: string;

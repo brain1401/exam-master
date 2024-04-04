@@ -1,3 +1,4 @@
+import usePublicProblem from "@/hooks/usePublicProblem";
 import {
   Pagination,
   PaginationContent,
@@ -7,16 +8,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "./pagination";
+import usePagenationState from "@/hooks/usePagenationState";
 
 type TypeType = "manage" | "public" | "results" | "exam";
-
-type Props = {
-  maxPage: number;
-  page: number;
-  className?: string;
-  type: TypeType;
-  searchString?: string;
-};
 
 export function getBasePaginationLink(type: TypeType, searchString?: string) {
   switch (type) {
@@ -72,13 +66,19 @@ export function getPaginationLink(
   }
 }
 
-export default function PaginationButton({
-  maxPage,
-  page,
-  className,
-  type,
-  searchString,
-}: Props) {
+type Props = {
+  className?: string;
+  type: TypeType;
+};
+
+export default function PaginationButton({ className, type }: Props) {
+  const { publicProblemSetsMaxPage, publicProblemSetsPage } =
+    usePagenationState();
+  const { searchString } = usePublicProblem();
+
+  const maxPage = publicProblemSetsMaxPage || 1;
+  const page = publicProblemSetsPage || 1;
+
   const getVisiblePages = () => {
     if (maxPage <= 5) {
       return Array.from({ length: maxPage }, (_, i) => i + 1);

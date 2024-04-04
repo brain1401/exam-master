@@ -1,3 +1,4 @@
+"use client";
 import { PublicProblemSetWithPagination } from "@/types/problems";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -15,14 +16,15 @@ import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
 import Link from "next/link";
 import usePublicProblem from "@/hooks/usePublicProblem";
 
-type Props = {
-  searchString: string;
-};
-export default function MainProblemSetsGrid({ searchString }: Props) {
+export default function MainProblemSetsGrid() {
   const { setPublicProblemSetsMaxPage, publicProblemSetsPage, pageSize } =
     usePagenationState();
 
-  const { sort } = usePublicProblem();
+  const { sort, searchString } = usePublicProblem();
+
+  useEffect(() => {
+    console.log("sort :", sort);
+  }, [sort]);
 
   const {
     data: publicProblemSets,
