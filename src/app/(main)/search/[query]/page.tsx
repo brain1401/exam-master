@@ -1,4 +1,4 @@
-import PublicPaginationPage from "@/components/publicProblem/PublicPaginationPage";
+import PublicPaginationPage from "@/components/pagination/PublicPaginationPage";
 import JotaiProvider from "@/context/JotaiContext";
 import type { Metadata } from "next";
 
