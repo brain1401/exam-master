@@ -1622,7 +1622,11 @@ export async function getTotalReferencesOfImageByImageUuid(
   }
 }
 
-export async function getPublicProblemSets(page: number, pageSize: number) {
+export async function getPublicProblemSets(
+  page: number,
+  pageSize: number,
+  orderBy: "popular" | "newest",
+) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
       const [[{ value: totalProblemSetsCount }], problemSets] =
@@ -1644,24 +1648,41 @@ export async function getPublicProblemSets(page: number, pageSize: number) {
                 },
               },
               user: true,
+              likedProblemSets: {
+                columns: { problemSetUuid: true },
+              },
             },
           }),
         ]);
 
       const returnData: PublicProblemSetWithPagination = {
-        data: problemSets.map((problemSet) => ({
-          uuid: problemSet.uuid,
-          name: problemSet.name,
-          description: problemSet.description ?? undefined,
-          updatedAt: problemSet.updatedAt,
-          examProblemsCount: problemSet.problems.length,
-          createdBy: problemSet.user.name,
-        })),
+        data:
+          orderBy === "popular"
+            ? problemSets
+                .map((problemSet) => ({
+                  uuid: problemSet.uuid,
+                  name: problemSet.name,
+                  description: problemSet.description ?? undefined,
+                  updatedAt: problemSet.updatedAt,
+                  examProblemsCount: problemSet.problems.length,
+                  createdBy: problemSet.user.name,
+                  likes: problemSet.likedProblemSets.length,
+                }))
+                .toSorted((a, b) => b.likes - a.likes)
+            : problemSets.map((problemSet) => ({
+                uuid: problemSet.uuid,
+                name: problemSet.name,
+                description: problemSet.description ?? undefined,
+                updatedAt: problemSet.updatedAt,
+                examProblemsCount: problemSet.problems.length,
+                createdBy: problemSet.user.name,
+                likes: problemSet.likedProblemSets.length,
+              })),
         pagination: {
           page: page,
           pageSize: pageSize,
           pageCount: Math.ceil(totalProblemSetsCount / pageSize),
-          total: problemSets.length,
+          total: totalProblemSetsCount,
         },
       };
 
@@ -1678,6 +1699,7 @@ export async function getPublicProblemSetsByName(
   name: string,
   page: number,
   pageSize: number,
+  orderBy: "popular" | "newest",
 ) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
@@ -1690,13 +1712,16 @@ export async function getPublicProblemSetsByName(
             ),
           offset: (page - 1) * pageSize,
           limit: pageSize,
-          orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
+          orderBy: (problemSet, { desc, asc }) => [desc(problemSet.updatedAt)],
           with: {
             problems: {
               orderBy: (problem, { asc }) => [asc(problem.order)],
               with: { image: true },
             },
             user: true,
+            likedProblemSets: {
+              columns: { problemSetUuid: true },
+            },
           },
         }),
         dt
@@ -1711,14 +1736,28 @@ export async function getPublicProblemSetsByName(
       ]);
 
       const returnData: PublicProblemSetWithPagination = {
-        data: problemSets.map((problemSet) => ({
-          uuid: problemSet.uuid,
-          name: problemSet.name,
-          updatedAt: problemSet.updatedAt,
-          description: problemSet.description ?? undefined,
-          examProblemsCount: problemSet.problems.length,
-          createdBy: problemSet.user.name,
-        })),
+        data:
+          orderBy === "popular"
+            ? problemSets
+                .map((problemSet) => ({
+                  uuid: problemSet.uuid,
+                  name: problemSet.name,
+                  description: problemSet.description ?? undefined,
+                  updatedAt: problemSet.updatedAt,
+                  examProblemsCount: problemSet.problems.length,
+                  createdBy: problemSet.user.name,
+                  likes: problemSet.likedProblemSets.length,
+                }))
+                .toSorted((a, b) => b.likes - a.likes)
+            : problemSets.map((problemSet) => ({
+                uuid: problemSet.uuid,
+                name: problemSet.name,
+                description: problemSet.description ?? undefined,
+                updatedAt: problemSet.updatedAt,
+                examProblemsCount: problemSet.problems.length,
+                createdBy: problemSet.user.name,
+                likes: problemSet.likedProblemSets.length,
+              })),
         pagination: {
           page: page,
           pageSize: pageSize,

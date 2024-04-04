@@ -279,6 +279,7 @@ export async function fetchPublicProblemSets(
   debouncedSearchString: string,
   problemSetsPage: number,
   pageSize: number,
+  orderBy: string,
   setPublicProblemSetsMaxPage?: (maxPage: number) => void,
 ) {
   try {
@@ -292,6 +293,7 @@ export async function fetchPublicProblemSets(
           name: debouncedSearchString.trim(),
           page: problemSetsPage,
           pageSize,
+          orderBy,
         },
         timeout: 3000,
       });
@@ -300,6 +302,7 @@ export async function fetchPublicProblemSets(
         params: {
           page: problemSetsPage,
           pageSize,
+          orderBy,
         },
         timeout: 3000,
       });

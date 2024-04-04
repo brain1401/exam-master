@@ -29,6 +29,7 @@ export default async function PublicPaginationPage({
       defaultPageSize,
       searchString || "",
       null,
+      "popular",
     ],
     queryFn: () =>
       searchString
@@ -36,8 +37,9 @@ export default async function PublicPaginationPage({
             searchString || "",
             page || 1,
             defaultPageSize,
+            "popular",
           )
-        : getPublicProblemSets(page ?? 1, defaultPageSize),
+        : getPublicProblemSets(page ?? 1, defaultPageSize, "popular"),
   });
 
   const maxPage = await getPublicProblemSetsMaxPage(

@@ -63,6 +63,7 @@ export type ProblemSet = {
 export type ProblemSetWithCreatedBy = Prettify<
   Omit<ProblemSet, "createdAt"> & {
     createdBy: string;
+    likes: number;
   }
 >;
 

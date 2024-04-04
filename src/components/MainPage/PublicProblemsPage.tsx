@@ -20,6 +20,7 @@ import {
 import { IoSearchOutline } from "react-icons/io5";
 import useRevalidation from "@/hooks/useRevalidate";
 import Link from "next/link";
+import usePublicProblem from "@/hooks/usePublicProblem";
 
 type Props = {
   maxPage: number;
@@ -42,7 +43,8 @@ export default function PublicProblemsPage({
 
   const { revalidatePathAndRedirect, revalidateAllPath } = useRevalidation();
 
-  const [sort, setSort] = useState<"newest" | "popular">("newest");
+  const { sort, setSort } = usePublicProblem();
+
   const [localSearchString, setLocalSearchString] = useState(
     searchString ?? "",
   );

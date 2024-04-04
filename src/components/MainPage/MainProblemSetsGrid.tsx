@@ -13,6 +13,7 @@ import {
 import { fetchPublicProblemSets } from "@/utils/problems";
 import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
 import Link from "next/link";
+import usePublicProblem from "@/hooks/usePublicProblem";
 
 type Props = {
   searchString: string;
@@ -20,6 +21,8 @@ type Props = {
 export default function MainProblemSetsGrid({ searchString }: Props) {
   const { setPublicProblemSetsMaxPage, publicProblemSetsPage, pageSize } =
     usePagenationState();
+
+  const { sort } = usePublicProblem();
 
   const {
     data: publicProblemSets,
@@ -32,16 +35,17 @@ export default function MainProblemSetsGrid({ searchString }: Props) {
       pageSize,
       searchString,
       setPublicProblemSetsMaxPage,
+      sort,
     ],
     queryFn: () =>
       fetchPublicProblemSets(
         searchString,
         publicProblemSetsPage,
         pageSize,
+        sort,
         setPublicProblemSetsMaxPage,
       ),
   });
-
 
   const MainContent = () => {
     if (publicProblemSets?.data.length === 0) {
