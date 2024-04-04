@@ -62,7 +62,7 @@ export default function MainProblemSetsGrid() {
     } else {
       return (
         publicProblemSets?.data && (
-          <ul className="flex w-full flex-1 flex-row justify-between flex-wrap gap-y-[1rem]">
+          <ul className="flex w-full flex-1 flex-row flex-wrap gap-y-[1rem]">
             {publicProblemSets?.data.map((publicProblemSet, i) => (
               <ProblemGridCardLayout key={publicProblemSet.uuid}>
                 <Card>
