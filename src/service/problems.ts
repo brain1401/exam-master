@@ -347,31 +347,28 @@ export async function updateProblems({
       }
 
       await Promise.all([
-        // 문제집 이름 및 공개 여부 업데이트
+        // 문제집 정보 업데이트
         dt
           .update(problemSet)
-          .set({ name: problemSetName })
+          .set({
+            name: problemSetName,
+            isPublic: problemSetIsPublic,
+            description: description,
+            updatedAt: new Date(),
+          })
           .where(eq(problemSet.uuid, problemSetUUID)),
-        dt
-          .update(problemSet)
-          .set({ isPublic: problemSetIsPublic })
-          .where(eq(problemSet.uuid, problemSetUUID)),
-        dt
-          .update(problemSet)
-          .set({ description: description })
-          .where(eq(problemSet.uuid, problemSetUUID)),
+
+        // 삭제할 문제 삭제
+        ...(oldProblems.length > 0
+          ? [
+              Promise.all(
+                oldProblems.map((oldProblem) =>
+                  dt.delete(problem).where(eq(problem.uuid, oldProblem.uuid)),
+                ),
+              ),
+            ]
+          : []),
       ]);
-
-      if (oldProblems.length > 0) {
-        console.log(`기존 문제들 삭제 시작`, oldProblems);
-
-        // 기존 문제 삭제
-        await Promise.all(
-          oldProblems.map(async (oldProblem) => {
-            await dt.delete(problem).where(eq(problem.uuid, oldProblem.uuid));
-          }),
-        );
-      }
 
       console.log("기존 문제 삭제 완료");
       return true;
