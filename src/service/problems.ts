@@ -206,16 +206,19 @@ export async function updateProblems({
     const result = await drizzleSession.transaction(async (dt) => {
       console.log("기존 문제 불러오기 시작");
 
-      const oldProblems = await dt.query.problem.findMany({
-        where: eq(problem.problemSetUuid, problemSetUUID),
-        with: {
-          image: true,
-        },
-        columns: {
-          uuid: true,
-          order: true,
-        },
-      });
+      const [oldProblems, userUuid] = await Promise.all([
+        dt.query.problem.findMany({
+          where: eq(problem.problemSetUuid, problemSetUUID),
+          with: {
+            image: true,
+          },
+          columns: {
+            uuid: true,
+            order: true,
+          },
+        }),
+        getUserUUIDbyEmail(userEmail, dt),
+      ]);
 
       console.log(
         "oldProblems : ",
@@ -234,31 +237,23 @@ export async function updateProblems({
           imageKey,
           toBeCallbacked,
         }) => {
-          if (!isNoImage && isFirstImage) {
-            // 이미지가 있으면서 배열 내 처음 이미지인 경우
-            if (imageKey) {
-              const uuid = await createImageOnDBIfNotExistByS3Key(
-                imageKey,
-                userEmail,
-                dt,
-              );
+          if (!isNoImage && isFirstImage && imageKey) {
+            const uuid = await createImageOnDBIfNotExistByS3Key(
+              imageKey,
+              userEmail,
+              dt,
+            );
 
-              if (duplicateIndexes && duplicateIndexes.length > 0) {
-                const result = duplicateIndexes.map((i) => {
-                  const imageKey = toBeCallbacked[i].imageKey;
-                  if (!imageKey) throw new Error("이미지가 올바르지 않습니다.");
-                  return {
-                    index: i,
-                    uuid: uuid,
-                  };
-                });
-                return result;
-              }
-              return {
-                index,
+            if (duplicateIndexes && duplicateIndexes.length > 0) {
+              return duplicateIndexes.map((i) => ({
+                index: i,
                 uuid,
-              };
+              }));
             }
+            return {
+              index,
+              uuid,
+            };
           }
 
           return {
@@ -272,7 +267,6 @@ export async function updateProblems({
         "createdImages :",
         createdImages.toSorted((a, b) => a.index - b.index),
       );
-      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
       const newProblems = await Promise.all(
         replacingProblems.map(async (replacingProblem, index) => {
@@ -320,24 +314,13 @@ export async function updateProblems({
 
       console.log(`기존 문제들 삭제 시작`);
 
-      //삭제할 이미지 키 중복 제거
-      const toBeDeletedImageKey = [
-        ...new Set(
-          oldProblems.reduce((acc, cur) => {
-            if (cur.image) acc.push(cur.image.key);
-            return acc;
-          }, [] as string[]),
-        ),
-      ]
-        .reduce((acc, cur) => {
-          const newProblemsImageKey = newProblems.reduce((acc, cur) => {
-            if (cur.image) acc.push(cur.image.key);
-            return acc;
-          }, [] as string[]);
-
-          if (!newProblemsImageKey.includes(cur)) acc.push(cur);
-          return acc;
-        }, [] as string[])
+      const toBeDeletedImageKey = oldProblems
+        .map((oldProblem) => oldProblem.image?.key)
+        .filter(
+          (key): key is string =>
+            !!key &&
+            !newProblems.some((newProblem) => newProblem.image?.key === key),
+        )
         .map((key) => ({ key, problemSetCount: 1 }));
 
       console.log("toBeDeletedImageKey : ", toBeDeletedImageKey);
@@ -347,7 +330,6 @@ export async function updateProblems({
       }
 
       await Promise.all([
-        // 문제집 정보 업데이트
         dt
           .update(problemSet)
           .set({
@@ -357,17 +339,9 @@ export async function updateProblems({
             updatedAt: new Date(),
           })
           .where(eq(problemSet.uuid, problemSetUUID)),
-
-        // 삭제할 문제 삭제
-        ...(oldProblems.length > 0
-          ? [
-              Promise.all(
-                oldProblems.map((oldProblem) =>
-                  dt.delete(problem).where(eq(problem.uuid, oldProblem.uuid)),
-                ),
-              ),
-            ]
-          : []),
+        ...oldProblems.map((oldProblem) =>
+          dt.delete(problem).where(eq(problem.uuid, oldProblem.uuid)),
+        ),
       ]);
 
       console.log("기존 문제 삭제 완료");
@@ -2111,128 +2085,121 @@ export async function handlePublicProblemLikes({
   }
 }
 
-export async function getReferecesOfImageByImageKey(
-  imageKey: string,
+async function getCountByImageUuid(
+  imageUuid: string,
+  userUuid: string,
   dt: DrizzleTransaction,
 ) {
-  try {
-    const imageUuid = await getImageUuidOnDBByImageKey(imageKey, dt);
-    if (!imageUuid)
-      throw new Error("이미지 uuid를 찾는 중 오류가 발생했습니다.");
+  const problems = await dt.query.problem.findMany({
+    where: (problem, { eq, and }) =>
+      and(eq(problem.imageUuid, imageUuid), eq(problem.userUuid, userUuid)),
+    with: { problemSet: { columns: { uuid: true } } },
+  });
 
-    const imageUsers = await dt
+  const problemResults = await dt.query.problemResult.findMany({
+    where: (problemResult, { eq, and }) =>
+      and(
+        eq(problemResult.imageUuid, imageUuid),
+        eq(problemResult.userUuId, userUuid),
+      ),
+    with: { result: { columns: { uuid: true } } },
+  });
+
+  const problemSetCount = new Set(
+    problems.map((problem) => problem.problemSet.uuid),
+  ).size;
+  const problemResultsCount = new Set(
+    problemResults.map((problemResult) => problemResult.result.uuid),
+  ).size;
+
+  return {
+    problemSetCount,
+    problemResultsCount,
+    total: problemSetCount + problemResultsCount,
+  };
+}
+
+export async function getReferecesOfImageByImageKey(
+  imageKey: string,
+  drizzleTransaction: DrizzleTransaction,
+) {
+  try {
+    const imageUuid = await getImageUuidOnDBByImageKey(
+      imageKey,
+      drizzleTransaction,
+    );
+    if (!imageUuid) {
+      throw new Error(
+        `이미지 키 '${imageKey}'에 해당하는 uuid를 찾지 못했습니다.`,
+      );
+    }
+
+    const imageUsers = await drizzleTransaction
       .select({ userUuid: imageToUser.userUuid })
       .from(imageToUser)
       .where(eq(imageToUser.imageUuid, imageUuid));
 
     const users = await Promise.all(
       imageUsers.map(async (imageUser) => {
-        const userEmail = await dt.query.user.findFirst({
+        const userEmail = await drizzleTransaction.query.user.findFirst({
           where: (user_, { eq }) => eq(user_.uuid, imageUser.userUuid),
-          columns: {
-            email: true,
-          },
-        });
-        if (!userEmail) throw new Error("userEmail is null");
-
-        const problems = await dt.query.problem.findMany({
-          where: (problem, { eq, and }) =>
-            and(
-              eq(problem.imageUuid, imageUuid),
-              eq(problem.userUuid, imageUser.userUuid),
-            ),
-          with: {
-            problemSet: {
-              columns: {
-                uuid: true,
-              },
-            },
-          },
+          columns: { email: true },
         });
 
-        const problemResults = await dt.query.problemResult.findMany({
-          where: (problemResult, { eq, and }) =>
-            and(
-              eq(problemResult.imageUuid, imageUuid),
-              eq(problemResult.userUuId, imageUser.userUuid),
-            ),
-          with: {
-            result: {
-              columns: {
-                uuid: true,
-              },
-            },
-          },
-        });
+        if (!userEmail) {
+          console.warn(
+            `User email not found for user UUID: ${imageUser.userUuid}`,
+          );
+          return null;
+        }
+
+        const count = await getCountByImageUuid(
+          imageUuid,
+          imageUser.userUuid,
+          drizzleTransaction,
+        );
 
         return {
           uuid: imageUser.userUuid,
-          email: userEmail.email,
-          problems,
-          problemResults,
+          userEmail: userEmail.email,
+          count,
         };
       }),
     );
 
-    console.log("[getReferecesOfImageByImageKey] users : ", users);
+    const filteredUsers = users.filter(
+      (user): user is NonNullable<typeof user> => user !== null,
+    );
 
-    if (users.length === 0)
-      throw new Error("해당하는 key를 가진 이미지가 존재하지 않습니다.");
+    if (filteredUsers.length === 0) {
+      throw new Error(
+        `해당하는 key '${imageKey}'를 가진 이미지가 존재하지 않습니다.`,
+      );
+    }
 
     const result = {
-      users: users.map((user) => {
-        const problemSetCount = user.problems.reduce((acc, cur) => {
-          if (!acc.includes(cur.problemSet.uuid)) {
-            acc.push(cur.problemSet.uuid);
-          }
-          return acc;
-        }, [] as string[]).length;
-
-        const problemResultsCount = user.problemResults.reduce((acc, cur) => {
-          if (!acc.includes(cur.result.uuid)) {
-            acc.push(cur.result.uuid);
-          }
-          return acc;
-        }, [] as string[]).length;
-
-        const count = {
-          total: problemSetCount + problemResultsCount,
-          problemSetCount,
-          problemResultsCount,
-        };
-        console.log("count : ", count);
-
-        return {
-          userEmail: user.email,
-          userUuid: user.uuid,
-          count,
-        };
-      }),
+      users: filteredUsers,
     };
-    const allUserCount = {
-      ...result.users.reduce(
-        (acc, cur) => {
-          acc.problemSetCount += cur.count.problemSetCount;
-          acc.problemResultsCount += cur.count.problemResultsCount;
-          return acc;
-        },
-        { problemSetCount: 0, problemResultsCount: 0 },
-      ),
-      total: result.users.reduce((acc, cur) => {
-        acc += cur.count.problemSetCount;
-        acc += cur.count.problemResultsCount;
+
+    const allUserCount = filteredUsers.reduce(
+      (acc, cur) => {
+        acc.problemSetCount += cur.count.problemSetCount;
+        acc.problemResultsCount += cur.count.problemResultsCount;
+        acc.total += cur.count.total;
         return acc;
-      }, 0),
-    };
+      },
+      { problemSetCount: 0, problemResultsCount: 0, total: 0 },
+    );
+
     return {
       ...result,
       allUserCount,
     };
   } catch (err) {
-    console.error(err);
-    throw new Error(
-      "이미지를 참조하는 문제나 결과의 개수를 확인하는 중 오류가 발생했습니다.",
+    console.error(
+      `이미지를 참조하는 문제나 결과의 개수를 확인하는 중 오류가 발생했습니다: ${err}`,
     );
+    throw err;
   }
 }
 
