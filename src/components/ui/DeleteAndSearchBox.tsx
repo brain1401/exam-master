@@ -61,6 +61,8 @@ export default function DeleteAndSearchBox({
 
     await axios.delete(apiUrl, { data: { uuids } });
 
+    resetToDeletedUuid();
+
     const redirectUrl = getRedirectUrl(page, type, searchString);
     await revalidateAllPathAndRedirect(redirectUrl);
   };

@@ -13,6 +13,8 @@ export async function DELETE(req: NextRequest) {
 
   const {uuids} = await req.json();
 
+  console.log("uuids :", uuids);
+  
   const result = await deleteProblemSets(uuids, session.user.email);
 
   return NextResponse.json(
