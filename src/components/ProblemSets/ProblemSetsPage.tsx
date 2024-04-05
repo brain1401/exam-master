@@ -13,6 +13,9 @@ import {
   userEmailAtom,
 } from "@/jotai/pagination";
 import useRevalidation from "@/hooks/useRevalidate";
+import { useQuery } from "@tanstack/react-query";
+import { defaultPageSize } from "@/const/pageSize";
+import { fetchProblemSets } from "@/utils/problems";
 
 type Props = {
   type: "manage" | "exam";
@@ -44,6 +47,26 @@ export default function ProblemSetsPage({
     setProblemSetsPage,
     setUserEmail,
   } = usePagenationState();
+
+  const { data: problemSets } = useQuery({
+    queryKey: [
+      "problemSets",
+      page,
+      defaultPageSize,
+      searchString ?? "",
+      setProblemSetsMaxPage,
+      userEmail,
+    ],
+    queryFn: () =>
+      searchString
+        ? fetchProblemSets(
+            searchString,
+            page,
+            defaultPageSize,
+            setProblemSetsMaxPage,
+          )
+        : fetchProblemSets("", page, defaultPageSize, setProblemSetsMaxPage),
+  });
 
   useEffect(() => {
     setProblemSetsPage(page);
@@ -97,9 +120,9 @@ export default function ProblemSetsPage({
         userEmail={userEmail}
       />
       <PaginationButton
-        page={problemSetsPage}
+        page={problemSets?.pagination.page || 1}
+        maxPage={problemSets?.pagination.pageCount || 1}
         type={type}
-        maxPage={maxPage}
         searchString={searchString ?? ""}
         className="mt-10 flex justify-center pb-5"
       />

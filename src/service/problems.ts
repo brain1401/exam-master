@@ -512,7 +512,7 @@ export async function getProblemSets(
           page: page,
           pageSize: pageSize,
           pageCount: Math.ceil(totalProblemSetsCount / pageSize),
-          total: problemSets.length,
+          total: totalProblemSetsCount,
         },
       };
 
@@ -1136,7 +1136,7 @@ export async function getExamResults(
           page,
           pageSize: pageSize,
           pageCount: Math.ceil(totalExamResultsCount / pageSize),
-          total: examResults.length,
+          total: totalExamResultsCount,
         },
       };
 

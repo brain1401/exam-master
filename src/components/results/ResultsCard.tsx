@@ -42,7 +42,6 @@ export default function ResultsCard({ result }: Props) {
 
   // toDeletedUuid가 외부에서 변경되었을 때 isSelected 동기화
   useEffect(() => {
-    console.log(result.uuid);
     setIsSelected(
       toDeletedUuid.find((uuid: string) => uuid === result.uuid) ? true : false,
     );

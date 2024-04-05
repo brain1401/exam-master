@@ -12,7 +12,10 @@ import {
   userEmailAtom,
 } from "@/jotai/pagination";
 import useRevalidation from "@/hooks/useRevalidate";
-
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ResultsWithPagination } from "@/types/problems";
+import { fetchExamResults } from "@/utils/problems";
+import { defaultPageSize } from "@/const/pageSize";
 type Props = {
   userEmail: string;
   maxPage: number;
@@ -34,11 +37,32 @@ export default function ResultsPage({
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const {
     resultPage,
+    resultMaxPage,
     pageSize,
     setUserEmail,
     setResultsPage,
     setResultsMaxPage,
   } = usePagenationState();
+
+  const { data: results } = useQuery<ResultsWithPagination | null>({
+    queryKey: [
+      "results",
+      resultPage,
+      pageSize,
+      searchString ?? "",
+      setResultsMaxPage,
+      userEmail,
+    ],
+    queryFn: () =>
+      searchString
+        ? fetchExamResults(
+            searchString,
+            resultPage,
+            pageSize,
+            setResultsMaxPage,
+          )
+        : fetchExamResults("", resultPage, pageSize, setResultsMaxPage),
+  });
 
   useEffect(() => {
     setResultsPage(page);
@@ -89,8 +113,8 @@ export default function ResultsPage({
         />
 
         <PaginationButton
-          maxPage={maxPage}
-          page={resultPage}
+          page={results?.pagination.page || 1}
+          maxPage={results?.pagination.pageCount || 1}
           searchString={searchString ?? ""}
           type="results"
           className="mt-10 flex justify-center pb-5"

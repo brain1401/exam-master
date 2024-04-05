@@ -81,8 +81,6 @@ export default function PaginationButton({
   page,
   searchString,
 }: Props) {
-  const { publicProblemSetsMaxPage, publicProblemSetsPage } =
-    usePagenationState();
 
   const getVisiblePages = () => {
     if (maxPage <= 5) {

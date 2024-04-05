@@ -226,7 +226,7 @@ export async function fetchExamResults(
     console.log(data);
 
     if (data) {
-      setResultsMaxPage(data.pagination.pageCount || 1);
+      setResultsMaxPage(data.pagination.pageCount);
       return data;
     } else {
       return null;
