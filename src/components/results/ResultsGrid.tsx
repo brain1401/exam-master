@@ -70,7 +70,7 @@ export default function ResultsGrid({
       return (
         <>
           {results?.data && (
-            <ProblemSetsGridLayout>
+            <ProblemSetsGridLayout type="other">
               {results.data.map((result) => (
                 <ProblemGridCardLayout key={result.uuid}>
                   <ResultsCard result={result} />

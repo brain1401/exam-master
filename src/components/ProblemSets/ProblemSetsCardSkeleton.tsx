@@ -11,7 +11,7 @@ export default function ProblemSetsCardSkeleton({ pageSize }: Props) {
   const skeletonArray = Array.from({ length: pageSize }, (_, i) => i);
 
   return (
-    <ProblemSetsGridLayout>
+    <ProblemSetsGridLayout type="other">
       {skeletonArray.map((_, i) => (
         <ProblemGridCardLayout key={i}>
           <Card className="h-full w-full">

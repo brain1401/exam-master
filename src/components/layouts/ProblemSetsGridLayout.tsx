@@ -1,10 +1,24 @@
+import { cn } from "@/lib/utils";
+
 type Props = {
   children: React.ReactNode;
+  type: "public" | "other";
+  className?: string;
 };
 
-export default function ProblemSetsGridLayout({ children }: Props) {
+export default function ProblemSetsGridLayout({
+  children,
+  className,
+  type,
+}: Props) {
   return (
-    <ul className="mx-auto mt-[3.5rem] flex w-full min-w-0 flex-1 flex-row flex-wrap gap-y-[2.5rem] ">
+    <ul
+      className={cn(
+        "-mx-[0.5rem] flex w-[calc(100%+1rem)] flex-1 flex-row flex-wrap gap-y-[2.2rem] md:gap-y-[1rem]",
+        type === "public" ? "" : "mt-[4rem] md:mt-10",
+        className,
+      )}
+    >
       {children}
     </ul>
   );

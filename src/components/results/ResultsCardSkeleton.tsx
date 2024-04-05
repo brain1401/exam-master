@@ -17,7 +17,7 @@ export default function ResultsCardSkeleton({ pageSize }: Props) {
   const skeletonArray = Array.from({ length: pageSize }, (_, i) => i);
 
   return (
-    <ProblemSetsGridLayout>
+    <ProblemSetsGridLayout type="other">
       {skeletonArray.map((_, i) => (
         <li
           className="h-full max-w-[50%] basis-[50%] px-2 md:max-w-[25%] md:basis-[25%]"

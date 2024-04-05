@@ -16,6 +16,7 @@ import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
 import Link from "next/link";
 import usePublicProblem from "@/hooks/usePublicProblem";
 import ProblemGridCardLayout from "../layouts/ProblemGridCardLayout";
+import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 
 export default function MainProblemSetsGrid() {
   const { setPublicProblemSetsMaxPage, publicProblemSetsPage, pageSize } =
@@ -62,7 +63,7 @@ export default function MainProblemSetsGrid() {
     } else {
       return (
         publicProblemSets?.data && (
-          <ul className="flex w-full flex-1 flex-row flex-wrap gap-y-[1rem]">
+          <ProblemSetsGridLayout type="public">
             {publicProblemSets?.data.map((publicProblemSet, i) => (
               <ProblemGridCardLayout key={publicProblemSet.uuid}>
                 <Card>
@@ -99,7 +100,7 @@ export default function MainProblemSetsGrid() {
                 </Card>
               </ProblemGridCardLayout>
             ))}
-          </ul>
+          </ProblemSetsGridLayout>
         )
       );
     }

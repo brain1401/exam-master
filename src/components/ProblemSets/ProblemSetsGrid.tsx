@@ -64,7 +64,7 @@ export default function ProblemSetsGrid({
     } else {
       return (
         problemSets?.data && (
-          <ProblemSetsGridLayout>
+          <ProblemSetsGridLayout type="other">
             {problemSets.data.map((problemSet: ProblemSet) => (
               <ProblemGridCardLayout key={problemSet.uuid}>
                 <ProblemSetsCard problemSet={problemSet} type={type} />
