@@ -119,16 +119,20 @@ export default function DeleteAndSearchBox({
         setMaxPage,
       );
       if (newData?.data.length === 0) {
+        const redirectPage = Math.max(page - 1, 1);
         const redirectUrl = searchString
-          ? `/${type}/search/${searchString}/page/${Math.max(page - 1, 1)}`
-          : `/${type}/page/${Math.max(page - 1, 1)}`;
+          ? redirectPage === 1
+            ? `/${type}/search/${searchString}`
+            : `/${type}/search/${searchString}/page/${Math.max(page - 1, 1)}`
+          : redirectPage === 1
+            ? `/${type}`
+            : `/${type}/page/${Math.max(page - 1, 1)}`;
+
         await revalidateAllPathAndRedirect(redirectUrl);
       }
       return await queryClient.invalidateQueries({ queryKey: queryKey });
     },
   });
-
-  const router = useRouter();
 
   const onClick = () => {
     setIsDeleteButtonClicked(!isDeleteButtonClicked);
@@ -168,11 +172,6 @@ export default function DeleteAndSearchBox({
                   });
 
                   setIsDeleteButtonClicked(false);
-
-                  // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
-                  await revalidateAllPath();
-
-                  router.refresh();
                 }}
               >
                 삭제
