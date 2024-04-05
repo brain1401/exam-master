@@ -1,5 +1,7 @@
 import ExamProblems from "@/components/ExamProblems/ExamProblems";
 import LoginRequired from "@/components/ui/LoginRequired";
+import ProblemSetAccessDenied from "@/components/ui/ProblemSetAccessDenied";
+import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 import JotaiProvider from "@/context/JotaiContext";
 import {
   checkUserPermissionForProblemSet,
@@ -56,19 +58,21 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
     return <LoginRequired />;
   }
 
-  if (!isValidUUID(UUID)) {
-    return <div>문제 세트 UUID가 올바르지 않습니다.</div>;
-  }
+   const UUIDValidate = isValidUUID(UUID);
 
-  const validateResult = await checkUserPermissionForProblemSet(
-    UUID,
-    session.user.email,
-  );
+   if (!UUIDValidate) {
+     return <ProblemSetNotFound />;
+   }
 
-  if (validateResult === "NO") {
-    // 에러 페이지로 리다이렉트 필요
-    return <div>본인의 문제만 가져올 수 있습니다.</div>;
-  }
+   const authorized = await checkUserPermissionForProblemSet(
+     UUID,
+     session?.user?.email,
+   );
+
+   if (authorized === "NO") {
+     return <ProblemSetAccessDenied />;
+   }
+
 
   const examProblemSet = await getExamProblemsByProblemSetUUID(
     UUID,

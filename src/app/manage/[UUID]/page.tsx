@@ -1,10 +1,16 @@
 import ManageProblemsByUUID from "@/components/ManageProblems/ManageProblemsByUUID";
 import LoginRequired from "@/components/ui/LoginRequired";
-import { getProblemsSetByUUID } from "@/service/problems";
+import {
+  checkUserPermissionForProblemSet,
+  getProblemsSetByUUID,
+} from "@/service/problems";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import JotaiProvider from "@/context/JotaiContext";
 import { isValidUUID } from "@/utils/problems";
+import CustomError from "@/components/error/CustomError";
+import ProblemSetAccessDenied from "@/components/ui/ProblemSetAccessDenied";
+import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 type Props = {
   params: {
     UUID: string;
@@ -52,11 +58,25 @@ export default async function ManageProblem({ params: { UUID } }: Props) {
     return <LoginRequired />;
   }
 
+  const UUIDValidate = isValidUUID(UUID);
+
+  if (!UUIDValidate) {
+    return <ProblemSetNotFound />;
+  }
+
+  const authorized = await checkUserPermissionForProblemSet(
+    UUID,
+    session?.user?.email,
+  );
+
+  if (authorized === "NO") {
+    return <ProblemSetAccessDenied />;
+  }
+
   const problemSet = await getProblemsSetByUUID(UUID, session?.user?.email);
 
   if (!problemSet) {
-    // 에러 페이지로 리다이렉트 필요
-    return <div>문제집을 찾을 수 없습니다.</div>;
+    return <ProblemSetNotFound />;
   }
 
   return (

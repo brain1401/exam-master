@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-query";
 import { getServerSession } from "next-auth";
 import { isValidUUID } from "@/utils/problems";
+import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 
 type Props = {
   params: {
@@ -69,8 +70,8 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
   const exists = await checkIfPublicProblemSetExists(UUID);
 
   if (!exists) {
-    // 에러 페이지로 리다이렉트 필요
-    return <div>문제 세트를 찾을 수 없습니다.</div>;
+    
+    return <ProblemSetNotFound />;
   }
 
   const [userUUID] = await Promise.all([

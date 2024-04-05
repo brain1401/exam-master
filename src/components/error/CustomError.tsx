@@ -6,7 +6,7 @@ type Props = {
 };
 export default function CustomError({ statusCode, title }: Props) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white text-gray-900">
+    <div className="flex flex-1 flex-col items-center justify-center bg-white text-gray-900">
       <header className="flex items-center justify-center bg-white px-6 py-4">
         <Link className="flex items-center space-x-2" href="/">
           <SchoolIcon className="h-8 w-8 text-blue-600" />
@@ -17,7 +17,9 @@ export default function CustomError({ statusCode, title }: Props) {
       </header>
       <main className="flex flex-col items-center justify-center bg-white px-6 py-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-6xl font-bold text-gray-900">{statusCode ?? "404"}</h1>
+          <h1 className="text-6xl font-bold text-gray-900">
+            {statusCode ?? "404"}
+          </h1>
           <p className="mt-2 text-lg text-gray-500 dark:text-gray-400">
             {title || "Oops! The page you're looking for doesn't exist."}
           </p>

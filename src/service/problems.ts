@@ -785,6 +785,28 @@ export async function getImageFileOnS3ByImageKey(imageKey: string) {
   }
 }
 
+export async function checkUserPermissionForResults(
+  resultsUUID: string,
+  userEmail: string,
+) {
+  try {
+    const transactionResult = await drizzleSession.transaction(async (dt) => {
+      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+
+      const queryResult = await dt.query.result.findFirst({
+        where: and(eq(result.uuid, resultsUUID), eq(result.userUuid, userUuid)),
+      });
+
+      return queryResult ? "OK" : "NO";
+    });
+
+    return transactionResult;
+  } catch (err) {
+    console.log(err);
+    throw new Error("유저를 검증하는 중 오류가 발생했습니다.");
+  }
+}
+
 export async function checkUserPermissionForProblemSet(
   problemSetUUID: string,
   userEmail: string,

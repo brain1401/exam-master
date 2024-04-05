@@ -1,7 +1,12 @@
 import ResultPage from "@/components/result/ResultPage";
 import LoginRequired from "@/components/ui/LoginRequired";
+import ProblemSetAccessDenied from "@/components/ui/ProblemSetAccessDenied";
+import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 import JotaiProvider from "@/context/JotaiContext";
-import { getExamResultsByUUID } from "@/service/problems";
+import {
+  checkUserPermissionForResults,
+  getExamResultsByUUID,
+} from "@/service/problems";
 import { isValidUUID } from "@/utils/problems";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
@@ -55,6 +60,22 @@ export default async function page({ params: { UUID } }: Props) {
   if (!session || !session.user?.email) {
     return <LoginRequired />;
   }
+
+  const UUIDValidate = isValidUUID(UUID);
+
+  if (!UUIDValidate) {
+    return <ProblemSetNotFound />;
+  }
+
+  const authorized = await checkUserPermissionForResults(
+    UUID,
+    session?.user?.email,
+  );
+
+  if (authorized === "NO") {
+    return <ProblemSetAccessDenied />;
+  }
+
   const userEmail = session.user.email;
 
   const result = await getExamResultsByUUID(UUID, userEmail);
