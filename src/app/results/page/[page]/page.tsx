@@ -1,6 +1,4 @@
-
 import ResultsPaginationPage from "@/components/pagination/ResultsPaginationPage";
-import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   params: {
@@ -21,9 +19,5 @@ export async function generateMetadata({ params: { page } }: Props) {
 }
 
 export default async function ResultsPage({ params: { page } }: Props) {
-  return (
-    <JotaiProvider>
-      <ResultsPaginationPage page={Number(page)} />
-    </JotaiProvider>
-  );
+  return <ResultsPaginationPage page={Number(page)} />;
 }

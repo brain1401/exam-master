@@ -13,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/problemGridCard";
-import { cn } from "@/lib/utils";
 type Props = {
   type: "manage" | "exam";
   problemSet: ProblemSet;
@@ -92,7 +91,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
       <CustomCard />
       {isDeleteButtonClicked && (
         <Checkbox
-          className="absolute top-[calc(100%+.8rem)]"
+          className="absolute top-[calc(100%+.2rem)] md:top-[calc(100%+.8rem)]"
           checked={isSelected}
           onCheckedChange={(isSelected) => {
             const isChecked = isSelected === "indeterminate" ? false : true;

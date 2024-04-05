@@ -6,7 +6,11 @@ import usePagenationState from "@/hooks/usePagenationState";
 import ResultsGrid from "./ResultsGrid";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
 import { useHydrateAtoms } from "jotai/utils";
-import { resultMaxPageAtom, resultPageAtom } from "@/jotai/pagination";
+import {
+  resultMaxPageAtom,
+  resultPageAtom,
+  userEmailAtom,
+} from "@/jotai/pagination";
 import useRevalidation from "@/hooks/useRevalidate";
 
 type Props = {
@@ -24,11 +28,29 @@ export default function ResultsPage({
   useHydrateAtoms([
     [resultPageAtom, page],
     [resultMaxPageAtom, maxPage],
+    [userEmailAtom, userEmail],
   ]);
 
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
-  const { resultPage, resultMaxPage, pageSize, setResultsPage } =
-    usePagenationState();
+  const {
+    resultPage,
+    pageSize,
+    setUserEmail,
+    setResultsPage,
+    setResultsMaxPage,
+  } = usePagenationState();
+
+  useEffect(() => {
+    setResultsPage(page);
+  }, [page, setResultsPage]);
+
+  useEffect(() => {
+    setResultsMaxPage(maxPage);
+  }, [maxPage, setResultsMaxPage]);
+
+  useEffect(() => {
+    setUserEmail(userEmail);
+  }, [userEmail, setUserEmail]);
 
   const { revalidateAllPath } = useRevalidation();
 

@@ -4,6 +4,7 @@ import {
   problemSetsPageAtom,
   publicProblemSetsMaxPageAtom,
   publicProblemSetsPageAtom,
+  userEmailAtom,
   resetAction,
   resultMaxPageAtom,
   resultPageAtom,
@@ -24,6 +25,8 @@ export default function usePagenationState() {
   const [publicProblemSetsMaxPage, setPublicProblemSetsMaxPage] = useAtom(
     publicProblemSetsMaxPageAtom,
   );
+  const [userEmail, setUserEmail] = useAtom(userEmailAtom);
+
   const reset = useSetAtom(resetAction);
 
   return {
@@ -34,6 +37,7 @@ export default function usePagenationState() {
     pageSize,
     publicProblemSetsPage,
     publicProblemSetsMaxPage,
+    userEmail,
     setProblemSetsPage,
     setProblemSetsMaxPage,
     setResultsPage,
@@ -41,6 +45,7 @@ export default function usePagenationState() {
     setPageSize,
     setPublicProblemSetsPage,
     setPublicProblemSetsMaxPage,
+    setUserEmail,
     reset,
   };
 }

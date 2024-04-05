@@ -8,6 +8,7 @@ export const problemSetsPageAtom = atom(1);
 export const problemSetsMaxPageAtom = atom<number | null>(null);
 export const resultPageAtom = atom(1);
 export const resultMaxPageAtom = atom<number | null>(null);
+export const userEmailAtom = atom<string | null>(null);
 
 export const resetAction = atom(null, (_get, set) => {
   set(publicProblemSetsPageAtom, 1);

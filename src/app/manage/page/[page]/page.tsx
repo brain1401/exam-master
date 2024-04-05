@@ -1,5 +1,4 @@
 import ManagePaginationPage from "@/components/pagination/ManagePaginationPage";
-import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   params: {
@@ -20,9 +19,5 @@ export async function generateMetadata({ params: { page } }: Props) {
 }
 
 export default async function ManagePage({ params: { page } }: Props) {
-  return (
-    <JotaiProvider>
-      <ManagePaginationPage page={Number(page)} />
-    </JotaiProvider>
-  );
+  return <ManagePaginationPage page={Number(page)} />;
 }

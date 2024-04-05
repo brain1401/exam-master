@@ -1,5 +1,4 @@
 import ExamPaginationPage from "@/components/pagination/ExamPaginationPage";
-import JotaiProvider from "@/context/JotaiContext";
 import type { Metadata } from "next";
 
 type Props = {
@@ -24,11 +23,9 @@ export default function ExamSearchPage({ params: { page, query } }: Props) {
   const seachString = Array.isArray(query) ? query.join(" ") : query;
 
   return (
-    <JotaiProvider>
-      <ExamPaginationPage
-        page={Number(page)}
-        searchString={decodeURIComponent(seachString)}
-      />
-    </JotaiProvider>
+    <ExamPaginationPage
+      page={Number(page)}
+      searchString={decodeURIComponent(seachString)}
+    />
   );
 }

@@ -1,5 +1,4 @@
 import ManagePaginationPage from "@/components/pagination/ManagePaginationPage";
-import JotaiProvider from "@/context/JotaiContext";
 import type { Metadata } from "next";
 
 type Props = {
@@ -28,11 +27,9 @@ export default function ManageSearchPage({ params: { query } }: Props) {
   const seachString = Array.isArray(query) ? query.join(" ") : query;
 
   return (
-    <JotaiProvider>
-      <ManagePaginationPage
-        page={1}
-        searchString={decodeURIComponent(seachString)}
-      />
-    </JotaiProvider>
+    <ManagePaginationPage
+      page={1}
+      searchString={decodeURIComponent(seachString)}
+    />
   );
 }

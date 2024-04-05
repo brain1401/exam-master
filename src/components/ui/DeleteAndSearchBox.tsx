@@ -9,6 +9,13 @@ import usePagenationState from "@/hooks/usePagenationState";
 import { useRouter } from "next/navigation";
 import { fetchExamResults, fetchProblemSets } from "@/utils/problems";
 import { defaultPageSize } from "@/const/pageSize";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  ProblemSet,
+  ProblemSetWithPagination,
+  ResultWithCount,
+  ResultsWithPagination,
+} from "@/types/problems";
 
 type Props = {
   searchString: string;
@@ -32,9 +39,94 @@ export default function DeleteAndSearchBox({
   const {
     resultPage,
     problemSetsPage,
+    userEmail,
     setResultsMaxPage,
     setProblemSetsMaxPage,
   } = usePagenationState();
+
+  const queryClient = useQueryClient();
+
+  const queryKey = [
+    type === "results" ? "results" : "problemSets",
+    type === "results" ? resultPage : problemSetsPage,
+    defaultPageSize,
+    searchString ?? "",
+    null,
+    userEmail,
+  ];
+
+  const { mutate: deleteData } = useMutation({
+    mutationFn: async (params: {
+      uuids: string[];
+      dataType: "problemSet" | "problemResult";
+    }) => {
+      const { uuids, dataType } = params;
+      if (uuids.length === 0) {
+        alert("삭제할 문제집 또는 결과를 선택해주세요.");
+        return;
+      }
+      const apiUrl =
+        dataType === "problemSet"
+          ? "/api/deleteProblemSetByUUID"
+          : "/api/deleteProblemResultsByUUID";
+
+      await axios.delete(apiUrl, { data: { uuids } });
+    },
+    onMutate: async (params: {
+      uuids: string[];
+      dataType: "problemSet" | "problemResult";
+    }) => {
+      const { uuids, dataType } = params;
+      await queryClient.cancelQueries({ queryKey: queryKey });
+
+      const previousData = queryClient.getQueryData<
+        ProblemSetWithPagination | ResultsWithPagination
+      >(queryKey);
+      queryClient.setQueryData<
+        ProblemSetWithPagination | ResultsWithPagination
+      >(queryKey, (old) => {
+        if (!old) {
+          return old;
+        }
+        const tempSet = [
+          ...old.data.filter((dat) => !uuids.includes(dat.uuid)),
+        ] as ProblemSet[];
+        const data = {
+          ...old,
+          data: tempSet,
+        } as ProblemSetWithPagination | ResultsWithPagination;
+        return data;
+      });
+      return { previousData };
+    },
+    onError: (err, params, context) => {
+      queryClient.setQueryData<
+        ProblemSetWithPagination | ResultsWithPagination
+      >(queryKey, context?.previousData);
+    },
+    onSettled: async (data, error, params) => {
+      const { dataType } = params;
+      resetToDeletedUuid();
+      const fetchFunction =
+        dataType === "problemSet" ? fetchProblemSets : fetchExamResults;
+      const page = dataType === "problemSet" ? problemSetsPage : resultPage;
+      const setMaxPage =
+        dataType === "problemSet" ? setProblemSetsMaxPage : setResultsMaxPage;
+      const newData = await fetchFunction(
+        "",
+        page,
+        defaultPageSize,
+        setMaxPage,
+      );
+      if (newData?.data.length === 0) {
+        const redirectUrl = searchString
+          ? `/${type}/search/${searchString}/page/${Math.max(page - 1, 1)}`
+          : `/${type}/page/${Math.max(page - 1, 1)}`;
+        await revalidateAllPathAndRedirect(redirectUrl);
+      }
+      return await queryClient.invalidateQueries({ queryKey: queryKey });
+    },
+  });
 
   const router = useRouter();
 
@@ -46,65 +138,6 @@ export default function DeleteAndSearchBox({
       resetToDeletedUuid();
     }
   };
-
-  const deleteProblemSets = async (uuids: string[]) => {
-    if (uuids.length === 0) return alert("삭제할 문제집을 선택해주세요.");
-
-    await axios.delete(`/api/deleteProblemSetByUUID`, {
-      data: { uuids },
-    });
-
-    resetToDeletedUuid();
-
-    // 삭제 후 문제집 데이터 가져오기
-    const problemSets = await fetchProblemSets(
-      "",
-      problemSetsPage,
-      defaultPageSize,
-      setProblemSetsMaxPage,
-    );
-
-    // 현재 페이지에 문제집이 없는 경우
-    if (problemSets?.data.length === 0) {
-      const redirectUrl = searchString
-        ? `/${type}/search/${searchString}/page/${Math.max(problemSetsPage - 1, 1)}`
-        : `/${type}/page/${Math.max(problemSetsPage - 1, 1)}`;
-      await revalidateAllPathAndRedirect(redirectUrl);
-    }
-  };
-
-  const deleteProblemResults = async (uuids: string[]) => {
-    if (uuids.length === 0) return alert("삭제할 문제집을 선택해주세요.");
-
-    await axios.delete(`/api/deleteProblemResultsByUUID`, {
-      data: {
-        uuids,
-      },
-    });
-
-    resetToDeletedUuid();
-
-    // 삭제 후 결과 데이터 가져오기
-    const results = await fetchExamResults(
-      "",
-      resultPage,
-      defaultPageSize,
-      setResultsMaxPage,
-    );
-
-    // 현재 페이지에 결과가 없는 경우
-    if (results?.data.length === 0) {
-      const redirectUrl = searchString
-        ? `/${type}/search/${searchString}/page/${Math.max(resultPage - 1, 1)}`
-        : `/${type}/page/${Math.max(resultPage - 1, 1)}`;
-      await revalidateAllPathAndRedirect(redirectUrl);
-    }
-  };
-
-  const deleteProblem =
-    type === "exam" || type === "manage"
-      ? deleteProblemSets
-      : deleteProblemResults;
 
   return (
     <div className="flex justify-between">
@@ -128,7 +161,11 @@ export default function DeleteAndSearchBox({
               <Button
                 className="px-6 py-2"
                 onClick={async () => {
-                  await deleteProblem(toDeletedUuid);
+                  deleteData({
+                    uuids: toDeletedUuid,
+                    dataType:
+                      type === "results" ? "problemResult" : "problemSet",
+                  });
 
                   setIsDeleteButtonClicked(false);
 

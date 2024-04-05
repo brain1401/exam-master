@@ -86,7 +86,7 @@ export default function ResultsCard({ result }: Props) {
           <CustomCard />
           {isDeleteButtonClicked && (
             <Checkbox
-              className="absolute top-[calc(100%+.8rem)]"
+              className="absolute top-[calc(100%+.2rem)] md:top-[calc(100%+.8rem)]"
               checked={isSelected}
               onCheckedChange={(isSelected) => {
                 const isChecked = isSelected === "indeterminate" ? false : true;

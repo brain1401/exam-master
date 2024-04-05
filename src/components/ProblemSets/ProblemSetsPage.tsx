@@ -10,6 +10,7 @@ import { useHydrateAtoms } from "jotai/utils";
 import {
   problemSetsMaxPageAtom,
   problemSetsPageAtom,
+  userEmailAtom,
 } from "@/jotai/pagination";
 import useRevalidation from "@/hooks/useRevalidate";
 
@@ -28,14 +29,33 @@ export default function ProblemSetsPage({
   maxPage,
   page,
 }: Props) {
+  // 초기 hydrate시 atom도 hydrate
   useHydrateAtoms([
     [problemSetsPageAtom, page],
     [problemSetsMaxPageAtom, maxPage],
+    [userEmailAtom, userEmail],
   ]);
 
   // 화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
-  const { problemSetsPage, pageSize } =
-    usePagenationState();
+  const {
+    problemSetsPage,
+    pageSize,
+    setProblemSetsMaxPage,
+    setProblemSetsPage,
+    setUserEmail,
+  } = usePagenationState();
+
+  useEffect(() => {
+    setProblemSetsPage(page);
+  }, [page, setProblemSetsPage]);
+
+  useEffect(() => {
+    setProblemSetsMaxPage(maxPage);
+  }, [maxPage, setProblemSetsMaxPage]);
+
+  useEffect(() => {
+    setUserEmail(userEmail);
+  }, [userEmail, setUserEmail]);
 
   const { revalidateAllPath } = useRevalidation();
 
