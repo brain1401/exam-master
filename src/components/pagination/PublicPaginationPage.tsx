@@ -10,7 +10,6 @@ import {
   getPublicProblemSetsMaxPage,
 } from "@/service/problems";
 import { defaultPageSize } from "@/const/pageSize";
-import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   page: number;

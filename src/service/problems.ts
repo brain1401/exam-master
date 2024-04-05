@@ -561,14 +561,20 @@ export async function getProblemSetsByName(
   pageSize: number,
 ) {
   try {
+    const searchName = name.trim().split(" ");
     const data = await drizzleSession.transaction(async (dt) => {
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);
 
       const [problemSets, [{ totalCount }]] = await Promise.all([
         dt.query.problemSet.findMany({
-          where: (problemSet, { like, and, eq }) =>
+          where: (problemSet, { like, and, or, eq }) =>
             and(
-              like(problemSet.name, `%${name}%`),
+              or(
+                ...searchName.map((name) => like(problemSet.name, `%${name}%`)),
+                ...searchName.map((name) =>
+                  like(problemSet.description, `%${name}%`),
+                ),
+              ),
               eq(problemSet.userUuid, userUuid),
             ),
           offset: (page - 1) * pageSize,
@@ -589,7 +595,12 @@ export async function getProblemSetsByName(
           .where(
             and(
               eq(problemSet.userUuid, userUuid),
-              like(problemSet.name, `%${name}%`),
+              or(
+                ...searchName.map((name) => like(problemSet.name, `%${name}%`)),
+                ...searchName.map((name) =>
+                  like(problemSet.description, `%${name}%`),
+                ),
+              ),
             ),
           ),
       ]);
@@ -1153,6 +1164,7 @@ export async function getExamResultsByName(
   pageSize: number,
 ) {
   try {
+    const searchName = name.trim().split(" ");
     const transactionResult = await drizzleSession.transaction(async (dt) => {
       const userUuid = await getUserUUIDbyEmail(userEmail, dt);
       const [[{ totalExamResultsCount }], examResults] = await Promise.all([
@@ -1161,14 +1173,22 @@ export async function getExamResultsByName(
           .from(result)
           .where(
             and(
+              or(
+                ...searchName.map((name) =>
+                  like(result.problemSetName, `%${name}%`),
+                ),
+              ),
               eq(result.userUuid, userUuid),
-              like(result.problemSetName, `%${name}%`),
             ),
           ),
         dt.query.result.findMany({
           where: (result, { and, like }) =>
             and(
-              like(result.problemSetName, `%${name}%`),
+              or(
+                ...searchName.map((name) =>
+                  like(result.problemSetName, `%${name}%`),
+                ),
+              ),
               eq(result.userUuid, userUuid),
             ),
           offset: (page - 1) * pageSize,
@@ -1702,12 +1722,18 @@ export async function getPublicProblemSetsByName(
   orderBy: "popular" | "newest",
 ) {
   try {
+    const searchName = name.trim().split(" ");
     const data = await drizzleSession.transaction(async (dt) => {
       const [problemSets, [{ totalCount }]] = await Promise.all([
         dt.query.problemSet.findMany({
-          where: (problemSet, { like, and, eq }) =>
+          where: (problemSet, { like, and, or, eq }) =>
             and(
-              like(problemSet.name, `%${name}%`),
+              or(
+                ...searchName.map((name) => like(problemSet.name, `%${name}%`)),
+                ...searchName.map((name) =>
+                  like(problemSet.description, `%${name}%`),
+                ),
+              ),
               eq(problemSet.isPublic, true),
             ),
           offset: (page - 1) * pageSize,
@@ -1729,11 +1755,18 @@ export async function getPublicProblemSetsByName(
           .from(problemSet)
           .where(
             and(
+              or(
+                ...searchName.map((name) => like(problemSet.name, `%${name}%`)),
+                ...searchName.map((name) =>
+                  like(problemSet.description, `%${name}%`),
+                ),
+              ),
               eq(problemSet.isPublic, true),
-              like(problemSet.name, `%${name}%`),
             ),
           ),
       ]);
+
+      console.log();
 
       const returnData: PublicProblemSetWithPagination = {
         data:

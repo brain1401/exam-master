@@ -22,6 +22,9 @@ export default function MainPageSearchBar() {
     searchString ?? "",
   );
 
+  useEffect(() => {
+    setLocalSearchString(searchString ?? "");
+  }, [searchString]);
 
   // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
   useEffect(() => {
