@@ -184,6 +184,7 @@ export default function ProblemsOption({ type }: Props) {
         <Input
           id="maxIndex"
           textCenter={true}
+          allowOnlyNumber
           wrapperClassName=" mr-2"
           inputClassName="w-[3rem] text-[.95rem] h-[2.2rem]"
           value={problemLength}
