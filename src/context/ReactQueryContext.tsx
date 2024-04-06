@@ -20,7 +20,7 @@ function makeQueryClient() {
         staleTime: 0,
         gcTime: Infinity,
         retry: 3,
-        refetchOnWindowFocus: "always",
+        refetchOnWindowFocus: true,
       },
     },
   });
