@@ -622,10 +622,11 @@ export async function getExamProblemsByProblemSetUUID(
     throw null;
   }
 
-  const examProblems: ExamProblem[] = data.problems.map((problem) => {
+  const examProblems: ExamProblem[] = data.problems.map((problem, i) => {
     if (!problem) throw new Error("문제가 없습니다.");
 
     return {
+      order: problem.order,
       uuid: problem.uuid || "",
       type: problem.type as "obj" | "sub",
       question: problem.question,
@@ -687,6 +688,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         isPublic: foundProblemSet.isPublic,
         description: foundProblemSet.description ?? "",
         problems: foundProblemSet.problems.map((problem) => ({
+          order: problem.order,
           uuid: problem.uuid,
           question: problem.question,
           additionalView: problem.additionalView ?? "",
@@ -956,7 +958,7 @@ export function getParsedProblems<T extends boolean>(
   }
 }
 
-export async function postProblemResult({
+export async function postExamProblemResult({
   order,
   examProblem,
   resultsUuid,
@@ -1862,6 +1864,7 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
 
       if (!foundProblemSet) return null;
 
+      //정답은 지움
       const returnData: PublicExamProblemSet = {
         uuid: foundProblemSet.uuid,
         name: foundProblemSet.name,
@@ -1870,11 +1873,17 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
         timeLimit: foundProblemSet.timeLimit || 20,
         creator: foundProblemSet.user.name,
         problems: foundProblemSet.problems.map((problem) => ({
+          order: problem.order,
           uuid: problem.uuid,
           question: problem.question,
           type: problem.questionType as "obj" | "sub",
-          candidates: problem.candidates ?? null,
-          subAnswer: problem.subjectiveAnswer ?? null,
+          candidates:
+            problem.candidates?.map((candidate) => ({
+              id: candidate.id,
+              text: candidate.text,
+              isAnswer: false,
+            })) ?? null,
+          subAnswer: "" ?? null,
           image: problem.image ?? null,
           additionalView: problem.additionalView ?? "",
           isAnswerMultiple: problem.isAnswerMultiple ?? false,
@@ -1890,6 +1899,65 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
     throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
   }
 }
+
+export async function getRandomExamPublicProblemSetByUUID(problemSetUUID: string) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const foundProblemSet = await dt.query.problemSet.findFirst({
+        where: and(
+          eq(problemSet.uuid, problemSetUUID),
+          eq(problemSet.isPublic, true),
+        ),
+        with: {
+          problems: {
+            orderBy: (problem, { asc }) => [asc(problem.order)],
+            with: {
+              image: true,
+            },
+          },
+          user: true,
+        },
+      });
+
+      if (!foundProblemSet) return null;
+
+      const originalProblems = foundProblemSet.problems.map((problem) => ({
+        order: problem.order,
+        uuid: problem.uuid,
+        question: problem.question,
+        type: problem.questionType as "obj" | "sub",
+        isAnswerMultiple: problem.isAnswerMultiple ?? false,
+        additionalView: problem.additionalView ?? "",
+        image: problem.image ?? null,
+        subAnswer: problem.questionType === "sub" ? "" : null,
+        candidates:
+          problem.candidates?.map((candidate) => ({
+            id: candidate.id,
+            text: candidate.text,
+            isAnswer: candidate.isAnswer,
+          })) ?? null,
+      }));
+
+      const returnData: PublicExamProblemSet = {
+        uuid: foundProblemSet.uuid,
+        name: foundProblemSet.name,
+        updatedAt: foundProblemSet.updatedAt,
+        description: foundProblemSet.description ?? "",
+        timeLimit: foundProblemSet.timeLimit || 20,
+        creator: foundProblemSet.user.name,
+        problems: problemShuffle(originalProblems),
+      };
+
+      return returnData;
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("문제집을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
 export async function getPublicProblemSetComments(problemSetUUID: string) {
   const isUUIDValidated = uuidSchema.safeParse(problemSetUUID);
   if (!isUUIDValidated.success) {
@@ -2226,7 +2294,7 @@ export function validateS3Key(fileName: string): boolean {
   return pattern.test(fileName);
 }
 
-export async function evaluateProblems(
+export async function evaluateExamProblems(
   examProblems: ExamProblem[],
   problemSetName: string,
   userEmail: string,
@@ -2297,7 +2365,7 @@ export async function evaluateProblems(
             answer,
           );
 
-          await postProblemResult({
+          await postExamProblemResult({
             order: index + 1,
             userUuid,
             dt,

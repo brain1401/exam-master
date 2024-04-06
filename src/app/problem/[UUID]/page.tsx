@@ -74,8 +74,9 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
     return <ProblemSetNotFound />;
   }
 
-  const [userUUID] = await Promise.all([
+  const [userUUID, publicProblemSet] = await Promise.all([
     session?.user?.email ? await getUserUUIDbyEmail(session.user.email) : null,
+    getPublicProblemSetByUUID(UUID),
     queryClient.prefetchQuery({
       queryKey: ["publicProblemLikes", UUID, session?.user?.email],
       queryFn: () => getPublicProblemLikes(UUID, session?.user?.email),
@@ -97,6 +98,7 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
         userEmail={session?.user?.email}
         userName={session?.user?.name}
         userUUID={userUUID}
+        publicProblemSet={publicProblemSet}
       />
     </HydrationBoundary>
   );

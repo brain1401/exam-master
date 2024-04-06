@@ -30,6 +30,7 @@ export type Problem = {
 } | null;
 
 export type ProblemWithoutImageFile = Prettify<{
+  order: number;
   uuid?: string;
   type: "obj" | "sub";
   question: string;
@@ -115,12 +116,12 @@ export type ExamProblemSet = {
   problems: ExamProblem[];
 };
 
-export type PublicExamProblemSet = ExamProblemSet & {
+export type PublicExamProblemSet = Prettify<ExamProblemSet & {
   timeLimit: number;
   updatedAt: Date;
   creator: string;
   description: string;
-};
+}>;
 
 export type ProblemSetComment = {
   uuid: string;
@@ -161,6 +162,7 @@ export const problemSchema = z
   .nullable();
 
 export const examProblemSchema = z.object({
+  order: z.number(),
   uuid: z.string(),
   type: z.union([z.literal("obj"), z.literal("sub")]),
   question: z.string(),

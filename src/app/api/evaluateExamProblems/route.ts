@@ -1,5 +1,5 @@
-import { evaluateProblems } from "@/service/problems";
-import { ExamProblem, ExamProblemAnswer } from "@/types/problems";
+import { evaluateExamProblems } from "@/service/problems";
+import { ExamProblem } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const uuid = await evaluateProblems(
+    const uuid = await evaluateExamProblems(
       examProblems,
       examProblemSetName,
       session.user.email,
