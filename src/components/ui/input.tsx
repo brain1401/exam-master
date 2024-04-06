@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
 
 export interface InputProps
@@ -9,6 +8,7 @@ export interface InputProps
   endContent?: React.ReactNode;
   textCenter?: boolean;
   allowOnlyNumber?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -21,10 +21,22 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       allowOnlyNumber,
       type,
       textCenter,
+      onChange,
       ...props
     },
     ref,
   ) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (allowOnlyNumber) {
+        const value = e.target.value;
+        const numericValue = value.replace(/[^0-9]/g, "");
+        e.target.value = numericValue;
+      }
+      if (onChange) {
+        onChange(e);
+      }
+    };
+
     return (
       <div className={cn("relative flex h-fit", wrapperClassName)}>
         <input
@@ -36,22 +48,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             inputClassName,
           )}
           {...(allowOnlyNumber && {
-            type: "number",
             inputMode: "numeric",
             pattern: "[0-9]*",
           })}
           ref={ref}
+          onChange={handleChange}
           {...props}
         />
         {endContent && (
-          <div
-            className="absolute right-0 flex h-full items-center justify-end px-4"
-            {...(allowOnlyNumber && {
-              type: "number",
-              inputMode: "numeric",
-              pattern: "[0-9]*",
-            })}
-          >
+          <div className="absolute right-0 flex h-full items-center justify-end px-4">
             {endContent}
           </div>
         )}
@@ -59,6 +64,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
+
 Input.displayName = "Input";
 
 export { Input };
