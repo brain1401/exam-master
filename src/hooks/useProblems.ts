@@ -9,6 +9,7 @@ import {
   localProblemSetsNameAtom,
   problemLengthAtom,
   problemSetsNameAtom,
+  timeLimitAtom,
   resetProblemsAtom,
   currentProblemAtom,
   currentProblemCandidatesAtom,
@@ -34,6 +35,7 @@ export default function useProblems() {
   const [problemLength, setProblemLength] = useAtom(problemLengthAtom);
   const [problemSetsName, setProblemSetsName] = useAtom(problemSetsNameAtom);
   const [problemSetIsPublic, setProblemSetIsPublic] = useAtom(isPublicAtom);
+  const [timeLimit, setTimeLimit] = useAtom(timeLimitAtom);
   const resetProblems = useSetAtom(resetProblemsAtom);
 
   return {
@@ -60,6 +62,8 @@ export default function useProblems() {
     setProblemSetsName,
     problemSetIsPublic,
     setProblemSetIsPublic,
+    timeLimit,
+    setTimeLimit,
     resetProblems,
   };
 }

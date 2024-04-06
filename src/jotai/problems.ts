@@ -36,6 +36,8 @@ export const problemSetsNameAtom = atom("");
 
 export const descriptionAtom = atom("");
 
+export const timeLimitAtom = atom("20");
+
 export const localProblemSetsNameAtom = atom("");
 
 export const problemLengthAtom = atom("10");
