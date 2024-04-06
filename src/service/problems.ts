@@ -683,7 +683,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         name: foundProblemSet.name,
         createdAt: foundProblemSet.createdAt,
         updatedAt: foundProblemSet.updatedAt,
-        timeLimit: foundProblemSet.timeLimit || 1,
+        timeLimit: foundProblemSet.timeLimit || 20,
         isPublic: foundProblemSet.isPublic,
         description: foundProblemSet.description ?? "",
         problems: foundProblemSet.problems.map((problem) => ({
@@ -1867,7 +1867,7 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
         name: foundProblemSet.name,
         updatedAt: foundProblemSet.updatedAt,
         description: foundProblemSet.description ?? "",
-        timeLimit: foundProblemSet.timeLimit || 1,
+        timeLimit: foundProblemSet.timeLimit || 20,
         creator: foundProblemSet.user.name,
         problems: foundProblemSet.problems.map((problem) => ({
           uuid: problem.uuid,
