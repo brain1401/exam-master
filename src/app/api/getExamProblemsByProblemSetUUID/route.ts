@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     if(!problem) throw new Error("문제가 없습니다.");
 
     return {
-      uuid: problem.uuid,
+      uuid: problem.uuid ?? "",
       type: problem.type as "obj" | "sub",
       question: problem.question,
       additionalView: problem.additionalView,

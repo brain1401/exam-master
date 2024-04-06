@@ -62,14 +62,14 @@ export default function ProblemsOption({ type }: Props) {
   };
 
   useEffect(() => {
-    if (problemSetIsPublic) {
+    if (problemSetIsPublic && type === "create") {
       toast({
         description: "문제집 설정 버튼을 눌러 문제집 설정을 완료해주세요!",
         className: "bg-sky-500 text-white text-[1.5rem]",
         duration: 5000,
       });
     }
-  }, [problemSetIsPublic, toast]);
+  }, [problemSetIsPublic, type, toast]);
 
   const applyProblemLength = () => {
     const maxProblemLength = parseInt(problemLength); // 입력한 최대 문제 수
@@ -168,11 +168,13 @@ export default function ProblemsOption({ type }: Props) {
 
   const onProblemSetDescriptionOK = () => {
     setDescription(textarea);
+    setTimeLimit(timeInput);
     setIsDialogOpen(false);
   };
 
   const onProblemSetDescriptionCancel = () => {
     setTextarea(description);
+    setTimeInput(timeLimit);
   };
 
   return (

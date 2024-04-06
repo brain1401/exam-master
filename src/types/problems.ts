@@ -29,6 +29,19 @@ export type Problem = {
   subAnswer: string | null;
 } | null;
 
+export type ProblemWithoutImageFile = Prettify<{
+  uuid?: string;
+  type: "obj" | "sub";
+  question: string;
+  additionalView: string;
+  isAnswerMultiple: boolean | null;
+  image: z.infer<typeof ImageSchema> | null;
+  isAdditionalViewButtonClicked: boolean;
+  isImageButtonClicked: boolean;
+  candidates: Candidate[] | null;
+  subAnswer: string | null;
+}>;
+
 export type ProblemReplacedImageKey = Prettify<
   | (Omit<NonNullable<Problem>, "image"> & {
       image: { key: string } | null;
@@ -85,13 +98,16 @@ export type PublicProblemSetWithPagination = Prettify<
   }
 >;
 
-export type ProblemSetWithName = {
-  uuid: string | undefined;
+export type ProblemSetWithName = Prettify<{
+  uuid: string;
   name: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   isPublic: boolean;
   description?: string;
-  problems: Problem[];
-};
+  timeLimit?: number;
+  problems: ProblemWithoutImageFile[];
+}>;
 
 export type ExamProblemSet = {
   uuid: string | undefined;
@@ -100,6 +116,7 @@ export type ExamProblemSet = {
 };
 
 export type PublicExamProblemSet = ExamProblemSet & {
+  timeLimit: number;
   updatedAt: Date;
   creator: string;
   description: string;

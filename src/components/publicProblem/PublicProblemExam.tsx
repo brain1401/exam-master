@@ -72,6 +72,8 @@ export default function PublicProblemExam({
     queryFn: () => fetchPublicProblemLikes(publicSetUUID),
   });
 
+  const timeLimit = publicProblemSet?.timeLimit;
+
   const { mutate: problemSetLikesMutate } = useMutation({
     mutationFn: (liked: boolean) => {
       return axios.put("/api/handlePublicProblemSetLike", {
@@ -331,9 +333,12 @@ export default function PublicProblemExam({
                         제한 시간 (분)
                       </Label>
                       <Input
+                        defaultValue={timeLimit}
                         onKeyDown={async (e) =>
                           handleEnterKeyPress(e, () => {})
                         }
+                        pattern="[0-9]*"
+                        inputMode="numeric"
                         className="w-[10rem]"
                         id="time-limit"
                         type="number"

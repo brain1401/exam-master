@@ -20,6 +20,7 @@ export default function CreateProblemsSubmitButton() {
     problemSetsName,
     problemSetIsPublic,
     description,
+    timeLimit,
     setProblemSetsName,
     resetProblems,
   } = useProblems();
@@ -127,6 +128,7 @@ export default function CreateProblemsSubmitButton() {
       });
       formData.append("problemSetsName", problemSetsName);
       formData.append("description", description);
+      formData.append("timeLimit", timeLimit);
       formData.append("problemSetIsPublic", problemSetIsPublic.toString());
 
       const response = await fetch("/api/postProblems", {

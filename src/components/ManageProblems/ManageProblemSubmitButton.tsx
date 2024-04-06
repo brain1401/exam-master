@@ -18,8 +18,13 @@ type Props = {
 export default function ManageProblemSubmitButton({ uuid }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { revalidateAllPath } = useRevalidation();
-  const { problems, problemSetsName, problemSetIsPublic, description } =
-    useProblems();
+  const {
+    problems,
+    problemSetsName,
+    problemSetIsPublic,
+    timeLimit,
+    description,
+  } = useProblems();
 
   const handleSubmit = async () => {
     if (problems.some((problem) => isProblemEmpty(problem))) {
@@ -119,6 +124,7 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
       });
       formData.append("problemSetsName", problemSetsName);
       formData.append("problemSetIsPublic", problemSetIsPublic.toString());
+      formData.append("timeLimit", timeLimit);
       formData.append("description", description);
       formData.append("uuid", uuid);
 

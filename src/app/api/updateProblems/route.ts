@@ -23,6 +23,7 @@ export async function PUT(req: NextRequest) {
     problems,
     problemSetIsPublic,
     problemSetUUID,
+    timeLimit,
     description,
   } = getParsedProblems(formData, true);
 
@@ -69,6 +70,7 @@ export async function PUT(req: NextRequest) {
       replacingProblems: problems,
       problemSetUUID,
       description,
+      timeLimit,
       problemSetIsPublic,
       userEmail: session.user.email,
     });

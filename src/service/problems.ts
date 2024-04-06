@@ -15,6 +15,7 @@ import {
   examProblemsSchema,
   uuidSchema,
   ExamResultsSet,
+  ProblemSetWithName,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
@@ -74,11 +75,13 @@ export async function postProblems({
   problemSetName,
   toBePostedProblems,
   userEmail,
+  timeLimit,
   isPublic,
   description,
 }: {
   problemSetName: string;
   userEmail: string;
+  timeLimit?: number;
   toBePostedProblems: ProblemReplacedImageKey[];
   isPublic: boolean;
   description?: string;
@@ -146,6 +149,7 @@ export async function postProblems({
           userUuid: userUuId,
           updatedAt: new Date(),
           description,
+          timeLimit,
           isPublic,
         })
         .returning({ uuid: problemSet.uuid });
@@ -188,6 +192,7 @@ export async function updateProblems({
   problemSetName,
   replacingProblems,
   problemSetUUID,
+  timeLimit,
   description,
   problemSetIsPublic,
   userEmail,
@@ -195,7 +200,8 @@ export async function updateProblems({
   problemSetName: string;
   replacingProblems: ProblemReplacedImageKey[];
   problemSetUUID: string;
-  description: string | undefined;
+  timeLimit?: number;
+  description?: string;
   problemSetIsPublic: boolean;
   userEmail: string;
 }) {
@@ -336,6 +342,7 @@ export async function updateProblems({
             name: problemSetName,
             isPublic: problemSetIsPublic,
             description: description,
+            timeLimit: timeLimit,
             updatedAt: new Date(),
           })
           .where(eq(problemSet.uuid, problemSetUUID)),
@@ -619,11 +626,11 @@ export async function getExamProblemsByProblemSetUUID(
     if (!problem) throw new Error("문제가 없습니다.");
 
     return {
-      uuid: problem.uuid,
+      uuid: problem.uuid || "",
       type: problem.type as "obj" | "sub",
       question: problem.question,
       additionalView: problem.additionalView,
-      image: problem.image ? problem.image : null,
+      image: problem.image ?? null,
       isAnswerMultiple: problem.isAnswerMultiple,
       // 문제의 정답을 알 수 없게 함
       candidates:
@@ -671,18 +678,19 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
 
       if (!foundProblemSet) return null;
 
-      const returnData = {
+      const returnData: ProblemSetWithName = {
         uuid: foundProblemSet.uuid,
         name: foundProblemSet.name,
         createdAt: foundProblemSet.createdAt,
         updatedAt: foundProblemSet.updatedAt,
+        timeLimit: foundProblemSet.timeLimit || 1,
         isPublic: foundProblemSet.isPublic,
         description: foundProblemSet.description ?? "",
         problems: foundProblemSet.problems.map((problem) => ({
           uuid: problem.uuid,
           question: problem.question,
           additionalView: problem.additionalView ?? "",
-          candidates: problem.candidates as Candidate[],
+          candidates: problem.candidates,
           image: problem.image,
           isAdditionalViewButtonClicked: problem.additionalView ? true : false,
           isAnswerMultiple: problem.isAnswerMultiple,
@@ -859,6 +867,7 @@ type ProblemsAndSetName = {
   problemSetName: string;
   problemSetIsPublic: boolean;
   description?: string;
+  timeLimit?: number;
   problems: ProblemReplacedImageKey[];
 };
 
@@ -877,6 +886,7 @@ export function getParsedProblems<T extends boolean>(
   let problemSetUUID: string | undefined;
   let problemSetIsPublic: boolean | undefined;
   let description: string | undefined;
+  let timeLimit: number | undefined;
 
   for (const [name, value] of entries) {
     if (name === "problemSetsName") {
@@ -889,6 +899,10 @@ export function getParsedProblems<T extends boolean>(
     }
     if (name === "description") {
       description = value as string;
+      continue;
+    }
+    if (name === "timeLimit") {
+      timeLimit = parseInt(value as string);
       continue;
     }
     if (includeUuid && name === "uuid") {
@@ -928,12 +942,14 @@ export function getParsedProblems<T extends boolean>(
       problems,
       problemSetIsPublic,
       description,
+      timeLimit,
       problemSetUUID,
     } as T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetName;
   } else {
     return {
       problemSetName,
       problems,
+      timeLimit,
       description,
       problemSetIsPublic,
     } as T extends true ? ProblemsAndSetsNameWithUUID : ProblemsAndSetName;
@@ -1851,6 +1867,7 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
         name: foundProblemSet.name,
         updatedAt: foundProblemSet.updatedAt,
         description: foundProblemSet.description ?? "",
+        timeLimit: foundProblemSet.timeLimit || 1,
         creator: foundProblemSet.user.name,
         problems: foundProblemSet.problems.map((problem) => ({
           uuid: problem.uuid,

@@ -20,6 +20,7 @@ import {
   localProblemSetsNameAtom,
   problemLengthAtom,
   problemSetsNameAtom,
+  timeLimitAtom,
 } from "@/jotai/problems";
 import { useEffect } from "react";
 
@@ -43,6 +44,7 @@ export default function ManageProblemsByUUID({ UUID, problemSet }: Props) {
       candidatesCountAtom,
       problemSet.problems[0]?.candidates?.length.toString() ?? "4",
     ],
+    [timeLimitAtom, problemSet.timeLimit?.toString() || "1"],
   ]);
 
   const { resetProblems } = useProblems();
@@ -53,23 +55,15 @@ export default function ManageProblemsByUUID({ UUID, problemSet }: Props) {
 
   return (
     <ProblemEditorLayout>
-      <div className="relative">
-        <ProblemsOption type="manage" />
+      <ProblemsOption type="manage" />
 
-        <div className="absolute right-0 top-0">
-          <Button size="icon" variant="outline">
-            <FiShare size={20} />
-          </Button>
-        </div>
+      <CurrentProblemIndicator />
 
-        <CurrentProblemIndicator />
+      <ProblemsEditor />
 
-        <ProblemsEditor />
+      <NextOrPrevButtons />
 
-        <NextOrPrevButtons />
-
-        <ManageProblemSubmitButton uuid={UUID} />
-      </div>
+      <ManageProblemSubmitButton uuid={UUID} />
     </ProblemEditorLayout>
   );
 }
