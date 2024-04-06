@@ -333,13 +333,11 @@ export default function PublicProblemExam({
                         제한 시간 (분)
                       </Label>
                       <Input
-                        defaultValue={timeLimit}
+                        defaultValue={timeLimit || 30}
                         onKeyDown={async (e) =>
                           handleEnterKeyPress(e, () => {})
                         }
-                        pattern="[0-9]*"
-                        inputMode="numeric"
-                        className="w-[10rem]"
+                        allowOnlyNumber
                         id="time-limit"
                         type="number"
                       />

@@ -257,6 +257,7 @@ export default function ProblemsOption({ type }: Props) {
                         <Input
                           inputClassName="w-[3rem] h-[2.2rem] text-center"
                           value={timeInput}
+                          allowOnlyNumber
                           onChange={(e) => setTimeInput(e.target.value)}
                         />
                         <Label className="ml-2 text-[.9rem] ">분</Label>
