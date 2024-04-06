@@ -15,6 +15,7 @@ import {
 import { getServerSession } from "next-auth";
 import { isValidUUID } from "@/utils/problems";
 import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
+import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   params: {
@@ -93,13 +94,15 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PublicProblemExam
-        publicSetUUID={UUID}
-        userEmail={session?.user?.email}
-        userName={session?.user?.name}
-        userUUID={userUUID}
-        publicProblemSet={publicProblemSet}
-      />
+      <JotaiProvider>
+        <PublicProblemExam
+          publicSetUUID={UUID}
+          userEmail={session?.user?.email}
+          userName={session?.user?.name}
+          userUUID={userUUID}
+          publicProblemSet={publicProblemSet}
+        />
+      </JotaiProvider>
     </HydrationBoundary>
   );
 }

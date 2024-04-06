@@ -4,16 +4,18 @@ import ExamHeader from "../exam/ExamHeader";
 import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "../exam/ExamFooter";
 import ExamProblem from "../exam/ExamProblem";
+import ExamSubmitButton from "../exam/ExamSubmitButton";
+import { PublicExamProblemSet } from "@/types/problems";
 
 type Props = {
   problemSetTimeLimit: number;
-  publicSetUUID: string;
-  userEmail: string | null | undefined;
-  userName: string | null | undefined;
-  userUUID: string | null | undefined;
+  publicProblemSet: PublicExamProblemSet | null;
 };
 
-export default function PublicProblemExamPage({ problemSetTimeLimit }: Props) {
+export default function PublicProblemExamPage({
+  problemSetTimeLimit,
+  publicProblemSet,
+}: Props) {
   const {
     isExamStarted,
     currentPublicExamProblem,
@@ -32,7 +34,6 @@ export default function PublicProblemExamPage({ problemSetTimeLimit }: Props) {
   const [isTimeOver, setIsTimeOver] = useState(false);
   const questionNumber = currentExamProblemIndex + 1;
 
-
   useEffect(() => {
     console.log("isTimeOver :", isTimeOver);
   }, [isTimeOver]);
@@ -48,26 +49,8 @@ export default function PublicProblemExamPage({ problemSetTimeLimit }: Props) {
     console.log("publicExamProblems :", publicExamProblems);
   }, [publicExamProblems]);
 
-  useEffect(() => {
-    return () => {
-      setIsExamStarted(false);
-    };
-  }, [setIsExamStarted]);
-
-  useEffect(() => {
-    return () => {
-      setTimeLimit(problemSetTimeLimit.toString());
-    };
-  }, [setTimeLimit, problemSetTimeLimit]);
-
-  useEffect(() => {
-    return () => {
-      setCurrentExamProblemIndex(0);
-    };
-  }, [setCurrentExamProblemIndex]);
-
   return (
-    <section className="flex h-full w-full flex-col items-center justify-center p-4 md:p-8">
+    <section className="flex h-full w-full flex-col items-center justify-center">
       <div className="w-full max-w-3xl">
         <ExamHeader
           totalProblems={publicExamProblems?.length ?? 0}
@@ -81,13 +64,14 @@ export default function PublicProblemExamPage({ problemSetTimeLimit }: Props) {
         />
         <ExamProblem
           questionNumber={questionNumber}
-          problem={currentPublicExamProblem}
+          currentProblem={currentPublicExamProblem}
           candidates={currentPublicExamProblemCandidates}
           setCurrentPublicExamProblemCandidates={
             setCurrentPublicExamProblemCandidates
           }
         />
         <ExamFooter
+          problemSet={publicProblemSet}
           publicExamProblems={publicExamProblems}
           setCurrentExamProblemIndex={setCurrentExamProblemIndex}
           setCurrentPublicExamProblemCandidates={

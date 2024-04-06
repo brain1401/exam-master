@@ -1,5 +1,9 @@
-import { ExamProblem } from "@/types/problems";
+import { ExamProblem, ExamProblemSet } from "@/types/problems";
 import { atom } from "jotai";
+
+export const publicExamProblemSetAtom = atom<ExamProblemSet | null>(
+  null,
+);
 
 export const timeLimitAtom = atom<string>("0");
 

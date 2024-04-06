@@ -2,10 +2,12 @@ import { handleEnterKeyPress } from "@/utils/keyboard";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Candidate, ExamProblem } from "@/types/problems";
+import { Candidate, ExamProblem, PublicExamProblemSet } from "@/types/problems";
 import { useEffect, useState } from "react";
+import ExamSubmitButton from "./ExamSubmitButton";
 
 type Props = {
+  problemSet: PublicExamProblemSet | null;
   setIsExamStarted: (isStarted: boolean) => void;
   setCurrentExamProblemIndex: (index: number) => void;
   setCurrentPublicExamProblemCandidates: (
@@ -16,6 +18,7 @@ type Props = {
 };
 
 export default function ExamFooter({
+  problemSet,
   publicExamProblems,
   setCurrentExamProblemIndex,
   setCurrentPublicExamProblemCandidates,
@@ -46,6 +49,7 @@ export default function ExamFooter({
       <Button variant="outline" onClick={handleEndExam}>
         시험 종료
       </Button>
+      <ExamSubmitButton ProblemSet={problemSet} />
       <div className="flex items-center gap-4">
         <Label>문제 이동</Label>
         <Input

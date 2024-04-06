@@ -7,7 +7,7 @@ import checkImage from "../../../public/images/checkBlack.png";
 import { Textarea } from "../ui/textarea";
 
 type Props = {
-  problem: ExamProblem;
+  currentProblem: ExamProblem;
   questionNumber: number;
   candidates: Candidate[] | null;
   setCurrentPublicExamProblemCandidates: (
@@ -17,16 +17,16 @@ type Props = {
 
 export default function ExamProblem({
   candidates,
-  problem,
+  currentProblem,
   questionNumber,
   setCurrentPublicExamProblemCandidates,
 }: Props) {
   const handleCandidateClick = (i: number) => {
-    if (!problem || !problem.candidates) {
+    if (!currentProblem || !currentProblem.candidates) {
       throw new Error("무언가가 잘못되었습니다.");
     }
 
-    const isMultipleAnswer = problem.isAnswerMultiple ?? false;
+    const isMultipleAnswer = currentProblem.isAnswerMultiple ?? false;
 
     const newCandidates =
       candidates?.map((candidate, index) => {
@@ -45,7 +45,7 @@ export default function ExamProblem({
     setCurrentPublicExamProblemCandidates(newCandidates);
   };
 
-  const objective = problem?.candidates?.map((candidate, i) => {
+  const objective = currentProblem?.candidates?.map((candidate, i) => {
     const isAnswer = candidates?.[i]?.isAnswer;
     return (
       <div key={candidate.id} className="relative">
@@ -75,22 +75,22 @@ export default function ExamProblem({
     />
   );
 
-  const imageURL = problem.image?.url ?? "";
+  const imageURL = currentProblem.image?.url ?? "";
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">{`${questionNumber}. ${problem?.question}`}</CardTitle>
+        <CardTitle className="text-lg">{`${questionNumber}. ${currentProblem?.question}`}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col">
         <div className="flex w-full items-center justify-center">
           {imageURL ? (
-            <Image src={imageURL} width={400} height={400} alt="문제 이미지" className="mb-[2rem]" />
+            <Image priority src={imageURL} width={400} height={400} alt="문제 이미지" className="mb-[2rem]" />
           ) : null}
         </div>
 
         <div className="w-full space-y-2">
-          {problem?.type === "obj" ? objective : subjective}
+          {currentProblem?.type === "obj" ? objective : subjective}
         </div>
       </CardContent>
     </Card>
