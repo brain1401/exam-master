@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
 import { IoMdSettings } from "react-icons/io";
@@ -19,6 +19,7 @@ import {
   DialogOverlay,
   DialogTrigger,
 } from "../ui/dialog";
+import { useToast } from "../ui/use-toast";
 import { Textarea } from "../ui/textarea";
 import { handleEnterKeyPress } from "@/utils/keyboard";
 
@@ -42,19 +43,33 @@ export default function ProblemsOption({ type }: Props) {
     problemLength,
     setProblemLength,
     description,
+    timeLimit,
+    setTimeLimit,
     setDescription,
   } = useProblems();
 
   const [isLoading, setIsLoading] = useState(false);
   const [textarea, setTextarea] = useState(description);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [timeInput, setTimeInput] = useState(timeLimit);
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
   const handleProblemLengthChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = e.target.value;
     setProblemLength(value);
   };
+
+  useEffect(() => {
+    if (problemSetIsPublic) {
+      toast({
+        description: "문제집 설정 버튼을 눌러 문제집 설정을 완료해주세요!",
+        className: "bg-sky-500 text-white text-[1.5rem]",
+        duration: 5000,
+      });
+    }
+  }, [problemSetIsPublic, toast]);
 
   const applyProblemLength = () => {
     const maxProblemLength = parseInt(problemLength); // 입력한 최대 문제 수
@@ -226,7 +241,7 @@ export default function ProblemsOption({ type }: Props) {
                   >
                     <div>
                       <Button className="block max-[520px]:hidden">
-                        문제집 설명 설정
+                        문제집 설정
                       </Button>
                       <Button className="hidden w-fit max-[520px]:block">
                         <IoMdSettings />
@@ -234,15 +249,34 @@ export default function ProblemsOption({ type }: Props) {
                     </div>
                   </DialogTrigger>
                   <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-                    <DialogHeader>
-                      <DialogTitle>{`문제집 설명 ${type === "manage" ? "수정" : "설정"}`}</DialogTitle>
+                    <DialogHeader className="relative text-start">
+                      <div className="absolute right-0 top-[1rem] flex  items-center justify-center">
+                        <Label className="mr-2 text-[.9rem] ">제한시간</Label>
+                        <Input
+                          inputClassName="w-[3rem] h-[2.2rem] text-center"
+                          value={timeInput}
+                          onChange={(e) => setTimeInput(e.target.value)}
+                        />
+                        <Label className="ml-2 text-[.9rem] ">분</Label>
+                      </div>
+                      <DialogTitle>{`문제집 ${type === "manage" ? "수정" : "설정"}`}</DialogTitle>
+                      <DialogDescription>
+                        문제집을 설정해주세요.
+                      </DialogDescription>
                     </DialogHeader>
-                    <Textarea
-                      className="resize-none"
-                      value={textarea}
-                      placeholder="다른 사용자에게 문제집에 대한 설명을 남겨주세요."
-                      onChange={(e) => setTextarea(e.target.value)}
-                    />
+
+                    <div className="flex flex-col">
+                      <Label className="mb-2 ml-[.2rem] mt-2 text-[1rem]">
+                        문제집 설명
+                      </Label>
+                      <Textarea
+                        className="resize-none"
+                        value={textarea}
+                        placeholder="다른 사용자에게 문제집에 대한 설명을 남겨주세요."
+                        onChange={(e) => setTextarea(e.target.value)}
+                      />
+                    </div>
+
                     <DialogFooter>
                       <Button
                         className="px-6 py-3"
