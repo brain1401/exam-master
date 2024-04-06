@@ -22,7 +22,7 @@ const Label = React.forwardRef<
   <LabelPrimitive.Root
     ref={ref}
     onClick={(e) => preventDefault && e.preventDefault()}
-    className={cn(labelVariants(), className)}
+    className={cn(labelVariants(), "block",className)}
     {...props}
   />
 ));
