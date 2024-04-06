@@ -339,7 +339,6 @@ export default function PublicProblemExam({
                         }
                         allowOnlyNumber
                         id="time-limit"
-                        type="number"
                       />
                     </div>
                   </div>
