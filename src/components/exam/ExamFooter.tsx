@@ -1,9 +1,5 @@
-import { handleEnterKeyPress } from "@/utils/keyboard";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Candidate, ExamProblem, ExamProblemSet } from "@/types/problems";
-import { useEffect, useState } from "react";
+import { ExamProblemSet } from "@/types/problems";
 import ExamSubmitButton from "./ExamSubmitButton";
 import { useRouter } from "next/navigation";
 
