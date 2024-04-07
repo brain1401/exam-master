@@ -1,4 +1,4 @@
-import ExamProblems from "@/components/ExamProblems/ExamProblems";
+import LoggedInExamProblems from "@/components/exam/loggenInExamProblem";
 import LoginRequired from "@/components/ui/LoginRequired";
 import ProblemSetAccessDenied from "@/components/ui/ProblemSetAccessDenied";
 import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
@@ -58,21 +58,20 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
     return <LoginRequired />;
   }
 
-   const UUIDValidate = isValidUUID(UUID);
+  const UUIDValidate = isValidUUID(UUID);
 
-   if (!UUIDValidate) {
-     return <ProblemSetNotFound />;
-   }
+  if (!UUIDValidate) {
+    return <ProblemSetNotFound />;
+  }
 
-   const authorized = await checkUserPermissionForProblemSet(
-     UUID,
-     session?.user?.email,
-   );
+  const authorized = await checkUserPermissionForProblemSet(
+    UUID,
+    session?.user?.email,
+  );
 
-   if (authorized === "NO") {
-     return <ProblemSetAccessDenied />;
-   }
-
+  if (authorized === "NO") {
+    return <ProblemSetAccessDenied />;
+  }
 
   const examProblemSet = await getExamProblemsByProblemSetUUID(
     UUID,
@@ -85,7 +84,7 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
 
   return (
     <JotaiProvider>
-      <ExamProblems examProblemSet={examProblemSet} />
+      <LoggedInExamProblems _examProblemSet={examProblemSet} />
     </JotaiProvider>
   );
 }

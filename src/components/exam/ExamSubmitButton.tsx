@@ -1,50 +1,60 @@
 import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
-import { PublicExamProblemSet } from "@/types/problems";
+import { ExamProblemSet } from "@/types/problems";
 import { useState } from "react";
 import useRevalidation from "@/hooks/useRevalidate";
 import { isExamProblemAnswered } from "@/utils/problems";
 import axios from "axios";
 
 type Props = {
-  ProblemSet: PublicExamProblemSet | null;
+  problemSet: ExamProblemSet | null;
 };
 
-export default function ExamSubmitButton({ ProblemSet }: Props) {
+export default function ExamSubmitButton({ problemSet }: Props) {
   const { data: session } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
+
   const { revalidateAllPathAndRedirect } = useRevalidation();
 
-  const user = session?.user;
+  const isUserLoggedIn = session ? true : false;
 
-  const userEmail = user?.email;
-  const userName = user?.name;
+  const ProblemSetUUID = problemSet?.uuid;
+  const problems = problemSet?.problems;
 
-  const problems = ProblemSet?.problems;
+  const apiURL = isUserLoggedIn
+    ? "/api/evaluateExamProblems"
+    : "/api/evaluatePublicExamProblems";
+
+  const body = isUserLoggedIn
+    ? {
+        examProblems: problems,
+        examProblemSetUUID: ProblemSetUUID,
+      }
+    : {
+        publicExamProblems: problems,
+        publicExamProblemSetUuid: ProblemSetUUID,
+      };
 
   const onClick = async () => {
-
-    console.log("problems :",problems);
+    console.log("problems :", problems);
     if (!problems?.every(isExamProblemAnswered)) {
       return alert("모든 문제에 답을 입력해주세요.");
     }
 
     setIsLoading(true);
-    let uuid = "";
 
     try {
-      const { data } = await axios.post("/api/evaluatePublicExamProblems", {
-        examProblems: problems,
-        publicProblemSetUuid: ProblemSet?.uuid,
-      });
-      uuid = data.uuid;
+      const { data } = await axios.post(apiURL, body);
+      const uuid = data.uuid;
+
+      const directURL = isUserLoggedIn
+        ? `/result/${uuid}`
+        : `/public-result/${uuid}`;
 
       // // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화 및 결과 페이지로 리다이렉트
-      //   await revalidateAllPathAndRedirect(`/result/${uuid}`);
-
-      console.log("uuid :",uuid);
-      
+      await revalidateAllPathAndRedirect(directURL);
+      console.log("uuid :", uuid);
     } catch (e) {
       if (e instanceof Error) {
         console.error(e);

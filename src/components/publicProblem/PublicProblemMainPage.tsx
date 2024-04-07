@@ -291,7 +291,7 @@ export default function PublicProblemMainPage({
   }, [like]);
 
   return (
-    <div className="mx-auto max-w-[50rem]">
+    <div className="mx-auto w-full max-w-[50rem] pt-[6rem] px-[1.5rem]">
       <Card>
         <CardHeader>
           <div className="relative">
@@ -340,9 +340,11 @@ export default function PublicProblemMainPage({
                     <Input
                       value={timeLimit}
                       onChange={(e) => setTimeLimit(e.target.value)}
-                      onKeyDown={async (e) => handleEnterKeyPress(e, () => {
-                        setIsExamStarted(true);
-                      })}
+                      onKeyDown={async (e) =>
+                        handleEnterKeyPress(e, () => {
+                          setIsExamStarted(true);
+                        })
+                      }
                       allowOnlyNumber
                       id="time-limit"
                     />

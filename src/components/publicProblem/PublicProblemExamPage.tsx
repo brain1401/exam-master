@@ -5,6 +5,7 @@ import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "../exam/ExamFooter";
 import ExamProblem from "../exam/ExamProblem";
 import { PublicExamProblemSet } from "@/types/problems";
+import ExamLayout from "../layouts/ExamLayout";
 
 type Props = {
   problemSetTimeLimit: number;
@@ -51,40 +52,38 @@ export default function PublicProblemExamPage({
   }, [publicExamProblems]);
 
   return (
-    <section className="flex h-full w-full flex-col items-center justify-center">
-      <div className="w-full max-w-3xl">
-        <ExamHeader
-          totalProblems={publicExamProblems?.length ?? 0}
-          currentExamProblemIndex={currentExamProblemIndex}
-          setCurrentExamProblemIndex={setCurrentExamProblemIndex}
-        />
-        <ExamProgressBar
-          timeLimit={problemSetTimeLimit}
-          isTimeOver={isTimeOver}
-          setIsTimeOver={setIsTimeOver}
-        />
-        <ExamProblem
-          questionNumber={questionNumber}
-          currentProblem={currentPublicExamProblem}
-          candidates={currentPublicExamProblemCandidates}
-          setCurrentPublicExamProblemCandidates={
-            setCurrentPublicExamProblemCandidates
-          }
-          setCurrentPublicExamProblemSubAnswer={
-            setCurrentPublicExamProblemSubAnswer
-          }
-        />
-        <ExamFooter
-          problemSet={publicExamProblemSet}
-          publicExamProblems={publicExamProblems}
-          setCurrentExamProblemIndex={setCurrentExamProblemIndex}
-          setCurrentPublicExamProblemCandidates={
-            setCurrentPublicExamProblemCandidates
-          }
-          currentExamProblemIndex={currentExamProblemIndex}
-          setIsExamStarted={setIsExamStarted}
-        />
-      </div>
-    </section>
+    <ExamLayout>
+      <ExamHeader
+        totalProblems={publicExamProblems?.length ?? 0}
+        currentExamProblemIndex={currentExamProblemIndex}
+        setCurrentExamProblemIndex={setCurrentExamProblemIndex}
+      />
+      <ExamProgressBar
+        timeLimit={problemSetTimeLimit}
+        isTimeOver={isTimeOver}
+        setIsTimeOver={setIsTimeOver}
+      />
+      <ExamProblem
+        questionNumber={questionNumber}
+        currentProblem={currentPublicExamProblem}
+        candidates={currentPublicExamProblemCandidates}
+        setCurrentExamProblemCandidates={
+          setCurrentPublicExamProblemCandidates
+        }
+        setCurrentExamProblemSubAnswer={
+          setCurrentPublicExamProblemSubAnswer
+        }
+      />
+      <ExamFooter
+        problemSet={publicExamProblemSet}
+        publicExamProblems={publicExamProblems}
+        setCurrentExamProblemIndex={setCurrentExamProblemIndex}
+        setCurrentPublicExamProblemCandidates={
+          setCurrentPublicExamProblemCandidates
+        }
+        currentExamProblemIndex={currentExamProblemIndex}
+        setIsExamStarted={setIsExamStarted}
+      />
+    </ExamLayout>
   );
 }

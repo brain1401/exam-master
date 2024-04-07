@@ -5,11 +5,13 @@ import {
   examProblemSetNameAtom,
   examProblemsAtom,
   resetExamProblemAnswersAtom,
+  currentExamProblemCandidatesAtom,
+  currentExamProblemSubAnswerAtom,
 } from "@/jotai/examProblems";
 import { useAtom, useSetAtom } from "jotai";
 
 export default function useExamProblems() {
-  const [examProblemSets, setExamProblemSets] = useAtom(examProblemSetAtom);
+  const [examProblemSet, setExamProblemSet] = useAtom(examProblemSetAtom);
   const [currentExamProblem, setCurrentExamProblem] = useAtom(
     currentExamProblemAtom,
   );
@@ -20,12 +22,19 @@ export default function useExamProblems() {
     examProblemSetNameAtom,
   );
   const [examProblems, setExamProblems] = useAtom(examProblemsAtom);
-  
+
+  const [currentExamProblemCandidates, setCurrentExamProblemCandidates] =
+    useAtom(currentExamProblemCandidatesAtom);
+
+  const [currentExamProblemSubAnswer, setCurrentExamProblemSubAnswer] = useAtom(
+    currentExamProblemSubAnswerAtom,
+  );
+
   const resetExamProblems = useSetAtom(resetExamProblemAnswersAtom);
 
   return {
-    examProblemSets,
-    setExamProblemSets,
+    examProblemSet,
+    setExamProblemSet,
     examProblems,
     setExamProblems,
     currentExamProblem,
@@ -34,6 +43,10 @@ export default function useExamProblems() {
     setCurrentExamProblemIndex,
     examProblemSetName,
     setExamProblemSetName,
+    currentExamProblemCandidates,
+    setCurrentExamProblemCandidates,
+    currentExamProblemSubAnswer,
+    setCurrentExamProblemSubAnswer,
     resetExamProblems,
   };
 }

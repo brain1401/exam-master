@@ -7,23 +7,23 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession();
 
   const {
-    examProblems,
-    publicProblemSetUuid,
+    publicExamProblems,
+    publicExamProblemSetUuid,
   }: {
-    examProblems: ExamProblem[];
-    publicProblemSetUuid: string;
+    publicExamProblems: ExamProblem[];
+    publicExamProblemSetUuid: string;
   } = await req.json();
 
   const userEmail = session?.user?.email;
 
-  if (!examProblems || !publicProblemSetUuid) {
+  if (!publicExamProblems || !publicExamProblemSetUuid) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
     );
   }
 
-  if (examProblemsSchema.safeParse(examProblems).success === false) {
+  if (examProblemsSchema.safeParse(publicExamProblems).success === false) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const uuid = await evaluateExamProblems(
-      examProblems,
-      publicProblemSetUuid,
+      publicExamProblems,
+      publicExamProblemSetUuid,
       userEmail ?? undefined,
     );
     return NextResponse.json({ uuid });

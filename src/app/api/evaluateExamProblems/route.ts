@@ -1,5 +1,5 @@
 import { evaluateExamProblems } from "@/service/problems";
-import { ExamProblem, examProblemsSchema } from "@/types/problems";
+import { ExamProblem, examProblemsSchema, uuidSchema } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -21,16 +21,20 @@ export async function POST(req: NextRequest) {
 
   const {
     examProblems,
-    examProblemSetName,
+    examProblemSetUUID,
   }: {
     examProblems: ExamProblem[];
-    examProblemSetName: string;
+    examProblemSetUUID: string;
   } = await req.json();
 
   console.log("examProblems", examProblems);
-  console.log("problemSetName", examProblemSetName);
+  console.log("problemSetName", examProblemSetUUID);
 
-  if (!examProblems || !examProblemSetName) {
+  if (
+    !examProblems ||
+    !examProblemSetUUID ||
+    uuidSchema.safeParse(examProblemSetUUID).success === false
+  ) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
@@ -47,7 +51,7 @@ export async function POST(req: NextRequest) {
   try {
     const uuid = await evaluateExamProblems(
       examProblems,
-      examProblemSetName,
+      examProblemSetUUID,
       session.user.email,
     );
     return NextResponse.json({ uuid });

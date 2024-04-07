@@ -5,24 +5,27 @@ import { cn } from "@/lib/utils";
 import candidateNumber from "@/utils/candidateNumber";
 import checkImage from "../../../public/images/checkBlack.png";
 import { Textarea } from "../ui/textarea";
+import { useEffect } from "react";
 
 type Props = {
   currentProblem: ExamProblem;
   questionNumber: number;
   candidates: Candidate[] | null;
-  setCurrentPublicExamProblemCandidates: (
-    candidates: Candidate[] | null,
-  ) => void;
-  setCurrentPublicExamProblemSubAnswer: (subAnswer: string | null) => void;
+  setCurrentExamProblemCandidates: (candidates: Candidate[] | null) => void;
+  setCurrentExamProblemSubAnswer: (subAnswer: string | null) => void;
 };
 
 export default function ExamProblem({
   candidates,
   currentProblem,
   questionNumber,
-  setCurrentPublicExamProblemCandidates,
-  setCurrentPublicExamProblemSubAnswer,
+  setCurrentExamProblemCandidates,
+  setCurrentExamProblemSubAnswer,
 }: Props) {
+  useEffect(() => {
+    console.log("candidates :", candidates);
+  }, [candidates]);
+
   const handleCandidateClick = (i: number) => {
     if (!currentProblem || !currentProblem.candidates) {
       throw new Error("무언가가 잘못되었습니다.");
@@ -44,7 +47,7 @@ export default function ExamProblem({
         };
       }) ?? null;
 
-    setCurrentPublicExamProblemCandidates(newCandidates);
+    setCurrentExamProblemCandidates(newCandidates);
   };
 
   const objective = currentProblem?.candidates?.map((candidate, i) => {
@@ -75,7 +78,7 @@ export default function ExamProblem({
       className="h-[2rem] w-full resize-none rounded-md border p-2"
       placeholder="답을 입력해주세요."
       onChange={(e) => {
-        setCurrentPublicExamProblemSubAnswer(e.target.value);
+        setCurrentExamProblemSubAnswer(e.target.value);
       }}
     />
   );

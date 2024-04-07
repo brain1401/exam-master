@@ -1,10 +1,11 @@
-import { ExamProblem, ExamProblemSet } from "@/types/problems";
+import { Candidate, ExamProblem, ExamProblemSet } from "@/types/problems";
 import { atom } from "jotai";
 
 export const examProblemSetAtom = atom<ExamProblemSet>({
   name: "",
   problems: [],
   uuid: "",
+  timeLimit: 0,
 });
 
 export const currentExamProblemIndexAtom = atom<number>(0);
@@ -21,7 +22,6 @@ export const examProblemsAtom = atom(
     }));
   },
 );
-
 
 export const currentExamProblemAtom = atom(
   (get) => {
@@ -44,6 +44,35 @@ export const currentExamProblemAtom = atom(
   },
 );
 
+export const currentExamProblemCandidatesAtom = atom(
+  (get) => {
+    const currentExamProblem = get(currentExamProblemAtom);
+    return currentExamProblem.candidates;
+  },
+  (get, set, update: Candidate[] | null) => {
+    set(currentExamProblemAtom, {
+      candidates: update,
+    });
+  },
+);
+
+export const currentExamProblemSubAnswerAtom = atom(
+  (get) => {
+    const currentExamProblem = get(currentExamProblemAtom);
+    return currentExamProblem.subAnswer;
+  },
+  (get, set, update: string | null) => {
+    if (update === null) {
+      set(currentExamProblemAtom, {
+        subAnswer: "",
+      });
+    } else {
+      set(currentExamProblemAtom, {
+        subAnswer: update,
+      });
+    }
+  },
+);
 
 export const examProblemSetNameAtom = atom(
   (get) => {
@@ -63,5 +92,6 @@ export const resetExamProblemAnswersAtom = atom(null, (get, set) => {
     name: "",
     problems: [],
     uuid: "",
+    timeLimit: 0,
   });
 });

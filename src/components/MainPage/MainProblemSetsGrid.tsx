@@ -68,7 +68,7 @@ export default function MainProblemSetsGrid() {
               <ProblemGridCardLayout key={publicProblemSet.uuid}>
                 <Card>
                   <Link
-                    href={`/problem/${publicProblemSet.uuid}`}
+                    href={`/public-problem/${publicProblemSet.uuid}`}
                     className="flex h-full w-full flex-col"
                   >
                     <CardHeader>

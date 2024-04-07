@@ -84,12 +84,12 @@ export const examProblemsSchema = z.array(examProblemSchema);
 export type ExamProblemSet = {
   uuid: string | undefined;
   name: string;
+  timeLimit: number;
   problems: ExamProblem[];
 };
 
 export type PublicExamProblemSet = Prettify<
   ExamProblemSet & {
-    timeLimit: number;
     updatedAt: Date;
     creator: string;
     description: string;

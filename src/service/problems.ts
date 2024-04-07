@@ -650,6 +650,7 @@ export async function getExamProblemsByProblemSetUUID(
   const result: ExamProblemSet = {
     uuid: data.uuid,
     name: data.name,
+    timeLimit: data.timeLimit || 20,
     problems: problemShuffle(examProblems),
   };
 

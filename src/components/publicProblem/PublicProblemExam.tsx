@@ -39,7 +39,7 @@ export default function PublicProblemExam({
   const { isExamStarted } = usePublicProblemExam();
 
   return (
-    <div className="px-3 py-3 pt-10">
+    <>
       {isExamStarted ? (
         <PublicProblemExamPage
           publicProblemSet={publicProblemSet}
@@ -53,6 +53,6 @@ export default function PublicProblemExam({
           userUUID={userUUID}
         />
       )}
-    </div>
+    </>
   );
 }
