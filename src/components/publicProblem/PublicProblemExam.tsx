@@ -36,6 +36,10 @@ export default function PublicProblemExam({
     [publicExamProblemSetAtom, publicProblemSet],
   ]);
 
+  useEffect(() => {
+    console.log("publicProblemSet :", publicProblemSet);
+  }, [publicProblemSet]);
+
   const { isExamStarted } = usePublicProblemExam();
 
   return (

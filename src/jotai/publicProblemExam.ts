@@ -1,4 +1,5 @@
 import { ExamProblem, PublicExamProblemSet } from "@/types/problems";
+import { problemShuffle } from "@/utils/problemShuffle";
 import { atom } from "jotai";
 
 export const publicExamProblemSetAtom = atom<PublicExamProblemSet | null>(null);
@@ -8,6 +9,10 @@ export const timeLimitAtom = atom<string>("0");
 export const currentExamProblemIndexAtom = atom<number>(0);
 
 export const isExamStartedAtom = atom<boolean>(false);
+
+export const isRandomSelectedAtom = atom<boolean>(false);
+
+export const originalProblemsAtom = atom<ExamProblem[]>([]);
 
 export const publicExamProblemsAtom = atom(
   (get) => {
@@ -24,6 +29,23 @@ export const publicExamProblemsAtom = atom(
     }
   },
 );
+
+export const setPublicExamProblemsRandomAtom = atom(null, (get, set) => {
+  const problems = get(publicExamProblemsAtom);
+  set(originalProblemsAtom, problems);
+
+  const shuffledProblems = problemShuffle(problems);
+  set(publicExamProblemsAtom, shuffledProblems);
+});
+
+export const setPublicExamProblemsOriginalAtom = atom(null, (get, set) => {
+  const originalProblems = get(originalProblemsAtom);
+
+  if (originalProblems.length === 0) return;
+
+  const problems = get(originalProblemsAtom);
+  set(publicExamProblemsAtom, problems);
+});
 
 export const currentPublicExamProblemAtom = atom(
   (get) => {

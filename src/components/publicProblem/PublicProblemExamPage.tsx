@@ -6,6 +6,7 @@ import ExamFooter from "../exam/ExamFooter";
 import ExamProblem from "../exam/ExamProblem";
 import { PublicExamProblemSet } from "@/types/problems";
 import ExamLayout from "../layouts/ExamLayout";
+import { problemShuffle } from "@/utils/problemShuffle";
 
 type Props = {
   problemSetTimeLimit: number;
@@ -22,6 +23,8 @@ export default function PublicProblemExamPage({
     timeLimit,
     publicExamProblemSet,
     publicExamProblems,
+    isRandomSelected,
+    setPublicExamProblemSet,
     currentPublicExamProblemCandidates,
     setCurrentPublicExamProblem,
     setCurrentPublicExamProblemCandidates,
@@ -50,6 +53,8 @@ export default function PublicProblemExamPage({
   useEffect(() => {
     console.log("publicExamProblems :", publicExamProblems);
   }, [publicExamProblems]);
+
+
 
   return (
     <ExamLayout>

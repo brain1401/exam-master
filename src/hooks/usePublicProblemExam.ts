@@ -6,9 +6,12 @@ import {
   currentPublicExamProblemAtom,
   currentPublicExamProblemCandidatesAtom,
   publicExamProblemSetAtom,
+  isRandomSelectedAtom,
+  setPublicExamProblemsOriginalAtom,
+  setPublicExamProblemsRandomAtom,
   currentPublicExamProblemSubAnswerAtom,
 } from "@/jotai/publicProblemExam";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 
 export function usePublicProblemExam() {
   const [timeLimit, setTimeLimit] = useAtom(timeLimitAtom);
@@ -38,6 +41,16 @@ export function usePublicProblemExam() {
     setCurrentPublicExamProblemSubAnswer,
   ] = useAtom(currentPublicExamProblemSubAnswerAtom);
 
+  const [isRandomSelected, setIsRandomSelected] = useAtom(isRandomSelectedAtom);
+
+  const setPublicExamProblemsOriginal = useSetAtom(
+    setPublicExamProblemsOriginalAtom,
+  );
+
+  const setPublicExamProblemsRandom = useSetAtom(
+    setPublicExamProblemsRandomAtom,
+  );
+
   return {
     isExamStarted,
     timeLimit,
@@ -47,6 +60,10 @@ export function usePublicProblemExam() {
     currentPublicExamProblemCandidates,
     publicExamProblemSet,
     currentPublicExamProblemSubAnswer,
+    isRandomSelected,
+    setPublicExamProblemsOriginal,
+    setPublicExamProblemsRandom,
+    setIsRandomSelected,
     setCurrentPublicExamProblemSubAnswer,
     setPublicExamProblemSet,
     setCurrentPublicExamProblemCandidates,

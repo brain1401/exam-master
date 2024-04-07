@@ -38,6 +38,8 @@ import axios from "axios";
 import { handleEnterKeyPress } from "@/utils/keyboard";
 import { TrashIcon } from "lucide-react";
 import { usePublicProblemExam } from "@/hooks/usePublicProblemExam";
+import { Switch } from "../ui/switch";
+import { problemShuffle } from "@/utils/problemShuffle";
 
 type Props = {
   publicSetUUID: string;
@@ -52,7 +54,15 @@ export default function PublicProblemMainPage({
   userName,
   userUUID,
 }: Props) {
-  const { timeLimit, setTimeLimit, setIsExamStarted } = usePublicProblemExam();
+  const {
+    timeLimit,
+    setTimeLimit,
+    setIsExamStarted,
+    isRandomSelected,
+    setIsRandomSelected,
+    setPublicExamProblemsRandom,
+    setPublicExamProblemsOriginal,
+  } = usePublicProblemExam();
   const [comment, setComment] = useState("");
   const { revalidateAllPath } = useRevalidation();
   const queryClient = useQueryClient();
@@ -278,6 +288,18 @@ export default function PublicProblemMainPage({
   };
 
   useEffect(() => {
+    if (isRandomSelected) {
+      setPublicExamProblemsRandom();
+    } else {
+      setPublicExamProblemsOriginal();
+    }
+  }, [
+    isRandomSelected,
+    setPublicExamProblemsRandom,
+    setPublicExamProblemsOriginal,
+  ]);
+
+  useEffect(() => {
     console.log("timeLimit :", timeLimit);
   }, [timeLimit]);
 
@@ -291,7 +313,7 @@ export default function PublicProblemMainPage({
   }, [like]);
 
   return (
-    <div className="mx-auto w-full max-w-[50rem] pt-[6rem] px-[1.5rem]">
+    <div className="mx-auto w-full max-w-[50rem] px-[1.5rem] pt-[6rem]">
       <Card>
         <CardHeader>
           <div className="relative">
@@ -322,18 +344,24 @@ export default function PublicProblemMainPage({
               <DialogTrigger asChild>
                 <Button size="lg">문제 풀기 시작</Button>
               </DialogTrigger>
-              <DialogContent
-                className="sm:max-w-[425px]"
-                onOpenAutoFocus={(e) => e.preventDefault()}
-              >
-                <DialogHeader>
+              <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+                <DialogHeader className="text-left">
                   <DialogTitle>제한 시간 설정</DialogTitle>
                   <DialogDescription className="whitespace-pre-wrap">
-                    {`시험을 시작하기 전 시험에 제한 시간을 설정하세요.\n문제집 만든이가 설정한 기본 제한 시간은 ${publicProblemSet?.timeLimit || 20}분입니다.`}
+                    {`시험을 시작하기 전 시험에 제한 시간을 설정하세요.\n문제집 만든이가 설정한 기본 제한 시간은`}
+                    <strong className="text-black">{`${publicProblemSet?.timeLimit || 20}분`}</strong>
+                    {`입니다.`}
                   </DialogDescription>
                 </DialogHeader>
-                <div className="flex items-center justify-center py-4">
-                  <div>
+                <div className="flex items-center justify-end min-[508px]:absolute min-[508px]:right-[1rem] min-[508px]:top-[3rem]">
+                  <Label className="">랜덤으로 풀기</Label>
+                  <Switch
+                    checked={isRandomSelected}
+                    onCheckedChange={(checked) => setIsRandomSelected(checked)}
+                  />
+                </div>
+                <div className="mb-5 flex flex-col items-center justify-center min-[508px]:mb-0 min-[508px]:gap-y-2 min-[508px]:py-4">
+                  <div className="flex flex-col">
                     <Label className="mb-3 block font-bold">
                       제한 시간 (분)
                     </Label>
