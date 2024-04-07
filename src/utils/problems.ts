@@ -1,6 +1,5 @@
 import {
   Problem,
-  ImageType,
   ImageSchema,
   ExamProblem,
   ProblemSetWithPagination,
@@ -16,6 +15,7 @@ import {
   ExamProblemSet,
   ExamProblemAnswer,
   uuidSchema,
+  ImageURL,
 } from "@/types/problems";
 import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import axios, { isAxiosError } from "axios";
@@ -63,7 +63,7 @@ export function isImageFileObject(image: any): image is File {
   );
 }
 
-export function isImageUrlObject(image: any): image is ImageType {
+export function isImageUrlObject(image: any): image is ImageURL {
   return ImageSchema.safeParse(image).success;
 }
 

@@ -37,7 +37,7 @@ export default function AddViewAndPhoto({ className }: Props) {
       };
     } else if (isImageUrlObject(image)) {
       // image가 null이 아니고 URL프로퍼티를 포함한 객체인 경우
-      setImageURL(image?.url);
+      setImageURL(image.url);
     } else {
       setImageURL(null);
     }

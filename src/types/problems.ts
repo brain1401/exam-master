@@ -10,6 +10,8 @@ export const ImageSchema = z.object({
   hash: z.string(),
 });
 
+export type ImageURL = z.infer<typeof ImageSchema>;
+
 export type Candidate = {
   id: number | null;
   text: string;
@@ -75,10 +77,9 @@ export const examProblemSchema = z.object({
   subAnswer: z.string().nullable(),
 });
 
-export const examProblemsSchema = z.array(examProblemSchema);
-
 export type ExamProblem = z.infer<typeof examProblemSchema>;
 
+export const examProblemsSchema = z.array(examProblemSchema);
 
 export type ExamProblemSet = {
   uuid: string | undefined;
@@ -112,6 +113,7 @@ export type ProblemSet = {
   problems?: Problem[];
   examProblemsCount?: number;
 };
+
 export type ProblemSetWithCreatedBy = Prettify<
   Omit<ProblemSet, "createdAt"> & {
     createdBy: string;
@@ -153,8 +155,6 @@ export type ProblemSetComment = {
   userUUID: string;
   userName: string;
 };
-
-export type ImageType = z.infer<typeof ImageSchema>;
 
 export const problemSchema = z
   .object({
@@ -220,6 +220,7 @@ export const ExamResultsSetSchema = z.object({
   userUuid: z.string().uuid().nullable(),
   problemResults: z.array(ProblemResultSchema),
 });
+export type ExamResultsSet = Prettify<z.infer<typeof ExamResultsSetSchema>>;
 
 export const ResultWithCountSchema = z.object({
   uuid: z.string().uuid(),
@@ -228,19 +229,16 @@ export const ResultWithCountSchema = z.object({
   problemSetName: z.string(),
   problemResultsCount: z.number(),
 });
-
 export type ResultWithCount = z.infer<typeof ResultWithCountSchema>;
 
 export type ResultsWithPagination = {
   data: ResultWithCount[];
   pagination: Pagination;
 };
+
 export type CorrectAnswer = string | (number | null)[] | null;
 
-export type ExamResultsSet = Prettify<z.infer<typeof ExamResultsSetSchema>>;
-
 export const QuestionTypeSchema = z.enum(["obj", "sub"]);
-
 export type QuestionType = z.infer<typeof QuestionTypeSchema>;
 
 export const PaginationSchema = z.object({
@@ -260,7 +258,6 @@ export const ExamResultsWithCountResponseSchema = z.object({
   data: z.array(ResultWithCountSchema),
   meta: MetaSchema,
 });
-
 export type ExamResultsWithCountResponse = z.infer<
   typeof ExamResultsWithCountResponseSchema
 >;

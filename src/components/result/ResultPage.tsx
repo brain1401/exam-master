@@ -1,5 +1,4 @@
 "use client";
-import axios, { isAxiosError } from "axios";
 import { useEffect, useState, useRef } from "react";
 import CurrentQuestion from "./CurrentQuestion";
 import CurrentCandidates from "./CurrentCandidates";
@@ -10,7 +9,6 @@ import SubjectiveAnswered from "./SubjectiveAnswered";
 import ExamCardLayout from "../layouts/ExamCardLayout";
 import useProblemResults from "@/hooks/useProblemResults";
 import CorrectAnswer from "./CorrectAnswer";
-import CustomLoading from "../ui/CustomLoading";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
 import CorrectMark from "../../../public/images/correctCircle.png";
 import WrongMark from "../../../public/images/wrong.png";
