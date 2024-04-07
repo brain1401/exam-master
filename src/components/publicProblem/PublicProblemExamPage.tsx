@@ -63,7 +63,7 @@ export default function PublicProblemExamPage({
         publicExamProblemLength={publicExamProblems?.length ?? 0}
       />
       <ExamProgressBar
-        timeLimit={problemSetTimeLimit}
+        timeLimit={Number(timeLimit) || 0}
         isTimeOver={isTimeOver}
         setIsTimeOver={setIsTimeOver}
       />
@@ -74,9 +74,7 @@ export default function PublicProblemExamPage({
         setCurrentExamProblemCandidates={setCurrentPublicExamProblemCandidates}
         setCurrentExamProblemSubAnswer={setCurrentPublicExamProblemSubAnswer}
       />
-      <ExamFooter
-        problemSet={publicExamProblemSet}
-      />
+      <ExamFooter problemSet={publicExamProblemSet} />
     </ExamLayout>
   );
 }
