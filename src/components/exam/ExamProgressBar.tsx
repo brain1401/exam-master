@@ -1,6 +1,7 @@
 import { Progress } from "@/app/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
 type Props = {
   timeLimit: number;
   isTimeOver: boolean;
@@ -13,21 +14,29 @@ export default function ExamProgressBar({
   setIsTimeOver,
 }: Props) {
   const [elapsedTime, setElapsedTime] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedTime((prevTime) => {
-        const newTime = prevTime + 0.1;
-        if (newTime >= timeLimit * 60) {
-          setIsTimeOver(true);
-          return timeLimit * 60;
-        }
-        return newTime;
-      });
-    }, 100);
+    const startTime = Date.now();
+
+    const timer = () => {
+      const currentTime = Date.now();
+      const elapsed = (currentTime - startTime) / 1000;
+      setElapsedTime(elapsed);
+
+      if (elapsed >= timeLimit * 60) {
+        setIsTimeOver(true);
+      } else {
+        timeoutRef.current = setTimeout(timer, 100);
+      }
+    };
+
+    timeoutRef.current = setTimeout(timer, 100);
 
     return () => {
-      clearInterval(interval);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, [timeLimit, setIsTimeOver]);
 
