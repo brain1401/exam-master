@@ -5,7 +5,6 @@ import PaginationButton from "../ui/PaginationButton";
 import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsGrid from "./ProblemSetsGrid";
 import DynamicSearchBox from "../ui/DynamicSearchBox";
-import useUiState from "@/hooks/useUiState";
 import { useHydrateAtoms } from "jotai/utils";
 import {
   problemSetsMaxPageAtom,

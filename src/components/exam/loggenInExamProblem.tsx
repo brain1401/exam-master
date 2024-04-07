@@ -2,61 +2,65 @@
 import usePreventClose from "@/hooks/usePreventClose";
 import useExamProblems from "@/hooks/useExamProblems";
 import { ExamProblemSet } from "@/types/problems";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useRevalidation from "@/hooks/useRevalidate";
-import { useHydrateAtoms } from "jotai/utils";
-import { examProblemSetAtom } from "@/jotai/examProblems";
 import ExamLayout from "../layouts/ExamLayout";
 import ExamHeader from "../exam/ExamHeader";
 import ExamProblem from "../exam/ExamProblem";
 import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "./ExamFooter";
-import { timeLimitAtom } from "@/jotai/publicProblemExam";
+import { useHydrateAtoms } from "jotai/utils";
+import {
+  examProblemSetAtom,
+  isTimeOverAtom,
+  timeLimitAtom,
+} from "@/jotai/examProblems";
+
 type Props = {
   _examProblemSet: ExamProblemSet;
 };
 export default function LoggedInExamProblems({ _examProblemSet }: Props) {
   useHydrateAtoms([
     [examProblemSetAtom, _examProblemSet],
-    [timeLimitAtom, _examProblemSet.timeLimit.toString()],
+    [isTimeOverAtom, false],
   ]);
 
   const {
     currentExamProblem,
     currentExamProblemIndex,
-    examProblemSetName,
     examProblemSet,
-    currentExamProblemCandidates,
-    currentExamProblemSubAnswer,
+    examProblems,
     timeLimit,
     isTimeOver,
     setIsTimeOver,
-    setIsExamStarted,
+    setExamProblemSet,
     setCurrentExamProblemSubAnswer,
     setCurrentExamProblemCandidates,
-    setCurrentExamProblem,
     setCurrentExamProblemIndex,
-    setExamProblemSetName,
-    setExamProblemSet,
-    setExamProblems,
-    examProblems,
     resetExamProblems,
   } = useExamProblems();
 
-  const { revalidateAllPath } = useRevalidation();
+  useEffect(() => {
+    setExamProblemSet(_examProblemSet);
+  }, [_examProblemSet, setExamProblemSet]);
+
+  useEffect(() => {
+    setIsTimeOver(false);
+  }, [currentExamProblemIndex, setIsTimeOver]);
+
+  useEffect(() => {
+    return () => {
+      resetExamProblems();
+    };
+  }, [resetExamProblems]);
 
   useEffect(() => {
     console.log("examProblemSet :", examProblemSet);
   }, [examProblemSet]);
 
   useEffect(() => {
-    // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
-    revalidateAllPath();
-
-    return () => {
-      resetExamProblems();
-    };
-  }, [revalidateAllPath, resetExamProblems]);
+    console.log("timeLimit :", timeLimit);
+  }, [timeLimit]);
 
   usePreventClose();
 
@@ -69,7 +73,7 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
         publicExamProblemLength={examProblems?.length ?? 0}
       />
       <ExamProgressBar
-        timeLimit={timeLimit}
+        timeLimit={Number(timeLimit)}
         isTimeOver={isTimeOver}
         setIsTimeOver={setIsTimeOver}
       />

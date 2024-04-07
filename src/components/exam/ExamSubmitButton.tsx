@@ -6,6 +6,18 @@ import useRevalidation from "@/hooks/useRevalidate";
 import { isExamProblemAnswered } from "@/utils/problems";
 import axios from "axios";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 
 type Props = {
   problemSet: ExamProblemSet | null;
@@ -16,6 +28,7 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
   const { data: session } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { revalidateAllPathAndRedirect } = useRevalidation();
 
@@ -23,6 +36,8 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
 
   const ProblemSetUUID = problemSet?.uuid;
   const problems = problemSet?.problems;
+
+  const isAllProblemAnswered = problems?.every(isExamProblemAnswered);
 
   const apiURL = isUserLoggedIn
     ? "/api/evaluateExamProblems"
@@ -40,9 +55,6 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
 
   const onClick = async () => {
     console.log("problems :", problems);
-    if (!problems?.every(isExamProblemAnswered)) {
-      return alert("모든 문제에 답을 입력해주세요.");
-    }
 
     setIsLoading(true);
 
@@ -67,12 +79,37 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
   };
 
   return (
-    <Button
-      className={cn(`mt-3 w-[6.5rem] px-6`, className)}
-      onClick={onClick}
-      isLoading={isLoading}
-    >
-      {isLoading ? "채점중..." : "제출하기"}
-    </Button>
+    <>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            className={cn(`mt-3 w-[6.5rem] px-6`, className)}
+            isLoading={isLoading}
+          >
+            {isLoading ? "채점중..." : "제출하기"}
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>시험 제출</DialogTitle>
+            <DialogClose />
+          </DialogHeader>
+          <DialogDescription>
+            {isAllProblemAnswered
+              ? "시험을 제출하시겠습니까? 제출 후에는 시험 결과를 확인할 수 있습니다."
+              : "모든 문제를 풀지 않았습니다. 제출하시겠습니까? 제출 후에는 시험 결과를 확인할 수 있습니다."}
+          </DialogDescription>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">취소</Button>
+            </DialogClose>
+            <Button onClick={onClick} disabled={isLoading}>
+              제출
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

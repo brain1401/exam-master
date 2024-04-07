@@ -12,7 +12,7 @@ export default function CurrentQuestion() {
   } = useProblemResults();
 
   return (
-    <div className="relative">
+    <div className="relative pointer-events-none">
       <Image
         className="absolute top-[-7rem] left-[-5rem]"
         width={200}

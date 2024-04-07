@@ -2,8 +2,6 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-export type Drizzle = ReturnType<typeof createDrizzle>;
-
 function getDatabaseUrl() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -17,6 +15,8 @@ function createDrizzle() {
   return drizzle(postgres(databaseUrl), { schema });
 }
 
+export type Drizzle = ReturnType<typeof createDrizzle>;
+
 let drizzleSession: Drizzle;
 
 try {
@@ -24,7 +24,6 @@ try {
     if (!global._pgPool) {
       global._pgPool = createDrizzle();
       drizzleSession = global._pgPool;
-
     } else {
       drizzleSession = global._pgPool;
     }

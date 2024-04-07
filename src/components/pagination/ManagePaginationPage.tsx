@@ -55,13 +55,13 @@ export default async function ManagePaginationPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-        <ProblemSetsPage
-          page={page}
-          searchString={searchString}
-          type="manage"
-          userEmail={userEmail}
-          maxPage={maxPage || 1}
-        />
+      <ProblemSetsPage
+        page={page}
+        searchString={searchString}
+        type="manage"
+        userEmail={userEmail}
+        maxPage={maxPage || 1}
+      />
     </HydrationBoundary>
   );
 }

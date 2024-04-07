@@ -13,6 +13,23 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/problemGridCard";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import useExamProblems from "@/hooks/useExamProblems";
 type Props = {
   type: "manage" | "exam";
   problemSet: ProblemSet;
@@ -26,11 +43,14 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
     toDeletedUuid,
   } = useUiState();
 
+  const { timeLimit, setTimeLimit } = useExamProblems();
+
   const [isSelected, setIsSelected] = useState<boolean>(
     toDeletedUuid.find((uuid: string) => uuid === problemSet.uuid)
       ? true
       : false,
   );
+  const router = useRouter();
 
   // toDeletedUuid가 외부에서 변경되었을 때 isSelected 동기화
   useEffect(() => {
@@ -57,7 +77,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
       minute: "2-digit",
     },
   );
-  const CustomCard = () => (
+  const CustomCard = (
     <Card>
       <CardHeader>
         <CardTitle>{problemSet.name}</CardTitle>
@@ -88,7 +108,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
         }
       }}
     >
-      <CustomCard />
+      {CustomCard}
       {isDeleteButtonClicked && (
         <Checkbox
           className="absolute top-[calc(100%+.2rem)] md:top-[calc(100%+.8rem)]"
@@ -106,15 +126,39 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
         />
       )}
     </button>
+  ) : type === "manage" ? (
+    <Link href={`/manage/${problemSet.uuid}`}>{CustomCard}</Link>
   ) : (
-    <Link
-      href={
-        type === "manage"
-          ? `/manage/${problemSet.uuid}`
-          : `/exam/${problemSet.uuid}`
-      }
-    >
-      <CustomCard />
-    </Link>
+    <Dialog>
+      <DialogTrigger className="w-full">{CustomCard}</DialogTrigger>
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+        <DialogHeader>
+          <DialogTitle>문제 풀기</DialogTitle>
+          <CardDescription>{problemSet.description}</CardDescription>
+        </DialogHeader>
+        <div className="flex flex-col">
+          <Label className="mb-2">문제집 제한 시간 (분)</Label>
+          <Input
+            allowOnlyNumber
+            value={timeLimit}
+            onChange={(e) => {
+              setTimeLimit(e.target.value);
+            }}
+          />
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">닫기</Button>
+          </DialogClose>
+          <Button
+            onClick={() => {
+              router.push(`/exam/${problemSet.uuid}`);
+            }}
+          >
+            문제 풀기
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

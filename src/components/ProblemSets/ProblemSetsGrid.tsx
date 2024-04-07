@@ -48,10 +48,6 @@ export default function ProblemSetsGrid({
       ),
   });
 
-  useEffect(() => {
-    console.log("problemSets", problemSets);
-  }, [problemSets]);
-
   const MainContent = () => {
     if (problemSets?.data.length === 0) {
       return (

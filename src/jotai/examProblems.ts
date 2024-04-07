@@ -5,13 +5,19 @@ export const examProblemSetAtom = atom<ExamProblemSet | null>(null);
 
 export const currentExamProblemIndexAtom = atom<number>(0);
 
+export const isExamStartedAtom = atom(false);
+
+export const isTimeOverAtom = atom(false);
+
 export const examProblemsAtom = atom(
   (get) => {
     const examProblemSets = get(examProblemSetAtom);
     return examProblemSets?.problems;
   },
   (get, set, update: ExamProblem[]) => {
+    const isTimeOver = get(isTimeOverAtom);
     set(examProblemSetAtom, (prevProblemSet) => {
+      if (isTimeOver) return prevProblemSet;
       if (prevProblemSet) {
         return {
           ...prevProblemSet,
@@ -23,11 +29,7 @@ export const examProblemsAtom = atom(
   },
 );
 
-export const timeLimitAtom = atom(0);
-
-export const isExamStartedAtom = atom(false);
-
-export const isTimeOverAtom = atom(false);
+export const timeLimitAtom = atom("20");
 
 export const currentExamProblemAtom = atom(
   (get) => {
@@ -39,6 +41,9 @@ export const currentExamProblemAtom = atom(
   (get, set, update: Partial<ExamProblem>) => {
     const examProblems = get(examProblemsAtom);
     const currentExamProblemIndex = get(currentExamProblemIndexAtom);
+    const isTimeOver = get(isTimeOverAtom);
+
+    if (isTimeOver) return;
 
     if (!examProblems) return;
 
@@ -58,6 +63,9 @@ export const currentExamProblemCandidatesAtom = atom(
     return currentExamProblem?.candidates;
   },
   (get, set, update: Candidate[] | null) => {
+    const isTimeOver = get(isTimeOverAtom);
+    if (isTimeOver) return;
+
     set(currentExamProblemAtom, {
       candidates: update,
     });
@@ -70,6 +78,9 @@ export const currentExamProblemSubAnswerAtom = atom(
     return currentExamProblem?.subAnswer;
   },
   (get, set, update: string | null) => {
+    const isTimeOver = get(isTimeOverAtom);
+    if (isTimeOver) return;
+
     if (update === null) {
       set(currentExamProblemAtom, {
         subAnswer: "",
@@ -99,4 +110,11 @@ export const examProblemSetNameAtom = atom(
 export const resetExamProblemAnswersAtom = atom(null, (get, set) => {
   set(currentExamProblemIndexAtom, 0);
   set(examProblemSetAtom, null);
+  set(isExamStartedAtom, false);
+  set(isTimeOverAtom, false);
+  set(examProblemsAtom, []);
+  set(timeLimitAtom, "20");
+  set(currentExamProblemCandidatesAtom, null);
+  set(currentExamProblemSubAnswerAtom, null);
+  set(examProblemSetNameAtom, "");
 });

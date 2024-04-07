@@ -151,7 +151,7 @@ export default function ExamProblemCard({
               <DialogHeader className="text-left">
                 <DialogTitle>제한 시간 설정</DialogTitle>
                 <DialogDescription className="whitespace-pre-wrap">
-                  {`시험을 시작하기 전 시험에 제한 시간을 설정하세요.\n문제집 만든이가 설정한 기본 제한 시간은`}
+                  {`시험을 시작하기 전 시험에 제한 시간을 설정하세요.\n문제집 만든이가 설정한 기본 제한 시간은 `}
                   <strong className="text-black">{`${problemSet?.timeLimit || 20}분`}</strong>
                   {`입니다.`}
                 </DialogDescription>

@@ -504,13 +504,20 @@ export async function getProblemSets(
                   image: true,
                 },
               },
+              user: {
+                columns: {
+                  name: true,
+                },
+              },
             },
           }),
         ]);
 
       const returnData: ProblemSetWithPagination = {
         data: problemSets.map((problemSet) => ({
+          createdBy: problemSet.user.name,
           uuid: problemSet.uuid,
+          timeLimit: problemSet.timeLimit || 20,
           name: problemSet.name,
           createdAt: problemSet.createdAt,
           updatedAt: problemSet.updatedAt,
@@ -566,6 +573,11 @@ export async function getProblemSetsByName(
                 image: true,
               },
             },
+            user: {
+              columns: {
+                name: true,
+              },
+            },
           },
         }),
         dt
@@ -586,6 +598,8 @@ export async function getProblemSetsByName(
 
       const returnData: ProblemSetWithPagination = {
         data: problemSets.map((problemSet) => ({
+          createdBy: problemSet.user.name,
+          timeLimit: problemSet.timeLimit || 20,
           uuid: problemSet.uuid,
           name: problemSet.name,
           createdAt: problemSet.createdAt,
@@ -610,7 +624,7 @@ export async function getProblemSetsByName(
   }
 }
 
-export async function getExamProblemsByProblemSetUUID(
+export async function getRandomExamProblemsByProblemSetUUID(
   UUID: string,
   userEmail: string,
 ) {
@@ -1500,7 +1514,7 @@ export async function validateExamProblemAnswer(
   examProblem: ExamProblem,
   answer: CorrectAnswer,
 ) {
-  let finalResult: boolean | null = null;
+  let finalResult = false;
 
   if (!examProblem || !examProblem.uuid) {
     throw new Error("something is null");
@@ -1515,20 +1529,21 @@ export async function validateExamProblemAnswer(
       ?.filter((candidate) => candidate.isAnswer)
       .map((candidate) => candidate.id);
 
-    finalResult =
-      (userAnswer && answer.every((id) => userAnswer.includes(id))) ?? null;
+    if (userAnswer && userAnswer.length > 0) {
+      finalResult = answer.every((id) => userAnswer.includes(id));
+    }
   } else if (examProblem.type === "sub") {
     if (typeof answer !== "string") {
       throw new Error("Answer is not a string");
     }
 
-    finalResult = examProblem.subAnswer === answer;
+    if (examProblem.subAnswer) {
+      finalResult = examProblem.subAnswer.trim() === answer.trim();
+    } else {
+      finalResult = !examProblem.subAnswer && !answer;
+    }
   } else {
     throw new Error("Invalid problem type");
-  }
-
-  if (finalResult === null) {
-    throw new Error("finalResult is null");
   }
 
   return finalResult;
@@ -1667,6 +1682,7 @@ export async function getPublicProblemSets(
                 .map((problemSet) => ({
                   uuid: problemSet.uuid,
                   name: problemSet.name,
+                  timeLimit: problemSet.timeLimit || 20,
                   description: problemSet.description ?? undefined,
                   updatedAt: problemSet.updatedAt,
                   examProblemsCount: problemSet.problems.length,
@@ -1677,6 +1693,7 @@ export async function getPublicProblemSets(
             : problemSets.map((problemSet) => ({
                 uuid: problemSet.uuid,
                 name: problemSet.name,
+                timeLimit: problemSet.timeLimit || 20,
                 description: problemSet.description ?? undefined,
                 updatedAt: problemSet.updatedAt,
                 examProblemsCount: problemSet.problems.length,
@@ -1760,6 +1777,7 @@ export async function getPublicProblemSetsByName(
                 .map((problemSet) => ({
                   uuid: problemSet.uuid,
                   name: problemSet.name,
+                  timeLimit: problemSet.timeLimit || 20,
                   description: problemSet.description ?? undefined,
                   updatedAt: problemSet.updatedAt,
                   examProblemsCount: problemSet.problems.length,
@@ -1770,6 +1788,7 @@ export async function getPublicProblemSetsByName(
             : problemSets.map((problemSet) => ({
                 uuid: problemSet.uuid,
                 name: problemSet.name,
+                timeLimit: problemSet.timeLimit || 20,
                 description: problemSet.description ?? undefined,
                 updatedAt: problemSet.updatedAt,
                 examProblemsCount: problemSet.problems.length,
@@ -2393,8 +2412,7 @@ export async function evaluateExamProblems(
 
           if (
             examProblem.type === "sub" &&
-            (typeof examProblem.subAnswer !== "string" ||
-              examProblem.subAnswer.trim() === "")
+            typeof examProblem.subAnswer !== "string"
           ) {
             throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
           }
@@ -2403,10 +2421,6 @@ export async function evaluateExamProblems(
             examProblem.uuid,
             dt,
           );
-
-          if (!answer) {
-            throw new Error("Answer not found");
-          }
 
           const evaluationResult = await validateExamProblemAnswer(
             examProblem,
@@ -2449,6 +2463,8 @@ async function postExamProblemResult({
   evaluationResult: boolean;
   resultsUuid: string;
 }) {
+  const date = new Date();
+
   await dt.insert(problemResult).values({
     order,
     question: examProblem.question,
@@ -2459,23 +2475,25 @@ async function postExamProblemResult({
     candidates: examProblem.candidates?.map((candidate) => ({
       id: candidate.id!,
       text: candidate.text,
-      isSelected: candidate.isAnswer,
+      isSelected: candidate.isAnswer ?? false,
     })) as ExamResultCandidate[],
     isAnswerMultiple: examProblem.isAnswerMultiple ?? false,
     imageUuid: examProblem.image?.uuid,
     subjectiveAnswered: examProblem.subAnswer,
     correctSubjectiveAnswer: typeof answer === "string" ? answer : undefined,
     correctCandidates:
-      Array.isArray(answer) && isCandidateArray(examProblem.candidates)
+      examProblem.type === "obj" &&
+      Array.isArray(answer) &&
+      examProblem.candidates
         ? examProblem.candidates
             .filter((candidate) => answer.includes(candidate.id))
             .map((candidate) => ({
               id: candidate.id!,
               text: candidate.text,
             }))
-        : undefined,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+        : [],
+    createdAt: date,
+    updatedAt: date,
   });
 }
 

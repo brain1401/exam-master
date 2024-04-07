@@ -2,6 +2,12 @@ import { Prettify } from "@/utils/type";
 import drizzleSession from "@/db/drizzle";
 import { z } from "zod";
 
+export const candidateSchema = z.object({
+  id: z.number().nullable(),
+  text: z.string(),
+  isAnswer: z.boolean().optional(),
+});
+
 export const ImageSchema = z.object({
   uuid: z.string(),
   key: z.string(),
@@ -10,13 +16,34 @@ export const ImageSchema = z.object({
   hash: z.string(),
 });
 
+export const examProblemSchema = z.object({
+  order: z.number(),
+  uuid: z.string(),
+  type: z.union([z.literal("obj"), z.literal("sub")]),
+  question: z.string(),
+  additionalView: z.string(),
+  isAnswerMultiple: z.boolean().nullable(),
+  image: ImageSchema.nullable(),
+  candidates: z.array(candidateSchema).nullable(),
+  subAnswer: z.string().nullable(),
+});
+
+export type ExamProblem = z.infer<typeof examProblemSchema>;
+
+export const examProblemsSchema = z.array(examProblemSchema);
+
+export type CorrectAnswer = string | (number | null)[] | null;
+
+export const CorrectCandidateSchema = z.object({
+  id: z.number(),
+  text: z.string(),
+});
+
+export type CorrectCandidate = z.infer<typeof CorrectCandidateSchema>;
+
 export type ImageURL = z.infer<typeof ImageSchema>;
 
-export type Candidate = {
-  id: number | null;
-  text: string;
-  isAnswer: boolean;
-};
+export type Candidate = z.infer<typeof candidateSchema>;
 
 export type Problem = {
   uuid?: string;
@@ -59,28 +86,6 @@ export type ProblemReplacedImageKeyAndFile = Prettify<
   | null
 >;
 
-export const candidateSchema = z.object({
-  id: z.number().nullable(),
-  text: z.string(),
-  isAnswer: z.boolean(),
-});
-
-export const examProblemSchema = z.object({
-  order: z.number(),
-  uuid: z.string(),
-  type: z.union([z.literal("obj"), z.literal("sub")]),
-  question: z.string(),
-  additionalView: z.string(),
-  isAnswerMultiple: z.boolean().nullable(),
-  image: ImageSchema.nullable(),
-  candidates: z.array(candidateSchema).nullable(),
-  subAnswer: z.string().nullable(),
-});
-
-export type ExamProblem = z.infer<typeof examProblemSchema>;
-
-export const examProblemsSchema = z.array(examProblemSchema);
-
 export type ExamProblemSet = {
   uuid: string | undefined;
   name: string;
@@ -102,6 +107,8 @@ export type SortType = "popular" | "newest";
 export type ProblemSet = {
   uuid: string;
   name: string;
+  timeLimit: number;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
   description?: string;
@@ -111,7 +118,6 @@ export type ProblemSet = {
 
 export type ProblemSetWithCreatedBy = Prettify<
   Omit<ProblemSet, "createdAt"> & {
-    createdBy: string;
     likes: number;
   }
 >;
@@ -178,12 +184,6 @@ export const problemsSchema = z.array(problemSchema);
 
 export const uuidSchema = z.string().uuid();
 
-export const CorrectCandidateSchema = z.object({
-  id: z.number(),
-  text: z.string(),
-});
-export type CorrectCandidate = z.infer<typeof CorrectCandidateSchema>;
-
 export const ExamResultCandidateSchema = z.object({
   id: z.number(),
   text: z.string(),
@@ -231,8 +231,6 @@ export type ResultsWithPagination = {
   data: ResultWithCount[];
   pagination: Pagination;
 };
-
-export type CorrectAnswer = string | (number | null)[] | null;
 
 export const QuestionTypeSchema = z.enum(["obj", "sub"]);
 export type QuestionType = z.infer<typeof QuestionTypeSchema>;

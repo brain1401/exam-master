@@ -25,14 +25,21 @@ type Props = {
 export default function ResultPage({ _examResultsSet }: Props) {
   useHydrateAtoms([[examResultsSetAtom, _examResultsSet]]);
 
-  const { resetExamProblemResults, examResults } =
-    useProblemResults();
+  const {
+    resetExamProblemResults,
+    examResults,
+    currentExamResult: { candidates },
+  } = useProblemResults();
 
   useEffect(() => {
     return () => {
       resetExamProblemResults();
     };
   }, [resetExamProblemResults]);
+
+  useEffect(() => {
+    console.log("candidates :", candidates);
+  }, [candidates]);
 
   const imagesRef = useRef([CorrectMark, WrongMark, checkImage]);
 
