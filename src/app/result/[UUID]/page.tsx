@@ -1,5 +1,6 @@
 import ResultPage from "@/components/result/ResultPage";
 import LoginRequired from "@/components/ui/LoginRequired";
+import ProblemNotFound from "@/components/ui/ProblemNotFound";
 import ProblemSetAccessDenied from "@/components/ui/ProblemSetAccessDenied";
 import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 import JotaiProvider from "@/context/JotaiContext";
@@ -82,7 +83,7 @@ export default async function page({ params: { UUID } }: Props) {
 
   if (!result) {
     // 에러 페이지로 리다이렉트 필요
-    return <div>시험 결과가 존재하지 않습니다.</div>;
+    return <ProblemNotFound />;
   }
 
   return (

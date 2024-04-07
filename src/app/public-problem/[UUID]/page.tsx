@@ -71,7 +71,6 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
   const exists = await checkIfPublicProblemSetExists(UUID);
 
   if (!exists) {
-    
     return <ProblemSetNotFound />;
   }
 

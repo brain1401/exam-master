@@ -2,12 +2,10 @@
 import ResultsCard from "./ResultsCard";
 import usePagenationState from "@/hooks/usePagenationState";
 import {
-  ExamResultsWithCountResponse,
   ResultsWithPagination,
 } from "@/types/problems";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import CustomLoading from "../ui/CustomLoading";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 import ResultsCardSkeleton from "./ResultsCardSkeleton";
 import { fetchExamResults } from "@/utils/problems";

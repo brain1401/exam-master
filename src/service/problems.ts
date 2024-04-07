@@ -17,6 +17,7 @@ import {
   ExamResultsSet,
   ProblemSetWithName,
   ExamResultCandidate,
+  ProblemResult,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
@@ -843,7 +844,6 @@ export async function getAnswerByProblemUuid(
     throw new Error("정답을 불러오는 중 오류가 발생했습니다.");
   }
 }
-
 
 export function isCandidateArray(candidates: any): candidates is Candidate[] {
   return (
@@ -1809,6 +1809,26 @@ export async function checkIfPublicProblemSetExists(problemSetUUID: string) {
   }
 }
 
+export async function checkIfPublicExamResultExists(examResultUUID: string) {
+  const isUUIDValidated = isValidUUID(examResultUUID);
+
+  if (!isUUIDValidated) {
+    return false;
+  }
+
+  try {
+    const queryResult = await drizzleSession.query.result.findFirst({
+      where: (result, { eq }) => eq(result.uuid, examResultUUID),
+    });
+
+    return queryResult ? true : false;
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+
 export async function getPublicProblemSetByUUID(problemSetUUID: string) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
@@ -2253,6 +2273,64 @@ export function validateS3Key(fileName: string): boolean {
   return pattern.test(fileName);
 }
 
+export async function getPublicExamProblemResult(
+  PublicExamProblemUUID: string,
+) {
+  try {
+    const data = await drizzleSession.transaction(async (dt) => {
+      const queryResult = await dt.query.result.findFirst({
+        where: and(
+          eq(result.uuid, PublicExamProblemUUID),
+          eq(result.isPublic, true),
+        ),
+        with: {
+          problemResults: {
+            orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
+            with: {
+              image: true,
+            },
+          },
+          problemSet: {
+            columns: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!queryResult) return null;
+
+      const returnData: ExamResultsSet = {
+        ...queryResult,
+        problemSetName: queryResult.problemSet.name,
+        problemResults: queryResult.problemResults.map((problemResult) => ({
+          uuid: problemResult.uuid,
+          order: problemResult.order,
+          isCorrect: problemResult.isCorrect,
+          candidates: problemResult.candidates,
+          subjectiveAnswered: problemResult.subjectiveAnswered,
+          question: problemResult.question,
+          additionalView: problemResult.additionalView,
+          questionType: problemResult.questionType as "obj" | "sub",
+          isAnswerMultiple: problemResult.isAnswerMultiple,
+          correctCandidates: problemResult.correctCandidates,
+          correctSubjectiveAnswer: problemResult.correctSubjectiveAnswer,
+          image: problemResult.image,
+          createdAt: problemResult.createdAt,
+          updatedAt: problemResult.updatedAt,
+        })),
+      };
+
+      return returnData;
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw new Error("시험 결과를 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
 export async function evaluateExamProblems(
   examProblems: ExamProblem[],
   problemSetUuid: string,
@@ -2348,7 +2426,6 @@ export async function evaluateExamProblems(
     throw err;
   }
 }
-
 
 async function postExamProblemResult({
   order,
