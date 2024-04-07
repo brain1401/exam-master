@@ -4,19 +4,9 @@ import ExamHeader from "../exam/ExamHeader";
 import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "../exam/ExamFooter";
 import ExamProblem from "../exam/ExamProblem";
-import { PublicExamProblemSet } from "@/types/problems";
 import ExamLayout from "../layouts/ExamLayout";
-import { problemShuffle } from "@/utils/problemShuffle";
 
-type Props = {
-  problemSetTimeLimit: number;
-  publicProblemSet: PublicExamProblemSet | null;
-};
-
-export default function PublicProblemExamPage({
-  problemSetTimeLimit,
-  publicProblemSet,
-}: Props) {
+export default function PublicProblemExamPage() {
   const {
     isExamStarted,
     currentPublicExamProblem,

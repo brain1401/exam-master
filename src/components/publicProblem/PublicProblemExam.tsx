@@ -45,10 +45,7 @@ export default function PublicProblemExam({
   return (
     <>
       {isExamStarted ? (
-        <PublicProblemExamPage
-          publicProblemSet={publicProblemSet}
-          problemSetTimeLimit={publicProblemSet?.timeLimit || 20}
-        />
+        <PublicProblemExamPage/>
       ) : (
         <PublicProblemMainPage
           publicSetUUID={publicSetUUID}
