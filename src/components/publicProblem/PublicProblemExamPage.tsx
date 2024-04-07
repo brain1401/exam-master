@@ -76,13 +76,6 @@ export default function PublicProblemExamPage({
       />
       <ExamFooter
         problemSet={publicExamProblemSet}
-        publicExamProblems={publicExamProblems}
-        setCurrentExamProblemIndex={setCurrentExamProblemIndex}
-        setCurrentPublicExamProblemCandidates={
-          setCurrentPublicExamProblemCandidates
-        }
-        currentExamProblemIndex={currentExamProblemIndex}
-        setIsExamStarted={setIsExamStarted}
       />
     </ExamLayout>
   );

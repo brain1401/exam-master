@@ -75,12 +75,8 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
         setCurrentExamProblemSubAnswer={setCurrentExamProblemSubAnswer}
       />
       <ExamFooter
-        currentExamProblemIndex={currentExamProblemIndex}
         problemSet={examProblemSet}
-        publicExamProblems={examProblems}
-        setCurrentExamProblemIndex={setCurrentExamProblemIndex}
-        setCurrentPublicExamProblemCandidates={setCurrentExamProblemCandidates}
-        setIsExamStarted={setIsTimeOver}
+ 
       />
     </ExamLayout>
   );
