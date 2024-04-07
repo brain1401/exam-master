@@ -28,7 +28,7 @@ export default function ExamFooter({ problemSet }: Props) {
   return (
     <div className="mt-8 flex flex-col gap-y-2 sm:flex-row sm:items-center sm:justify-between sm:gap-y-0">
       <Dialog>
-        <DialogTrigger>
+        <DialogTrigger asChild>
           <Button variant="destructive">시험 중단</Button>
         </DialogTrigger>
         <DialogContent>
