@@ -78,6 +78,7 @@ export async function GET(req: NextRequest) {
   const result: ExamProblemSet = {
     uuid: data.uuid,
     name: data.name,
+    timeLimit: data.timeLimit || 0,
     problems: problemShuffle(examProblems),
   };
 
