@@ -60,6 +60,7 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
         totalProblems={examProblems?.length ?? 0}
         currentExamProblemIndex={currentExamProblemIndex}
         setCurrentExamProblemIndex={setCurrentExamProblemIndex}
+        publicExamProblemLength={examProblems?.length ?? 0}
       />
       <ExamProgressBar
         timeLimit={examProblemSet.timeLimit}
