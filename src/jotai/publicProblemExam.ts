@@ -1,9 +1,7 @@
-import { ExamProblem, ExamProblemSet } from "@/types/problems";
+import { ExamProblem, PublicExamProblemSet } from "@/types/problems";
 import { atom } from "jotai";
 
-export const publicExamProblemSetAtom = atom<ExamProblemSet | null>(
-  null,
-);
+export const publicExamProblemSetAtom = atom<PublicExamProblemSet | null>(null);
 
 export const timeLimitAtom = atom<string>("0");
 
@@ -11,7 +9,21 @@ export const currentExamProblemIndexAtom = atom<number>(0);
 
 export const isExamStartedAtom = atom<boolean>(false);
 
-export const publicExamProblemsAtom = atom<ExamProblem[]>([]);
+export const publicExamProblemsAtom = atom(
+  (get) => {
+    const publicExamProblemSet = get(publicExamProblemSetAtom);
+    return publicExamProblemSet?.problems ?? [];
+  },
+  (get, set, newProblems: ExamProblem[]) => {
+    const publicExamProblemSet = get(publicExamProblemSetAtom);
+    if (publicExamProblemSet) {
+      set(publicExamProblemSetAtom, {
+        ...publicExamProblemSet,
+        problems: newProblems,
+      });
+    }
+  },
+);
 
 export const currentPublicExamProblemAtom = atom(
   (get) => {

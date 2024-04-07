@@ -118,6 +118,146 @@ export const problemRelation = relations(problem, ({ one, many }) => ({
   }),
 }));
 
+export const result = pgTable(
+  "Result",
+  {
+    uuid: uuid("uuid")
+      .primaryKey()
+      .notNull()
+      .default(sql`uuid_generate_v4()`),
+    userUuid: uuid("userUuid").references(() => user.uuid, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    problemSetUuid: uuid("problemSetUuid")
+      .notNull()
+      .references(() => problemSet.uuid, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    isPublic: boolean("isPublic").notNull(),
+    createdAt: timestamp("createdAt", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp("updatedAt", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      uuidKey: uniqueIndex("Result_uuid_key").on(table.uuid),
+    };
+  },
+);
+
+export const resultRelation = relations(result, ({ many, one }) => ({
+  problemResults: many(problemResult),
+  user: one(user, {
+    fields: [result.userUuid],
+    references: [user.uuid],
+  }),
+  problemSet: one(problemSet, {
+    fields: [result.problemSetUuid],
+    references: [problemSet.uuid],
+  }),
+}));
+
+export const problemResult = pgTable(
+  "ProblemResult",
+  {
+    uuid: uuid("uuid")
+      .primaryKey()
+      .notNull()
+      .default(sql`uuid_generate_v4()`),
+    order: integer("order").notNull(),
+    question: text("question").notNull(),
+    questionType: text("questionType").notNull(),
+    additionalView: text("additionalView"),
+    resultUuid: uuid("resultUuid")
+      .notNull()
+      .references(() => result.uuid, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    isCorrect: boolean("isCorrect").notNull(),
+    candidates: jsonb("candidates").$type<ExamResultCandidate[]>(),
+    isAnswerMultiple: boolean("isAnswerMultiple").notNull(),
+    imageUuid: uuid("imageUuid").references(() => image.uuid, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    subjectiveAnswered: text("subjectiveAnswered"),
+    correctSubjectiveAnswer: text("correctSubjectiveAnswer"),
+    correctCandidates: jsonb("correctCandidates").$type<CorrectCandidate[]>(),
+    createdAt: timestamp("createdAt", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp("updatedAt", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      uuidKey: uniqueIndex("ProblemResult_uuid_key").on(table.uuid),
+    };
+  },
+);
+
+export const problemResultRelation = relations(problemResult, ({ one }) => ({
+  result: one(result, {
+    fields: [problemResult.resultUuid],
+    references: [result.uuid],
+  }),
+  image: one(image, {
+    fields: [problemResult.imageUuid],
+    references: [image.uuid],
+  }),
+}));
+
+export const imageToUser = pgTable(
+  "_ImageToUser",
+  {
+    imageUuid: uuid("imageUuid")
+      .notNull()
+      .references(() => image.uuid, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    userUuid: uuid("userUuid")
+      .notNull()
+      .references(() => user.uuid, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.imageUuid, t.userUuid] }),
+  }),
+);
+
+export const imageToUserRelation = relations(imageToUser, ({ one }) => ({
+  images: one(image, {
+    fields: [imageToUser.imageUuid],
+    references: [image.uuid],
+  }),
+  user: one(user, {
+    fields: [imageToUser.userUuid],
+    references: [user.uuid],
+  }),
+}));
+
 export const user = pgTable(
   "User",
   {
@@ -227,148 +367,6 @@ export const imageRelation = relations(image, ({ many, one }) => ({
   users: many(imageToUser),
   problems: many(problem),
   problemResults: many(problemResult),
-}));
-
-export const result = pgTable(
-  "Result",
-  {
-    uuid: uuid("uuid")
-      .primaryKey()
-      .notNull()
-      .default(sql`uuid_generate_v4()`),
-    userUuid: uuid("userUuid")
-      .notNull()
-      .references(() => user.uuid, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    problemSetName: text("problemSetName").notNull(),
-    createdAt: timestamp("createdAt", {
-      precision: 0,
-      mode: "date",
-      withTimezone: true,
-    })
-      .default(sql`now()`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt", {
-      precision: 0,
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
-  },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("Result_uuid_key").on(table.uuid),
-    };
-  },
-);
-
-export const resultRelation = relations(result, ({ many, one }) => ({
-  problemResults: many(problemResult),
-  user: one(user, {
-    fields: [result.userUuid],
-    references: [user.uuid],
-  }),
-}));
-
-export const problemResult = pgTable(
-  "ProblemResult",
-  {
-    uuid: uuid("uuid")
-      .primaryKey()
-      .notNull()
-      .default(sql`uuid_generate_v4()`),
-    order: integer("order").notNull(),
-    question: text("question").notNull(),
-    questionType: text("questionType").notNull(),
-    additionalView: text("additionalView"),
-    resultUuid: uuid("resultUuid")
-      .notNull()
-      .references(() => result.uuid, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    isCorrect: boolean("isCorrect").notNull(),
-    candidates: jsonb("candidates").$type<ExamResultCandidate[]>(),
-    isAnswerMultiple: boolean("isAnswerMultiple").notNull(),
-    userUuId: uuid("userUuId")
-      .notNull()
-      .references(() => user.uuid, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    imageUuid: uuid("imageUuid").references(() => image.uuid, {
-      onDelete: "set null",
-      onUpdate: "cascade",
-    }),
-    subjectiveAnswered: text("subjectiveAnswered"),
-    correctSubjectiveAnswer: text("correctSubjectiveAnswer"),
-    correctCandidates: jsonb("correctCandidates").$type<CorrectCandidate[]>(),
-    createdAt: timestamp("createdAt", {
-      precision: 0,
-      mode: "date",
-      withTimezone: true,
-    })
-      .default(sql`now()`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt", {
-      precision: 0,
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
-  },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("ProblemResult_uuid_key").on(table.uuid),
-    };
-  },
-);
-
-export const problemResultRelation = relations(problemResult, ({ one }) => ({
-  result: one(result, {
-    fields: [problemResult.resultUuid],
-    references: [result.uuid],
-  }),
-  image: one(image, {
-    fields: [problemResult.imageUuid],
-    references: [image.uuid],
-  }),
-  user: one(user, {
-    fields: [problemResult.userUuId],
-    references: [user.uuid],
-  }),
-}));
-
-export const imageToUser = pgTable(
-  "_ImageToUser",
-  {
-    imageUuid: uuid("imageUuid")
-      .notNull()
-      .references(() => image.uuid, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    userUuid: uuid("userUuid")
-      .notNull()
-      .references(() => user.uuid, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.imageUuid, t.userUuid] }),
-  }),
-);
-
-export const imageToUserRelation = relations(imageToUser, ({ one }) => ({
-  images: one(image, {
-    fields: [imageToUser.imageUuid],
-    references: [image.uuid],
-  }),
-  user: one(user, {
-    fields: [imageToUser.userUuid],
-    references: [user.uuid],
-  }),
 }));
 
 export const problemSetComment = pgTable(

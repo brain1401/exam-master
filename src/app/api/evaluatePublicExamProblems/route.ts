@@ -1,36 +1,22 @@
 import { evaluateExamProblems } from "@/service/problems";
-import { ExamProblem, examProblemsSchema } from "@/types/problems";
+import { examProblemsSchema, type ExamProblem } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession();
 
-  if (!session) {
-    return NextResponse.json(
-      { error: "로그인이 필요합니다." },
-      { status: 401 },
-    );
-  }
-
-  if (!session?.user?.email)
-    return NextResponse.json(
-      { error: "로그인이 필요합니다." },
-      { status: 401 },
-    );
-
   const {
     examProblems,
-    examProblemSetName,
+    publicProblemSetUuid,
   }: {
     examProblems: ExamProblem[];
-    examProblemSetName: string;
+    publicProblemSetUuid: string;
   } = await req.json();
 
-  console.log("examProblems", examProblems);
-  console.log("problemSetName", examProblemSetName);
+  const userEmail = session?.user?.email;
 
-  if (!examProblems || !examProblemSetName) {
+  if (!examProblems || !publicProblemSetUuid) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
@@ -47,8 +33,8 @@ export async function POST(req: NextRequest) {
   try {
     const uuid = await evaluateExamProblems(
       examProblems,
-      examProblemSetName,
-      session.user.email,
+      publicProblemSetUuid,
+      userEmail ?? undefined,
     );
     return NextResponse.json({ uuid });
   } catch (e) {

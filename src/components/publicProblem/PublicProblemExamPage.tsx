@@ -4,7 +4,6 @@ import ExamHeader from "../exam/ExamHeader";
 import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "../exam/ExamFooter";
 import ExamProblem from "../exam/ExamProblem";
-import ExamSubmitButton from "../exam/ExamSubmitButton";
 import { PublicExamProblemSet } from "@/types/problems";
 
 type Props = {
@@ -20,6 +19,7 @@ export default function PublicProblemExamPage({
     isExamStarted,
     currentPublicExamProblem,
     timeLimit,
+    publicExamProblemSet,
     publicExamProblems,
     currentPublicExamProblemCandidates,
     setCurrentPublicExamProblem,
@@ -71,7 +71,7 @@ export default function PublicProblemExamPage({
           }
         />
         <ExamFooter
-          problemSet={publicProblemSet}
+          problemSet={publicExamProblemSet}
           publicExamProblems={publicExamProblems}
           setCurrentExamProblemIndex={setCurrentExamProblemIndex}
           setCurrentPublicExamProblemCandidates={

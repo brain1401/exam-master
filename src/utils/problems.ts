@@ -396,7 +396,7 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
-export function isExamProblemAsnwered(problem: ExamProblem) {
+export function isExamProblemAnswered(problem: ExamProblem) {
   if (!problem) {
     throw new Error("something is null");
   }

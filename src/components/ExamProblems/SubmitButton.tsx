@@ -4,7 +4,7 @@ import useExamProblems from "@/hooks/useExamProblems";
 import axios from "axios";
 import { useState } from "react";
 import useRevalidation from "@/hooks/useRevalidate";
-import { isExamProblemAsnwered } from "@/utils/problems";
+import { isExamProblemAnswered } from "@/utils/problems";
 
 export default function SubmitButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,7 +13,7 @@ export default function SubmitButton() {
   const { examProblems, examProblemSetName } = useExamProblems();
 
   const onClick = async () => {
-    if (!examProblems.every(isExamProblemAsnwered)) {
+    if (!examProblems.every(isExamProblemAnswered)) {
       return alert("모든 문제에 답을 입력해주세요.");
     }
 
@@ -21,11 +21,12 @@ export default function SubmitButton() {
     let uuid = "";
 
     try {
-      const { data } = await axios.post("/api/evaluateProblems", {
+      const { data } = await axios.post("/api/evaluateExamProblems", {
         examProblems,
         examProblemSetName,
       });
       uuid = data.uuid;
+
       // // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화 및 결과 페이지로 리다이렉트
       await revalidateAllPathAndRedirect(`/result/${uuid}`);
     } catch (e) {

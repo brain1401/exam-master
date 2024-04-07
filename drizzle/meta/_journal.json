@@ -169,6 +169,27 @@
       "when": 1712212101226,
       "tag": "0023_famous_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1712449395856,
+      "tag": "0024_aromatic_giant_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1712450803346,
+      "tag": "0025_thankful_steel_serpent",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1712454190060,
+      "tag": "0026_cheerful_human_cannonball",
+      "breakpoints": true
     }
   ]
 }

@@ -16,6 +16,7 @@ import {
   uuidSchema,
   ExamResultsSet,
   ProblemSetWithName,
+  ExamResultCandidate,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
@@ -842,6 +843,7 @@ export async function getAnswerByProblemUuid(
   }
 }
 
+
 export function isCandidateArray(candidates: any): candidates is Candidate[] {
   return (
     Array.isArray(candidates) &&
@@ -958,118 +960,33 @@ export function getParsedProblems<T extends boolean>(
   }
 }
 
-export async function postExamProblemResult({
-  order,
-  examProblem,
-  resultsUuid,
-  evaluationResult,
-  answer,
-  userUuid,
-  dt,
-}: {
-  order: number;
-  examProblem: ExamProblem;
-  resultsUuid: string;
-  evaluationResult: boolean;
-  answer: CorrectAnswer;
-  userUuid: string;
-  dt: DrizzleTransaction;
-}) {
-  if (!examProblem || !examProblem.uuid) throw new Error("something is null");
-
-  try {
-    const date = new Date();
-
-    const [{ uuid: createdProblemResult }] = await dt
-      .insert(problemResult)
-      .values({
-        order: order,
-        resultUuid: resultsUuid,
-        isCorrect: evaluationResult,
-        userUuId: userUuid,
-        candidates:
-          examProblem && examProblem.candidates
-            ? examProblem.candidates.map((candidate) => ({
-                id: candidate.id ?? 0,
-                text: candidate.text,
-                isSelected: candidate.isAnswer,
-              }))
-            : undefined,
-        subjectiveAnswered:
-          typeof examProblem.subAnswer === "string"
-            ? examProblem.subAnswer
-            : null,
-        question: examProblem.question,
-        additionalView: examProblem.additionalView ?? null,
-        questionType: examProblem.type,
-        isAnswerMultiple: examProblem.isAnswerMultiple ?? false,
-        correctCandidates: Array.isArray(answer)
-          ? answer
-              .map((id) => ({
-                id: id ?? 0,
-                text:
-                  examProblem.candidates?.find(
-                    (candidate) => candidate.id === id,
-                  )?.text ?? "",
-              }))
-              .toSorted((a, b) => {
-                if (!examProblem.candidates)
-                  throw new Error("examProblem.candidates is null");
-                if (
-                  examProblem.candidates.findIndex(
-                    (candidate) => candidate.id === a.id,
-                  ) >
-                  examProblem.candidates.findIndex(
-                    (candidate) => candidate.id === b.id,
-                  )
-                )
-                  return 1;
-                if (
-                  examProblem.candidates.findIndex(
-                    (candidate) => candidate.id === a.id,
-                  ) <
-                  examProblem.candidates.findIndex(
-                    (candidate) => candidate.id === b.id,
-                  )
-                )
-                  return -1;
-                return 0;
-              })
-          : undefined,
-        correctSubjectiveAnswer: typeof answer === "string" ? answer : null,
-        imageUuid: isImageUrlObject(examProblem.image)
-          ? examProblem.image.uuid
-          : undefined,
-        createdAt: date,
-        updatedAt: date,
-      })
-      .returning({ uuid: problemResult.uuid });
-
-    console.log("createdProblemResult :", createdProblemResult);
-    if (!createdProblemResult)
-      throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
-  } catch (err) {
-    console.log(err);
-    throw new Error("문제 결과를 생성하는 중 오류가 발생했습니다.");
-  }
-}
-
 export async function getExamResultsByUUID(
   resultUuid: string,
-  userEmail: string,
+  userEmail?: string,
 ) {
   try {
     const result = await drizzleSession.transaction(async (dt) => {
-      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
+      let userUuid: string | null = null;
+      if (userEmail) {
+        userUuid = await getUserUUIDbyEmail(userEmail, dt);
+      }
 
       const result = await dt.query.result.findFirst({
         where: (result, { eq, and }) =>
-          and(eq(result.uuid, resultUuid), eq(result.userUuid, userUuid)),
+          userUuid
+            ? and(eq(result.uuid, resultUuid), eq(result.userUuid, userUuid))
+            : eq(result.uuid, resultUuid),
         with: {
           problemResults: {
             orderBy: (problemResult, { asc }) => [asc(problemResult.order)],
             with: {
               image: true,
+            },
+          },
+          problemSet: {
+            columns: {
+              uuid: true,
+              name: true,
             },
           },
         },
@@ -1079,6 +996,7 @@ export async function getExamResultsByUUID(
 
       const returnData: ExamResultsSet = {
         ...result,
+        problemSetName: result.problemSet.name,
         problemResults: result.problemResults.map((problemResult) => ({
           uuid: problemResult.uuid,
           order: problemResult.order,
@@ -1138,6 +1056,12 @@ export async function getExamResults(
                   image: true,
                 },
               },
+              problemSet: {
+                columns: {
+                  uuid: true,
+                  name: true,
+                },
+              },
             },
           }),
         ]);
@@ -1146,7 +1070,7 @@ export async function getExamResults(
         data: examResults.map((examResult) => ({
           uuid: examResult.uuid,
           problemResultsCount: examResult.problemResults.length,
-          problemSetName: examResult.problemSetName,
+          problemSetName: examResult.problemSet.name,
           createdAt: examResult.createdAt,
           updatedAt: examResult.updatedAt,
         })),
@@ -1185,20 +1109,17 @@ export async function getExamResultsByName(
           .where(
             and(
               or(
-                ...searchName.map((name) =>
-                  like(result.problemSetName, `%${name}%`),
-                ),
+                ...searchName.map((name) => like(problemSet.name, `%${name}%`)),
               ),
               eq(result.userUuid, userUuid),
             ),
-          ),
+          )
+          .innerJoin(problemSet, eq(problemSet.uuid, result.problemSetUuid)),
         dt.query.result.findMany({
           where: (result, { and, like }) =>
             and(
               or(
-                ...searchName.map((name) =>
-                  like(result.problemSetName, `%${name}%`),
-                ),
+                ...searchName.map((name) => like(problemSet.name, `%${name}%`)),
               ),
               eq(result.userUuid, userUuid),
             ),
@@ -1212,6 +1133,12 @@ export async function getExamResultsByName(
                 image: true,
               },
             },
+            problemSet: {
+              columns: {
+                uuid: true,
+                name: true,
+              },
+            },
           },
         }),
       ]);
@@ -1220,7 +1147,7 @@ export async function getExamResultsByName(
         data: examResults.map((examResult) => ({
           uuid: examResult.uuid,
           problemResultsCount: examResult.problemResults.length,
-          problemSetName: examResult.problemSetName,
+          problemSetName: examResult.problemSet.name,
           createdAt: examResult.createdAt,
           updatedAt: examResult.updatedAt,
         })),
@@ -1598,6 +1525,44 @@ export async function validateExamProblemAnswer(
   return finalResult;
 }
 
+export async function validatePublicExamProblemAnswer(
+  examProblem: ExamProblem,
+  answer: CorrectAnswer,
+) {
+  let finalResult: boolean | null = null;
+
+  if (!examProblem || !examProblem.uuid) {
+    throw new Error("something is null");
+  }
+
+  if (examProblem.type === "obj") {
+    if (!Array.isArray(answer)) {
+      throw new Error("Answer is not an array");
+    }
+
+    const userAnswer = examProblem.candidates
+      ?.filter((candidate) => candidate.isAnswer)
+      .map((candidate) => candidate.id);
+
+    finalResult =
+      (userAnswer && answer.every((id) => userAnswer.includes(id))) ?? null;
+  } else if (examProblem.type === "sub") {
+    if (typeof answer !== "string") {
+      throw new Error("Answer is not a string");
+    }
+
+    finalResult = examProblem.subAnswer === answer;
+  } else {
+    throw new Error("Invalid problem type");
+  }
+
+  if (finalResult === null) {
+    throw new Error("finalResult is null");
+  }
+
+  return finalResult;
+}
+
 export async function getTotalReferencesOfImageByImageUuid(
   imageUuid: string,
   dt: DrizzleTransaction,
@@ -1900,7 +1865,9 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
   }
 }
 
-export async function getRandomExamPublicProblemSetByUUID(problemSetUUID: string) {
+export async function getRandomExamPublicProblemSetByUUID(
+  problemSetUUID: string,
+) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
       const foundProblemSet = await dt.query.problemSet.findFirst({
@@ -2170,23 +2137,14 @@ export async function handlePublicProblemLikes({
   }
 }
 
-async function getCountByImageUuid(
-  imageUuid: string,
-  userUuid: string,
-  dt: DrizzleTransaction,
-) {
+async function getCountByImageUuid(imageUuid: string, dt: DrizzleTransaction) {
   const problems = await dt.query.problem.findMany({
-    where: (problem, { eq, and }) =>
-      and(eq(problem.imageUuid, imageUuid), eq(problem.userUuid, userUuid)),
+    where: (problem, { eq }) => eq(problem.imageUuid, imageUuid),
     with: { problemSet: { columns: { uuid: true } } },
   });
 
   const problemResults = await dt.query.problemResult.findMany({
-    where: (problemResult, { eq, and }) =>
-      and(
-        eq(problemResult.imageUuid, imageUuid),
-        eq(problemResult.userUuId, userUuid),
-      ),
+    where: (problemResult, { eq }) => eq(problemResult.imageUuid, imageUuid),
     with: { result: { columns: { uuid: true } } },
   });
 
@@ -2238,11 +2196,7 @@ export async function getReferecesOfImageByImageKey(
           return null;
         }
 
-        const count = await getCountByImageUuid(
-          imageUuid,
-          imageUser.userUuid,
-          drizzleTransaction,
-        );
+        const count = await getCountByImageUuid(imageUuid, drizzleTransaction);
 
         return {
           uuid: imageUser.userUuid,
@@ -2256,14 +2210,14 @@ export async function getReferecesOfImageByImageKey(
       (user): user is NonNullable<typeof user> => user !== null,
     );
 
-    if (filteredUsers.length === 0) {
-      throw new Error(
-        `해당하는 key '${imageKey}'를 가진 이미지가 존재하지 않습니다.`,
-      );
-    }
+    const publicCount = await getCountByImageUuid(
+      imageUuid,
+      drizzleTransaction,
+    );
 
     const result = {
       users: filteredUsers,
+      publicCount,
     };
 
     const allUserCount = filteredUsers.reduce(
@@ -2273,7 +2227,11 @@ export async function getReferecesOfImageByImageKey(
         acc.total += cur.count.total;
         return acc;
       },
-      { problemSetCount: 0, problemResultsCount: 0, total: 0 },
+      {
+        problemSetCount: publicCount.problemSetCount,
+        problemResultsCount: publicCount.problemResultsCount,
+        total: publicCount.total,
+      },
     );
 
     return {
@@ -2296,13 +2254,11 @@ export function validateS3Key(fileName: string): boolean {
 
 export async function evaluateExamProblems(
   examProblems: ExamProblem[],
-  problemSetName: string,
-  userEmail: string,
+  problemSetUuid: string,
+  userEmail?: string,
 ) {
   try {
     const transactionResult = await drizzleSession.transaction(async (dt) => {
-      const userUuid = await getUserUUIDbyEmail(userEmail, dt);
-
       const validateResult = examProblemsSchema.safeParse(examProblems);
 
       if (!validateResult.success) {
@@ -2310,11 +2266,17 @@ export async function evaluateExamProblems(
       }
       const date = new Date();
 
+      let userUuid: string | null = null;
+      if (userEmail) {
+        userUuid = await getUserUUIDbyEmail(userEmail, dt);
+      }
+
       const [{ uuid: resultsUuid }] = await dt
         .insert(result)
         .values({
-          problemSetName,
+          problemSetUuid,
           userUuid,
+          isPublic: userUuid === null,
           createdAt: date,
           updatedAt: date,
         })
@@ -2367,7 +2329,6 @@ export async function evaluateExamProblems(
 
           await postExamProblemResult({
             order: index + 1,
-            userUuid,
             dt,
             answer,
             examProblem,
@@ -2385,6 +2346,52 @@ export async function evaluateExamProblems(
     console.log(err);
     throw err;
   }
+}
+
+
+async function postExamProblemResult({
+  order,
+  dt,
+  answer,
+  examProblem,
+  evaluationResult,
+  resultsUuid,
+}: {
+  order: number;
+  dt: DrizzleTransaction;
+  answer: CorrectAnswer;
+  examProblem: ExamProblem;
+  evaluationResult: boolean;
+  resultsUuid: string;
+}) {
+  await dt.insert(problemResult).values({
+    order,
+    question: examProblem.question,
+    questionType: examProblem.type,
+    additionalView: examProblem.additionalView,
+    resultUuid: resultsUuid,
+    isCorrect: evaluationResult,
+    candidates: examProblem.candidates?.map((candidate) => ({
+      id: candidate.id!,
+      text: candidate.text,
+      isSelected: candidate.isAnswer,
+    })) as ExamResultCandidate[],
+    isAnswerMultiple: examProblem.isAnswerMultiple ?? false,
+    imageUuid: examProblem.image?.uuid,
+    subjectiveAnswered: examProblem.subAnswer,
+    correctSubjectiveAnswer: typeof answer === "string" ? answer : undefined,
+    correctCandidates:
+      Array.isArray(answer) && isCandidateArray(examProblem.candidates)
+        ? examProblem.candidates
+            .filter((candidate) => answer.includes(candidate.id))
+            .map((candidate) => ({
+              id: candidate.id!,
+              text: candidate.text,
+            }))
+        : undefined,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
 }
 
 export async function getProblemSetsMaxPage(
@@ -2423,12 +2430,12 @@ export async function getProblemSetsMaxPage(
 export async function getResultsMaxPage(
   userEmail: string,
   pageSize: number,
-  seachString: string,
+  searchString: string,
 ) {
   try {
     const totalExamResultsCount = await drizzleSession.transaction(
       async (dt) => {
-        if (seachString !== "") {
+        if (searchString !== "") {
           const userUuid = await getUserUUIDbyEmail(userEmail, dt);
           return dt
             .select({ value: count() })
@@ -2436,9 +2443,10 @@ export async function getResultsMaxPage(
             .where(
               and(
                 eq(result.userUuid, userUuid),
-                like(result.problemSetName, `%${seachString}%`),
+                like(problemSet.name, `%${searchString}%`),
               ),
-            );
+            )
+            .innerJoin(problemSet, eq(problemSet.uuid, result.problemSetUuid));
         }
         const userUuid = await getUserUUIDbyEmail(userEmail, dt);
         return dt

@@ -57,7 +57,43 @@ export type ProblemReplacedImageKeyAndFile = Prettify<
   | null
 >;
 
+export const candidateSchema = z.object({
+  id: z.number().nullable(),
+  text: z.string(),
+  isAnswer: z.boolean(),
+});
+
+export const examProblemSchema = z.object({
+  order: z.number(),
+  uuid: z.string(),
+  type: z.union([z.literal("obj"), z.literal("sub")]),
+  question: z.string(),
+  additionalView: z.string(),
+  isAnswerMultiple: z.boolean().nullable(),
+  image: ImageSchema.nullable(),
+  candidates: z.array(candidateSchema).nullable(),
+  subAnswer: z.string().nullable(),
+});
+
+export const examProblemsSchema = z.array(examProblemSchema);
+
 export type ExamProblem = z.infer<typeof examProblemSchema>;
+
+
+export type ExamProblemSet = {
+  uuid: string | undefined;
+  name: string;
+  problems: ExamProblem[];
+};
+
+export type PublicExamProblemSet = Prettify<
+  ExamProblemSet & {
+    timeLimit: number;
+    updatedAt: Date;
+    creator: string;
+    description: string;
+  }
+>;
 
 export type PrefetchPaginationType =
   | "manage"
@@ -110,19 +146,6 @@ export type ProblemSetWithName = Prettify<{
   problems: ProblemWithoutImageFile[];
 }>;
 
-export type ExamProblemSet = {
-  uuid: string | undefined;
-  name: string;
-  problems: ExamProblem[];
-};
-
-export type PublicExamProblemSet = Prettify<ExamProblemSet & {
-  timeLimit: number;
-  updatedAt: Date;
-  creator: string;
-  description: string;
-}>;
-
 export type ProblemSetComment = {
   uuid: string;
   content: string;
@@ -130,12 +153,6 @@ export type ProblemSetComment = {
   userUUID: string;
   userName: string;
 };
-
-export const candidateSchema = z.object({
-  id: z.number().nullable(),
-  text: z.string(),
-  isAnswer: z.boolean(),
-});
 
 export type ImageType = z.infer<typeof ImageSchema>;
 
@@ -160,20 +177,6 @@ export const problemSchema = z
     subAnswer: z.string().nullable(),
   })
   .nullable();
-
-export const examProblemSchema = z.object({
-  order: z.number(),
-  uuid: z.string(),
-  type: z.union([z.literal("obj"), z.literal("sub")]),
-  question: z.string(),
-  additionalView: z.string(),
-  isAnswerMultiple: z.boolean().nullable(),
-  image: ImageSchema.nullable(),
-  candidates: z.array(candidateSchema).nullable(),
-  subAnswer: z.string().nullable(),
-});
-
-export const examProblemsSchema = z.array(examProblemSchema);
 
 export const problemsSchema = z.array(problemSchema);
 
@@ -214,7 +217,7 @@ export const ExamResultsSetSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   problemSetName: z.string(),
-  userUuid: z.string().uuid(),
+  userUuid: z.string().uuid().nullable(),
   problemResults: z.array(ProblemResultSchema),
 });
 
@@ -234,7 +237,7 @@ export type ResultsWithPagination = {
 };
 export type CorrectAnswer = string | (number | null)[] | null;
 
-export type ExamResultsSet = z.infer<typeof ExamResultsSetSchema>;
+export type ExamResultsSet = Prettify<z.infer<typeof ExamResultsSetSchema>>;
 
 export const QuestionTypeSchema = z.enum(["obj", "sub"]);
 

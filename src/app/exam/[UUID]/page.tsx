@@ -80,8 +80,7 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
   );
 
   if (!examProblemSet) {
-    // 에러 페이지로 리다이렉트 필요
-    return <div>문제 세트를 찾을 수 없습니다.</div>;
+    return <ProblemSetNotFound />;
   }
 
   return (
