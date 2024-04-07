@@ -36,16 +36,17 @@ export default function PublicProblemExam({
     [publicExamProblemSetAtom, publicProblemSet],
   ]);
 
+  const { isExamStarted } = usePublicProblemExam();
+
   useEffect(() => {
     console.log("publicProblemSet :", publicProblemSet);
   }, [publicProblemSet]);
 
-  const { isExamStarted } = usePublicProblemExam();
 
   return (
     <>
       {isExamStarted ? (
-        <PublicProblemExamPage/>
+        <PublicProblemExamPage />
       ) : (
         <PublicProblemMainPage
           publicSetUUID={publicSetUUID}
