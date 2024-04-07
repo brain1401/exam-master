@@ -3,7 +3,8 @@ import { ProblemResult } from "@/types/problems";
 import { isValidUUID } from "@/utils/problems";
 import { NextRequest, NextResponse } from "next/server";
 
-export default async function GET(req: NextRequest) {
+export async function GET(req: NextRequest) {
+
   const searchParams = req.nextUrl.searchParams;
 
   const UUID = searchParams.get("UUID");
@@ -49,5 +50,5 @@ export default async function GET(req: NextRequest) {
     };
   });
 
-  return NextResponse.json(finalResult);
+  return NextResponse.json({ problemResults: finalResult });
 }
