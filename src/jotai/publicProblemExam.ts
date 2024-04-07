@@ -1,8 +1,8 @@
-import { ExamProblem, PublicExamProblemSet } from "@/types/problems";
+import { ExamProblem, ExamProblemSet } from "@/types/problems";
 import { problemShuffle } from "@/utils/problemShuffle";
 import { atom } from "jotai";
 
-export const publicExamProblemSetAtom = atom<PublicExamProblemSet | null>(null);
+export const publicExamProblemSetAtom = atom<ExamProblemSet | null>(null);
 
 export const timeLimitAtom = atom<string>("0");
 

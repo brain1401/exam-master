@@ -7,6 +7,9 @@ import {
   resetExamProblemAnswersAtom,
   currentExamProblemCandidatesAtom,
   currentExamProblemSubAnswerAtom,
+  isExamStartedAtom,
+  isTimeOverAtom,
+  timeLimitAtom,
 } from "@/jotai/examProblems";
 import { useAtom, useSetAtom } from "jotai";
 
@@ -22,6 +25,12 @@ export default function useExamProblems() {
     examProblemSetNameAtom,
   );
   const [examProblems, setExamProblems] = useAtom(examProblemsAtom);
+
+  const [isExamStarted, setIsExamStarted] = useAtom(isExamStartedAtom);
+
+  const [isTimeOver, setIsTimeOver] = useAtom(isTimeOverAtom);
+
+  const [timeLimit, setTimeLimit] = useAtom(timeLimitAtom);
 
   const [currentExamProblemCandidates, setCurrentExamProblemCandidates] =
     useAtom(currentExamProblemCandidatesAtom);
@@ -47,6 +56,12 @@ export default function useExamProblems() {
     setCurrentExamProblemCandidates,
     currentExamProblemSubAnswer,
     setCurrentExamProblemSubAnswer,
+    isExamStarted,
+    setIsExamStarted,
+    isTimeOver,
+    setIsTimeOver,
+    timeLimit,
+    setTimeLimit,
     resetExamProblems,
   };
 }

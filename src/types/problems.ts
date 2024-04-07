@@ -85,16 +85,11 @@ export type ExamProblemSet = {
   uuid: string | undefined;
   name: string;
   timeLimit: number;
+  updatedAt: Date;
+  creator: string;
+  description: string;
   problems: ExamProblem[];
 };
-
-export type PublicExamProblemSet = Prettify<
-  ExamProblemSet & {
-    updatedAt: Date;
-    creator: string;
-    description: string;
-  }
->;
 
 export type PrefetchPaginationType =
   | "manage"
@@ -140,6 +135,7 @@ export type PublicProblemSetWithPagination = Prettify<
 export type ProblemSetWithName = Prettify<{
   uuid: string;
   name: string;
+  userName: string;
   createdAt?: Date;
   updatedAt?: Date;
   isPublic: boolean;

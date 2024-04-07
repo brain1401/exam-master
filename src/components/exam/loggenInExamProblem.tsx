@@ -10,13 +10,16 @@ import ExamLayout from "../layouts/ExamLayout";
 import ExamHeader from "../exam/ExamHeader";
 import ExamProblem from "../exam/ExamProblem";
 import ExamProgressBar from "../exam/ExamProgressBar";
-import ExamSubmitButton from "../exam/ExamSubmitButton";
 import ExamFooter from "./ExamFooter";
+import { timeLimitAtom } from "@/jotai/publicProblemExam";
 type Props = {
   _examProblemSet: ExamProblemSet;
 };
 export default function LoggedInExamProblems({ _examProblemSet }: Props) {
-  useHydrateAtoms([[examProblemSetAtom, _examProblemSet]]);
+  useHydrateAtoms([
+    [examProblemSetAtom, _examProblemSet],
+    [timeLimitAtom, _examProblemSet.timeLimit.toString()],
+  ]);
 
   const {
     currentExamProblem,
@@ -25,19 +28,22 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
     examProblemSet,
     currentExamProblemCandidates,
     currentExamProblemSubAnswer,
+    timeLimit,
+    isTimeOver,
+    setIsTimeOver,
+    setIsExamStarted,
     setCurrentExamProblemSubAnswer,
     setCurrentExamProblemCandidates,
     setCurrentExamProblem,
     setCurrentExamProblemIndex,
     setExamProblemSetName,
-    setExamProblemSet: setExamProblemSets,
+    setExamProblemSet,
     setExamProblems,
     examProblems,
     resetExamProblems,
   } = useExamProblems();
-  const { revalidateAllPath } = useRevalidation();
 
-  const [isTimeOver, setIsTimeOver] = useState(false);
+  const { revalidateAllPath } = useRevalidation();
 
   useEffect(() => {
     console.log("examProblemSet :", examProblemSet);
@@ -63,21 +69,18 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
         publicExamProblemLength={examProblems?.length ?? 0}
       />
       <ExamProgressBar
-        timeLimit={examProblemSet.timeLimit}
+        timeLimit={timeLimit}
         isTimeOver={isTimeOver}
         setIsTimeOver={setIsTimeOver}
       />
       <ExamProblem
-        candidates={currentExamProblem?.candidates}
-        currentProblem={currentExamProblem}
+        candidates={currentExamProblem?.candidates ?? []}
+        currentProblem={currentExamProblem ?? ({} as any)}
         questionNumber={currentExamProblemIndex + 1}
         setCurrentExamProblemCandidates={setCurrentExamProblemCandidates}
         setCurrentExamProblemSubAnswer={setCurrentExamProblemSubAnswer}
       />
-      <ExamFooter
-        problemSet={examProblemSet}
- 
-      />
+      <ExamFooter problemSet={examProblemSet} />
     </ExamLayout>
   );
 }

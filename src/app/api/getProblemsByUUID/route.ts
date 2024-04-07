@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
 
   const result: ProblemSetWithName = {
     uuid: data.uuid,
+    userName: data.userName,
     name: data.name,
     isPublic: data.isPublic,
     description: data.description ?? "",

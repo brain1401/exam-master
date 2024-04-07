@@ -1,27 +1,4 @@
-import { GoHeart, GoHeartFill } from "react-icons/go";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-  CardFooter,
-} from "../ui/card";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { useEffect, useState } from "react";
 import useRevalidation from "@/hooks/useRevalidate";
@@ -32,14 +9,14 @@ import {
   fetchPublicProblemSetByUUID,
   fetchPublicProblemSetComments,
 } from "@/utils/problems";
-import { ProblemSetComment, PublicExamProblemSet } from "@/types/problems";
+import { ProblemSetComment, ExamProblemSet } from "@/types/problems";
 import { Like } from "./PublicProblemExam";
 import axios from "axios";
 import { handleEnterKeyPress } from "@/utils/keyboard";
 import { TrashIcon } from "lucide-react";
 import { usePublicProblemExam } from "@/hooks/usePublicProblemExam";
-import { Switch } from "../ui/switch";
-import { problemShuffle } from "@/utils/problemShuffle";
+import ExamProblemCard from "./ExamProblemCard";
+import ExamComments from "./ExamComments";
 
 type Props = {
   publicSetUUID: string;
@@ -63,13 +40,9 @@ export default function PublicProblemMainPage({
     setPublicExamProblemsRandom,
     setPublicExamProblemsOriginal,
   } = usePublicProblemExam();
-  const [comment, setComment] = useState("");
   const { revalidateAllPath } = useRevalidation();
-  const queryClient = useQueryClient();
 
-  const { toast } = useToast();
-
-  const { data: publicProblemSet } = useQuery<PublicExamProblemSet | null>({
+  const { data: publicProblemSet } = useQuery<ExamProblemSet | null>({
     queryKey: ["publicProblemSet", publicSetUUID],
     queryFn: () => fetchPublicProblemSetByUUID(publicSetUUID),
   });
@@ -84,208 +57,6 @@ export default function PublicProblemMainPage({
     queryFn: () => fetchPublicProblemLikes(publicSetUUID),
   });
 
-  const { mutate: problemSetLikesMutate } = useMutation({
-    mutationFn: (liked: boolean) => {
-      return axios.put("/api/handlePublicProblemSetLike", {
-        problemSetUUID: publicSetUUID,
-        liked,
-      });
-    },
-    onMutate: async (newLiked: boolean) => {
-      await queryClient.cancelQueries({
-        queryKey: ["publicProblemLikes", publicSetUUID],
-      });
-
-      const previousLike = queryClient.getQueryData<Like>([
-        "publicProblemLikes",
-        publicSetUUID,
-      ]);
-
-      queryClient.setQueryData<Like>(
-        ["publicProblemLikes", publicSetUUID],
-        (old) => {
-          if (!old) return { likes: newLiked ? 1 : 0, liked: newLiked };
-
-          return {
-            ...old,
-            likes: newLiked ? old.likes + 1 : old.likes - 1,
-            liked: newLiked,
-          };
-        },
-      );
-
-      return { previousLike };
-    },
-    onError: (err, newLiked, context) => {
-      queryClient.setQueryData<Like>(
-        ["publicProblemLikes", publicSetUUID],
-        context?.previousLike,
-      );
-    },
-    onSettled: async () => {
-      return await queryClient.invalidateQueries({
-        queryKey: ["publicProblemLikes", publicSetUUID],
-      });
-    },
-  });
-
-  const { mutate: problemSetCommentsAddMutate } = useMutation({
-    mutationFn: (newComment: string) => {
-      console.log(publicSetUUID);
-      return axios.post("/api/postProblemSetComment", {
-        problemSetUUID: publicSetUUID,
-        comment: newComment,
-      });
-    },
-    onMutate: async (newComment: string) => {
-      await queryClient.cancelQueries({
-        queryKey: ["problemSetComments", publicSetUUID],
-      });
-
-      const previousComment = queryClient.getQueryData<ProblemSetComment[]>([
-        "problemSetComments",
-        publicSetUUID,
-      ]);
-
-      queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicSetUUID],
-        (old) => {
-          const tempComment = {
-            uuid: "temp",
-            userName: userName ?? "",
-            userUUID: userUUID ?? "",
-            content: newComment,
-            createdAt: new Date(),
-          };
-
-          if (!old) {
-            return [tempComment];
-          }
-          return [...old, tempComment].sort((a, b) => {
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          });
-        },
-      );
-      return { previousComment };
-    },
-    onError: (err, newComment, context) => {
-      queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicSetUUID],
-        context?.previousComment,
-      );
-    },
-    onSettled: async () => {
-      return await queryClient.invalidateQueries({
-        queryKey: ["problemSetComments", publicSetUUID],
-      });
-    },
-  });
-
-  const { mutate: problemSetCommentsDeleteMutate } = useMutation({
-    mutationFn: (commentUUID: string) => {
-      return axios.delete("/api/deletePublicProblemComment", {
-        params: {
-          commentUUID,
-        },
-      });
-    },
-    onMutate: async (commentUUID: string) => {
-      await queryClient.cancelQueries({
-        queryKey: ["problemSetComments", publicSetUUID],
-      });
-
-      const previousComment = queryClient.getQueryData<ProblemSetComment[]>([
-        "problemSetComments",
-        publicSetUUID,
-      ]);
-
-      queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicSetUUID],
-        (old) => {
-          return old?.filter((comment) => comment.uuid !== commentUUID);
-        },
-      );
-
-      return { previousComment };
-    },
-    onError: (err, commentUUID, context) => {
-      queryClient.setQueryData<ProblemSetComment[]>(
-        ["problemSetComments", publicSetUUID],
-        context?.previousComment,
-      );
-    },
-    onSettled: async () => {
-      return await queryClient.invalidateQueries({
-        queryKey: ["problemSetComments", publicSetUUID],
-      });
-    },
-  });
-
-  const onCommentSubmit = async () => {
-    if (!userUUID) {
-      toast({
-        title: "로그인 후 이용해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (comment.trim().length === 0) {
-      alert("댓글을 입력하세요.");
-      return;
-    }
-
-    // 댓글 작성 로직
-    try {
-      problemSetCommentsAddMutate(comment);
-
-      setComment("");
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const onLikeClick = async () => {
-    if (!like) return;
-    if (!userUUID) {
-      toast({
-        title: "로그인 후 이용해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
-    try {
-      problemSetLikesMutate(like.liked);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const onDeleteComment = async (
-    commentUserUUID: string,
-    commentUUID: string,
-  ) => {
-    if (commentUserUUID === userUUID) {
-      try {
-        problemSetCommentsDeleteMutate(commentUUID);
-      } catch (e) {
-        console.error(e);
-      }
-    } else if (!userUUID) {
-      toast({
-        title: "로그인 후 이용해주세요.",
-        variant: "destructive",
-      });
-      return;
-    } else {
-      toast({
-        title: "본인의 댓글만 삭제할 수 있습니다.",
-        variant: "destructive",
-      });
-      return;
-    }
-  };
 
   useEffect(() => {
     if (isRandomSelected) {
@@ -314,152 +85,23 @@ export default function PublicProblemMainPage({
 
   return (
     <div className="mx-auto w-full max-w-[50rem] px-[1.5rem] pt-[6rem]">
-      <Card>
-        <CardHeader>
-          <div className="relative">
-            <CardTitle className="pr-[3.2rem]">
-              {publicProblemSet?.name}
-            </CardTitle>
-            <CardDescription>
-              {`${publicProblemSet?.creator ?? ""} 작성 | ${new Date(
-                publicProblemSet?.updatedAt ?? "",
-              ).toLocaleString("ko-KR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}`}
-            </CardDescription>
-            <p className="absolute bottom-0 right-0 top-0 text-lg font-bold">
-              {`${publicProblemSet?.problems.length} 문제`}
-            </p>
-          </div>
-        </CardHeader>
-        <CardContent className="grid gap-4 border-y py-4">
-          <p className="text-sm/relaxed">
-            {publicProblemSet?.description ||
-              "만든이가 설명을 제공하지 않았습니다."}
-          </p>
-          <div className="flex items-center justify-between">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="lg">문제 풀기 시작</Button>
-              </DialogTrigger>
-              <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-                <DialogHeader className="text-left">
-                  <DialogTitle>제한 시간 설정</DialogTitle>
-                  <DialogDescription className="whitespace-pre-wrap">
-                    {`시험을 시작하기 전 시험에 제한 시간을 설정하세요.\n문제집 만든이가 설정한 기본 제한 시간은`}
-                    <strong className="text-black">{`${publicProblemSet?.timeLimit || 20}분`}</strong>
-                    {`입니다.`}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex items-center justify-end min-[508px]:absolute min-[508px]:right-[1rem] min-[508px]:top-[3rem]">
-                  <Label className="">랜덤으로 풀기</Label>
-                  <Switch
-                    checked={isRandomSelected}
-                    onCheckedChange={(checked) => setIsRandomSelected(checked)}
-                  />
-                </div>
-                <div className="mb-5 flex flex-col items-center justify-center min-[508px]:mb-0 min-[508px]:gap-y-2 min-[508px]:py-4">
-                  <div className="flex flex-col">
-                    <Label className="mb-3 block font-bold">
-                      제한 시간 (분)
-                    </Label>
-                    <Input
-                      value={timeLimit}
-                      onChange={(e) => setTimeLimit(e.target.value)}
-                      onKeyDown={async (e) =>
-                        handleEnterKeyPress(e, () => {
-                          setIsExamStarted(true);
-                        })
-                      }
-                      allowOnlyNumber
-                      id="time-limit"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    onClick={() => {
-                      setIsExamStarted(true);
-                    }}
-                  >
-                    시작
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </CardContent>
-        <CardFooter className="flex items-center justify-between px-4 py-2">
-          <div className="flex items-center space-x-2">
-            <Button size="icon" variant="ghost" onClick={onLikeClick}>
-              {like?.liked ? (
-                <GoHeartFill className="h-6 w-6 text-red-500" />
-              ) : (
-                <GoHeart className="h-6 w-6" />
-              )}
-            </Button>
-            <span className="text-sm font-medium">{`${like?.likes ?? "0"} 좋아요`}</span>
-          </div>
-        </CardFooter>
-      </Card>
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold">{`댓글 (${comments?.length})`}</h2>
-        <div className="mt-4">
-          <Textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="resize-none"
-            placeholder="댓글을 입력하세요."
-            onKeyDown={(e) => handleEnterKeyPress(e, onCommentSubmit)}
-          />
-          <div className="mt-2 flex justify-between">
-            <Button onClick={onCommentSubmit}>댓글 작성</Button>
-          </div>
-        </div>
+      <ExamProblemCard
+        isRandomSelected={isRandomSelected}
+        setIsRandomSelected={setIsRandomSelected}
+        timeLimit={timeLimit}
+        setTimeLimit={setTimeLimit}
+        setIsExamStarted={setIsExamStarted}
+        problemSet={publicProblemSet ?? ({} as ExamProblemSet)}
+        problemSetUUID={publicSetUUID}
+        userUUID={userUUID}
+        like={like ?? ({ likes: 0, liked: false } as Like)}
+      />
 
-        {comments && comments.length > 0 && (
-          <div className="mt-4 space-y-4">
-            {comments.map((comment) => (
-              <div
-                className="border-b border-gray-200 pb-4 dark:border-gray-800"
-                key={comment.uuid}
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-medium">{comment.userName}</h3>
-                    <p className="text-[1rem] dark:text-gray-400">
-                      {comment.content}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(comment.createdAt).toLocaleString("ko-KR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  <Button
-                    className="h-8 w-8"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() =>
-                      onDeleteComment(comment.userUUID, comment.uuid)
-                    }
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <ExamComments
+        comments={comments ?? []}
+        publicSetUUID={publicSetUUID}
+        userUUID={userUUID}
+      />
     </div>
   );
 }

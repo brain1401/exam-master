@@ -1,5 +1,5 @@
 "use client";
-import type { PublicExamProblemSet } from "@/types/problems";
+import type { ExamProblemSet } from "@/types/problems";
 import { useEffect } from "react";
 import PublicProblemMainPage from "./PublicProblemMainPage";
 import { useHydrateAtoms } from "jotai/utils";
@@ -17,7 +17,7 @@ type Props = {
   userEmail: string | null | undefined;
   userName: string | null | undefined;
   userUUID: string | null | undefined;
-  publicProblemSet: PublicExamProblemSet | null;
+  publicProblemSet: ExamProblemSet | null;
 };
 
 export type Like = { likes: number; liked: boolean };

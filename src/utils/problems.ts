@@ -11,7 +11,6 @@ import {
   PublicProblemSetWithPagination,
   PrefetchPaginationType,
   ProblemSetComment,
-  PublicExamProblemSet,
   ExamProblemSet,
   ExamProblemAnswer,
   uuidSchema,
@@ -787,10 +786,10 @@ export async function fetchPublicProblemLikes(problemUuid: string | undefined) {
 }
 
 export async function fetchPublicProblemSetByUUID(problemUuid: string) {
-  const { data } = await axios.get<PublicExamProblemSet | null>(
+  const { data } = await axios.get<ExamProblemSet | null>(
     `/api/getPublicProblemSet/?problemSetUUID=${problemUuid}`,
   );
-  return data as PublicExamProblemSet | null;
+  return data as ExamProblemSet | null;
 }
 
 export function isValidUUID(UUID: string) {

@@ -9,7 +9,6 @@ import {
   ProblemReplacedImageKey,
   PublicProblemSetWithPagination,
   ExamProblemSet,
-  PublicExamProblemSet,
   ProblemSetComment,
   CorrectAnswer,
   examProblemsSchema,
@@ -649,6 +648,9 @@ export async function getExamProblemsByProblemSetUUID(
   });
 
   const result: ExamProblemSet = {
+    creator: data.userName,
+    description: data.description ?? "",
+    updatedAt: new Date(),
     uuid: data.uuid,
     name: data.name,
     timeLimit: data.timeLimit || 20,
@@ -677,6 +679,11 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
               image: true,
             },
           },
+          user: {
+            columns: {
+              name: true,
+            },
+          },
         },
       });
 
@@ -685,6 +692,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
       const returnData: ProblemSetWithName = {
         uuid: foundProblemSet.uuid,
         name: foundProblemSet.name,
+        userName: foundProblemSet.user.name,
         createdAt: foundProblemSet.createdAt,
         updatedAt: foundProblemSet.updatedAt,
         timeLimit: foundProblemSet.timeLimit || 20,
@@ -1828,7 +1836,6 @@ export async function checkIfPublicExamResultExists(examResultUUID: string) {
   }
 }
 
-
 export async function getPublicProblemSetByUUID(problemSetUUID: string) {
   try {
     const data = await drizzleSession.transaction(async (dt) => {
@@ -1851,7 +1858,7 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
       if (!foundProblemSet) return null;
 
       //정답은 지움
-      const returnData: PublicExamProblemSet = {
+      const returnData: ExamProblemSet = {
         uuid: foundProblemSet.uuid,
         name: foundProblemSet.name,
         updatedAt: foundProblemSet.updatedAt,
@@ -1926,7 +1933,7 @@ export async function getRandomExamPublicProblemSetByUUID(
           })) ?? null,
       }));
 
-      const returnData: PublicExamProblemSet = {
+      const returnData: ExamProblemSet = {
         uuid: foundProblemSet.uuid,
         name: foundProblemSet.name,
         updatedAt: foundProblemSet.updatedAt,
