@@ -1,15 +1,21 @@
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { handleEnterKeyPress } from "@/utils/keyboard";
 
 type Props = {
   totalProblems: number;
   currentExamProblemIndex: number;
   setCurrentExamProblemIndex: (index: number) => void;
+  publicExamProblemLength: number;
 };
 
 export default function ExamHeader({
   currentExamProblemIndex,
   setCurrentExamProblemIndex,
   totalProblems,
+  publicExamProblemLength,
 }: Props) {
   const handlePrevQuestion = () => {
     if (currentExamProblemIndex > 0) {
@@ -22,12 +28,35 @@ export default function ExamHeader({
       setCurrentExamProblemIndex(currentExamProblemIndex + 1);
     }
   };
+  const [value, setValue] = useState("1");
+
+  useEffect(() => {
+    setValue((currentExamProblemIndex + 1).toString());
+  }, [currentExamProblemIndex]);
+
+  const handleChangeQuestion = () => {
+    const newIndex = parseInt(value, 10) - 1;
+    if (newIndex >= 0 && newIndex < publicExamProblemLength) {
+      setCurrentExamProblemIndex(newIndex);
+    }
+  };
 
   return (
     <div className="flex items-center justify-between">
-      <h2 className="text-[1.2rem] font-bold md:text-2xl">
-        {`총 문제 수 ${totalProblems}`}
-      </h2>
+      <div className="flex items-center gap-4">
+        <Label>문제 이동</Label>
+        <Input
+          value={value}
+          inputClassName="w-[3rem] text-center px-0"
+          onChange={(e) => setValue(e.target.value)}
+          allowOnlyNumber
+          onKeyDown={(e) =>
+            handleEnterKeyPress(e, () => handleChangeQuestion())
+          }
+        />
+        <Button onClick={handleChangeQuestion}>이동</Button>
+      </div>
+
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={handlePrevQuestion}>
           이전

@@ -54,14 +54,13 @@ export default function PublicProblemExamPage({
     console.log("publicExamProblems :", publicExamProblems);
   }, [publicExamProblems]);
 
-
-
   return (
     <ExamLayout>
       <ExamHeader
         totalProblems={publicExamProblems?.length ?? 0}
         currentExamProblemIndex={currentExamProblemIndex}
         setCurrentExamProblemIndex={setCurrentExamProblemIndex}
+        publicExamProblemLength={publicExamProblems?.length ?? 0}
       />
       <ExamProgressBar
         timeLimit={problemSetTimeLimit}
@@ -72,12 +71,8 @@ export default function PublicProblemExamPage({
         questionNumber={questionNumber}
         currentProblem={currentPublicExamProblem}
         candidates={currentPublicExamProblemCandidates}
-        setCurrentExamProblemCandidates={
-          setCurrentPublicExamProblemCandidates
-        }
-        setCurrentExamProblemSubAnswer={
-          setCurrentPublicExamProblemSubAnswer
-        }
+        setCurrentExamProblemCandidates={setCurrentPublicExamProblemCandidates}
+        setCurrentExamProblemSubAnswer={setCurrentPublicExamProblemSubAnswer}
       />
       <ExamFooter
         problemSet={publicExamProblemSet}

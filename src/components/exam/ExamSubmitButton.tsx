@@ -5,12 +5,14 @@ import { useState } from "react";
 import useRevalidation from "@/hooks/useRevalidate";
 import { isExamProblemAnswered } from "@/utils/problems";
 import axios from "axios";
+import { cn } from "@/lib/utils";
 
 type Props = {
   problemSet: ExamProblemSet | null;
+  className?: string;
 };
 
-export default function ExamSubmitButton({ problemSet }: Props) {
+export default function ExamSubmitButton({ problemSet, className }: Props) {
   const { data: session } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +68,7 @@ export default function ExamSubmitButton({ problemSet }: Props) {
 
   return (
     <Button
-      className="mt-3 w-[6.5rem] px-6"
+      className={cn(`mt-3 w-[6.5rem] px-6`, className)}
       onClick={onClick}
       isLoading={isLoading}
     >
