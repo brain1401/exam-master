@@ -12,6 +12,8 @@ export const isExamStartedAtom = atom<boolean>(false);
 
 export const isRandomSelectedAtom = atom<boolean>(false);
 
+export const isTimeOverAtom = atom<boolean>(false);
+
 export const originalProblemsAtom = atom<ExamProblem[]>([]);
 
 export const publicExamProblemsAtom = atom(
@@ -21,7 +23,9 @@ export const publicExamProblemsAtom = atom(
   },
   (get, set, newProblems: ExamProblem[]) => {
     const publicExamProblemSet = get(publicExamProblemSetAtom);
-    if (publicExamProblemSet) {
+    const isTimeOver = get(isTimeOverAtom);
+
+    if (publicExamProblemSet && isTimeOver === false) {
       set(publicExamProblemSetAtom, {
         ...publicExamProblemSet,
         problems: newProblems,
@@ -56,6 +60,10 @@ export const currentPublicExamProblemAtom = atom(
   (get, set, newProblem: ExamProblem) => {
     const problems = get(publicExamProblemsAtom);
     const index = get(currentExamProblemIndexAtom);
+    const isTimeOver = get(isTimeOverAtom);
+    if (isTimeOver) {
+      return;
+    }
     const newProblems = [...problems];
     newProblems[index] = newProblem;
     set(publicExamProblemsAtom, newProblems);
@@ -69,6 +77,11 @@ export const currentPublicExamProblemCandidatesAtom = atom(
   },
   (get, set, newCandidates: ExamProblem["candidates"]) => {
     const problem = get(currentPublicExamProblemAtom);
+    const isTimeOver = get(isTimeOverAtom);
+
+    if (isTimeOver) {
+      return;
+    }
     const newProblem = { ...problem, candidates: newCandidates };
     set(currentPublicExamProblemAtom, newProblem);
   },
@@ -81,6 +94,11 @@ export const currentPublicExamProblemSubAnswerAtom = atom(
   },
   (get, set, newSubAnswer: ExamProblem["subAnswer"]) => {
     const problem = get(currentPublicExamProblemAtom);
+    const isTimeOver = get(isTimeOverAtom);
+
+    if (isTimeOver) {
+      return;
+    }
     const newProblem = { ...problem, subAnswer: newSubAnswer };
     set(currentPublicExamProblemAtom, newProblem);
   },

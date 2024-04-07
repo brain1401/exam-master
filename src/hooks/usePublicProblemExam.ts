@@ -10,6 +10,7 @@ import {
   setPublicExamProblemsOriginalAtom,
   setPublicExamProblemsRandomAtom,
   currentPublicExamProblemSubAnswerAtom,
+  isTimeOverAtom,
 } from "@/jotai/publicProblemExam";
 import { useAtom, useSetAtom } from "jotai";
 
@@ -43,6 +44,8 @@ export function usePublicProblemExam() {
 
   const [isRandomSelected, setIsRandomSelected] = useAtom(isRandomSelectedAtom);
 
+  const [isTimeOver, setIsTimeOver] = useAtom(isTimeOverAtom);
+
   const setPublicExamProblemsOriginal = useSetAtom(
     setPublicExamProblemsOriginalAtom,
   );
@@ -61,6 +64,8 @@ export function usePublicProblemExam() {
     publicExamProblemSet,
     currentPublicExamProblemSubAnswer,
     isRandomSelected,
+    isTimeOver,
+    setIsTimeOver,
     setPublicExamProblemsOriginal,
     setPublicExamProblemsRandom,
     setIsRandomSelected,

@@ -14,6 +14,8 @@ export default function PublicProblemExamPage() {
     publicExamProblemSet,
     publicExamProblems,
     isRandomSelected,
+    isTimeOver,
+    setIsTimeOver,
     setPublicExamProblemSet,
     currentPublicExamProblemCandidates,
     setCurrentPublicExamProblem,
@@ -26,7 +28,6 @@ export default function PublicProblemExamPage() {
     setCurrentExamProblemIndex,
   } = usePublicProblemExam();
 
-  const [isTimeOver, setIsTimeOver] = useState(false);
   const questionNumber = currentExamProblemIndex + 1;
 
   useEffect(() => {
