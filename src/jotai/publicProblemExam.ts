@@ -51,3 +51,15 @@ export const currentPublicExamProblemCandidatesAtom = atom(
     set(currentPublicExamProblemAtom, newProblem);
   },
 );
+
+export const currentPublicExamProblemSubAnswerAtom = atom(
+  (get) => {
+    const problem = get(currentPublicExamProblemAtom);
+    return problem.subAnswer;
+  },
+  (get, set, newSubAnswer: ExamProblem["subAnswer"]) => {
+    const problem = get(currentPublicExamProblemAtom);
+    const newProblem = { ...problem, subAnswer: newSubAnswer };
+    set(currentPublicExamProblemAtom, newProblem);
+  },
+);

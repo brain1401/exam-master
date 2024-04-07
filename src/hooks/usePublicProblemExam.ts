@@ -6,6 +6,7 @@ import {
   currentPublicExamProblemAtom,
   currentPublicExamProblemCandidatesAtom,
   publicExamProblemSetAtom,
+  currentPublicExamProblemSubAnswerAtom,
 } from "@/jotai/publicProblemExam";
 import { useAtom } from "jotai";
 
@@ -32,6 +33,11 @@ export function usePublicProblemExam() {
     setCurrentPublicExamProblemCandidates,
   ] = useAtom(currentPublicExamProblemCandidatesAtom);
 
+  const [
+    currentPublicExamProblemSubAnswer,
+    setCurrentPublicExamProblemSubAnswer,
+  ] = useAtom(currentPublicExamProblemSubAnswerAtom);
+
   return {
     isExamStarted,
     timeLimit,
@@ -40,6 +46,8 @@ export function usePublicProblemExam() {
     currentPublicExamProblem,
     currentPublicExamProblemCandidates,
     publicExamProblemSet,
+    currentPublicExamProblemSubAnswer,
+    setCurrentPublicExamProblemSubAnswer,
     setPublicExamProblemSet,
     setCurrentPublicExamProblemCandidates,
     setCurrentPublicExamProblem,

@@ -13,6 +13,7 @@ type Props = {
   setCurrentPublicExamProblemCandidates: (
     candidates: Candidate[] | null,
   ) => void;
+  setCurrentPublicExamProblemSubAnswer: (subAnswer: string | null) => void;
 };
 
 export default function ExamProblem({
@@ -20,6 +21,7 @@ export default function ExamProblem({
   currentProblem,
   questionNumber,
   setCurrentPublicExamProblemCandidates,
+  setCurrentPublicExamProblemSubAnswer,
 }: Props) {
   const handleCandidateClick = (i: number) => {
     if (!currentProblem || !currentProblem.candidates) {
@@ -72,6 +74,9 @@ export default function ExamProblem({
     <Textarea
       className="h-[2rem] w-full resize-none rounded-md border p-2"
       placeholder="답을 입력해주세요."
+      onChange={(e) => {
+        setCurrentPublicExamProblemSubAnswer(e.target.value);
+      }}
     />
   );
 
@@ -85,7 +90,14 @@ export default function ExamProblem({
       <CardContent className="flex flex-col">
         <div className="flex w-full items-center justify-center">
           {imageURL ? (
-            <Image priority src={imageURL} width={400} height={400} alt="문제 이미지" className="mb-[2rem]" />
+            <Image
+              priority
+              src={imageURL}
+              width={400}
+              height={400}
+              alt="문제 이미지"
+              className="mb-[2rem]"
+            />
           ) : null}
         </div>
 

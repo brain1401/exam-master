@@ -27,6 +27,7 @@ export default function PublicProblemExamPage({
     setPublicExamProblems,
     setTimeLimit,
     setIsExamStarted,
+    setCurrentPublicExamProblemSubAnswer,
     currentExamProblemIndex,
     setCurrentExamProblemIndex,
   } = usePublicProblemExam();
@@ -68,6 +69,9 @@ export default function PublicProblemExamPage({
           candidates={currentPublicExamProblemCandidates}
           setCurrentPublicExamProblemCandidates={
             setCurrentPublicExamProblemCandidates
+          }
+          setCurrentPublicExamProblemSubAnswer={
+            setCurrentPublicExamProblemSubAnswer
           }
         />
         <ExamFooter
