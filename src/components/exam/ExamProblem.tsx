@@ -91,18 +91,21 @@ export default function ExamProblem({
         <CardTitle className="text-lg">{`${questionNumber}. ${currentProblem?.question}`}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col">
-        <div className="flex w-full items-center justify-center">
-          {imageURL ? (
-            <Image
-              priority
-              src={imageURL}
-              width={400}
-              height={400}
-              alt="문제 이미지"
-              className="mb-[2rem]"
-            />
-          ) : null}
-        </div>
+        {imageURL ? (
+          <div className="mb-8 flex w-full justify-center">
+            {
+              <div className="relative h-[10rem] w-[30rem] min-[375px]:h-[12rem] min-[400px]:h-[15rem] min-[450px]:h-[18rem] min-[570px]:h-[20rem]">
+                <Image
+                  priority
+                  src={imageURL}
+                  fill
+                  alt="문제 이미지"
+                  className="object-contain"
+                />
+              </div>
+            }
+          </div>
+        ) : null}
 
         <div className="w-full space-y-2">
           {currentProblem?.type === "obj" ? objective : subjective}
