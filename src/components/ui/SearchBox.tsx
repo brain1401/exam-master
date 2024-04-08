@@ -16,20 +16,16 @@ export default function SearchBox({
   type,
 }: Props) {
   const { setProblemSetsPage } = usePagenationState();
-  const { revalidatePathAndRedirect } = useRevalidation();
+  const { revalidateAllPathAndRedirect } = useRevalidation();
 
   const handleSearch = () => {
     if (searchString.length === 0) {
       setProblemSetsPage(1);
-      revalidatePathAndRedirect({
-        path: `/${type}`,
-        redirectPath: `/${type}`,
-      });
+      revalidateAllPathAndRedirect(`/${type}`);
     } else {
-      revalidatePathAndRedirect({
-        path: `/${type}/search/${encodeURIComponent(searchString)}`,
-        redirectPath: `/${type}/search/${encodeURIComponent(searchString)}`,
-      });
+      revalidateAllPathAndRedirect(
+        `/${type}/search/${encodeURIComponent(searchString)}`,
+      );
     }
   };
 

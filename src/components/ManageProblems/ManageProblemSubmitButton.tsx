@@ -11,13 +11,11 @@ import {
   isProblemEmpty,
 } from "@/utils/problems";
 import axios from "axios";
-import useRevalidation from "@/hooks/useRevalidate";
 type Props = {
   uuid: string;
 };
 export default function ManageProblemSubmitButton({ uuid }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const { revalidateAllPath } = useRevalidation();
   const {
     problems,
     problemSetsName,
@@ -150,9 +148,6 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
       throw err;
     } finally {
       setIsLoading(false); // 로딩 완료
-
-      // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
-      await revalidateAllPath();
     }
   };
   return (

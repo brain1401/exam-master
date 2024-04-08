@@ -67,7 +67,7 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
         : `/public-problem/result/${uuid}`;
 
       // // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화 및 결과 페이지로 리다이렉트
-      await revalidateAllPathAndRedirect(directURL);
+      revalidateAllPathAndRedirect(directURL);
       console.log("uuid :", uuid);
     } catch (e) {
       if (e instanceof Error) {

@@ -152,7 +152,7 @@ export default function CreateProblemsSubmitButton() {
     } finally {
       setIsLoading(false); // 로딩 완료
       // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화.
-      await revalidateAllPath();
+      revalidateAllPath();
     }
   };
 
