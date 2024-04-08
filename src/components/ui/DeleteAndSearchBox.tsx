@@ -6,6 +6,7 @@ import axios from "axios";
 import { cn } from "@/lib/utils";
 import useRevalidation from "@/hooks/useRevalidate";
 import usePagenationState from "@/hooks/usePagenationState";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   searchString: string;
@@ -26,6 +27,8 @@ export default function DeleteAndSearchBox({
     toDeletedUuid,
   } = useUiState();
 
+  const queryClient = useQueryClient();
+
   const { resultPage, problemSetsPage } = usePagenationState();
 
   const getRedirectUrl = (page: number, type: string, searchString: string) => {
@@ -41,6 +44,10 @@ export default function DeleteAndSearchBox({
     } else {
       return redirectPage === 1 ? baseUrl : `${baseUrl}${pageUrl}`;
     }
+  };
+
+  const getQueryKey = () => {
+    return type === "results" ? "results" : "problemSets";
   };
 
   const deleteItems = async (
@@ -64,7 +71,11 @@ export default function DeleteAndSearchBox({
     resetToDeletedUuid();
 
     const redirectUrl = getRedirectUrl(page, type, searchString);
-    await revalidateAllPathAndRedirect(redirectUrl);
+    console.log(redirectUrl);
+
+    queryClient.invalidateQueries({ queryKey: [getQueryKey()] });
+
+    revalidateAllPathAndRedirect(redirectUrl);
   };
 
   const onClick = () => {
