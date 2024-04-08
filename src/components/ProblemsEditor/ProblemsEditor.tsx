@@ -1,11 +1,20 @@
 "use client";
-import * as Tabs from "@radix-ui/react-tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/app/components/ui/tabs";
 import ObjectiveTab from "./ObjectiveTab";
 import SubjectiveTab from "./SubjectiveTab";
 import usePreventClose from "@/hooks/usePreventClose";
 import useProblems from "@/hooks/useProblems";
 import Image from "next/image";
 import { isCardOnBeingWrited, isImageUrlObject } from "@/utils/problems";
+import { Button } from "../ui/button";
+
+const TRIGGER_CLASSNAME =
+  "rounded-lg px-5 py-[1.4rem] data-[state=active]:bg-primary data-[state=inactive]:bg-primary/50 data-[state=active]:text-white disabled:opacity-100";
 
 export default function ProblemsEditor() {
   const {
@@ -41,22 +50,6 @@ export default function ProblemsEditor() {
     });
   };
 
-  const getTriggerClassName = (tab: "obj" | "sub") => {
-    let value = "";
-
-    const BASIC_CLASS_NAME = "rounded-lg border border-gray-300 px-5 py-3";
-    const ON_CURRENT_TAB = "bg-[#454655] text-white";
-
-    if (tab === "obj") {
-      value = `mr-2 ${BASIC_CLASS_NAME} ${
-        currentTab === "obj" && ON_CURRENT_TAB
-      }`;
-    } else if (tab === "sub") {
-      value = `${BASIC_CLASS_NAME} ${currentTab === "sub" && ON_CURRENT_TAB}`;
-    }
-
-    return value;
-  };
   return (
     <section className="mx-auto flex max-w-[60rem] flex-col items-center justify-center">
       <div>
@@ -70,8 +63,7 @@ export default function ProblemsEditor() {
                   src={image.url}
                   alt="preload image"
                   className="hidden"
-                  height={400}
-                  width={400}
+                  fill
                   priority
                   key={problem?.uuid + "preload"}
                 />
@@ -79,43 +71,45 @@ export default function ProblemsEditor() {
             }
           })}
       </div>
-      <Tabs.Root
-        className="flex w-full flex-col overflow-y-hidden"
+      <Tabs
+        className="flex w-full flex-col"
         activationMode="manual"
         value={currentTab}
       >
-        <Tabs.List className="mb-2 flex justify-center md:justify-normal">
-          <Tabs.Trigger
-            className={getTriggerClassName("obj")}
+        <TabsList className="mb-2 flex justify-center gap-x-2 bg-transparent md:justify-normal">
+          <TabsTrigger
             value="obj"
             onClick={() => {
               onTabChange("obj");
             }}
             disabled={currentTab === "obj"}
+            className={TRIGGER_CLASSNAME}
+            asChild
           >
-            객관식
-          </Tabs.Trigger>
+            <Button>객관식</Button>
+          </TabsTrigger>
 
-          <Tabs.Trigger
-            className={getTriggerClassName("sub")}
+          <TabsTrigger
+            className={TRIGGER_CLASSNAME}
             value="sub"
             onClick={() => {
               onTabChange("sub");
             }}
             disabled={currentTab === "sub"}
+            asChild
           >
-            주관식
-          </Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="obj" asChild>
+            <Button>주관식</Button>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="obj">
           {/*객관식*/}
           <ObjectiveTab />
-        </Tabs.Content>
-        <Tabs.Content value="sub" asChild>
+        </TabsContent>
+        <TabsContent value="sub">
           {/*주관식*/}
           <SubjectiveTab />
-        </Tabs.Content>
-      </Tabs.Root>
+        </TabsContent>
+      </Tabs>
     </section>
   );
 }
