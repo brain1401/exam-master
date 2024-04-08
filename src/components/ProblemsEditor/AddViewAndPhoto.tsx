@@ -71,7 +71,7 @@ export default function AddViewAndPhoto({ className }: Props) {
     let value = "";
 
     const BASIC_CLASS_NAME =
-      "rounded-lg bg-[#d1d5db] text-black border border-gray-300 px-5 py-[1.4rem] hover:text-white";
+      "rounded-lg bg-[#d1d5db] text-black border border-gray-300 px-5 py-[1.4rem] hover:text-white active:text-white";
     const condition =
       type === "view" ? isAdditionalViewButtonClicked : isImageButtonClicked;
 
