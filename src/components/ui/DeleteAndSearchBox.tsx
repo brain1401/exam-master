@@ -59,23 +59,30 @@ export default function DeleteAndSearchBox({
       return;
     }
 
-    const page = dataType === "problemSet" ? problemSetsPage : resultPage;
+    try {
+      const page = dataType === "problemSet" ? problemSetsPage : resultPage;
 
-    const apiUrl =
-      dataType === "problemSet"
-        ? "/api/deleteProblemSetByUUID"
-        : "/api/deleteProblemResultsByUUID";
+      const apiUrl =
+        dataType === "problemSet"
+          ? "/api/deleteProblemSetByUUID"
+          : "/api/deleteProblemResultsByUUID";
 
-    await axios.delete(apiUrl, { data: { uuids } });
+      await axios.delete(apiUrl, { data: { uuids } });
 
-    resetToDeletedUuid();
+      resetToDeletedUuid();
 
-    const redirectUrl = getRedirectUrl(page, type, searchString);
-    console.log(redirectUrl);
+      const redirectUrl = getRedirectUrl(page, type, searchString);
+      console.log(redirectUrl);
 
-    queryClient.invalidateQueries({ queryKey: [getQueryKey()] });
+      queryClient.invalidateQueries({ queryKey: [getQueryKey()] });
 
-    revalidateAllPathAndRedirect(redirectUrl);
+      revalidateAllPathAndRedirect(redirectUrl);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert("문제를 삭제하는 중 오류가 발생했습니다.");
+      }
+      throw e;
+    }
   };
 
   const onClick = () => {
