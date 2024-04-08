@@ -21,20 +21,16 @@ export async function POST(req: NextRequest) {
 
   const {
     examProblems,
-    examProblemSetUUID,
+    examProblemSetName,
   }: {
     examProblems: ExamProblem[];
-    examProblemSetUUID: string;
+    examProblemSetName: string;
   } = await req.json();
 
   console.log("examProblems", examProblems);
-  console.log("problemSetName", examProblemSetUUID);
+  console.log("problemSetName", examProblemSetName);
 
-  if (
-    !examProblems ||
-    !examProblemSetUUID ||
-    uuidSchema.safeParse(examProblemSetUUID).success === false
-  ) {
+  if (!examProblems || !examProblemSetName) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
@@ -51,7 +47,7 @@ export async function POST(req: NextRequest) {
   try {
     const uuid = await evaluateExamProblems(
       examProblems,
-      examProblemSetUUID,
+      examProblemSetName,
       session.user.email,
     );
     return NextResponse.json({ uuid });

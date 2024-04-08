@@ -1006,12 +1006,6 @@ export async function getExamResultsByUUID(
               image: true,
             },
           },
-          problemSet: {
-            columns: {
-              uuid: true,
-              name: true,
-            },
-          },
         },
       });
 
@@ -1019,7 +1013,7 @@ export async function getExamResultsByUUID(
 
       const returnData: ExamResultsSet = {
         ...result,
-        problemSetName: result.problemSet.name,
+        problemSetName: result.problemSetName,
         problemResults: result.problemResults.map((problemResult) => ({
           uuid: problemResult.uuid,
           order: problemResult.order,
@@ -1079,12 +1073,6 @@ export async function getExamResults(
                   image: true,
                 },
               },
-              problemSet: {
-                columns: {
-                  uuid: true,
-                  name: true,
-                },
-              },
             },
           }),
         ]);
@@ -1093,7 +1081,7 @@ export async function getExamResults(
         data: examResults.map((examResult) => ({
           uuid: examResult.uuid,
           problemResultsCount: examResult.problemResults.length,
-          problemSetName: examResult.problemSet.name,
+          problemSetName: examResult.problemSetName,
           createdAt: examResult.createdAt,
           updatedAt: examResult.updatedAt,
         })),
@@ -1136,8 +1124,7 @@ export async function getExamResultsByName(
               ),
               eq(result.userUuid, userUuid),
             ),
-          )
-          .innerJoin(problemSet, eq(problemSet.uuid, result.problemSetUuid)),
+          ),
         dt.query.result.findMany({
           where: (result, { and, like }) =>
             and(
@@ -1156,12 +1143,6 @@ export async function getExamResultsByName(
                 image: true,
               },
             },
-            problemSet: {
-              columns: {
-                uuid: true,
-                name: true,
-              },
-            },
           },
         }),
       ]);
@@ -1170,7 +1151,7 @@ export async function getExamResultsByName(
         data: examResults.map((examResult) => ({
           uuid: examResult.uuid,
           problemResultsCount: examResult.problemResults.length,
-          problemSetName: examResult.problemSet.name,
+          problemSetName: examResult.problemSetName,
           createdAt: examResult.createdAt,
           updatedAt: examResult.updatedAt,
         })),
@@ -1207,7 +1188,6 @@ export async function deleteImagesFromSet(
   console.log("[deleteImagesFromSet] 이미지 삭제 시작");
 
   try {
-    // 삭제 실패에 대비하여 이미지 파일 복사
     console.time("이미지 삭제 실패 대비 이미지 복사 시간");
     problemFileImages = await Promise.all(
       toBeDeletedImages.map(async (image) => {
@@ -1220,7 +1200,6 @@ export async function deleteImagesFromSet(
     );
     console.timeEnd("이미지 삭제 실패 대비 이미지 복사 시간");
 
-    // 이미지가 다른곳에서 참조되는지 확인하고 참조가 없으면 삭제
     await Promise.all(
       toBeDeletedImages.map(async (toBeDeletedImage) => {
         if (toBeDeletedImage) {
@@ -1240,44 +1219,37 @@ export async function deleteImagesFromSet(
           );
 
           if (!imageUuid)
-            throw new Error("이미지 uuid를 찾는 중 오류가 발생했습니다.");
-
-          const currentUserImageReference = totalReference.users.find(
-            (user) => user.userEmail === userEmail,
-          )?.count.total;
-
-          if (!currentUserImageReference)
             throw new Error(
-              "[deleteImagesFromSet] currentUserImageReference이 undefind입니다.",
+              `이미지 ${toBeDeletedImage.key}의 UUID를 찾는 데 실패했습니다.`,
             );
 
           console.log(
-            `\n[${toBeDeletedImage.key}]\nif(totalRefercence.allUserCount.total) === toBeDeletedImage.problemSetCount\nif(${totalReference.allUserCount.total} === ${toBeDeletedImage.problemSetCount})`,
+            `\n[${toBeDeletedImage.key}]\nif(totalRefercence.totalCount.total) === toBeDeletedImage.problemSetCount\nif(${totalReference.totalCount.total} === ${toBeDeletedImage.problemSetCount})`,
           );
 
           if (
-            totalReference.allUserCount.total ===
-            toBeDeletedImage.problemSetCount
+            totalReference.totalCount.total === toBeDeletedImage.problemSetCount
           ) {
-            // 삭제할 이미지의 모든 유저의 이미지 참조가 삭제할 이미지의 세트 숫자만큼인 경우 s3에서 이미지 삭제 (s3 삭제 대상)
             console.log(
               `[deleteImagesFromSet] 참조가 없어 이미지 ${toBeDeletedImage.key} 삭제 시작`,
             );
 
+            // S3에서 이미지 삭제
             const command = new DeleteObjectCommand({
               Bucket: process.env.AWS_S3_BUCKET_NAME,
               Key: toBeDeletedImage.key,
             });
 
             const response = await s3.send(command);
-            if (!(response.$metadata.httpStatusCode === 204))
+            if (response.$metadata.httpStatusCode !== 204)
               throw new Error(
-                "S3에서 이미지를 삭제하는 중 오류가 발생했습니다.",
+                `S3에서 이미지 ${toBeDeletedImage.key}를 삭제하는 데 실패했습니다.`,
               );
             console.log(
               `[deleteImagesFromSet] 이미지 ${toBeDeletedImage.key} s3에서 삭제 성공`,
             );
 
+            // 데이터베이스에서 이미지 정보 삭제
             await dt.delete(image).where(eq(image.uuid, imageUuid));
 
             console.log(
@@ -1289,35 +1261,24 @@ export async function deleteImagesFromSet(
             );
           }
 
+          // 현재 사용자의 이미지 참조 정보 삭제
+          await dt
+            .delete(imageToUser)
+            .where(
+              and(
+                eq(imageToUser.imageUuid, imageUuid),
+                eq(imageToUser.userUuid, userUuid),
+              ),
+            );
+
           console.log(
-            `\n[${toBeDeletedImage.key}]\nif(currentUserImageReference) === toBeDeletedImage.problemSetCount\nif(${currentUserImageReference} === ${toBeDeletedImage.problemSetCount})`,
+            `[deleteImagesFromSet] 현재 사용자의 이미지 ${toBeDeletedImage.key} 참조 정보 삭제 성공`,
           );
-
-          if (currentUserImageReference === toBeDeletedImage.problemSetCount) {
-            // 삭제할 이미지의 현재 유저의 이미지 참조가 삭제할 이미지의 세트 숫자만큼인 경우 user 테이블에서 이미지 참조 삭제
-
-            console.log(
-              `[deleteImagesFromSet] user테이블에서 image ${toBeDeletedImage.key}연결 해제 시작`,
-            );
-
-            await dt
-              .delete(imageToUser)
-              .where(
-                and(
-                  eq(imageToUser.imageUuid, imageUuid),
-                  eq(imageToUser.userUuid, userUuid),
-                ),
-              );
-
-            console.log(
-              `[deleteImagesFromSet] user테이블에서 image ${toBeDeletedImage.key}연결 해제 성공`,
-            );
-          }
         }
       }),
     );
   } catch (err) {
-    console.log("이미지 삭제 중 오류 발생, 이미지 복구 시작!");
+    console.error("이미지 삭제 중 오류 발생:", err);
 
     const results = await Promise.all(
       problemFileImages.map(async (image) => {
@@ -1335,7 +1296,7 @@ export async function deleteImagesFromSet(
         results.map(async (result, index) => {
           if (!result) {
             const image = problemFileImages[index];
-            if (!image) throw new Error("이미지가 null입니다.");
+            if (!image) throw new Error(`복구할 이미지 ${index}가 없습니다.`);
 
             const command = new PutObjectCommand({
               Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -1345,16 +1306,22 @@ export async function deleteImagesFromSet(
             });
             const response = await s3.send(command);
 
-            if (!(response.$metadata.httpStatusCode === 200))
-              throw new Error("S3에 이미지를 복구하는 중 오류가 발생했습니다.");
+            if (response.$metadata.httpStatusCode !== 200)
+              throw new Error(
+                `S3에 이미지 ${image.imageKey}를 복구하는 데 실패했습니다.`,
+              );
           }
         }),
       );
     } catch (err) {
-      console.error("이미지 복구 중 오류 발생:", err);
-      throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
+      if (err instanceof Error) {
+        console.error("이미지 복구 중 오류 발생:", err);
+        throw new Error(`이미지 복구 중 오류가 발생했습니다: ${err.message}`);
+      }
     }
-    throw new Error("이미지를 삭제하는 중 오류가 발생했습니다.");
+    if (err instanceof Error) {
+      throw new Error(`이미지 삭제 중 오류가 발생했습니다: ${err.message}`);
+    }
   }
 }
 
@@ -2184,29 +2151,46 @@ export async function handlePublicProblemLikes({
   }
 }
 
-async function getCountByImageUuid(imageUuid: string, dt: DrizzleTransaction) {
+async function getCountByImageUuid(
+  imageUuid: string,
+  userUuid: string,
+  dt: DrizzleTransaction,
+) {
   const problems = await dt.query.problem.findMany({
-    where: (problem, { eq }) => eq(problem.imageUuid, imageUuid),
+    where: and(
+      eq(problem.imageUuid, imageUuid),
+      eq(problem.userUuid, userUuid),
+    ),
     with: { problemSet: { columns: { uuid: true } } },
   });
 
   const problemResults = await dt.query.problemResult.findMany({
-    where: (problemResult, { eq }) => eq(problemResult.imageUuid, imageUuid),
-    with: { result: { columns: { uuid: true } } },
+    where: eq(problemResult.imageUuid, imageUuid),
+    with: {
+      result: {
+        columns: { uuid: true, userUuid: true },
+      },
+    },
   });
+
+  const filteredProblemResults = problemResults.filter(
+    (problemResult) => problemResult.result?.userUuid === userUuid,
+  );
 
   const problemSetCount = new Set(
     problems.map((problem) => problem.problemSet.uuid),
   ).size;
-  const problemResultsCount = new Set(
-    problemResults.map((problemResult) => problemResult.result.uuid),
-  ).size;
+  const problemResultsCount = filteredProblemResults.length;
 
-  return {
+  const count = {
     problemSetCount,
     problemResultsCount,
     total: problemSetCount + problemResultsCount,
   };
+
+  console.log("userUUID : ", userUuid, "count :", count);
+
+  return count;
 }
 
 export async function getReferecesOfImageByImageKey(
@@ -2224,29 +2208,47 @@ export async function getReferecesOfImageByImageKey(
       );
     }
 
-    const imageUsers = await drizzleTransaction
-      .select({ userUuid: imageToUser.userUuid })
-      .from(imageToUser)
-      .where(eq(imageToUser.imageUuid, imageUuid));
+    const userUuids = new Set<string>();
+
+    // Problem 테이블에서 이미지를 사용하는 레코드의 userUuid 수집
+    const problemUsers = await drizzleTransaction.query.problem.findMany({
+      columns: { userUuid: true },
+      where: eq(problem.imageUuid, imageUuid),
+    });
+    problemUsers.forEach((problemUser) => userUuids.add(problemUser.userUuid));
+
+    // ProblemResult 테이블에서 이미지를 사용하는 레코드의 userUuid 수집
+    const problemResultUsers =
+      await drizzleTransaction.query.problemResult.findMany({
+        with: { result: { columns: { userUuid: true } } },
+        where: eq(problemResult.imageUuid, imageUuid),
+      });
+    problemResultUsers.forEach((problemResultUser) => {
+      if (problemResultUser.result?.userUuid) {
+        userUuids.add(problemResultUser.result.userUuid);
+      }
+    });
 
     const users = await Promise.all(
-      imageUsers.map(async (imageUser) => {
+      Array.from(userUuids).map(async (userUuid) => {
         const userEmail = await drizzleTransaction.query.user.findFirst({
-          where: (user_, { eq }) => eq(user_.uuid, imageUser.userUuid),
+          where: eq(user.uuid, userUuid),
           columns: { email: true },
         });
 
         if (!userEmail) {
-          console.warn(
-            `User email not found for user UUID: ${imageUser.userUuid}`,
-          );
+          console.warn(`User email not found for user UUID: ${userUuid}`);
           return null;
         }
 
-        const count = await getCountByImageUuid(imageUuid, drizzleTransaction);
+        const count = await getCountByImageUuid(
+          imageUuid,
+          userUuid,
+          drizzleTransaction,
+        );
 
         return {
-          uuid: imageUser.userUuid,
+          uuid: userUuid,
           userEmail: userEmail.email,
           count,
         };
@@ -2257,33 +2259,19 @@ export async function getReferecesOfImageByImageKey(
       (user): user is NonNullable<typeof user> => user !== null,
     );
 
-    const publicCount = await getCountByImageUuid(
-      imageUuid,
-      drizzleTransaction,
-    );
-
-    const result = {
-      users: filteredUsers,
-      publicCount,
-    };
-
-    const allUserCount = filteredUsers.reduce(
+    const totalCount = filteredUsers.reduce(
       (acc, cur) => {
         acc.problemSetCount += cur.count.problemSetCount;
         acc.problemResultsCount += cur.count.problemResultsCount;
         acc.total += cur.count.total;
         return acc;
       },
-      {
-        problemSetCount: publicCount.problemSetCount,
-        problemResultsCount: publicCount.problemResultsCount,
-        total: publicCount.total,
-      },
+      { problemSetCount: 0, problemResultsCount: 0, total: 0 },
     );
 
     return {
-      ...result,
-      allUserCount,
+      users: filteredUsers,
+      totalCount,
     };
   } catch (err) {
     console.error(
@@ -2316,11 +2304,6 @@ export async function getPublicExamProblemResult(
               image: true,
             },
           },
-          problemSet: {
-            columns: {
-              name: true,
-            },
-          },
         },
       });
 
@@ -2328,7 +2311,7 @@ export async function getPublicExamProblemResult(
 
       const returnData: ExamResultsSet = {
         ...queryResult,
-        problemSetName: queryResult.problemSet.name,
+        problemSetName: queryResult.problemSetName,
         problemResults: queryResult.problemResults.map((problemResult) => ({
           uuid: problemResult.uuid,
           order: problemResult.order,
@@ -2359,7 +2342,7 @@ export async function getPublicExamProblemResult(
 
 export async function evaluateExamProblems(
   examProblems: ExamProblem[],
-  problemSetUuid: string,
+  problemSetName: string,
   userEmail?: string,
 ) {
   try {
@@ -2379,7 +2362,7 @@ export async function evaluateExamProblems(
       const [{ uuid: resultsUuid }] = await dt
         .insert(result)
         .values({
-          problemSetUuid,
+          problemSetName,
           userUuid,
           isPublic: userUuid === null,
           createdAt: date,
@@ -2548,8 +2531,7 @@ export async function getResultsMaxPage(
                 eq(result.userUuid, userUuid),
                 like(problemSet.name, `%${searchString}%`),
               ),
-            )
-            .innerJoin(problemSet, eq(problemSet.uuid, result.problemSetUuid));
+            );
         }
         const userUuid = await getUserUUIDbyEmail(userEmail, dt);
         return dt

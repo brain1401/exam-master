@@ -8,15 +8,15 @@ export async function POST(req: NextRequest) {
 
   const {
     publicExamProblems,
-    publicExamProblemSetUuid,
+    publicExamProblemSetName,
   }: {
     publicExamProblems: ExamProblem[];
-    publicExamProblemSetUuid: string;
+    publicExamProblemSetName: string;
   } = await req.json();
 
   const userEmail = session?.user?.email;
 
-  if (!publicExamProblems || !publicExamProblemSetUuid) {
+  if (!publicExamProblems || !publicExamProblemSetName) {
     return NextResponse.json(
       { error: "서버로 전송된 문제가 올바르지 않습니다." },
       { status: 400 },
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   try {
     const uuid = await evaluateExamProblems(
       publicExamProblems,
-      publicExamProblemSetUuid,
+      publicExamProblemSetName,
       userEmail ?? undefined,
     );
     return NextResponse.json({ uuid });

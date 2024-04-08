@@ -34,7 +34,7 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
 
   const isUserLoggedIn = session ? true : false;
 
-  const ProblemSetUUID = problemSet?.uuid;
+  const ProblemSetName = problemSet?.name;
   const problems = problemSet?.problems;
 
   const isAllProblemAnswered = problems?.every(isExamProblemAnswered);
@@ -46,11 +46,11 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
   const body = isUserLoggedIn
     ? {
         examProblems: problems,
-        examProblemSetUUID: ProblemSetUUID,
+        examProblemSetName: ProblemSetName,
       }
     : {
         publicExamProblems: problems,
-        publicExamProblemSetUuid: ProblemSetUUID,
+        publicExamProblemSetName: ProblemSetName,
       };
 
   const onClick = async () => {

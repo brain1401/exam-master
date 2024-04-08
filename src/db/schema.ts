@@ -129,12 +129,7 @@ export const result = pgTable(
       onDelete: "set null",
       onUpdate: "cascade",
     }),
-    problemSetUuid: uuid("problemSetUuid")
-      .notNull()
-      .references(() => problemSet.uuid, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
+    problemSetName: text("problemSetName").notNull(),
     isPublic: boolean("isPublic").notNull(),
     createdAt: timestamp("createdAt", {
       precision: 0,
@@ -161,10 +156,6 @@ export const resultRelation = relations(result, ({ many, one }) => ({
   user: one(user, {
     fields: [result.userUuid],
     references: [user.uuid],
-  }),
-  problemSet: one(problemSet, {
-    fields: [result.problemSetUuid],
-    references: [problemSet.uuid],
   }),
 }));
 
