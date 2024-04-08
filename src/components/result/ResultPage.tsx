@@ -41,6 +41,10 @@ export default function ResultPage({ _examResultsSet }: Props) {
     console.log("candidates :", candidates);
   }, [candidates]);
 
+  useEffect(() => {
+    console.log("examResults :", examResults); 
+  }, [examResults]);
+
   const imagesRef = useRef([CorrectMark, WrongMark, checkImage]);
 
   return (
