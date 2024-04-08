@@ -56,8 +56,7 @@ export default function ResultPage({ _examResultsSet }: Props) {
                   key={examResult.uuid + "preload"}
                   src={image.url}
                   alt="preload image"
-                  width={400}
-                  height={400}
+                  fill
                   className="hidden"
                   priority
                 />

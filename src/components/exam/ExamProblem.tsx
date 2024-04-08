@@ -85,12 +85,19 @@ export default function ExamProblem({
 
   const imageURL = currentProblem.image?.url ?? "";
 
+  const additionalView = (
+    <div className="mb-5 flex w-full items-center justify-center rounded-md border border-black px-2 py-8">
+      {currentProblem?.additionalView}
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">{`${questionNumber}. ${currentProblem?.question}`}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col">
+        {additionalView}
         {imageURL ? (
           <div className="mb-8 flex w-full justify-center">
             {
