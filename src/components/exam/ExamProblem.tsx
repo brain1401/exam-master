@@ -85,11 +85,11 @@ export default function ExamProblem({
 
   const imageURL = currentProblem.image?.url ?? "";
 
-  const additionalView = (
+  const additionalView = currentProblem.additionalView ? (
     <div className="mb-5 flex w-full items-center justify-center rounded-md border border-black px-2 py-8">
       {currentProblem?.additionalView}
     </div>
-  );
+  ) : null;
 
   return (
     <Card>
