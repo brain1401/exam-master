@@ -47,7 +47,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return isLoading ? (
       <Comp
         disabled
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          "select-none",
+        )}
         ref={ref}
         {...props}
       >
@@ -55,7 +58,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </Comp>
     ) : (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          "select-none",
+        )}
         ref={ref}
         {...props}
       />
