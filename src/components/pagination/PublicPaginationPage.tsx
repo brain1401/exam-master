@@ -10,6 +10,7 @@ import {
   getPublicProblemSetsMaxPage,
 } from "@/service/problems";
 import { defaultPageSize } from "@/const/pageSize";
+import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   page: number;
@@ -70,11 +71,13 @@ export default async function PublicPaginationPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PublicProblemsPage
-        maxPage={maxPage}
-        page={page}
-        searchString={searchString}
-      />
+      <JotaiProvider>
+        <PublicProblemsPage
+          maxPage={maxPage}
+          page={page}
+          searchString={searchString}
+        />
+      </JotaiProvider>
     </HydrationBoundary>
   );
 }

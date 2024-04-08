@@ -30,6 +30,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import useExamProblems from "@/hooks/useExamProblems";
+import { useTimeLimit } from "@/hooks/useTimeLimit";
 type Props = {
   type: "manage" | "exam";
   problemSet: ProblemSet;
@@ -43,7 +44,9 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
     toDeletedUuid,
   } = useUiState();
 
-  const { timeLimit, setTimeLimit } = useExamProblems();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { setTimeLimit, timeLimit } = useTimeLimit();
 
   const [isSelected, setIsSelected] = useState<boolean>(
     toDeletedUuid.find((uuid: string) => uuid === problemSet.uuid)
@@ -51,6 +54,13 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
       : false,
   );
   const router = useRouter();
+
+  // Dialog가 열렸을 때 해당 카드의 timeLimit 동기화
+  useEffect(() => {
+    if (isDialogOpen) {
+      setTimeLimit(problemSet.timeLimit.toString() || "20");
+    }
+  }, [isDialogOpen, problemSet.timeLimit, setTimeLimit]);
 
   // toDeletedUuid가 외부에서 변경되었을 때 isSelected 동기화
   useEffect(() => {
@@ -129,7 +139,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
   ) : type === "manage" ? (
     <Link href={`/manage/${problemSet.uuid}`}>{CustomCard}</Link>
   ) : (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger className="w-full">{CustomCard}</DialogTrigger>
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>

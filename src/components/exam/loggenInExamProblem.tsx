@@ -10,11 +10,8 @@ import ExamProblem from "../exam/ExamProblem";
 import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "./ExamFooter";
 import { useHydrateAtoms } from "jotai/utils";
-import {
-  examProblemSetAtom,
-  isTimeOverAtom,
-  timeLimitAtom,
-} from "@/jotai/examProblems";
+import { examProblemSetAtom, isTimeOverAtom } from "@/jotai/examProblems";
+import { useTimeLimit } from "@/hooks/useTimeLimit";
 
 type Props = {
   _examProblemSet: ExamProblemSet;
@@ -30,7 +27,6 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
     currentExamProblemIndex,
     examProblemSet,
     examProblems,
-    timeLimit,
     isTimeOver,
     setIsTimeOver,
     setExamProblemSet,
@@ -40,6 +36,8 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
     resetExamProblems,
   } = useExamProblems();
 
+  const { timeLimit, setTimeLimit } = useTimeLimit();
+
   useEffect(() => {
     setExamProblemSet(_examProblemSet);
   }, [_examProblemSet, setExamProblemSet]);
@@ -47,6 +45,12 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
   useEffect(() => {
     setIsTimeOver(false);
   }, [currentExamProblemIndex, setIsTimeOver]);
+
+  useEffect(() => {
+    return () => {
+      setTimeLimit("20");
+    };
+  }, [setTimeLimit]);
 
   useEffect(() => {
     return () => {

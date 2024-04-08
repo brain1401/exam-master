@@ -29,8 +29,6 @@ export const examProblemsAtom = atom(
   },
 );
 
-export const timeLimitAtom = atom("20");
-
 export const currentExamProblemAtom = atom(
   (get) => {
     const examProblems = get(examProblemsAtom);
@@ -113,7 +111,6 @@ export const resetExamProblemAnswersAtom = atom(null, (get, set) => {
   set(isExamStartedAtom, false);
   set(isTimeOverAtom, false);
   set(examProblemsAtom, []);
-  set(timeLimitAtom, "20");
   set(currentExamProblemCandidatesAtom, null);
   set(currentExamProblemSubAnswerAtom, null);
   set(examProblemSetNameAtom, "");
