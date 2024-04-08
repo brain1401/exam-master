@@ -1,6 +1,6 @@
 import { Progress } from "@/app/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, startTransition } from "react";
 
 type Props = {
   timeLimit: number;
@@ -22,7 +22,10 @@ export default function ExamProgressBar({
     const timer = () => {
       const currentTime = Date.now();
       const elapsed = (currentTime - startTime) / 1000;
-      setElapsedTime(elapsed);
+
+      startTransition(() => {
+        setElapsedTime(elapsed);
+      });
 
       if (elapsed >= timeLimit * 60) {
         setIsTimeOver(true);
