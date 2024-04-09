@@ -78,7 +78,7 @@ export default function PublicProblemMainPage({
   }, [like]);
 
   return (
-    <div className="mx-auto w-full max-w-[60rem] px-[1.5rem] pt-[6rem]">
+    <div className="mx-auto w-full max-w-[60rem] px-[0.8rem] pt-[6rem]">
       <PublicExamProblemCard
         isRandomSelected={isRandomSelected}
         setIsRandomSelected={setIsRandomSelected}
