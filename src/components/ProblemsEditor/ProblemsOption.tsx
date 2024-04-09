@@ -8,7 +8,12 @@ import { useEffect, useState } from "react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
 import { IoMdSettings } from "react-icons/io";
-
+import { isMobile } from "react-device-detect";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/components/ui/popover";
 import {
   Dialog,
   DialogClose,
@@ -261,18 +266,34 @@ export default function ProblemsOption({ type }: Props) {
                   <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                     <DialogHeader className="relative text-start">
                       <div className="absolute right-0 top-[1rem] flex items-center">
-                        <HoverCard>
-                          <HoverCardTrigger asChild>
-                            <div className="mr-2">
-                              <Info className="w-[1.3rem] h-[1.3rem]"/>
-                            </div>
-                          </HoverCardTrigger>
-                          <HoverCardContent>
-                            <p className="text-[.8rem]">
-                              0으로 설정 시 제한시간이 없는 문제집이 됩니다.
-                            </p>
-                          </HoverCardContent>
-                        </HoverCard>
+                        {isMobile ? (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <div className="mr-2">
+                                <Info className="h-[1.3rem] w-[1.3rem]" />
+                              </div>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <p className="text-[.8rem]">
+                                0으로 설정 시 제한시간이 없는 문제집이 됩니다.
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        ) : (
+                          <HoverCard>
+                            <HoverCardTrigger asChild>
+                              <div className="mr-2">
+                                <Info className="h-[1.3rem] w-[1.3rem]" />
+                              </div>
+                            </HoverCardTrigger>
+                            <HoverCardContent>
+                              <p className="text-[.8rem]">
+                                0으로 설정 시 제한시간이 없는 문제집이 됩니다.
+                              </p>
+                            </HoverCardContent>
+                          </HoverCard>
+                        )}
+
                         <div className="flex items-center justify-center">
                           <Label className="mr-2 text-[.9rem] ">제한시간</Label>
                           <Input
