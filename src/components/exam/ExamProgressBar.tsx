@@ -17,25 +17,26 @@ export default function ExamProgressBar({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const startTime = Date.now();
+    if (timeLimit !== 0) {
+      const startTime = Date.now();
 
-    const timer = () => {
-      const currentTime = Date.now();
-      const elapsed = (currentTime - startTime) / 1000;
+      const timer = () => {
+        const currentTime = Date.now();
+        const elapsed = (currentTime - startTime) / 1000;
 
-      startTransition(() => {
-        setElapsedTime(elapsed);
-      });
+        startTransition(() => {
+          setElapsedTime(elapsed);
+        });
 
-      if (elapsed >= timeLimit * 60) {
-        setIsTimeOver(true);
-      } else {
-        timeoutRef.current = setTimeout(timer, 100);
-      }
-    };
+        if (elapsed >= timeLimit * 60) {
+          setIsTimeOver(true);
+        } else {
+          timeoutRef.current = setTimeout(timer, 100);
+        }
+      };
 
-    timeoutRef.current = setTimeout(timer, 100);
-
+      timeoutRef.current = setTimeout(timer, 100);
+    }
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -48,17 +49,21 @@ export default function ExamProgressBar({
   const seconds = Math.floor(remainingTime % 60);
 
   return (
-    <div className="my-8">
-      <div className="">
-        {isTimeOver
-          ? "시간 초과"
-          : `남은 시간 : ${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`}
-      </div>
-      <Progress
-        value={(elapsedTime / (timeLimit * 60)) * 100}
-        indicatorClassName={isTimeOver ? "bg-red-500" : ""}
-        className={cn("transition-all duration-100")}
-      ></Progress>
-    </div>
+    <>
+      {timeLimit !== 0 && (
+        <div>
+          <div className="">
+            {isTimeOver
+              ? "시간 초과"
+              : `남은 시간 : ${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`}
+          </div>
+          <Progress
+            value={(elapsedTime / (timeLimit * 60)) * 100}
+            indicatorClassName={isTimeOver ? "bg-red-500" : ""}
+            className={cn("transition-all duration-100")}
+          ></Progress>
+        </div>
+      )}
+    </>
   );
 }

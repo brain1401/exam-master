@@ -8,6 +8,7 @@ import ProblemSetsCardSkeleton from "./ProblemSetsCardSkeleton";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 import { fetchProblemSets } from "@/utils/problems";
 import ProblemGridCardLayout from "../layouts/ProblemGridCardLayout";
+import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   type: "manage" | "exam";

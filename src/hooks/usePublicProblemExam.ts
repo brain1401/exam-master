@@ -11,6 +11,7 @@ import {
   setPublicExamProblemsRandomAtom,
   currentPublicExamProblemSubAnswerAtom,
   isTimeOverAtom,
+  resetPublicProblemExamAtom,
 } from "@/jotai/publicProblemExam";
 import { useAtom, useSetAtom } from "jotai";
 
@@ -54,6 +55,8 @@ export function usePublicProblemExam() {
     setPublicExamProblemsRandomAtom,
   );
 
+  const resetPublicProblemExam = useSetAtom(resetPublicProblemExamAtom);
+
   return {
     isExamStarted,
     timeLimit,
@@ -77,5 +80,6 @@ export function usePublicProblemExam() {
     setPublicExamProblems,
     setIsExamStarted,
     setTimeLimit,
+    resetPublicProblemExam,
   };
 }

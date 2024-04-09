@@ -29,7 +29,6 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import useExamProblems from "@/hooks/useExamProblems";
 import { useTimeLimit } from "@/hooks/useTimeLimit";
 type Props = {
   type: "manage" | "exam";
@@ -46,7 +45,11 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { setTimeLimit, timeLimit } = useTimeLimit();
+  const [localTimeLimit, setLocalTimeLimit] = useState<string>(
+    problemSet.timeLimit?.toString() || "0",
+  );
+
+  const { timeLimit, setTimeLimit } = useTimeLimit();
 
   const [isSelected, setIsSelected] = useState<boolean>(
     toDeletedUuid.find((uuid: string) => uuid === problemSet.uuid)
@@ -55,12 +58,17 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
   );
   const router = useRouter();
 
-  // Dialog가 열렸을 때 해당 카드의 timeLimit 동기화
   useEffect(() => {
-    if (isDialogOpen) {
-      setTimeLimit(problemSet.timeLimit.toString() || "20");
-    }
-  }, [isDialogOpen, problemSet.timeLimit, setTimeLimit]);
+    console.log("problemSet.timeLimit :", problemSet.timeLimit);
+  }, [problemSet.timeLimit]);
+
+  useEffect(() => {
+    console.log("localTimeLimit :", localTimeLimit);
+  }, [localTimeLimit]);
+
+  useEffect(() => {
+    console.log("timeLimit :", timeLimit);
+  }, [timeLimit]);
 
   // toDeletedUuid가 외부에서 변경되었을 때 isSelected 동기화
   useEffect(() => {
@@ -87,8 +95,19 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
       minute: "2-digit",
     },
   );
+
+  const handleCardClick = () => {
+    console.log("localTimeLimit in handleCardClick :", localTimeLimit);
+    if (localTimeLimit !== "0") {
+      setIsDialogOpen(true);
+    } else {
+      console.log("else문 안에 들어옴");
+      router.push(`/exam/${problemSet.uuid}`);
+    }
+  };
+
   const CustomCard = (
-    <Card>
+    <Card onClick={handleCardClick} className="cursor-pointer">
       <CardHeader>
         <CardTitle>{problemSet.name}</CardTitle>
       </CardHeader>
@@ -139,36 +158,39 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
   ) : type === "manage" ? (
     <Link href={`/manage/${problemSet.uuid}`}>{CustomCard}</Link>
   ) : (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger className="w-full">{CustomCard}</DialogTrigger>
-      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-        <DialogHeader>
-          <DialogTitle>문제 풀기</DialogTitle>
-          <CardDescription>{problemSet.description}</CardDescription>
-        </DialogHeader>
-        <div className="flex flex-col">
-          <Label className="mb-2">문제집 제한 시간 (분)</Label>
-          <Input
-            allowOnlyNumber
-            value={timeLimit}
-            onChange={(e) => {
-              setTimeLimit(e.target.value);
-            }}
-          />
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">닫기</Button>
-          </DialogClose>
-          <Button
-            onClick={() => {
-              router.push(`/exam/${problemSet.uuid}`);
-            }}
-          >
-            문제 풀기
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <>
+      {CustomCard}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle>문제 풀기</DialogTitle>
+            <CardDescription>{problemSet.description}</CardDescription>
+          </DialogHeader>
+          <div className="flex flex-col">
+            <Label className="mb-2">문제집 제한 시간 (분)</Label>
+            <Input
+              allowOnlyNumber
+              value={localTimeLimit}
+              onChange={(e) => {
+                setLocalTimeLimit(e.target.value);
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">닫기</Button>
+            </DialogClose>
+            <Button
+              onClick={() => {
+                setTimeLimit(localTimeLimit);
+                router.push(`/exam/${problemSet.uuid}`);
+              }}
+            >
+              문제 풀기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

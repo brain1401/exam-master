@@ -46,7 +46,7 @@ export default function PublicProblemExamPage() {
   }, [publicExamProblems]);
 
   return (
-    <ExamLayout>
+    <ExamLayout > 
       <ExamHeader
         totalProblems={publicExamProblems?.length ?? 0}
         currentExamProblemIndex={currentExamProblemIndex}

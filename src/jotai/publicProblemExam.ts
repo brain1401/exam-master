@@ -103,3 +103,14 @@ export const currentPublicExamProblemSubAnswerAtom = atom(
     set(currentPublicExamProblemAtom, newProblem);
   },
 );
+
+
+export const resetPublicProblemExamAtom = atom(null, (get, set) => {
+  set(isExamStartedAtom, false);
+  set(isTimeOverAtom, false);
+  set(currentExamProblemIndexAtom, 0);
+  set(timeLimitAtom, "0");
+  set(isRandomSelectedAtom, false);
+  set(originalProblemsAtom, []);
+  set(publicExamProblemsAtom, []);
+});

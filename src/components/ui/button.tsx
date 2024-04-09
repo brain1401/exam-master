@@ -4,6 +4,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/components/ui/popover";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -39,32 +45,106 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   isLoading?: boolean;
+  popoverContent?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, isLoading, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      isLoading,
+      popoverContent,
+      ...props
+    },
+    ref,
+  ) => {
+    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+    React.useImperativeHandle<
+      HTMLButtonElement | null,
+      HTMLButtonElement | null
+    >(ref, () => buttonRef.current);
+
     const Comp = asChild ? Slot : "button";
-    return isLoading ? (
-      <Comp
-        disabled
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          "select-none",
-        )}
-        ref={ref}
-        {...props}
-      >
-        <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
-      </Comp>
-    ) : (
-      <Comp
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          "select-none",
-        )}
-        ref={ref}
-        {...props}
-      />
+
+    return (
+      <>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+          {isLoading ? (
+            <div className="relative flex items-center">
+              <Comp
+                disabled
+                className={cn(
+                  buttonVariants({ variant, size, className }),
+                  "select-none",
+                )}
+                ref={buttonRef}
+                {...props}
+              >
+                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
+              </Comp>
+              {popoverContent ? (
+                <div className="absolute right-0 top-0 flex h-full w-[2rem] items-center justify-center p-0">
+                  <PopoverTrigger
+                    className={cn(
+                      buttonVariants({ variant }),
+                      "h-full w-fit p-0",
+                    )}
+                  >
+                    {isPopoverOpen ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </PopoverTrigger>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="relative flex items-center">
+              <Comp
+                className={cn(
+                  buttonVariants({ variant, size, className }),
+                  "select-none",
+                )}
+                ref={buttonRef}
+                {...props}
+              >
+                {props.children}
+              </Comp>
+              {popoverContent ? (
+                <div className="absolute right-0 top-0 flex h-full w-[2rem] items-center justify-center p-0">
+                  <PopoverTrigger
+                    className={cn(
+                      buttonVariants({ variant }),
+                      "h-full w-fit p-0",
+                    )}
+                  >
+                    {isPopoverOpen ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </PopoverTrigger>
+                </div>
+              ) : null}
+            </div>
+          )}
+          {popoverContent ? (
+            <PopoverContent
+              className="w-fit translate-x-[-3.7rem] !animate-none"
+              align="center"
+            >
+              {popoverContent}
+            </PopoverContent>
+          ) : null}
+        </Popover>
+      </>
     );
   },
 );

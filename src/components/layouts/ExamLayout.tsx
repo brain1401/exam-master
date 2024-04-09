@@ -6,5 +6,5 @@ type Props = {
 };
 
 export default function ExamLayout({ children, className }: Props) {
-  return <section className={cn("mx-auto w-full max-w-3xl py-[3rem] px-[1.5rem]",className)}>{children}</section>;
+  return <section className={cn("mx-auto w-full max-w-3xl py-[3rem] px-[1.5rem] space-y-5",className)}>{children}</section>;
 }

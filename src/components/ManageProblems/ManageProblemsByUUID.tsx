@@ -23,6 +23,7 @@ import {
   timeLimitAtom,
 } from "@/jotai/problems";
 import { useEffect } from "react";
+import useRevalidation from "@/hooks/useRevalidate";
 
 type Props = {
   UUID: string;
@@ -48,6 +49,11 @@ export default function ManageProblemsByUUID({ UUID, problemSet }: Props) {
   ]);
 
   const { resetProblems } = useProblems();
+  const { revalidateAllPath } = useRevalidation();
+  
+  useEffect(() => {
+    revalidateAllPath();
+  }, [revalidateAllPath]);
 
   useEffect(() => {
     () => resetProblems();

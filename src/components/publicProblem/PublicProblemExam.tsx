@@ -30,18 +30,23 @@ export default function PublicProblemExam({
   publicProblemSet,
 }: Props) {
   useHydrateAtoms([
-    [timeLimitAtom, publicProblemSet?.timeLimit.toString() || "20"],
+    [timeLimitAtom, publicProblemSet?.timeLimit?.toString() || "0"],
     [isExamStartedAtom, false],
-    [publicExamProblemsAtom, publicProblemSet?.problems || []],
+    [publicExamProblemsAtom, publicProblemSet?.problems ?? []],
     [publicExamProblemSetAtom, publicProblemSet],
   ]);
 
-  const { isExamStarted } = usePublicProblemExam();
+  const { isExamStarted, resetPublicProblemExam } = usePublicProblemExam();
 
   useEffect(() => {
     console.log("publicProblemSet :", publicProblemSet);
   }, [publicProblemSet]);
-
+  
+  useEffect(() => {
+    return () => {
+      resetPublicProblemExam();
+    };
+  }, [resetPublicProblemExam]);
 
   return (
     <>

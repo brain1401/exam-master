@@ -1,9 +1,6 @@
-import { Button } from "../ui/button";
-import { Textarea } from "../ui/textarea";
 import { useEffect, useState } from "react";
 import useRevalidation from "@/hooks/useRevalidate";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "../ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import {
   fetchPublicProblemLikes,
   fetchPublicProblemSetByUUID,
@@ -11,11 +8,8 @@ import {
 } from "@/utils/problems";
 import { ProblemSetComment, ExamProblemSet } from "@/types/problems";
 import { Like } from "./PublicProblemExam";
-import axios from "axios";
-import { handleEnterKeyPress } from "@/utils/keyboard";
-import { TrashIcon } from "lucide-react";
 import { usePublicProblemExam } from "@/hooks/usePublicProblemExam";
-import ExamProblemCard from "./ExamProblemCard";
+import PublicExamProblemCard from "./PublicExamProblemCard";
 import ExamComments from "./ExamComments";
 
 type Props = {
@@ -84,8 +78,8 @@ export default function PublicProblemMainPage({
   }, [like]);
 
   return (
-    <div className="mx-auto w-full max-w-[50rem] px-[1.5rem] pt-[6rem]">
-      <ExamProblemCard
+    <div className="mx-auto w-full max-w-[60rem] px-[1.5rem] pt-[6rem]">
+      <PublicExamProblemCard
         isRandomSelected={isRandomSelected}
         setIsRandomSelected={setIsRandomSelected}
         timeLimit={timeLimit}

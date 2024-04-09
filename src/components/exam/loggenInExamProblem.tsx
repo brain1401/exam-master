@@ -48,7 +48,7 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
 
   useEffect(() => {
     return () => {
-      setTimeLimit("20");
+      setTimeLimit("0");
     };
   }, [setTimeLimit]);
 
