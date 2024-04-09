@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
 import { IoMdSettings } from "react-icons/io";
+
 import {
   Dialog,
   DialogClose,
@@ -22,6 +23,12 @@ import {
 import { useToast } from "../ui/use-toast";
 import { Textarea } from "../ui/textarea";
 import { handleEnterKeyPress } from "@/utils/keyboard";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/app/components/ui/hover-card";
+import { Info } from "lucide-react";
 
 const BUTTON_CLASSNAMES = "w-[4rem] rounded-lg";
 // "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
@@ -50,7 +57,7 @@ export default function ProblemsOption({ type }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [textarea, setTextarea] = useState(description);
-  const [timeInput, setTimeInput] = useState(timeLimit);
+  const [timeInput, setTimeInput] = useState(timeLimit || "0");
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -253,15 +260,29 @@ export default function ProblemsOption({ type }: Props) {
                   </DialogTrigger>
                   <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                     <DialogHeader className="relative text-start">
-                      <div className="absolute right-0 top-[1rem] flex  items-center justify-center">
-                        <Label className="mr-2 text-[.9rem] ">제한시간</Label>
-                        <Input
-                          inputClassName="w-[3rem] h-[2.2rem] text-center"
-                          value={timeInput}
-                          allowOnlyNumber
-                          onChange={(e) => setTimeInput(e.target.value)}
-                        />
-                        <Label className="ml-2 text-[.9rem] ">분</Label>
+                      <div className="absolute right-0 top-[1rem] flex items-center">
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <div className="mr-2">
+                              <Info className="w-[1.3rem] h-[1.3rem]"/>
+                            </div>
+                          </HoverCardTrigger>
+                          <HoverCardContent>
+                            <p className="text-[.8rem]">
+                              0으로 설정 시 제한시간이 없는 문제집이 됩니다.
+                            </p>
+                          </HoverCardContent>
+                        </HoverCard>
+                        <div className="flex items-center justify-center">
+                          <Label className="mr-2 text-[.9rem] ">제한시간</Label>
+                          <Input
+                            inputClassName="w-[3rem] h-[2.2rem] text-center"
+                            value={timeInput}
+                            allowOnlyNumber
+                            onChange={(e) => setTimeInput(e.target.value)}
+                          />
+                          <Label className="ml-2 text-[.9rem] ">분</Label>
+                        </div>
                       </div>
                       <DialogTitle>{`문제집 ${type === "manage" ? "수정" : "설정"}`}</DialogTitle>
                       <DialogDescription>
