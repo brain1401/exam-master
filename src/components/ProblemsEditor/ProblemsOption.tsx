@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import useProblems from "@/hooks/useProblems";
 import { isCardOnBeingWrited } from "@/utils/problems";
 import { IoMdSettings } from "react-icons/io";
-import { isMobile } from "react-device-detect";
+import { isMobile, isTablet } from "react-device-detect";
 import {
   Popover,
   PopoverContent,
@@ -266,7 +266,7 @@ export default function ProblemsOption({ type }: Props) {
                   <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                     <DialogHeader className="relative text-start">
                       <div className="absolute right-0 top-[1rem] flex items-center">
-                        {isMobile ? (
+                        {isMobile || isTablet ? (
                           <Popover>
                             <PopoverTrigger asChild>
                               <div className="mr-2">
