@@ -517,7 +517,7 @@ export async function getProblemSets(
         data: problemSets.map((problemSet) => ({
           createdBy: problemSet.user.name,
           uuid: problemSet.uuid,
-          timeLimit: problemSet.timeLimit || 20,
+          timeLimit: problemSet.timeLimit,
           name: problemSet.name,
           createdAt: problemSet.createdAt,
           updatedAt: problemSet.updatedAt,
@@ -599,7 +599,7 @@ export async function getProblemSetsByName(
       const returnData: ProblemSetWithPagination = {
         data: problemSets.map((problemSet) => ({
           createdBy: problemSet.user.name,
-          timeLimit: problemSet.timeLimit || 20,
+          timeLimit: problemSet.timeLimit,
           uuid: problemSet.uuid,
           name: problemSet.name,
           createdAt: problemSet.createdAt,
@@ -667,7 +667,7 @@ export async function getRandomExamProblemsByProblemSetUUID(
     updatedAt: new Date(),
     uuid: data.uuid,
     name: data.name,
-    timeLimit: data.timeLimit || 20,
+    timeLimit: data.timeLimit ?? null,
     problems: problemShuffle(examProblems),
   };
 
@@ -709,7 +709,7 @@ export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
         userName: foundProblemSet.user.name,
         createdAt: foundProblemSet.createdAt,
         updatedAt: foundProblemSet.updatedAt,
-        timeLimit: foundProblemSet.timeLimit || 20,
+        timeLimit: foundProblemSet.timeLimit,
         isPublic: foundProblemSet.isPublic,
         description: foundProblemSet.description ?? "",
         problems: foundProblemSet.problems.map((problem) => ({
@@ -1649,7 +1649,7 @@ export async function getPublicProblemSets(
                 .map((problemSet) => ({
                   uuid: problemSet.uuid,
                   name: problemSet.name,
-                  timeLimit: problemSet.timeLimit || 20,
+                  timeLimit: problemSet.timeLimit,
                   description: problemSet.description ?? undefined,
                   updatedAt: problemSet.updatedAt,
                   examProblemsCount: problemSet.problems.length,
@@ -1660,7 +1660,7 @@ export async function getPublicProblemSets(
             : problemSets.map((problemSet) => ({
                 uuid: problemSet.uuid,
                 name: problemSet.name,
-                timeLimit: problemSet.timeLimit || 20,
+                timeLimit: problemSet.timeLimit,
                 description: problemSet.description ?? undefined,
                 updatedAt: problemSet.updatedAt,
                 examProblemsCount: problemSet.problems.length,
@@ -1744,7 +1744,7 @@ export async function getPublicProblemSetsByName(
                 .map((problemSet) => ({
                   uuid: problemSet.uuid,
                   name: problemSet.name,
-                  timeLimit: problemSet.timeLimit || 20,
+                  timeLimit: problemSet.timeLimit,
                   description: problemSet.description ?? undefined,
                   updatedAt: problemSet.updatedAt,
                   examProblemsCount: problemSet.problems.length,
@@ -1755,7 +1755,7 @@ export async function getPublicProblemSetsByName(
             : problemSets.map((problemSet) => ({
                 uuid: problemSet.uuid,
                 name: problemSet.name,
-                timeLimit: problemSet.timeLimit || 20,
+                timeLimit: problemSet.timeLimit,
                 description: problemSet.description ?? undefined,
                 updatedAt: problemSet.updatedAt,
                 examProblemsCount: problemSet.problems.length,
@@ -1849,7 +1849,7 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
         name: foundProblemSet.name,
         updatedAt: foundProblemSet.updatedAt,
         description: foundProblemSet.description ?? "",
-        timeLimit: foundProblemSet.timeLimit || 20,
+        timeLimit: foundProblemSet.timeLimit,
         creator: foundProblemSet.user.name,
         problems: foundProblemSet.problems.map((problem) => ({
           order: problem.order,
@@ -1924,7 +1924,7 @@ export async function getRandomExamPublicProblemSetByUUID(
         name: foundProblemSet.name,
         updatedAt: foundProblemSet.updatedAt,
         description: foundProblemSet.description ?? "",
-        timeLimit: foundProblemSet.timeLimit || 20,
+        timeLimit: foundProblemSet.timeLimit,
         creator: foundProblemSet.user.name,
         problems: problemShuffle(originalProblems),
       };

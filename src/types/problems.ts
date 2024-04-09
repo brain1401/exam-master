@@ -89,7 +89,7 @@ export type ProblemReplacedImageKeyAndFile = Prettify<
 export type ExamProblemSet = {
   uuid: string | undefined;
   name: string;
-  timeLimit: number;
+  timeLimit: number | null;
   updatedAt: Date;
   creator: string;
   description: string;
@@ -107,7 +107,7 @@ export type SortType = "popular" | "newest";
 export type ProblemSet = {
   uuid: string;
   name: string;
-  timeLimit: number;
+  timeLimit: number | null;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
@@ -146,7 +146,7 @@ export type ProblemSetWithName = Prettify<{
   updatedAt?: Date;
   isPublic: boolean;
   description?: string;
-  timeLimit?: number;
+  timeLimit?: number | null;
   problems: ProblemWithoutImageFile[];
 }>;
 
