@@ -28,10 +28,10 @@ export default function PCNavbar({ loginButton }: Props) {
           </div>
           <ul className="flex items-center gap-3">
             <li className={LIST_ITEM}>
-              <Link href="/exam">문제 풀기</Link>
+              <Link href="/exam">내 문제 풀기</Link>
             </li>
             <li className={LIST_ITEM}>
-              <Link href="/manage">문제 관리</Link>
+              <Link href="/manage">내 문제 관리</Link>
             </li>
             <li className={LIST_ITEM}>
               <Link href="/create">문제 생성</Link>

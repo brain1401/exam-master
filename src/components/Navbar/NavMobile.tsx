@@ -42,21 +42,23 @@ export default function NavMobile({ loginButton }: Props) {
     >
       <ul className="flex w-full flex-col items-center justify-center">
         <li className="flex w-full items-center justify-center border-b border-gray-300 py-2 ">
-          <Image src={logo} alt="logo" className="h-[2rem] w-[8rem]" />
+          <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+            <Image src={logo} alt="logo" className="h-[2rem] w-[8rem]" />
+          </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
           <Link href="/exam" onClick={() => setMobileMenuOpen(false)}>
-            문제 풀기
+            내 문제 풀기
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
           <Link href="/manage" onClick={() => setMobileMenuOpen(false)}>
-            문제 관리
+            내 문제 관리
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
           <Link href="/create" onClick={() => setMobileMenuOpen(false)}>
-            문제 생성
+            문제 만들기
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
