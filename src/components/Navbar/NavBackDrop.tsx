@@ -9,6 +9,6 @@ export default function NavBackDrop() {
         isMobileMenuOpen ? "block md:hidden" : "hidden"
       } fixed left-0 top-0 z-40 h-full w-full bg-black opacity-50 backdrop-blur-md`}
       onClick={() => setMobileMenuOpen(false)}
-    ></div>
+    />
   );
 }

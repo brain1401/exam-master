@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -76,12 +77,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           {isLoading ? (
-            <div className="relative flex items-center">
+            <div className="relative">
               <Comp
                 disabled
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  "select-none",
+                  "w-full select-none",
                 )}
                 ref={buttonRef}
                 {...props}
@@ -106,11 +107,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               ) : null}
             </div>
           ) : (
-            <div className="relative flex items-center">
+            <div className="relative">
               <Comp
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  "select-none",
+                  "w-full select-none",
                 )}
                 ref={buttonRef}
                 {...props}

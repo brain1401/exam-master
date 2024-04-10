@@ -1,11 +1,11 @@
 import LoginButton from "../ui/LoginButton";
-import NavMobile from "./NavMobile";
+import MobileNavSlide from "./MobileNavSlide";
 import NavBackDrop from "./NavBackDrop";
-import PCNavbar from "./PCNavbar";
+import Navbar from "./PCNavbar";
 import { getServerSession } from "next-auth";
 import MediaQuery from "./MediaQuery";
 
-export default async function Navbar() {
+export default async function MainNavbar() {
   const session = await getServerSession();
 
   const loginButton = session ? (
@@ -16,10 +16,10 @@ export default async function Navbar() {
 
   return (
     <header>
-      <NavMobile loginButton={loginButton} />
+      <MobileNavSlide loginButton={loginButton} />
       <NavBackDrop />
       <MediaQuery />
-      <PCNavbar loginButton={loginButton} />
+      <Navbar loginButton={loginButton} />
     </header>
   );
 }

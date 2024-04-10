@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Viewport } from "next";
-import Navbar from "@/components/Navbar/Navbar";
+import MainNavbar from "@/components/Navbar/MainNavbar";
 import AuthContext from "@/context/AuthContext";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
@@ -102,7 +102,7 @@ export default function RootLayout({
           <ReduxProvider>
             <ReactQueryContext>
               <JotaiProvider>
-                <Navbar />
+                <MainNavbar />
                 <main className="flex flex-1 flex-col">{children}</main>
                 <Toaster />
               </JotaiProvider>

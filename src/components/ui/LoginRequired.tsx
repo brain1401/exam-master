@@ -1,23 +1,29 @@
+"use client";
 /**
  * v0 by Vercel.
  * @see https://v0.dev/t/C253p3E95V3
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
 
 export default function LoginRequired() {
   return (
     <div className="flex h-full flex-col items-center justify-center bg-white text-gray-900">
       <div className="mx-auto max-w-md text-center">
         <LockIcon className="mx-auto h-24 w-24 text-blue-500" />
-        <h1 className="mt-4 text-3xl font-semibold">로그인 필요</h1>
-        <p className="mt-2 text-lg text-gray-500">
+        <h1 className="mt-4 text-2xl sm:text-3xl font-semibold">로그인 필요</h1>
+        <p className="mt-2 text-md sm:text-lg text-gray-500">
           이 페이지에 접근하려면 로그인이 필요합니다.
         </p>
-        <div className="mt-6">
-          <Button className="border-blue-600 bg-blue-600 text-white hover:bg-blue-700">
-            <Link href="#">로그인 하기</Link>
+        <div className="mt-6 flex items-center justify-center">
+          <Button
+            className="border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() => {
+              signIn();
+            }}
+          >
+            로그인 하기
           </Button>
         </div>
       </div>

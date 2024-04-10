@@ -9,7 +9,7 @@ const MOBILE_LIST_ITEM = "py-2 w-full border-b border-gray-300 text-center";
 type Props = {
   loginButton: JSX.Element;
 };
-export default function NavMobile({ loginButton }: Props) {
+export default function MobileNavSlide({ loginButton }: Props) {
   const menuRef = useRef<HTMLDivElement>(null);
   const { isMobileMenuOpen, setMobileMenuOpen } = useIsMobileNavMenuOpen();
 

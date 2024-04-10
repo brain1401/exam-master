@@ -12,7 +12,7 @@ type Props = {
   loginButton: JSX.Element;
 };
 
-export default function PCNavbar({ loginButton }: Props) {
+export default function Navbar({ loginButton }: Props) {
   const { toggleMobileMenu } = useIsMobileNavMenuOpen();
 
   return (
@@ -21,7 +21,7 @@ export default function PCNavbar({ loginButton }: Props) {
     >
       <div className="flex w-full max-w-[110rem] items-center justify-center">
         <div className="flex w-full items-center justify-between md:gap-3">
-          <div className="flex">
+          <div className="flex items-center justify-center">
             <div className="ml-[1rem] px-5 py-2 text-xl font-bold md:ml-[3rem] md:text-2xl">
               <Link href="/">
                 <Image src={logo} alt="logo" className="h-[2rem] w-[8rem]" />
@@ -43,15 +43,17 @@ export default function PCNavbar({ loginButton }: Props) {
             </ul>
           </div>
 
-          <div className="hidden md:mr-[10vw] md:block ">
-            <div className="flex h-full w-full items-center justify-center">
-              {loginButton}
+          <div>
+            <div className="hidden md:mr-[10vw] md:block ">
+              <div className="flex h-full w-full items-center justify-center">
+                {loginButton}
+              </div>
             </div>
-          </div>
-          <div className="md:hidden">
-            <button onClick={() => toggleMobileMenu()}>
-              <HiMenu className="absolute right-5 top-[0.5rem] text-[1.9rem]" />
-            </button>
+            <div className="flex items-center justify-center pr-[1.3rem] md:hidden">
+              <button onClick={() => toggleMobileMenu()}>
+                <HiMenu className="text-[1.9rem]" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
