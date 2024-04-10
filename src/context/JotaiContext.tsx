@@ -1,14 +1,25 @@
 "use client";
 
+import { mainStore, examStore } from "@/jotai/store/store";
 import { Provider } from "jotai";
-import { createStore } from "jotai/vanilla";
-type Store = ReturnType<typeof createStore>;
 
 type Props = {
   children: React.ReactNode;
-  store?: Store;
+  storeType?: "main" | "exam" | "publicExam";
 };
 
-export default function JotaiProvider({ children, store }: Props) {
+export default function JotaiProvider({ children, storeType }: Props) {
+  const getStore = () => {
+    switch (storeType) {
+      case "main":
+        return mainStore;
+      case "exam":
+        return examStore;
+      default:
+        return undefined;
+    }
+  };
+
+  const store = getStore();
   return <Provider store={store}>{children}</Provider>;
 }

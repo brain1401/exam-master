@@ -14,6 +14,7 @@ import {
 } from "@/service/problems";
 import { getUserUUIDbyEmail } from "@/service/user";
 import { defaultPageSize } from "@/const/pageSize";
+import JotaiProvider from "@/context/JotaiContext";
 export const metadata: Metadata = {
   title: "문제 풀기",
   description: "문제를 풀어보세요.",
@@ -55,13 +56,15 @@ export default async function ManagePaginationPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProblemSetsPage
-        page={page}
-        searchString={searchString}
-        type="manage"
-        userEmail={userEmail}
-        maxPage={maxPage || 1}
-      />
+      <JotaiProvider>
+        <ProblemSetsPage
+          page={page}
+          searchString={searchString}
+          type="manage"
+          userEmail={userEmail}
+          maxPage={maxPage || 1}
+        />
+      </JotaiProvider>
     </HydrationBoundary>
   );
 }

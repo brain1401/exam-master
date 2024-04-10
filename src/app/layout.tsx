@@ -101,7 +101,7 @@ export default function RootLayout({
         <AuthContext>
           <ReduxProvider>
             <ReactQueryContext>
-              <JotaiProvider>
+              <JotaiProvider storeType="main">
                 <MainNavbar />
                 <main className="flex flex-1 flex-col">{children}</main>
                 <Toaster />

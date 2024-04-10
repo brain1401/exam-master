@@ -82,5 +82,11 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
     return <ProblemSetNotFound />;
   }
 
-  return <LoggedInExamProblems _examProblemSet={examProblemSet} />;
+  return (
+    <JotaiProvider storeType="exam">
+      <LoggedInExamProblems _examProblemSet={examProblemSet} />
+    </JotaiProvider>
+  );
+ 
+  
 }

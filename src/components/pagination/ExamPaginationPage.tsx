@@ -14,6 +14,7 @@ import {
 } from "@/service/problems";
 import { getUserUUIDbyEmail } from "@/service/user";
 import { defaultPageSize } from "@/const/pageSize";
+import JotaiProvider from "@/context/JotaiContext";
 
 export const metadata: Metadata = {
   title: "문제 풀기",
@@ -56,13 +57,15 @@ export default async function ExamPaginationPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProblemSetsPage
-        page={page}
-        searchString={searchString}
-        type="exam"
-        userEmail={userEmail}
-        maxPage={maxPage || 1}
-      />
+      <JotaiProvider storeType="exam">
+        <ProblemSetsPage
+          page={page}
+          searchString={searchString}
+          type="exam"
+          userEmail={userEmail}
+          maxPage={maxPage || 1}
+        />
+      </JotaiProvider>
     </HydrationBoundary>
   );
 }

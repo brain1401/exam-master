@@ -12,6 +12,7 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   page: number;
@@ -56,12 +57,14 @@ export default async function ResultsPaginationPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ResultsPage
-        page={page}
-        searchString={searchString}
-        userEmail={userEmail}
-        maxPage={maxPage}
-      />
+      <JotaiProvider>
+        <ResultsPage
+          page={page}
+          searchString={searchString}
+          userEmail={userEmail}
+          maxPage={maxPage}
+        />
+      </JotaiProvider>
     </HydrationBoundary>
   );
 }
