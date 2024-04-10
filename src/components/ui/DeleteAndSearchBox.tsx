@@ -101,7 +101,6 @@ export default function DeleteAndSearchBox({
           variant="outline"
           size="icon"
           className={cn(
-            `ml-[1rem] md:ml-[8vw]`,
             `${isDeleteButtonClicked && "brightness-[80%]"}`,
             `${type === "exam" && "pointer-events-none opacity-0"}`,
           )}

@@ -28,9 +28,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
+        default: "h-10 w-full px-4 py-2",
+        sm: "h-9 w-full rounded-md px-3",
+        lg: "h-11 w-full rounded-md px-8",
         icon: "h-10 w-10",
       },
     },
@@ -64,27 +64,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
-    const buttonRef = React.useRef<HTMLButtonElement>(null);
-
-    React.useImperativeHandle<
-      HTMLButtonElement | null,
-      HTMLButtonElement | null
-    >(ref, () => buttonRef.current);
-
     const Comp = asChild ? Slot : "button";
 
     return (
       <>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           {isLoading ? (
-            <div className="relative">
+            <div className="relative flex items-center justify-center">
               <Comp
                 disabled
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  "w-full select-none",
+                  "select-none",
                 )}
-                ref={buttonRef}
+                ref={ref}
                 {...props}
               >
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
@@ -107,13 +100,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               ) : null}
             </div>
           ) : (
-            <div className="relative">
+            <div className="relative flex items-center justify-center">
               <Comp
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  "w-full select-none",
+                  "select-none",
                 )}
-                ref={buttonRef}
+                ref={ref}
                 {...props}
               >
                 {props.children}
