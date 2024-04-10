@@ -70,7 +70,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           {isLoading ? (
-            <div className="relative flex items-center justify-center">
+            <div className="flex items-center justify-center">
               <Comp
                 disabled
                 className={cn(
@@ -83,28 +83,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
               </Comp>
               {popoverContent ? (
-                <div className="absolute right-0 top-0 flex h-full w-[2rem] items-center justify-center p-0">
+                <div className="flex h-full items-center justify-center">
                   <PopoverTrigger
                     className={cn(
-                      buttonVariants({ variant }),
-                      "h-full w-fit p-0",
+                      buttonVariants({ variant, size }),
+                      "w-fit rounded-bl-none rounded-tl-none p-0 px-[.2rem]",
                     )}
                   >
                     {isPopoverOpen ? (
-                      <ChevronUp className="h-5 w-5" />
+                      <ChevronUp size={20} />
                     ) : (
-                      <ChevronDown className="h-5 w-5" />
+                      <ChevronDown size={20} />
                     )}
                   </PopoverTrigger>
                 </div>
               ) : null}
             </div>
           ) : (
-            <div className="relative flex items-center justify-center">
+            <div className="flex h-full items-center justify-center">
               <Comp
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  "select-none",
+                  `select-none ${popoverContent ? "rounded-br-none rounded-tr-none" : ""}`,
                 )}
                 ref={ref}
                 {...props}
@@ -112,17 +112,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 {props.children}
               </Comp>
               {popoverContent ? (
-                <div className="absolute right-0 top-0 flex h-full w-[2rem] items-center justify-center p-0">
+                <div className="flex h-full items-center justify-center">
                   <PopoverTrigger
                     className={cn(
-                      buttonVariants({ variant }),
-                      "h-full w-fit p-0",
+                      buttonVariants({ variant, size }),
+                      "w-fit rounded-bl-none rounded-tl-none p-0 px-[.2rem]",
                     )}
+                    
                   >
                     {isPopoverOpen ? (
-                      <ChevronUp className="h-5 w-5" />
+                      <ChevronUp size={20} />
                     ) : (
-                      <ChevronDown className="h-5 w-5" />
+                      <ChevronDown size={20} />
                     )}
                   </PopoverTrigger>
                 </div>

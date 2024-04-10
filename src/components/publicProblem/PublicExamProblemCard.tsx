@@ -220,7 +220,6 @@ export default function PublicExamProblemCard({
       </Card>
       <div className="mt-5 flex items-center gap-x-4">
         <Button
-          size="lg"
           className="w-full sm:w-fit"
           onClick={handleButtonClick}
           popoverContent={
