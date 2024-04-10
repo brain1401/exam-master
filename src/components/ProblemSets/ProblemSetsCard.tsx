@@ -29,7 +29,8 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useTimeLimit } from "@/hooks/useTimeLimit";
+import { useExamExternelState } from "@/hooks/useTimeLimit";
+import { Switch } from "../ui/switch";
 type Props = {
   type: "manage" | "exam";
   problemSet: ProblemSet;
@@ -49,7 +50,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
     problemSet.timeLimit?.toString() || "0",
   );
 
-  const { timeLimit, setTimeLimit } = useTimeLimit();
+  const { setTimeLimit } = useExamExternelState();
 
   const [isSelected, setIsSelected] = useState<boolean>(
     toDeletedUuid.find((uuid: string) => uuid === problemSet.uuid)
@@ -65,10 +66,6 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
   useEffect(() => {
     console.log("localTimeLimit :", localTimeLimit);
   }, [localTimeLimit]);
-
-  useEffect(() => {
-    console.log("timeLimit :", timeLimit);
-  }, [timeLimit]);
 
   // toDeletedUuid가 외부에서 변경되었을 때 isSelected 동기화
   useEffect(() => {

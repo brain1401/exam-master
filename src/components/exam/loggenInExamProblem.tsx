@@ -11,7 +11,7 @@ import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "./ExamFooter";
 import { useHydrateAtoms } from "jotai/utils";
 import { examProblemSetAtom, isTimeOverAtom } from "@/jotai/examProblems";
-import { useTimeLimit } from "@/hooks/useTimeLimit";
+import { useExamExternelState } from "@/hooks/useTimeLimit";
 
 type Props = {
   _examProblemSet: ExamProblemSet;
@@ -28,6 +28,8 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
     examProblemSet,
     examProblems,
     isTimeOver,
+    setExamProblemsOriginal,
+    setExamProblemsRandom,
     setIsTimeOver,
     setExamProblemSet,
     setCurrentExamProblemSubAnswer,
@@ -36,11 +38,25 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
     resetExamProblems,
   } = useExamProblems();
 
-  const { timeLimit, setTimeLimit } = useTimeLimit();
+  const { timeLimit, setTimeLimit, isRandomExam, setIsRandomExam } =
+    useExamExternelState();
 
   useEffect(() => {
     setExamProblemSet(_examProblemSet);
-  }, [_examProblemSet, setExamProblemSet]);
+    isRandomExam ? setExamProblemsRandom() : setExamProblemsOriginal();
+  }, [
+    _examProblemSet,
+    setExamProblemSet,
+    setExamProblemsOriginal,
+    setExamProblemsRandom,
+    isRandomExam,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      setIsRandomExam(false);
+    };
+  }, [setIsRandomExam]);
 
   useEffect(() => {
     setIsTimeOver(false);

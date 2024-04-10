@@ -1,4 +1,5 @@
 import { Candidate, ExamProblem, ExamProblemSet } from "@/types/problems";
+import { problemShuffle } from "@/utils/problemShuffle";
 import { atom } from "jotai";
 
 export const examProblemSetAtom = atom<ExamProblemSet | null>(null);
@@ -28,6 +29,28 @@ export const examProblemsAtom = atom(
     });
   },
 );
+
+export const originalProblemsAtom = atom<ExamProblem[]>([]);
+
+export const setExamProblemsRandomAtom = atom(null, (get, set) => {
+  const problems = get(examProblemsAtom);
+
+  if (problems) {
+    set(originalProblemsAtom, problems);
+
+    const shuffledProblems = problemShuffle(problems);
+    set(examProblemsAtom, shuffledProblems);
+  }
+});
+
+export const setExamProblemsOriginalAtom = atom(null, (get, set) => {
+  const originalProblems = get(originalProblemsAtom);
+
+  if (originalProblems.length === 0) return;
+
+  const problems = get(originalProblemsAtom);
+  set(examProblemsAtom, problems);
+});
 
 export const currentExamProblemAtom = atom(
   (get) => {

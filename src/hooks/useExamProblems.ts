@@ -7,6 +7,8 @@ import {
   resetExamProblemAnswersAtom,
   currentExamProblemCandidatesAtom,
   currentExamProblemSubAnswerAtom,
+  setExamProblemsOriginalAtom,
+  setExamProblemsRandomAtom,
   isExamStartedAtom,
   isTimeOverAtom,
 } from "@/jotai/examProblems";
@@ -37,6 +39,9 @@ export default function useExamProblems() {
     currentExamProblemSubAnswerAtom,
   );
 
+  const setExamProblemsOriginal = useSetAtom(setExamProblemsOriginalAtom);
+  const setExamProblemsRandom = useSetAtom(setExamProblemsRandomAtom);
+
   const resetExamProblems = useSetAtom(resetExamProblemAnswersAtom);
 
   return {
@@ -54,6 +59,8 @@ export default function useExamProblems() {
     setCurrentExamProblemCandidates,
     currentExamProblemSubAnswer,
     setCurrentExamProblemSubAnswer,
+    setExamProblemsOriginal,
+    setExamProblemsRandom,
     isExamStarted,
     setIsExamStarted,
     isTimeOver,

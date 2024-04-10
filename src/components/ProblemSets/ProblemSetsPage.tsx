@@ -15,6 +15,9 @@ import useRevalidation from "@/hooks/useRevalidate";
 import { useQuery } from "@tanstack/react-query";
 import { defaultPageSize } from "@/const/pageSize";
 import { fetchProblemSets } from "@/utils/problems";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { useExamExternelState } from "@/hooks/useTimeLimit";
 
 type Props = {
   type: "manage" | "exam";
@@ -85,12 +88,20 @@ export default function ProblemSetsPage({
     searchString ?? "",
   );
 
+  const { isRandomExam, setIsRandomExam } = useExamExternelState();
+
+  const [localIsRandomExam, setLocalIsRandomExam] = useState(false);
+
   const [latestSearchString] = useState(localSearchString);
 
   useEffect(() => {
     // 다음 navigation 시 Router Cache (클라이언트 캐시)를 무효화
     revalidateAllPath();
   }, [revalidateAllPath]);
+
+  useEffect(() => {
+    setIsRandomExam(localIsRandomExam);
+  }, [localIsRandomExam, setIsRandomExam]);
 
   useEffect(() => {
     console.log("maxPage :", maxPage);
@@ -105,6 +116,19 @@ export default function ProblemSetsPage({
   return (
     <section className="mx-auto w-full max-w-[70rem] p-3">
       <h1 className="mb-3 mt-10 text-center text-[2rem]">{title}</h1>
+
+      {type === "exam" ? (
+        <div className="flex items-center justify-start">
+          <Label htmlFor="isRandom" className="mr-2 translate-y-[-.1rem]">
+            랜덤으로 풀기
+          </Label>
+          <Switch
+            id="isRandom"
+            checked={localIsRandomExam}
+            onCheckedChange={setLocalIsRandomExam}
+          />
+        </div>
+      ) : null}
 
       <DynamicSearchBox
         searchString={localSearchString}
