@@ -5,8 +5,8 @@ import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 import JotaiProvider from "@/context/JotaiContext";
 import {
   checkUserPermissionForProblemSet,
-  getRandomExamProblemsByProblemSetUUID,
   getProblemsSetByUUID,
+  getExamProblemsByProblemSetUUID,
 } from "@/service/problems";
 import { isValidUUID } from "@/utils/problems";
 import type { Metadata } from "next";
@@ -73,7 +73,7 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
     return <ProblemSetAccessDenied />;
   }
 
-  const examProblemSet = await getRandomExamProblemsByProblemSetUUID(
+  const examProblemSet = await getExamProblemsByProblemSetUUID(
     UUID,
     session.user.email,
   );
@@ -87,6 +87,4 @@ export default async function DetailedExamPage({ params: { UUID } }: Props) {
       <LoggedInExamProblems _examProblemSet={examProblemSet} />
     </JotaiProvider>
   );
- 
-  
 }
