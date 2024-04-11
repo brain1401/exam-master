@@ -17,16 +17,17 @@ export const examProblemsAtom = atom(
   },
   (get, set, update: ExamProblem[]) => {
     const isTimeOver = get(isTimeOverAtom);
-    set(examProblemSetAtom, (prevProblemSet) => {
-      if (isTimeOver) return prevProblemSet;
-      if (prevProblemSet) {
-        return {
-          ...prevProblemSet,
-          problems: update,
-        };
-      }
-      return null;
-    });
+    if (!isTimeOver) {
+      set(examProblemSetAtom, (prevProblemSet) => {
+        if (prevProblemSet) {
+          return {
+            ...prevProblemSet,
+            problems: update,
+          };
+        }
+        return null;
+      });
+    }
   },
 );
 
@@ -48,8 +49,7 @@ export const setExamProblemsOriginalAtom = atom(null, (get, set) => {
 
   if (originalProblems.length === 0) return;
 
-  const problems = get(originalProblemsAtom);
-  set(examProblemsAtom, problems);
+  set(examProblemsAtom, originalProblems);
 });
 
 export const currentExamProblemAtom = atom(
@@ -60,21 +60,21 @@ export const currentExamProblemAtom = atom(
     return examProblems?.[currentExamProblemIndex];
   },
   (get, set, update: Partial<ExamProblem>) => {
-    const examProblems = get(examProblemsAtom);
-    const currentExamProblemIndex = get(currentExamProblemIndexAtom);
     const isTimeOver = get(isTimeOverAtom);
+    if (!isTimeOver) {
+      const examProblems = get(examProblemsAtom);
+      const currentExamProblemIndex = get(currentExamProblemIndexAtom);
 
-    if (isTimeOver) return;
+      if (!examProblems) return;
 
-    if (!examProblems) return;
+      const newExamProblems = [...examProblems];
+      newExamProblems[currentExamProblemIndex] = {
+        ...newExamProblems[currentExamProblemIndex],
+        ...update,
+      };
 
-    const newExamProblems = [...examProblems];
-    newExamProblems[currentExamProblemIndex] = {
-      ...newExamProblems[currentExamProblemIndex],
-      ...update,
-    };
-
-    set(examProblemsAtom, newExamProblems);
+      set(examProblemsAtom, newExamProblems);
+    }
   },
 );
 
@@ -85,11 +85,11 @@ export const currentExamProblemCandidatesAtom = atom(
   },
   (get, set, update: Candidate[] | null) => {
     const isTimeOver = get(isTimeOverAtom);
-    if (isTimeOver) return;
-
-    set(currentExamProblemAtom, {
-      candidates: update,
-    });
+    if (!isTimeOver) {
+      set(currentExamProblemAtom, {
+        candidates: update,
+      });
+    }
   },
 );
 
@@ -100,16 +100,16 @@ export const currentExamProblemSubAnswerAtom = atom(
   },
   (get, set, update: string | null) => {
     const isTimeOver = get(isTimeOverAtom);
-    if (isTimeOver) return;
-
-    if (update === null) {
-      set(currentExamProblemAtom, {
-        subAnswer: "",
-      });
-    } else {
-      set(currentExamProblemAtom, {
-        subAnswer: update,
-      });
+    if (!isTimeOver) {
+      if (update === null) {
+        set(currentExamProblemAtom, {
+          subAnswer: "",
+        });
+      } else {
+        set(currentExamProblemAtom, {
+          subAnswer: update,
+        });
+      }
     }
   },
 );
@@ -133,6 +133,7 @@ export const resetExamProblemAnswersAtom = atom(null, (get, set) => {
   set(examProblemSetAtom, null);
   set(isExamStartedAtom, false);
   set(isTimeOverAtom, false);
+  set(originalProblemsAtom, []);
   set(examProblemsAtom, []);
   set(currentExamProblemCandidatesAtom, null);
   set(currentExamProblemSubAnswerAtom, null);
