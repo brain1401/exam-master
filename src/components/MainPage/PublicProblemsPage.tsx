@@ -75,7 +75,7 @@ export default function PublicProblemsPage({
       <div className="flex-1">
         <div>
           <div className="flex w-full flex-col pt-10">
-            <h2 className="mb-4 text-[1.5rem] font-semibold text-gray-900 dark:text-gray-50">
+            <h2 className="mb-4 text-[1.5rem] font-semibold text-primary">
               공개된 문제집
             </h2>
             <div className="mb-8 flex w-full items-center">
