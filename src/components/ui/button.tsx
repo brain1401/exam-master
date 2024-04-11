@@ -75,7 +75,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 disabled
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  "select-none",
+                  `select-none ${popoverContent ? "!rounded-br-none !rounded-tr-none" : ""}`,
                 )}
                 ref={ref}
                 {...props}
@@ -87,7 +87,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                   <PopoverTrigger
                     className={cn(
                       buttonVariants({ variant, size }),
-                      "w-fit rounded-bl-none rounded-tl-none p-0 px-[.2rem]",
+                      "w-fit !rounded-bl-none !rounded-tl-none p-0 px-[.2rem]",
                     )}
                   >
                     {isPopoverOpen ? (
@@ -104,7 +104,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               <Comp
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  `select-none ${popoverContent ? "rounded-br-none rounded-tr-none" : ""}`,
+                  `select-none ${popoverContent ? " rounded-lg !rounded-br-none !rounded-tr-none !pl-5 !pr-2" : ""}`,
                 )}
                 ref={ref}
                 {...props}
@@ -116,9 +116,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                   <PopoverTrigger
                     className={cn(
                       buttonVariants({ variant, size }),
-                      "w-fit rounded-bl-none rounded-tl-none p-0 px-[.2rem]",
+                      "w-[2rem] rounded-lg !rounded-bl-none !rounded-tl-none p-0 px-[.2rem]",
                     )}
-                    
                   >
                     {isPopoverOpen ? (
                       <ChevronUp size={20} />
