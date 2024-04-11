@@ -9,9 +9,9 @@ export default function SubjectiveAnswered() {
 
   return (
     <>
-      {subjectiveAnswered && (
-        <p className="text-lg">{`입력한 답 : ${subjectiveAnswered}`}</p>
-      )}
+      {
+        <p className="text-lg">{`입력한 답 : ${subjectiveAnswered || "답을 입력하지 않음."}`}</p>
+      }
     </>
   );
 }

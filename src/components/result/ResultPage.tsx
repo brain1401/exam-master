@@ -12,7 +12,6 @@ import CorrectAnswer from "./CorrectAnswer";
 import CurrentProblemIndicator from "./CurrentProblemIndicator";
 import CorrectMark from "../../../public/images/correctCircle.png";
 import WrongMark from "../../../public/images/wrong.png";
-import checkImage from "../../../public/images/checkBlack.png";
 import Image from "next/image";
 import { isImageUrlObject } from "@/utils/problems";
 import { ExamResultsSet, ProblemResult } from "@/types/problems";
@@ -45,7 +44,7 @@ export default function ResultPage({ _examResultsSet }: Props) {
     console.log("examResults :", examResults); 
   }, [examResults]);
 
-  const imagesRef = useRef([CorrectMark, WrongMark, checkImage]);
+  const imagesRef = useRef([CorrectMark, WrongMark]);
 
   return (
     <section className="mx-auto flex w-full max-w-[70rem] flex-col p-3 pb-8 pt-10">

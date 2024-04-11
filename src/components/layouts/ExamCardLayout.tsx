@@ -1,7 +1,9 @@
+import { Card } from "../ui/card";
+
 type Props = {
   children: React.ReactNode;
 };
 
 export default function ExamCardLayout({ children }: Props) {
-  return <div className={`rounded-lg bg-slate-200 p-3 `}>{children}</div>;
+  return <Card className={`rounded-lg bg-background p-3 `}>{children}</Card>;
 }

@@ -42,15 +42,22 @@ export default function LoggedInExamProblems({ _examProblemSet }: Props) {
     useExamExternelState();
 
   useEffect(() => {
+    console.log("isRandomExam :", isRandomExam);
+  }, [isRandomExam]);
+
+  useEffect(() => {
     setExamProblemSet(_examProblemSet);
-    isRandomExam ? setExamProblemsRandom() : setExamProblemsOriginal();
-  }, [
-    _examProblemSet,
-    setExamProblemSet,
-    setExamProblemsOriginal,
-    setExamProblemsRandom,
-    isRandomExam,
-  ]);
+  }, [_examProblemSet, setExamProblemSet]);
+
+  useEffect(() => {
+    if (isRandomExam) {
+      console.log("randomExam");
+      setExamProblemsRandom();
+    } else {
+      console.log("originalExam");
+      setExamProblemsOriginal();
+    }
+  }, [isRandomExam, setExamProblemsOriginal, setExamProblemsRandom]);
 
   useEffect(() => {
     return () => {

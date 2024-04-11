@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import candidateNumber from "@/utils/candidateNumber";
-import checkImage from "../../../public/images/checkBlack.png";
+import CheckSVG from "../../../public/images/checkBlack.svg";
 import { Textarea } from "../ui/textarea";
 import { useEffect } from "react";
 
@@ -54,12 +54,9 @@ export default function ExamProblem({
     const isAnswer = candidates?.[i]?.isAnswer;
     return (
       <div key={candidate.id} className="relative">
-        <Image
-          src={checkImage}
-          alt="정답 체크"
-          priority
+        <CheckSVG
           className={cn(
-            "absolute left-[.6rem] top-[-.35rem] h-[2rem] w-[2rem]",
+            "absolute left-[.6rem] top-[-.35rem] h-[2rem] w-[2rem] fill-primary",
             isAnswer ? "opacity-100" : "opacity-0",
           )}
         />
