@@ -104,7 +104,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               <Comp
                 className={cn(
                   buttonVariants({ variant, size, className }),
-                  `select-none ${popoverContent ? " rounded-lg !rounded-br-none !rounded-tr-none !pl-5 !pr-2" : ""}`,
+                  `select-none ${popoverContent ? " rounded-lg !rounded-br-none !rounded-tr-none !pl-5 !pr-[0.3rem]" : ""}`,
                 )}
                 ref={ref}
                 {...props}
