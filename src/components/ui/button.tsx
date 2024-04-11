@@ -83,7 +83,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
               </Comp>
               {popoverContent ? (
-                <div className="flex h-full items-center justify-center">
+                <div className="flex items-center justify-center">
                   <PopoverTrigger
                     className={cn(
                       buttonVariants({ variant, size }),
@@ -100,7 +100,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               ) : null}
             </div>
           ) : (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex items-center justify-center">
               <Comp
                 className={cn(
                   buttonVariants({ variant, size, className }),
@@ -112,7 +112,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 {props.children}
               </Comp>
               {popoverContent ? (
-                <div className="flex h-full items-center justify-center">
+                <div className="flex items-center justify-center">
                   <PopoverTrigger
                     className={cn(
                       buttonVariants({ variant, size }),

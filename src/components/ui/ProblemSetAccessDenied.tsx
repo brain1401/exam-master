@@ -8,17 +8,15 @@ import { Button } from "@/components/ui/button";
 
 export default function ProblemSetAccessDenied() {
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-white text-gray-900">
+    <div className="flex h-full flex-col items-center justify-center bg-background text-gray-900">
       <div className="mx-auto max-w-md text-center">
         <AlertTriangleIcon className="mx-auto h-24 w-24 text-red-500" />
-        <h1 className="mt-4 text-3xl font-semibold">접근 거부</h1>
+        <h1 className="mt-4 text-3xl font-semibold text-primary">접근 거부</h1>
         <p className="mt-2 text-lg text-gray-500">
           이 콘텐츠에 대한 권한이 없습니다.
         </p>
         <div className="mt-6">
-          <Button
-            className="border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
-          >
+          <Button className="border-blue-600 bg-blue-600 text-white hover:bg-blue-700">
             <Link href="#">홈으로 가기</Link>
           </Button>
         </div>

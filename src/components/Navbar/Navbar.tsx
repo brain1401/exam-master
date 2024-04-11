@@ -30,7 +30,7 @@ export default function Navbar({ loginButton }: Props) {
           <div className="flex items-center justify-center">
             <div className="ml-[1rem] px-5 py-2 text-xl font-bold md:ml-[3rem] md:text-2xl">
               <Link href="/">
-                <Logo className="h-[2rem] w-[8rem] fill-black dark:fill-white" />
+                <Logo className="h-[2rem] w-[8rem] fill-primary" />
               </Link>
             </div>
             <ul className="flex items-center gap-3">

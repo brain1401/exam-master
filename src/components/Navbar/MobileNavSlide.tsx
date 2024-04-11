@@ -43,7 +43,7 @@ export default function MobileNavSlide({ loginButton }: Props) {
       <ul className="flex w-full flex-col items-center justify-center">
         <li className="flex w-full items-center justify-center border-b border-gray-300 py-2 ">
           <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-            <Logo className="h-[2rem] w-[8rem] dark:fill-white" />
+            <Logo className="h-[2rem] w-[8rem] dark:fill-primary" />
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>

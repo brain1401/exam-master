@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "../ui/button";
 
 type Props = {
   statusCode?: number;
@@ -6,29 +7,26 @@ type Props = {
 };
 export default function CustomError({ statusCode, title }: Props) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-white text-gray-900">
-      <header className="flex items-center justify-center bg-white px-6 py-4">
+    <div className="flex flex-1 flex-col items-center justify-center bg-background text-gray-900">
+      <header className="flex items-center justify-center bg-background px-6 py-4">
         <Link className="flex items-center space-x-2" href="/">
           <SchoolIcon className="h-8 w-8 text-blue-600" />
-          <span className="text-2xl font-semibold text-gray-900">
+          <span className="text-2xl font-semibold text-gray-900 text-primary">
             Exam Master
           </span>
         </Link>
       </header>
-      <main className="flex flex-col items-center justify-center bg-white px-6 py-8">
+      <main className="flex flex-col items-center justify-center bg-background px-6 py-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-6xl font-bold text-gray-900">
+          <h1 className="text-6xl font-bold text-zinc-300">
             {statusCode ?? "404"}
           </h1>
           <p className="mt-2 text-lg text-gray-500 dark:text-gray-400">
-            {title || "Oops! The page you're looking for doesn't exist."}
+            {title || "이런! 페이지를 찾을 수 없습니다."}
           </p>
           <div className="mt-8">
-            <Link
-              className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-              href="/"
-            >
-              Go Home
+            <Link href="/">
+              <Button>Go Home</Button>
             </Link>
           </div>
         </div>
