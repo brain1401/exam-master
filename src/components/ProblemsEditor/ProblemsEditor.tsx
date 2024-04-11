@@ -14,7 +14,7 @@ import { isCardOnBeingWrited, isImageUrlObject } from "@/utils/problems";
 import { Button } from "../ui/button";
 
 const TRIGGER_CLASSNAME =
-  "rounded-lg px-5 py-[1.4rem] data-[state=active]:bg-primary data-[state=inactive]:bg-primary/50 data-[state=active]:text-white disabled:opacity-100";
+  "rounded-lg px-5 py-[1.4rem] disabled:opacity-100 data-[state=active]:bg-primary data-[state=inactive]:bg-primary/50 dark:data-[state=active]:text-black data-[state=active]:text-white";
 
 export default function ProblemsEditor() {
   const {
