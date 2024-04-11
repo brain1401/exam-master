@@ -674,6 +674,56 @@ export async function getRandomExamProblemsByProblemSetUUID(
   return result;
 }
 
+export async function getExamProblemsByProblemSetUUID(
+  UUID: string,
+  userEmail: string,
+) {
+  if (!isValidUUID(UUID)) {
+    return null;
+  }
+  const data = await getProblemsSetByUUID(UUID, userEmail);
+
+  if (!data) {
+    throw null;
+  }
+
+  const examProblems: ExamProblem[] = data.problems.map((problem, i) => {
+    if (!problem) throw new Error("문제가 없습니다.");
+
+    return {
+      order: problem.order,
+      uuid: problem.uuid || "",
+      type: problem.type as "obj" | "sub",
+      question: problem.question,
+      additionalView: problem.additionalView,
+      image: problem.image ?? null,
+      isAnswerMultiple: problem.isAnswerMultiple,
+      // 문제의 정답을 알 수 없게 함
+      candidates:
+        problem.candidates?.map((candidate) => ({
+          id: candidate.id,
+          text: candidate.text,
+          isAnswer: false,
+        })) ?? null,
+
+      // 문제의 정답을 알 수 없게 함
+      subAnswer: problem.type === "sub" ? "" : null,
+    };
+  });
+
+  const result: ExamProblemSet = {
+    creator: data.userName,
+    description: data.description ?? "",
+    updatedAt: new Date(),
+    uuid: data.uuid,
+    name: data.name,
+    timeLimit: data.timeLimit ?? null,
+    problems: examProblems,
+  };
+
+  return result;
+}
+
 export async function getProblemsSetByUUID(uuid: string, userEmail: string) {
   if (!isValidUUID(uuid)) {
     return null;
