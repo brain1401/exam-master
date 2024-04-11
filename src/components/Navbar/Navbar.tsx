@@ -63,7 +63,7 @@ export default function Navbar({ loginButton }: Props) {
                 {loginButton}
               </div>
             </div>
-            <div className="flex items-center justify-center pr-[1.3rem] md:hidden">
+            <div className="flex items-center justify-center gap-x-2 pr-[1.3rem] md:hidden">
               <ToggleThemeButton />
               <button onClick={() => toggleMobileMenu()}>
                 <HiMenu className="text-[1.9rem]" />
