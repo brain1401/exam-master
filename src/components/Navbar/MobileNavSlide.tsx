@@ -38,12 +38,12 @@ export default function MobileNavSlide({ loginButton }: Props) {
         isMobileMenuOpen
           ? "pointer-events-auto translate-x-0 opacity-100 md:hidden"
           : "pointer-events-none max-h-0 translate-x-full overflow-hidden opacity-0"
-      } absolute right-0 top-0 z-50 h-screen w-3/4 bg-neutral-100 transition-all duration-300 ease-in-out`}
+      } absolute right-0 top-0 z-50 h-screen w-3/4 bg-background transition-all duration-300 ease-in-out`}
     >
       <ul className="flex w-full flex-col items-center justify-center">
         <li className="flex w-full items-center justify-center border-b border-gray-300 py-2 ">
           <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-            <Logo className="h-[2rem] w-[8rem]" />
+            <Logo className="h-[2rem] w-[8rem] dark:fill-white" />
           </Link>
         </li>
         <li className={MOBILE_LIST_ITEM}>
