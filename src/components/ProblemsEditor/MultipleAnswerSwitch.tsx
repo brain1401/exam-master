@@ -34,10 +34,7 @@ export default function MultipleAnswerSwitch() {
 
   return (
     <>
-      <Label
-        htmlFor="isAnswerMultiple"
-        className="block text-[1rem] mr-2"
-      >
+      <Label htmlFor="isAnswerMultiple" className="mr-2 block text-[1rem]">
         복수정답
       </Label>
       <Switch

@@ -1,7 +1,7 @@
 import LoginButton from "../ui/LoginButton";
 import MobileNavSlide from "./MobileNavSlide";
 import NavBackDrop from "./NavBackDrop";
-import Navbar from "./PCNavbar";
+import Navbar from "./Navbar";
 import { getServerSession } from "next-auth";
 import MediaQuery from "./MediaQuery";
 

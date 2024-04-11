@@ -1,12 +1,13 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
-import logo from "../../../public/images/Exam Master.svg";
+import Logo from "../../../public/images/Exam Master.svg";
 import { HiMenu } from "react-icons/hi";
 import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "../ui/button";
+import { useEffect } from "react";
+import ToggleThemeButton from "../ui/ToggleThemeButton";
 
 const LIST_ITEM =
   "hidden md:flex text-md font-bold items-center justify-center list-none";
@@ -16,7 +17,8 @@ type Props = {
 };
 
 export default function Navbar({ loginButton }: Props) {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
+
   const { toggleMobileMenu } = useIsMobileNavMenuOpen();
 
   return (
@@ -28,7 +30,14 @@ export default function Navbar({ loginButton }: Props) {
           <div className="flex items-center justify-center">
             <div className="ml-[1rem] px-5 py-2 text-xl font-bold md:ml-[3rem] md:text-2xl">
               <Link href="/">
-                <Image src={logo} alt="logo" className="h-[2rem] w-[8rem]" />
+                <Logo
+                  className="hidden h-[2rem] w-[8rem] dark:block"
+                  fill="white"
+                />
+                <Logo
+                  className="block h-[2rem] w-[8rem] dark:hidden"
+                  fill="black"
+                />
               </Link>
             </div>
             <ul className="flex items-center gap-3">
@@ -49,25 +58,13 @@ export default function Navbar({ loginButton }: Props) {
 
           <div>
             <div className="hidden md:mr-[10vw] md:flex md:gap-x-2 ">
-              <Button size="icon" variant="outline">
-                {resolvedTheme === "light" ? (
-                  <Moon onClick={() => setTheme("dark")} />
-                ) : (
-                  <Sun onClick={() => setTheme("light")} />
-                )}
-              </Button>
+              <ToggleThemeButton />
               <div className="flex h-full w-full items-center justify-center">
                 {loginButton}
               </div>
             </div>
             <div className="flex items-center justify-center pr-[1.3rem] md:hidden">
-              <Button size="icon">
-                {resolvedTheme === "light" ? (
-                  <Moon onClick={() => setTheme("dark")} />
-                ) : (
-                  <Sun onClick={() => setTheme("light")} />
-                )}
-              </Button>
+              <ToggleThemeButton />
               <button onClick={() => toggleMobileMenu()}>
                 <HiMenu className="text-[1.9rem]" />
               </button>
