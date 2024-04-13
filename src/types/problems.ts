@@ -314,3 +314,22 @@ export type toBeCallbackedItSelf = {
 export type HandleImageCallback<T> = (
   toBeCallbackedImage: toBeCallbacked,
 ) => Promise<T>;
+
+export const QuestionSchema = z.object({
+  type: z.string(),
+  question: z.string(),
+  options: z.union([z.array(z.string()), z.null()]).optional(),
+  answer: z.array(z.union([z.number(), z.string()])),
+  explanation: z.string(),
+});
+export type Question = z.infer<typeof QuestionSchema>;
+
+export const GenerateQuestionResponseSchema = z.object({
+  generatedQuestions: z.number().optional(),
+  totalQuestions: z.number(),
+  questionCount: z.number(),
+  questions: z.array(QuestionSchema),
+});
+export type GenerateQuestionResponse = z.infer<
+  typeof GenerateQuestionResponseSchema
+>;
