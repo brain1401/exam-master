@@ -35,16 +35,24 @@ export default function Navbar({ loginButton }: Props) {
             </div>
             <ul className="flex items-center gap-3">
               <li className={LIST_ITEM}>
-                <Link href="/exam">내 문제 풀기</Link>
+                <Link href="/exam" className="py-2">
+                  내 문제 풀기
+                </Link>
               </li>
               <li className={LIST_ITEM}>
-                <Link href="/manage">내 문제 관리</Link>
+                <Link href="/manage" className="py-2">
+                  내 문제 관리
+                </Link>
               </li>
               <li className={LIST_ITEM}>
-                <Link href="/create">문제 생성</Link>
+                <Link href="/create" className="py-2">
+                  문제 생성
+                </Link>
               </li>
               <li className={LIST_ITEM}>
-                <Link href="/results">시험 결과</Link>
+                <Link href="/results" className="py-2">
+                  시험 결과
+                </Link>
               </li>
             </ul>
           </div>
