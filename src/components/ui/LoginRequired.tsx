@@ -18,7 +18,7 @@ export default function LoginRequired() {
         </p>
         <div className="mt-6 flex items-center justify-center">
           <Button
-            className="border-blue-600 bg-blue-600 text-primary hover:bg-blue-700"
+            className="border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
             onClick={() => {
               signIn();
             }}
