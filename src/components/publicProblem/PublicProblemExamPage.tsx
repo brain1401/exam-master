@@ -1,6 +1,6 @@
 "use client";
 import { usePublicProblemExam } from "@/hooks/usePublicProblemExam";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ExamHeader from "../exam/ExamHeader";
 import ExamProgressBar from "../exam/ExamProgressBar";
 import ExamFooter from "../exam/ExamFooter";
@@ -35,7 +35,6 @@ export default function PublicProblemExamPage({ publicProblemSet }: Props) {
     setIsTimeOver,
     currentPublicExamProblemCandidates,
     setCurrentPublicExamProblemCandidates,
-    setPublicExamProblemSet,
     setCurrentPublicExamProblemSubAnswer,
     currentExamProblemIndex,
     setPublicExamProblemsRandom,
@@ -45,12 +44,8 @@ export default function PublicProblemExamPage({ publicProblemSet }: Props) {
   } = usePublicProblemExam();
 
   useEffect(() => {
-    if (publicProblemSet) {
-      console.log("publicProblemSet :", publicProblemSet);
-      setPublicExamProblemSet(publicProblemSet);
-      setCurrentExamProblemIndex(0);
-    }
-  }, [publicProblemSet, setPublicExamProblemSet, setCurrentExamProblemIndex]);
+    setCurrentExamProblemIndex(0);
+  }, [setCurrentExamProblemIndex]);
 
   useEffect(() => {
     if (isRandomSelected) {
