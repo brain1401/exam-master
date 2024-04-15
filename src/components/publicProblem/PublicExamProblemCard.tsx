@@ -36,6 +36,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useToast } from "../ui/use-toast";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Props = {
   problemSet: ExamProblemSet;
@@ -46,7 +48,6 @@ type Props = {
   setIsRandomSelected: (checked: boolean) => void;
   timeLimit: string;
   setTimeLimit: (value: string) => void;
-  setIsExamStarted: (started: boolean) => void;
 };
 
 export default function PublicExamProblemCard({
@@ -58,13 +59,14 @@ export default function PublicExamProblemCard({
   userUUID,
   setIsRandomSelected,
   setTimeLimit,
-  setIsExamStarted,
 }: Props) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const queryClient = useQueryClient();
 
   const { toast } = useToast();
+
+  const router = useRouter();
 
   const { mutate: problemSetLikesMutate } = useMutation({
     mutationFn: (liked: boolean) => {
@@ -131,7 +133,7 @@ export default function PublicExamProblemCard({
     if (problemSet.timeLimit) {
       setIsDialogOpen(true);
     } else {
-      setIsExamStarted(true);
+      router.push(`/public-problem/exam/${problemSetUUID}`);
     }
   };
 
@@ -182,7 +184,7 @@ export default function PublicExamProblemCard({
                       onChange={(e) => setTimeLimit(e.target.value)}
                       onKeyDown={async (e) =>
                         handleEnterKeyPress(e, () => {
-                          setIsExamStarted(true);
+                          router.push(`/public-problem/exam/${problemSetUUID}`);
                         })
                       }
                       allowOnlyNumber
@@ -191,15 +193,11 @@ export default function PublicExamProblemCard({
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    onClick={() => {
-                      setIsExamStarted(true);
-                    }}
-                  >
-                    시작
-                  </Button>
+                  <Link href={`/public-problem/exam/${problemSetUUID}`}>
+                    <Button type="submit" className="w-full">
+                      시작
+                    </Button>
+                  </Link>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

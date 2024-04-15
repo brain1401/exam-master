@@ -1,3 +1,6 @@
+"use client";
+import { useEffect } from "react";
+
 import Link from "next/link";
 import { Button } from "../ui/button";
 
@@ -6,6 +9,10 @@ type Props = {
   title?: string;
 };
 export default function CustomError({ statusCode, title }: Props) {
+  useEffect(() => {
+    throw new Error(title ?? "An unexpected error occurred.");
+  }, [title]);
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-background text-gray-900">
       <header className="flex items-center justify-center bg-background px-6 py-4">
