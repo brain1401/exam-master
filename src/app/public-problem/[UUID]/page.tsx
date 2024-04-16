@@ -93,7 +93,7 @@ export default async function ProblemPage({ params: { UUID } }: Props) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <JotaiProvider storeType="publicProblem">
+      <JotaiProvider>
         <PublicProblemExam
           publicSetUUID={UUID}
           userEmail={session?.user?.email}
