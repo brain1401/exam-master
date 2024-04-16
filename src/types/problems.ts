@@ -325,11 +325,22 @@ export const QuestionSchema = z.object({
 export type Question = z.infer<typeof QuestionSchema>;
 
 export const GenerateQuestionResponseSchema = z.object({
-  generatedQuestions: z.number().optional(),
   totalQuestions: z.number(),
   questionCount: z.number(),
   questions: z.array(QuestionSchema),
 });
 export type GenerateQuestionResponse = z.infer<
   typeof GenerateQuestionResponseSchema
+>;
+
+export const GenerateQuestionResponsesSchema = z.array(
+  z.object({
+    totalQuestions: z.number(),
+    questionCount: z.number(),
+    questions: z.array(QuestionSchema),
+  }),
+);
+
+export type GenerateQuestionResponses = z.infer<
+  typeof GenerateQuestionResponsesSchema
 >;

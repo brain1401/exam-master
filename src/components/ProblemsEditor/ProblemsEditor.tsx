@@ -12,6 +12,7 @@ import useProblems from "@/hooks/useProblems";
 import Image from "next/image";
 import { isCardOnBeingWrited, isImageUrlObject } from "@/utils/problems";
 import { Button } from "../ui/button";
+import { useEffect } from "react";
 
 const TRIGGER_CLASSNAME =
   "rounded-lg px-5 py-[1.4rem] disabled:opacity-100 data-[state=active]:bg-primary data-[state=inactive]:bg-primary/50 dark:data-[state=active]:text-black data-[state=active]:text-white";
@@ -49,6 +50,10 @@ export default function ProblemsEditor() {
       subAnswer: tab === "obj" ? null : "",
     });
   };
+
+  useEffect(() => {
+    console.log("currentProblem : ", currentProblem);
+  }, [currentProblem]);
 
   return (
     <section className="mx-auto flex max-w-[60rem] flex-col items-center justify-center">
