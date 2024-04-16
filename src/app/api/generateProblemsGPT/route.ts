@@ -303,7 +303,7 @@ If there is no more content left to generate questions from and the <generatedQu
           )
             ? question.answer.includes(i)
             : false,
-        })) ?? [],
+        })) ?? null,
       image: null,
       subAnswer: question.answer.every((answer) => typeof answer === "string")
         ? question.answer.join()
