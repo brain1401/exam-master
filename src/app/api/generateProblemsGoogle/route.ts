@@ -5,29 +5,19 @@ import {
 } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { ChatAnthropic } from "@langchain/anthropic";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { LLMChain } from "langchain/chains";
 import { ConversationChain } from "langchain/chains";
-import {
-  ChatPromptTemplate,
-  SystemMessagePromptTemplate,
-  HumanMessagePromptTemplate,
-} from "@langchain/core/prompts";
 import { postProblems } from "@/service/problems";
 import { BufferMemory } from "langchain/memory";
-import {
-  assistantMessage,
-  humanPrompt,
-  systemPrompt,
-  totalQuestionsPrompt,
-} from "@/prompt/problemGeneration";
+import { chatPrompt, totalQuestionsPrompt } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 
-const model = new ChatAnthropic({
-  anthropicApiKey: process.env.CLAUDE_API_KEY,
+const model = new ChatGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_GEMINI_API,
   temperature: 0.4,
-  model: "claude-3-haiku-20240307",
-  maxTokens: 4000,
+  model: "gemini-pro",
+  maxOutputTokens: 4000,
 });
 
 export async function POST(req: NextRequest) {
@@ -41,50 +31,32 @@ export async function POST(req: NextRequest) {
 
   const source: string = requestBody.source;
 
-  const totalQuestionsChatPrompt = ChatPromptTemplate.fromMessages([
-    new SystemMessagePromptTemplate(totalQuestionsPrompt),
-    HumanMessagePromptTemplate.fromTemplate("{source}"),
-    assistantMessage,
-  ]);
+  const memory = new BufferMemory({
+    inputKey: "source",
+  });
 
   // 총 질문 수를 결정하는 LLMChain
   const totalQuestionsChain = new LLMChain({
     llm: model,
-    prompt: totalQuestionsChatPrompt,
-  });
-
-  // 대화 프롬프트 템플릿 생성
-  const chatPrompt = ChatPromptTemplate.fromMessages([
-    systemPrompt,
-    humanPrompt,
-    assistantMessage,
-  ]);
-
-  const memory = new BufferMemory({
-    inputKey: "source",
+    prompt: totalQuestionsPrompt,
   });
 
   // 대화 체인 생성
   const chain = new ConversationChain({
     llm: model,
     prompt: chatPrompt,
-    memory: memory,
+    memory,
   });
 
   try {
-    const parsedJson: GenerateQuestionResponse | null = await generateQuestions(
-      {
-        source,
-        totalQuestionsChain,
-        conversationChain: chain,
-      },
-    );
+    const parsedJson: GenerateQuestionResponse | null = await generateQuestions({
+      source,
+      totalQuestionsChain,
+      conversationChain: chain,
+    });
 
-    if (parsedJson === null) {
-      return NextResponse.json({
-        error: "문제를 생성하는데 실패했습니다..",
-        status: 400,
-      });
+    if(parsedJson === null) {
+      return NextResponse.json({ error: "문제를 생성하는데 실패했습니다..", status: 400 });
     }
 
     console.log(parsedJson);
@@ -135,7 +107,9 @@ export async function POST(req: NextRequest) {
       parsedJson ?? { error: "파싱에 실패했습니다.", status: 400 },
     );
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Internal Server Error", status: 500 });
+    if (e instanceof Error) {
+      console.error("error :", e);
+      return NextResponse.json({ error: e.message, status: 400 });
+    }
   }
 }

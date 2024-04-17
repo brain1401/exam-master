@@ -536,18 +536,18 @@ export default function TestPage() {
       setIsLoading(true);
 
       const res = await axios.post<GenerateQuestionResponse>(
-        "/api/generateProblemsGPT",
+        "/api/generateProblemsGoogle",
         {
           source: document,
         },
       );
       const data = res.data;
 
-      if (!data) {
-        throw new Error("data가 없습니다.");
+      if (data === null) {
+        alert("문제를 생성하는데 실패했습니다..");
+      } else {
+        setGenerateQuestionResponse(data);
       }
-
-      setGenerateQuestionResponse(data);
     } catch (e) {
       if (e instanceof Error) {
         alert(e.message);
