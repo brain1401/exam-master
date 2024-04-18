@@ -6,11 +6,10 @@ import {
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { LLMChain } from "langchain/chains";
 import { ConversationChain } from "langchain/chains";
 import { postProblems } from "@/service/problems";
 import { BufferMemory } from "langchain/memory";
-import { chatPrompt, totalQuestionsPrompt } from "@/prompt/problemGeneration";
+import { chatPrompt } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 
 const model = new ChatGoogleGenerativeAI({
@@ -73,21 +72,23 @@ export async function POST(req: NextRequest) {
           type: question.type as "obj" | "sub",
           question: question.question,
           candidates:
-            question.options?.map((option, i) => ({
-              id: i,
-              text: option,
-              isAnswer: question.answer.every(
-                (answer) => typeof answer === "number",
-              )
-                ? question.answer.includes(i)
-                : false,
-            })) ?? null,
+            question.options?.map((option, i) => {
+              if (Array.isArray(question.answer)) {
+                return {
+                  id: i,
+                  text: option,
+                  isAnswer: question.answer.every(
+                    (answer) => typeof answer === "number",
+                  )
+                    ? question.answer.includes(i)
+                    : false,
+                };
+              }
+              return { id: null, text: "", isAnswer: false };
+            }) || null,
           image: null,
-          subAnswer: question.answer.every(
-            (answer) => typeof answer === "string",
-          )
-            ? question.answer.join()
-            : null,
+          subAnswer:
+            typeof question.answer === "string" ? question.answer : null,
           isAnswerMultiple: question.answer.length > 1,
           additionalView: "",
           isAdditionalViewButtonClicked: false,
@@ -105,7 +106,6 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(parsedJson, { status: 200 });
-    
   } catch (e) {
     if (e instanceof Error) {
       console.error("error :", e);

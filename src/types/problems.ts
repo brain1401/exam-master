@@ -319,7 +319,7 @@ export const QuestionSchema = z.object({
   type: z.string(),
   question: z.string(),
   options: z.union([z.array(z.string()), z.null()]).optional(),
-  answer: z.array(z.union([z.number(), z.string()])),
+  answer: z.union([z.array(z.number()), z.string()]),
   explanation: z.string(),
 });
 export type Question = z.infer<typeof QuestionSchema>;
@@ -338,3 +338,12 @@ export const GenerateQuestionResponsesSchema = z.array(
 export type GenerateQuestionResponses = z.infer<
   typeof GenerateQuestionResponsesSchema
 >;
+
+export type UpdateProblemsSetData = {
+  problems: ProblemReplacedImageKey[];
+  problemSetName: string;
+  problemSetIsPublic: boolean;
+  timeLimit: string;
+  description: string;
+  problemSetUUID?: string;
+};

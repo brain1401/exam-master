@@ -536,7 +536,7 @@ export default function TestPage() {
       setIsLoading(true);
 
       const res = await axios.post<GenerateQuestionResponse>(
-        "/api/generateProblemsGoogle",
+        "/api/generateProblemsClaude",
         {
           source: document,
         },

@@ -16,14 +16,16 @@ export async function generateQuestions({
   isAssistantAdded?: boolean;
 }) {
   let retryCount = 0;
-  const maxRetryCount = 5;
+  const maxRetryCount = 3;
+
+  let i = 0;
 
   let generatedQuestions: GenerateQuestionResponse = {
     questions: [],
   };
 
   while (retryCount < maxRetryCount) {
-    console.log("generatedQuestions :", generatedQuestions);
+    console.log(`${++i}번째 시도 :`);
 
     // 대화 체인을 사용하여 질문 생성
     const result = await chain.call({
@@ -41,7 +43,7 @@ export async function generateQuestions({
     let response: GenerateQuestionResponse | null = null;
 
     try {
-      const parsed = JSON.parse(resultResponse);
+      const parsed: GenerateQuestionResponse = JSON.parse(resultResponse);
       response = parsed;
     } catch (e) {
       console.error("error:", e);
@@ -67,24 +69,41 @@ export async function generateQuestions({
             if (newQuestion.type === "obj" && prevQuestion.type === "obj") {
               return (
                 prevQuestion.question === newQuestion.question ||
-                prevQuestion.options?.toSorted().join() ===
-                  newQuestion.options?.toSorted().join()
+                (prevQuestion.options &&
+                  newQuestion.options &&
+                  prevQuestion.options.length === newQuestion.options.length &&
+                  prevQuestion.options.every((option, index) =>
+                    newQuestion.options?.includes(option),
+                  ))
               );
-            } else {
-              return prevQuestion.question === newQuestion.question;
+            } else if (
+              newQuestion.type === "sub" &&
+              prevQuestion.type === "sub"
+            ) {
+              return (
+                prevQuestion.question === newQuestion.question ||
+                prevQuestion.answer === newQuestion.answer
+              );
             }
           }) &&
           !exampleQuestions.some((exampleQuestion) => {
             if (newQuestion.type === "obj" && exampleQuestion.type === "obj") {
               return (
                 exampleQuestion.question === newQuestion.question ||
-                exampleQuestion.options?.toSorted().join() ===
-                  newQuestion.options?.toSorted().join()
+                (exampleQuestion.options &&
+                  newQuestion.options &&
+                  exampleQuestion.options.length ===
+                    newQuestion.options.length &&
+                  exampleQuestion.options.every((option, index) =>
+                    newQuestion.options?.includes(option),
+                  ))
               );
             } else {
               return exampleQuestion.question === newQuestion.question;
             }
-          });
+          }) &&
+          !(newQuestion.type === "obj" && newQuestion.answer.length === 0);
+
         return isUnique;
       }),
     ];
@@ -103,5 +122,5 @@ export async function generateQuestions({
     }
   }
 
-  return generatedQuestions;
+  return generatedQuestions.questions.length > 0 ? generatedQuestions : null;
 }

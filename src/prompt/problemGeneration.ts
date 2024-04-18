@@ -1,3 +1,4 @@
+import { GenerateQuestionResponse } from "@/types/problems";
 import {
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
@@ -9,7 +10,7 @@ import {
 } from "@langchain/core/prompts";
 
 // 예시 질문 생성
-export const exampleQuestions = [
+export const exampleQuestions: GenerateQuestionResponse["questions"] = [
   {
     type: "obj",
     question: "데이터베이스에서 릴레이션에 대한 설명으로 틀린 것은?",
@@ -55,7 +56,8 @@ export const exampleQuestions = [
     type: "sub",
     question:
       "많은 데이터를 그림을 이용하여 집합의 범위와 중앙값을 빠르게 확인할 수 있으며, 또한 통계적으로 이상 값이 있는지 빠르게 확인이 가능한 시각화 기법은 무엇인가?",
-    answer: ["박스플롯", "boxplot"],
+    answer:
+      "박스플롯(Boxplot) 또는 상자 수염 그림은 데이터의 분포를 시각화하는 방법 중 하나입니다. 상자의 양쪽 끝은 1사분위수와 3사분위수로, 이를 통해 데이터의 중간 50%의 범위를 확인할 수 있습니다. 상자 내부의 선은 중앙값(2사분위수)을 나타내어 데이터의 중심 경향을 파악할 수 있습니다. 상자 바깥으로 뻗은 선(수염)은 1사분위수와 3사분위수로부터 1.5 IQR(interquartile range, 사분위 범위) 이내의 데이터 범위를 보여줍니다. 수염 밖의 점들은 이상치(outlier)로 간주됩니다. 따라서 박스플롯을 통해 데이터의 범위, 중앙값, 이상치 등을 한눈에 파악할 수 있습니다.",
     explanation:
       "박스플롯(Boxplot)은 데이터의 분포를 간단하게 표현할 수 있는 시각화 방법입니다. 박스의 양쪽 끝은 1사분위수와 3사분위수를 나타내어 데이터의 범위를 확인할 수 있고, 박스 안의 선은 중앙값을 나타냅니다. 또한 박스 바깥의 점들을 통해 이상치를 쉽게 발견할 수 있습니다.",
   },
@@ -85,37 +87,43 @@ Respond ONLY in JSON format, without any additional remarks, using the following
 const systemTemplate = `
 You are an expert question generator tasked with creating a comprehensive set of questions based on the content within the <source> tags. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
 
-Generate questions with a ratio of 80% multiple choice (type: "obj") and 20% short answer (type: "sub") across all API requests. When generating questions, refer to the question examples within the "questions" array in the example JSON for tone and formatting, but do not use the actual questions from the examples. 
+Generate questions with a ratio of 80% multiple choice (type: "obj") and 20% subjective (type: "sub") across all API requests. When generating questions, refer to the question examples within the "questions" array in the example JSON for tone and formatting, but do not use the actual questions from the examples. 
 
 Throughout this process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags. Compare the <source> tags from the user prompt with the <generatedQuestions> to determine the starting point for question generation in the current request. 
 
-Generate questions that cover the remaining content not yet addressed in the <generatedQuestions>. If at any point during the process you determine that there are no more questions to generate based on the remaining content, respond with an empty "questions" array in the JSON format specified in instruction 10. 
+Generate questions that cover the remaining content not yet addressed in the <generatedQuestions>.
 
-MUST Avoid duplicating questions or content across requests.
+Before generating questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question.
+
+If at any point during the process you determine that there are no more questions to generate based on the remaining content, respond with an empty "questions" array in the JSON format specified in instruction 9. 
+
+Remember, If at any point during the process you determine that there are no more questions to generate based on the remaining content, respond with an empty "questions" array in the JSON format specified in instruction 9. 
 
 You must follow all of these instructions:
 
-1. Before generating new questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question.
+1. For multiple choice questions, each question must have 4 answer options. Indicate the correct answer(s) for each question by providing the exact index number(s) of the correct option(s) from the "options" array in the "answer" array (e.g., [0] if the first option is correct, [1] if the second option is correct, [0, 2] if the first and third options are correct, etc.). Set the "type" key to "obj" for multiple choice questions. Some questions may have multiple correct answers.
 
-2. For multiple choice questions, each question must have 4 answer options. Indicate the correct answer(s) for each question using the index number(s) of the correct option(s) in the "options" array (e.g., 0 for the first option, 1 for the second option, etc.). Set the "type" key to "obj" for multiple choice questions. Some questions may have multiple correct answers.
+2. For subjective questions, provide the question and a detailed, comprehensive answer that covers all relevant information. The answer should include key terms, phrases, concepts, and explanations that demonstrate a thorough understanding of the topic. Set the "type" key to "sub" for subjective questions.
 
-3. For short answer questions, provide the question and all acceptable correct answers. The correct answer(s) should be a single word or a combination of up to two words to facilitate easy grading through string comparison. Include all acceptable words or combinations of words that would be considered correct in the "answer" array. Set the "type" key to "sub" for short answer questions.
+3. Provide a detailed and thorough explanation for each question, discussing why the correct answer is correct and the incorrect options are incorrect for multiple choice questions, or providing additional context and insights for subjective questions. The explanations should be comprehensive and not overly brief.
 
-4. Provide a detailed and thorough explanation for each question, discussing why the correct answer is correct and the incorrect options are incorrect. The explanations should be comprehensive and not overly brief.
+4. Ensure the questions address key information in the text and the answer options are plausible based on the source content.
 
-5. Ensure the questions address key information in the text and the answer options are plausible based on the source content.
+5. Make sure there is consistency between the question, answer options, and the correct answer(s) for multiple choice questions, and between the question and the provided answer for subjective questions.
 
-6. Make sure there is consistency between the question, answer options, and the correct answer(s).
+6. Verify that the question, answer options, correct answer(s), and explanation can be validated against the source content for multiple choice questions, and that the question and answer are relevant to the source content for subjective questions.
 
-7. Verify that the question, answer options, and correct answer(s) can be validated against the source content.
+7. Ensure that the question, answer options, correct answer(s), and explanation are all logically consistent with each other for multiple choice questions, and that the question and answer are coherent and well-structured for subjective questions.
 
-8. Ensure that the question, answer options, correct answer(s), and explanation are all logically consistent with each other.
+8. Remember, If at any point during the process you determine that there are no more questions to generate based on the remaining content, respond with an empty "questions" array in the JSON format specified below.
 
 9. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
 
 {{
 "questions": ${JSON.stringify(exampleQuestions).replaceAll("}", "}}").replaceAll("{", "{{")}
 }}
+
+
 `;
 
 // 사용자 입력을 위한 프롬프트 템플릿

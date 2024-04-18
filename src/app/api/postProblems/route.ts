@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { getParsedProblems, postProblems } from "@/service/problems";
-import { problemsSchema } from "@/types/problems";
+import { postProblems } from "@/service/problems";
+import { UpdateProblemsSetData, problemsSchema } from "@/types/problems";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession();
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       { status: 401 },
     );
 
-  const formData = await req.formData();
+  const data: UpdateProblemsSetData = await req.json();
 
   const {
     problemSetName,
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     problemSetIsPublic,
     timeLimit,
     description,
-  } = getParsedProblems(formData, false);
+  } = data;
 
   if (!problemSetName || !problems) {
     return NextResponse.json(
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       isPublic: problemSetIsPublic,
       problemSetName: problemSetName,
       toBePostedProblems: problems,
-      timeLimit,
+      timeLimit: Number(timeLimit) || 0,
       description: description,
       userEmail: session.user.email,
     });

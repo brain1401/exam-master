@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import {
-  getParsedProblems,
   updateProblems,
   checkUserPermissionForProblemSet,
 } from "@/service/problems";
-import { problemsSchema, uuidSchema } from "@/types/problems";
+import {
+  UpdateProblemsSetData,
+  problemsSchema,
+  uuidSchema,
+} from "@/types/problems";
 
 export async function PUT(req: NextRequest) {
   const session = await getServerSession();
@@ -16,7 +19,8 @@ export async function PUT(req: NextRequest) {
       { status: 401 },
     );
   }
-  const formData = await req.formData();
+
+  const data: UpdateProblemsSetData = await req.json();
 
   const {
     problemSetName,
@@ -25,7 +29,9 @@ export async function PUT(req: NextRequest) {
     problemSetUUID,
     timeLimit,
     description,
-  } = getParsedProblems(formData, true);
+  } = data;
+
+  console.log("getParsedProblems(formData, true) 후");
 
   if (!problemSetName || !problems || !problemSetUUID) {
     return NextResponse.json(
@@ -70,7 +76,7 @@ export async function PUT(req: NextRequest) {
       replacingProblems: problems,
       problemSetUUID,
       description,
-      timeLimit,
+      timeLimit: Number(timeLimit) || 0,
       problemSetIsPublic,
       userEmail: session.user.email,
     });

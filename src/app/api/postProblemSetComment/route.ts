@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     );
   }
   const reqBody = await req.json();
-  console.log({reqBody});
+  console.log({ reqBody });
 
   const userUUID = await getUserUUIDbyEmail(session.user.email);
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     problemSetUUID: reqBody.problemSetUUID,
     comment: reqBody.comment,
     userUUID: userUUID,
-  })
+  });
 
   return NextResponse.json({ uuid: result });
 }

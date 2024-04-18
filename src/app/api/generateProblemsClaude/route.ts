@@ -5,13 +5,10 @@ import {
 } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { ChatAnthropic } from "@langchain/anthropic";
-import { LLMChain } from "langchain/chains";
+import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ConversationChain } from "langchain/chains";
 import {
   ChatPromptTemplate,
-  SystemMessagePromptTemplate,
-  HumanMessagePromptTemplate,
 } from "@langchain/core/prompts";
 import { postProblems } from "@/service/problems";
 import { BufferMemory } from "langchain/memory";
@@ -19,15 +16,18 @@ import {
   assistantMessage,
   humanPrompt,
   systemPrompt,
-  totalQuestionsPrompt,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 
-const model = new ChatAnthropic({
-  anthropicApiKey: process.env.CLAUDE_API_KEY,
-  temperature: 0.2,
-  model: "claude-3-haiku-20240307",
+const model = new BedrockChat({
+  temperature: 0.4,
+  region: "us-west-2",
+  model: "anthropic.claude-3-sonnet-20240229-v1:0",
   maxTokens: 4000,
+  credentials: {
+    accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY || "",
+  },
 });
 
 export async function POST(req: NextRequest) {
@@ -91,21 +91,23 @@ export async function POST(req: NextRequest) {
           type: question.type as "obj" | "sub",
           question: question.question,
           candidates:
-            question.options?.map((option, i) => ({
-              id: i,
-              text: option,
-              isAnswer: question.answer.every(
-                (answer) => typeof answer === "number",
-              )
-                ? question.answer.includes(i)
-                : false,
-            })) ?? null,
+            question.options?.map((option, i) => {
+              if (Array.isArray(question.answer)) {
+                return {
+                  id: i,
+                  text: option,
+                  isAnswer: question.answer.every(
+                    (answer) => typeof answer === "number",
+                  )
+                    ? question.answer.includes(i)
+                    : false,
+                };
+              }
+              return { id: null, text: "", isAnswer: false };
+            }) || null,
           image: null,
-          subAnswer: question.answer.every(
-            (answer) => typeof answer === "string",
-          )
-            ? question.answer.join()
-            : null,
+          subAnswer:
+            typeof question.answer === "string" ? question.answer : null,
           isAnswerMultiple: question.answer.length > 1,
           additionalView: "",
           isAdditionalViewButtonClicked: false,
@@ -123,7 +125,6 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(parsedJson, { status: 200 });
-    
   } catch (e) {
     console.error(e);
     return NextResponse.json(
