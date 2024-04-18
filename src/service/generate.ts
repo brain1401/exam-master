@@ -1,40 +1,29 @@
-import type { GenerateQuestionResponse } from "@/types/problems";
-import type { LLMChain } from "langchain/chains";
+import { exampleQuestions } from "@/prompt/problemGeneration";
+import {
+  GenerateQuestionResponseSchema,
+  type GenerateQuestionResponse,
+} from "@/types/problems";
 import type { ConversationChain } from "langchain/chains";
 
 // 질문 생성 함수
 export async function generateQuestions({
   source,
-  totalQuestionsChain,
   conversationChain: chain,
+  isAssistantAdded,
 }: {
   source: string;
-  totalQuestionsChain: LLMChain;
   conversationChain: ConversationChain;
+  isAssistantAdded?: boolean;
 }) {
-  // 총 질문 수 결정
-  const totalQuestionsResult = await totalQuestionsChain.call({ source });
-  console.log("totalQuestionsResult :", totalQuestionsResult);
-
-  const totalQuestions = JSON.parse(totalQuestionsResult.text).totalQuestions;
-  console.log("totalQuestions :", totalQuestions);
-
   let retryCount = 0;
+  const maxRetryCount = 5;
 
   let generatedQuestions: GenerateQuestionResponse = {
-    totalQuestions: totalQuestions,
-    questionCount: 0,
     questions: [],
   };
 
-  let isFailed = false;
-
-  while (generatedQuestions.questionCount < totalQuestions) {
-    if (retryCount >= 5) {
-      console.log("리트라이 횟수 초과");
-      isFailed = true;
-      break;
-    }
+  while (retryCount < maxRetryCount) {
+    console.log("generatedQuestions :", generatedQuestions);
 
     // 대화 체인을 사용하여 질문 생성
     const result = await chain.call({
@@ -45,97 +34,74 @@ export async function generateQuestions({
           : JSON.stringify(generatedQuestions),
     });
 
+    const resultResponse = isAssistantAdded
+      ? "{" + result.response
+      : result.response;
+
     let response: GenerateQuestionResponse | null = null;
 
-    console.log("result.response :", result.response);
-
     try {
-      const parsed = JSON.parse(result.response);
+      const parsed = JSON.parse(resultResponse);
       response = parsed;
     } catch (e) {
-      console.error("error :", e);
+      console.error("error:", e);
     }
 
-    if (response === null) {
+    if (
+      response === null ||
+      GenerateQuestionResponseSchema.safeParse(response).success === false
+    ) {
       console.log("파싱 에러, 재시도 합니다.");
       retryCount++;
       continue;
     }
 
     const newQuestions = response.questions;
+    console.log("newQuestions:", newQuestions);
 
-    console.log("result :", result);
-    console.log("newQuestions :", newQuestions);
-
-    let foundDuplicate = false;
-
-    const uniqueNewQuestions = newQuestions.filter((newQuestion) => {
-      const isUnique = !generatedQuestions.questions.some((prevQuestion) => {
-        if (newQuestion.type === "obj" && prevQuestion.type === "obj") {
-          return (
-            prevQuestion.question === newQuestion.question ||
-            prevQuestion.options?.join() === newQuestion.options?.join()
-          );
-        } else {
-          return prevQuestion.question === newQuestion.question;
-        }
-      });
-
-      if (!isUnique) {
-        foundDuplicate = true;
-      }
-
-      return isUnique;
-    });
-
-    if (foundDuplicate) {
-      console.log("중복된 질문 발견 재시도 함.");
-      retryCount++;
-    }
-
-    // 생성된 질문 추가
-    generatedQuestions.questions = [
+    const uniqueQuestions = [
       ...generatedQuestions.questions,
-      ...uniqueNewQuestions,
+      ...newQuestions.filter((newQuestion) => {
+        const isUnique =
+          !generatedQuestions.questions.some((prevQuestion) => {
+            if (newQuestion.type === "obj" && prevQuestion.type === "obj") {
+              return (
+                prevQuestion.question === newQuestion.question ||
+                prevQuestion.options?.toSorted().join() ===
+                  newQuestion.options?.toSorted().join()
+              );
+            } else {
+              return prevQuestion.question === newQuestion.question;
+            }
+          }) &&
+          !exampleQuestions.some((exampleQuestion) => {
+            if (newQuestion.type === "obj" && exampleQuestion.type === "obj") {
+              return (
+                exampleQuestion.question === newQuestion.question ||
+                exampleQuestion.options?.toSorted().join() ===
+                  newQuestion.options?.toSorted().join()
+              );
+            } else {
+              return exampleQuestion.question === newQuestion.question;
+            }
+          });
+        return isUnique;
+      }),
     ];
 
-    generatedQuestions.questionCount += uniqueNewQuestions.length;
-
-    // questionCount와 실제 질문 수 검증
-    if (
-      generatedQuestions.questionCount !== generatedQuestions.questions.length
-    ) {
-      generatedQuestions.questionCount = generatedQuestions.questions.length;
+    if (uniqueQuestions.length === generatedQuestions.questions.length) {
+      console.log("새로운 질문이 없습니다. 재시도 합니다.");
+      retryCount++;
+      continue;
     }
-    console.log(
-      "generatedQuestions.questionsCount :",
-      generatedQuestions.questionCount,
-    );
-    console.log("totalQuestions :", totalQuestions);
+
+    generatedQuestions.questions = uniqueQuestions;
+
+    if (newQuestions.length === 0) {
+      console.log("더 이상 생성할 질문이 없습니다.");
+      break;
+    }
   }
 
-  if (isFailed === true) {
-    return null;
-  }
-
-  // 최종 결과에서 중복 질문 제거
-  const uniqueQuestions = generatedQuestions.questions.filter(
-    (question, index, self) =>
-      index ===
-      self.findIndex((q) => {
-        if (question.type === "obj" && q.type === "obj") {
-          return (
-            q.question === question.question &&
-            q.options?.join() === question.options?.join()
-          );
-        } else {
-          return q.question === question.question;
-        }
-      }),
-  );
-  generatedQuestions.questions = uniqueQuestions;
-  generatedQuestions.questionCount = uniqueQuestions.length;
-
-  // 최종 결과 JSON 문자열로 반환
   return generatedQuestions;
 }

@@ -561,7 +561,7 @@ export default function TestPage() {
   useEffect(() => {
     console.log("generateQuestionResponse :", {
       ...generateQuestionResponse,
-      questions: generateQuestionResponse?.questions.toSorted((a, b) =>
+      questions: generateQuestionResponse?.questions?.toSorted((a, b) =>
         a.question < b.question ? -1 : 1,
       ),
     });
@@ -573,7 +573,7 @@ export default function TestPage() {
         Click Me
       </Button>
       {isLoading && <div>로딩중... {`단계 ${step}`}</div>}
-      <div>{generateQuestionResponse?.questions.toString()}</div>
+      <div>{generateQuestionResponse?.questions?.toString()}</div>
     </div>
   );
 }

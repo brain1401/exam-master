@@ -37,12 +37,6 @@ export async function POST(req: NextRequest) {
 
   const source: string = requestBody.source;
 
-  // 총 질문 수를 결정하는 LLMChain
-  const totalQuestionsChain = new LLMChain({
-    llm: model,
-    prompt: totalQuestionsPrompt,
-  });
-
   const memory = new BufferMemory({
     inputKey: "source",
   });
@@ -58,16 +52,19 @@ export async function POST(req: NextRequest) {
     const parsedJson: GenerateQuestionResponse | null = await generateQuestions(
       {
         source,
-        totalQuestionsChain,
         conversationChain: chain,
       },
     );
 
     if (parsedJson === null) {
-      return NextResponse.json({
-        error: "문제를 생성하는데 실패했습니다..",
-        status: 400,
-      });
+      return NextResponse.json(
+        {
+          error: "문제를 생성하는데 실패했습니다..",
+        },
+        {
+          status: 400,
+        },
+      );
     }
     console.log(parsedJson);
 
@@ -105,19 +102,15 @@ export async function POST(req: NextRequest) {
         description: "AI로 생성된 문제입니다.",
         userEmail: session.user?.email,
       });
-      if (
-        GenerateQuestionResponseSchema.safeParse(parsedJson).success === false
-      ) {
-        return NextResponse.json({
-          error: "파싱에 실패했습니다.",
-          status: 400,
-        });
-      }
-
+    } else {
       return NextResponse.json(
-        parsedJson ?? { error: "파싱에 실패했습니다.", status: 400 },
+        { error: "파싱에 실패했습니다." },
+        { status: 400 },
       );
     }
+
+    return NextResponse.json(parsedJson, { status: 200 });
+    
   } catch (e) {
     console.error(e);
     return NextResponse.json(

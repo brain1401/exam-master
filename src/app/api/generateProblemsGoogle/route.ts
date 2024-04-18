@@ -15,7 +15,7 @@ import { generateQuestions } from "@/service/generate";
 
 const model = new ChatGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GEMINI_API,
-  temperature: 0.4,
+  temperature: 0.2,
   model: "gemini-pro",
   maxOutputTokens: 4000,
 });
@@ -35,12 +35,6 @@ export async function POST(req: NextRequest) {
     inputKey: "source",
   });
 
-  // 총 질문 수를 결정하는 LLMChain
-  const totalQuestionsChain = new LLMChain({
-    llm: model,
-    prompt: totalQuestionsPrompt,
-  });
-
   // 대화 체인 생성
   const chain = new ConversationChain({
     llm: model,
@@ -49,14 +43,22 @@ export async function POST(req: NextRequest) {
   });
 
   try {
-    const parsedJson: GenerateQuestionResponse | null = await generateQuestions({
-      source,
-      totalQuestionsChain,
-      conversationChain: chain,
-    });
+    const parsedJson: GenerateQuestionResponse | null = await generateQuestions(
+      {
+        source,
+        conversationChain: chain,
+      },
+    );
 
-    if(parsedJson === null) {
-      return NextResponse.json({ error: "문제를 생성하는데 실패했습니다..", status: 400 });
+    if (parsedJson === null) {
+      return NextResponse.json(
+        {
+          error: "문제를 생성하는데 실패했습니다..",
+        },
+        {
+          status: 400,
+        },
+      );
     }
 
     console.log(parsedJson);
@@ -95,21 +97,24 @@ export async function POST(req: NextRequest) {
         description: "AI로 생성된 문제입니다.",
         userEmail: session.user?.email,
       });
+    } else {
+      return NextResponse.json(
+        { error: "파싱에 실패했습니다." },
+        { status: 400 },
+      );
     }
 
-    if (
-      GenerateQuestionResponseSchema.safeParse(parsedJson).success === false
-    ) {
-      return NextResponse.json({ error: "파싱에 실패했습니다.", status: 400 });
-    }
-
-    return NextResponse.json(
-      parsedJson ?? { error: "파싱에 실패했습니다.", status: 400 },
-    );
+    return NextResponse.json(parsedJson, { status: 200 });
+    
   } catch (e) {
     if (e instanceof Error) {
       console.error("error :", e);
-      return NextResponse.json({ error: e.message, status: 400 });
+      return NextResponse.json({ error: e.message }, { status: 400 });
     }
+
+    return NextResponse.json(
+      { error: "에러가 발생했습니다." },
+      { status: 400 },
+    );
   }
 }

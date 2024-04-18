@@ -25,7 +25,7 @@ import { generateQuestions } from "@/service/generate";
 
 const model = new ChatAnthropic({
   anthropicApiKey: process.env.CLAUDE_API_KEY,
-  temperature: 0.4,
+  temperature: 0.2,
   model: "claude-3-haiku-20240307",
   maxTokens: 4000,
 });
@@ -40,18 +40,6 @@ export async function POST(req: NextRequest) {
   const requestBody = await req.json();
 
   const source: string = requestBody.source;
-
-  const totalQuestionsChatPrompt = ChatPromptTemplate.fromMessages([
-    new SystemMessagePromptTemplate(totalQuestionsPrompt),
-    HumanMessagePromptTemplate.fromTemplate("{source}"),
-    assistantMessage,
-  ]);
-
-  // 총 질문 수를 결정하는 LLMChain
-  const totalQuestionsChain = new LLMChain({
-    llm: model,
-    prompt: totalQuestionsChatPrompt,
-  });
 
   // 대화 프롬프트 템플릿 생성
   const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -75,16 +63,20 @@ export async function POST(req: NextRequest) {
     const parsedJson: GenerateQuestionResponse | null = await generateQuestions(
       {
         source,
-        totalQuestionsChain,
         conversationChain: chain,
+        isAssistantAdded: true,
       },
     );
 
     if (parsedJson === null) {
-      return NextResponse.json({
-        error: "문제를 생성하는데 실패했습니다..",
-        status: 400,
-      });
+      return NextResponse.json(
+        {
+          error: "문제를 생성하는데 실패했습니다..",
+        },
+        {
+          status: 400,
+        },
+      );
     }
 
     console.log(parsedJson);
@@ -123,19 +115,20 @@ export async function POST(req: NextRequest) {
         description: "AI로 생성된 문제입니다.",
         userEmail: session.user?.email,
       });
+    } else {
+      return NextResponse.json(
+        { error: "파싱에 실패했습니다." },
+        { status: 400 },
+      );
     }
 
-    if (
-      GenerateQuestionResponseSchema.safeParse(parsedJson).success === false
-    ) {
-      return NextResponse.json({ error: "파싱에 실패했습니다.", status: 400 });
-    }
-
-    return NextResponse.json(
-      parsedJson ?? { error: "파싱에 실패했습니다.", status: 400 },
-    );
+    return NextResponse.json(parsedJson, { status: 200 });
+    
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: "Internal Server Error", status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

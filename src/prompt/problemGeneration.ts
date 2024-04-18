@@ -9,7 +9,7 @@ import {
 } from "@langchain/core/prompts";
 
 // 예시 질문 생성
-const exampleQuestions = [
+export const exampleQuestions = [
   {
     type: "obj",
     question: "데이터베이스에서 릴레이션에 대한 설명으로 틀린 것은?",
@@ -73,7 +73,7 @@ const exampleQuestions = [
 export const totalQuestionsPrompt = new PromptTemplate({
   template: `Based on the given <SourceText> tags below, how many total questions should be generated to comprehensively cover the content? The questions should be a mix of multiple choice (type: "obj") and short answer (type: "sub") questions, with a ratio of 80% multiple choice and 20% short answer.
 
-Answer in JSON format with the following key:
+Respond ONLY in JSON format, without any additional remarks, using the following key:
 {{
 "totalQuestions": ( total_number_of_questions )
 }}
@@ -82,15 +82,24 @@ Answer in JSON format with the following key:
   inputVariables: ["source"],
 });
 
-// 시스템 메시지 프롬프트 템플릿
 const systemTemplate = `
-Your task is to generate a comprehensive question set based on the entire content within the <source> tags. Generate questions with a ratio of 80% multiple choice (type: "obj") and 20% short answer (type: "sub") across all API requests. When generating questions, refer to the question examples within the "questions" array in the example JSON for tone and formatting. Throughout this process, ensure that each request focuses on a specific portion of the source content and builds upon the previous requests to gradually cover the entire content. MUST Avoid duplicating questions or content across requests. You must follow all of these instructions:
+You are an expert question generator tasked with creating a comprehensive set of questions based on the content within the <source> tags. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
 
-1. For multiple choice questions, each question must have 4 answer options. Indicate the correct answer(s) for each question using the index number(s) of the correct option(s) in the "options" array (e.g., 0 for the first option, 1 for the second option, etc.). Set the "type" key to "obj" for multiple choice questions. Some questions may have multiple correct answers.
+Generate questions with a ratio of 80% multiple choice (type: "obj") and 20% short answer (type: "sub") across all API requests. When generating questions, refer to the question examples within the "questions" array in the example JSON for tone and formatting, but do not use the actual questions from the examples. 
 
-2. For short answer questions, provide the question and all acceptable correct answers. The correct answer(s) should be a single word or a combination of up to two words to facilitate easy grading through string comparison. Include all acceptable words or combinations of words that would be considered correct in the "answer" array. Set the "type" key to "sub" for short answer questions.
+Throughout this process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags. Compare the <source> tags from the user prompt with the <generatedQuestions> to determine the starting point for question generation in the current request. 
 
-3. Before generating new questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question. 
+Generate questions that cover the remaining content not yet addressed in the <generatedQuestions>. If at any point during the process you determine that there are no more questions to generate based on the remaining content, respond with an empty "questions" array in the JSON format specified in instruction 10. 
+
+MUST Avoid duplicating questions or content across requests.
+
+You must follow all of these instructions:
+
+1. Before generating new questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question.
+
+2. For multiple choice questions, each question must have 4 answer options. Indicate the correct answer(s) for each question using the index number(s) of the correct option(s) in the "options" array (e.g., 0 for the first option, 1 for the second option, etc.). Set the "type" key to "obj" for multiple choice questions. Some questions may have multiple correct answers.
+
+3. For short answer questions, provide the question and all acceptable correct answers. The correct answer(s) should be a single word or a combination of up to two words to facilitate easy grading through string comparison. Include all acceptable words or combinations of words that would be considered correct in the "answer" array. Set the "type" key to "sub" for short answer questions.
 
 4. Provide a detailed and thorough explanation for each question, discussing why the correct answer is correct and the incorrect options are incorrect. The explanations should be comprehensive and not overly brief.
 
@@ -102,20 +111,11 @@ Your task is to generate a comprehensive question set based on the entire conten
 
 8. Ensure that the question, answer options, correct answer(s), and explanation are all logically consistent with each other.
 
-9. After generating the questions, verify that they comprehensively cover the designated portion of the <source> content without any significant omissions. If any key information has been missed, generate additional questions to address those gaps.
-
-10. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
+9. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
 
 {{
-"totalQuestions": <totalQuestions>,
-"questionCount": (현재 요청에서 생성된 문제 수(중복 제거 후)),
 "questions": ${JSON.stringify(exampleQuestions).replaceAll("}", "}}").replaceAll("{", "{{")}
 }}
-
-
-After generating the questions, double-check that the number of questions in the "questions" array matches the value of "questionCount". If there is a mismatch, adjust the "questionCount" value or remove/add questions as needed to ensure consistency.
-
-If there is no more content left to generate questions from and the <generatedQuestions> tags are not empty, respond with an empty "questions" array and set "questionCount" to 0.
 `;
 
 // 사용자 입력을 위한 프롬프트 템플릿
