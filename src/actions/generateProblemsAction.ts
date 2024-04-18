@@ -1,10 +1,11 @@
+"use server";
+
 import {
   GenerateQuestionResponse,
   GenerateQuestionResponseSchema,
   ProblemReplacedImageKey,
 } from "@/types/problems";
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ConversationChain } from "langchain/chains";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
@@ -31,24 +32,32 @@ const model = new BedrockChat({
   },
 });
 
-export async function POST(req: NextRequest) {
+export async function requestGeneratedProblemSet({ source }: { source: string }) {
   const session = await getServerSession();
 
   if (!session || !session.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return { error: "Unauthorized" };
   }
 
-  const requestBody = await req.json();
+  if (!source) {
+    return { error: "source가 비어있습니다." };
+  }
+  
+  generateProblemSet({ source });
 
-  const source: string | undefined = requestBody.source;
+  return { success: true };
+}
 
-  if(!source) {
-    return NextResponse.json(
-      { error: "source가 비어있습니다." },
-      { status: 400 },
-    );
+async function generateProblemSet({ source }: { source: string }) {
+  const session = await getServerSession();
+
+  if (!session || !session.user?.email) {
+    return { error: "Unauthorized" };
   }
 
+  if (!source) {
+    return { error: "source가 비어있습니다." };
+  }
 
   // 대화 프롬프트 템플릿 생성
   const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -78,14 +87,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (parsedJson === null) {
-      return NextResponse.json(
-        {
-          error: "문제를 생성하는데 실패했습니다..",
-        },
-        {
-          status: 400,
-        },
-      );
+      return { error: "문제를 생성하는데 실패했습니다.." };
     }
 
     console.log(parsedJson);
@@ -127,18 +129,13 @@ export async function POST(req: NextRequest) {
         userEmail: session.user.email,
       });
     } else {
-      return NextResponse.json(
-        { error: "파싱에 실패했습니다." },
-        { status: 400 },
-      );
+      return { error: "파싱에 실패했습니다." };
     }
 
-    return NextResponse.json(parsedJson, { status: 200 });
+    console.log("parsedJson:", parsedJson);
+
   } catch (e) {
     console.error(e);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    return { error: "Internal Server Error" };
   }
 }

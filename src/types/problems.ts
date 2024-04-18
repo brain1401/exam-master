@@ -325,6 +325,8 @@ export const QuestionSchema = z.object({
 export type Question = z.infer<typeof QuestionSchema>;
 
 export const GenerateQuestionResponseSchema = z.object({
+  setTitle: z.string(),
+  setDescription: z.string(),
   questions: z.array(QuestionSchema),
 });
 export type GenerateQuestionResponse = z.infer<

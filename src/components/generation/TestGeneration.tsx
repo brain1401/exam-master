@@ -5,68 +5,50 @@ import { GenerateQuestionResponse } from "@/types/problems";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-
+import { useTransition } from "react";
+import { requestGeneratedProblemSet } from "@/actions/generateProblemsAction";
 export default function TestGeneration() {
-  const [generateQuestionResponse, setGenerateQuestionResponse] =
-    useState<GenerateQuestionResponse | null>(null);
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const [isOCRLoading, setIsOCRLoading] = useState<boolean>(false);
-
   const [file, setFile] = useState<File | null>(null);
-
-  const [step, setStep] = useState<number>(1);
-
   const [document, setDocument] = useState<string>("");
+  const [isPending, startTransition] = useTransition();
+
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const serverAction = async () => {
       try {
-        setIsLoading(true);
-
-        const res = await axios.post<GenerateQuestionResponse>(
-          "/api/generateProblemsClaude",
-          {
+        startTransition(async () => {
+          const { error, success } = await requestGeneratedProblemSet({
             source: document,
-          },
-        );
-        const data = res.data;
+          });
 
-        if (data === null) {
-          alert("문제를 생성하는데 실패했습니다..");
-        } else {
-          setGenerateQuestionResponse(data);
-        }
+          if (success) {
+            setIsSuccess(true);
+          } else if (error) {
+            throw new Error(error);
+          }
+        });
       } catch (e) {
         if (e instanceof Error) {
           alert(e.message);
         }
-      } finally {
-        setIsLoading(false);
-        setStep(1);
       }
     };
 
     if (document !== "") {
-      fetch();
+      serverAction();
+      setDocument("");
     }
   }, [document]);
 
-  useEffect(() => {
-    console.log("generateQuestionResponse :", {
-      ...generateQuestionResponse,
-      questions: generateQuestionResponse?.questions?.toSorted((a, b) =>
-        a.question < b.question ? -1 : 1,
-      ),
-    });
-  }, [generateQuestionResponse]);
-
   return (
     <div className="flex flex-col items-center justify-center">
-      
-      {isLoading && <div>로딩중... {`단계 ${step}`}</div>}
-      <div>{generateQuestionResponse?.questions?.toString()}</div>
+      {isSuccess && (
+        <div>
+          문제 생성 요청 성공! 5분 정도 후 내 문제 관리 메뉴로 가보세요.
+        </div>
+      )}
 
       <div className="mt-10 space-y-2">
         <Input
@@ -86,7 +68,6 @@ export default function TestGeneration() {
               alert("파일을 선택해주세요.");
               return;
             }
-
             try {
               setIsOCRLoading(true);
 
