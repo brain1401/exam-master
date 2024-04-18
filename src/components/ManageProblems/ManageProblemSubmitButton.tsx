@@ -11,6 +11,7 @@ import {
   isProblemEmpty,
 } from "@/utils/problems";
 import axios from "axios";
+import { UpdateProblemsSetData } from "@/types/problems";
 type Props = {
   uuid: string;
 };
@@ -111,28 +112,27 @@ export default function ManageProblemSubmitButton({ uuid }: Props) {
       console.timeEnd("processImagesAndUpload");
       console.log("uploadedImages : ", uploadedImages);
 
-      // FormData 생성
-      const formData = new FormData();
-      problems.forEach((problem, index) => {
-        formData.append(
-          `image[${index}]`,
-          uploadedImages[index]?.imageKey ?? "null",
-        );
-        formData.append(`data[${index}]`, JSON.stringify(problem));
-      });
-      formData.append("problemSetsName", problemSetsName);
-      formData.append("problemSetIsPublic", problemSetIsPublic.toString());
-      formData.append("timeLimit", timeLimit);
-      formData.append("description", description);
-      formData.append("uuid", uuid);
+      const data: UpdateProblemsSetData = {
+        problems: problems.map((problem, index) => {
+          const imageKey = uploadedImages[index]?.imageKey;
+          
+          return {
+            ...(problem as NonNullable<typeof problem>),
+            image: imageKey ? { key: imageKey } : null,
+          };
+        }),
+        problemSetName: problemSetsName,
+        problemSetIsPublic,
+        timeLimit,
+        description,
+        problemSetUUID: uuid,
+      };
 
       try {
-        const response = await fetch("/api/updateProblems", {
-          method: "PUT",
-          body: formData,
-        });
+        const response = await axios.put("/api/updateProblems", data);
 
-        const result = await response.json();
+        const result = response.data;
+
         if (result === true) {
           alert("문제집이 성공적으로 등록되었습니다.");
         } else {

@@ -13,6 +13,7 @@ import {
   analyzeProblemsImagesAndDoCallback,
 } from "@/utils/problems";
 import useRevalidation from "@/hooks/useRevalidate";
+import { UpdateProblemsSetData } from "@/types/problems";
 
 export default function CreateProblemsSubmitButton() {
   const {
@@ -116,27 +117,23 @@ export default function CreateProblemsSubmitButton() {
       console.timeEnd("processImagesAndUpload");
       console.log("uploadedImages : ", handledImages);
 
-      const formData = new FormData();
+      const createData: UpdateProblemsSetData = {
+        problems: problems.map((problem, index) => {
+          const imageKey = handledImages[index]?.imageKey;
+          return {
+            ...(problem as NonNullable<typeof problem>),
+            image: imageKey ? { key: imageKey } : null,
+          };
+        }),
+        problemSetName: problemSetsName,
+        problemSetIsPublic,
+        timeLimit,
+        description,
+      };
 
-      problems.forEach((problem, index) => {
-        formData.append(
-          `image[${index}]`,
-          handledImages[index]?.imageKey ?? "null",
-        );
+      const response = await axios.post("/api/postProblems", createData);
 
-        formData.append(`data[${index}]`, JSON.stringify(problem));
-      });
-      formData.append("problemSetsName", problemSetsName);
-      formData.append("description", description);
-      formData.append("timeLimit", timeLimit);
-      formData.append("problemSetIsPublic", problemSetIsPublic.toString());
-
-      const response = await fetch("/api/postProblems", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success === "OK") {
         alert("문제집이 성공적으로 등록되었습니다.");
