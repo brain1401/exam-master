@@ -3,8 +3,10 @@ import ProtectPage from "@/components/protection/ProtectPage";
 
 export default function TestPage() {
   return (
-    <ProtectPage>
-      <TestGeneration />
-    </ProtectPage>
+    <>
+      <ProtectPage>
+        <TestGeneration />
+      </ProtectPage>
+    </>
   );
 }
