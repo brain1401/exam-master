@@ -39,6 +39,7 @@ jobs:
           ENV_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           ENV_CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           ENV_OPEN_AI_KEY: ${{ secrets.OPEN_AI_KEY }}
+          ENV_NEXT_PUBLIC_PASSWORD_HASH_KEY: ${{ secrets.NEXT_PUBLIC_PASSWORD_HASH_KEY }}
           ENV_TZ: ${{ secrets.TZ }}
 
       - name: create .sentryclirc
