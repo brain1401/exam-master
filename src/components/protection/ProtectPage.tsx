@@ -2,9 +2,7 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { SHA256 } from "crypto-js";
-import { hashKey } from "@/const/hashKey";
-
+import axios from "axios";
 type Props = {
   children: React.ReactNode;
 };
@@ -13,18 +11,21 @@ export default function ProtectPage({ children }: Props) {
 
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
 
-  const passwordHash =
-    "98c3c9ed9c0eda8c835648afc3e10c495b998d6656635e81319e25eb3dcc2ce7";
-
-  const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    const hash = SHA256(password, { hashKey: hashKey }).toString();
+    try {
+      const response = await axios.post("/api/checkGeneratePagePasswordValid", {
+        password,
+      });
 
-    if (hash === passwordHash) {
-      setIsPasswordCorrect(true);
-    } else {
-      alert("비밀번호가 일치하지 않습니다.");
+      if (response.data.success === true) {
+        setIsPasswordCorrect(true);
+      } else {
+        alert("비밀번호가 일치하지 않습니다.");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
