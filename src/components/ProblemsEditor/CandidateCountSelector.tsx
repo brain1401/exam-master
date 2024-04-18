@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ChangeEvent, useLayoutEffect } from "react";
+import { ChangeEvent, useEffect, useLayoutEffect } from "react";
 import useProblems from "@/hooks/useProblems";
 import { Label } from "../ui/label";
 export default function CandidateCountSelector() {
@@ -20,12 +20,13 @@ export default function CandidateCountSelector() {
   } = useProblems();
 
   useLayoutEffect(() => {
-    setCandidatesCount(currentProblem?.candidates?.length.toString() || "4");
-  }, [currentProblem?.candidates?.length, setCandidatesCount, candidatesCount]);
+    const count = currentProblem?.candidates?.length.toString();
+    console.log("count :", count);
 
+    setCandidatesCount(count || "4");
+  }, [currentProblem, setCandidatesCount, candidatesCount]);
 
   const handleSelectedChange = (value: string) => {
-
     if (!currentProblemCandidates) throw new Error("무언가가 잘못되었습니다.");
 
     let newValues = [...currentProblemCandidates];
@@ -54,12 +55,13 @@ export default function CandidateCountSelector() {
 
   return (
     <div className="flex">
-      <div className="flex justify-center items-center">
-        <Label className="block text-[1rem] mr-2">선택지 개수</Label>
+      <div className="flex items-center justify-center">
+        <Label className="mr-2 block text-[1rem]">선택지 개수</Label>
       </div>
 
       <Select
         defaultValue={candidatesCount}
+        value={candidatesCount}
         onValueChange={handleSelectedChange}
       >
         <SelectTrigger className="w-[4rem]">
