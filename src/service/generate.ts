@@ -136,44 +136,84 @@ export async function generateQuestions({
       generatedQuestions.questions = uniqueQuestions;
     }
 
-    await postProblems({
-      isPublic: false,
-      problemSetName: generatedQuestions.setTitle,
-      toBePostedProblems: generatedQuestions.questions.map<
-        NonNullable<ProblemReplacedImageKey>
-      >((question) => ({
-        type: question.type as "obj" | "sub",
-        question: question.question,
-        candidates:
-          question.options?.map((option, i) => {
-            if (Array.isArray(question.answer)) {
-              return {
-                id: i,
-                text: option,
-                isAnswer: question.answer.every(
-                  (answer) => typeof answer === "number",
-                )
-                  ? question.answer.includes(i)
-                  : false,
-              };
-            }
-            return { id: null, text: "", isAnswer: false };
-          }) || null,
-        image: null,
-        subAnswer: typeof question.answer === "string" ? question.answer : null,
-        isAnswerMultiple: question.answer.length > 1,
-        additionalView: "",
-        isAdditionalViewButtonClicked: false,
-        isImageButtonClicked: false,
-      })),
-      timeLimit: 0,
-      description: generatedQuestions.setDescription,
-      userEmail: userEmail,
-    });
-
-
+    if (generatedQuestions.questions.length !== 0) {
+      await postProblems({
+        isPublic: false,
+        problemSetName: generatedQuestions.setTitle,
+        toBePostedProblems: generatedQuestions.questions.map<
+          NonNullable<ProblemReplacedImageKey>
+        >((question) => ({
+          type: question.type as "obj" | "sub",
+          question: question.question,
+          candidates:
+            question.options?.map((option, i) => {
+              if (Array.isArray(question.answer)) {
+                return {
+                  id: i,
+                  text: option,
+                  isAnswer: question.answer.every(
+                    (answer) => typeof answer === "number",
+                  )
+                    ? question.answer.includes(i)
+                    : false,
+                };
+              }
+              return { id: null, text: "", isAnswer: false };
+            }) || null,
+          image: null,
+          subAnswer:
+            typeof question.answer === "string" ? question.answer : null,
+          isAnswerMultiple: question.answer.length > 1,
+          additionalView: "",
+          isAdditionalViewButtonClicked: false,
+          isImageButtonClicked: false,
+        })),
+        timeLimit: 0,
+        description: generatedQuestions.setDescription,
+        userEmail: userEmail,
+      });
+    }
   } catch (e) {
     console.error("error:", e);
-    return generatedQuestions;
+
+    if (generatedQuestions.questions.length !== 0) {
+      console.log("에러 발생으로 인해 지금까지 생성된 문제를 저장합니다.");
+
+      await postProblems({
+        isPublic: false,
+        problemSetName: generatedQuestions.setTitle,
+        toBePostedProblems: generatedQuestions.questions.map<
+          NonNullable<ProblemReplacedImageKey>
+        >((question) => ({
+          type: question.type as "obj" | "sub",
+          question: question.question,
+          candidates:
+            question.options?.map((option, i) => {
+              if (Array.isArray(question.answer)) {
+                return {
+                  id: i,
+                  text: option,
+                  isAnswer: question.answer.every(
+                    (answer) => typeof answer === "number",
+                  )
+                    ? question.answer.includes(i)
+                    : false,
+                };
+              }
+              return { id: null, text: "", isAnswer: false };
+            }) || null,
+          image: null,
+          subAnswer:
+            typeof question.answer === "string" ? question.answer : null,
+          isAnswerMultiple: question.answer.length > 1,
+          additionalView: "",
+          isAdditionalViewButtonClicked: false,
+          isImageButtonClicked: false,
+        })),
+        timeLimit: 0,
+        description: generatedQuestions.setDescription,
+        userEmail: userEmail,
+      });
+    }
   }
 }

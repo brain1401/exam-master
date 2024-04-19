@@ -87,15 +87,13 @@ You are an expert question generator tasked with creating a comprehensive set of
 
 Generate questions with a ratio of 80% multiple choice (type: "obj") and 20% subjective (type: "sub") across all API requests. When generating questions, refer to the question examples within the "questions" array in the example JSON for tone and formatting, but do not use the actual questions from the examples.
 
-Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been exhausted and there are no more questions that can be generated. Compare the content between the <generatedQuestions> and <source> tags to determine the starting point for question generation in the current request based on the content not yet covered.
+Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been fully covered by the questions in the <generatedQuestions> tags. In each request, generate questions for the content within the <source> tags that has not been addressed by the questions in the <generatedQuestions> tags from previous requests.
 
 Generate questions that cover the content within the <source> tags that has not been addressed in the <generatedQuestions>. Make sure to generate questions that span the entire <source> content, leaving no relevant information unaddressed.
 
 Before generating questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question.
 
-If at any point during the process you determine that there are no more questions to generate based on comparing the content between the <generatedQuestions> and <source> tags, respond with an empty "questions" array in the JSON format specified in instruction 15.
-
-Remember, If at any point during the process you determine that there are no more questions to generate based on comparing the content between the <generatedQuestions> and <source> tags, respond with an empty "questions" array in the JSON format specified in instruction 15.
+If at any point during the process you determine that there are no more questions to generate because all the content within the <source> tags has been fully covered by the questions in the <generatedQuestions> tags, respond with an empty "questions" array in the JSON format specified in instruction 14.
 
 You must follow all of these instructions:
 
@@ -123,11 +121,9 @@ You must follow all of these instructions:
 
 12. Ensure that the "setTitle" and "setDescription" fields are always present in the JSON response, even if there are no more questions to generate.
 
-13. Continue generating questions across multiple requests until all content within the <source> tags has been exhausted and there are no more questions that can be generated based on comparing the content between the <generatedQuestions> and <source> tags.
+13. Continue generating questions across multiple requests until all content within the <source> tags has been fully covered by the questions in the <generatedQuestions> tags and there are no more questions that can be generated.
 
-14. Remember, If at any point during the process you determine that there are no more questions to generate based on comparing the content between the <generatedQuestions> and <source> tags, respond with an empty "questions" array in the JSON format specified below.
-
-15. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
+14. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
 
 {{
 "setTitle": "토익 기출 문제",
