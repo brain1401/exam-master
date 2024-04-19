@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
     llm: model,
     prompt: chatPrompt,
     memory: memory,
+    verbose: true,
   });
 
   try {

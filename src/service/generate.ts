@@ -32,7 +32,7 @@ export async function generateQuestions({
 
   try {
     while (retryCount < maxRetryCount) {
-      console.log(`${++i}번째 시도 :`);
+      console.log(`${i}번째 시도 :`);
 
       // 대화 체인을 사용하여 질문 생성
       const result = await chain.call({
@@ -40,7 +40,7 @@ export async function generateQuestions({
         generatedQuestions:
           generatedQuestions.questions.length === 0
             ? ""
-            : JSON.stringify(generatedQuestions),
+            : JSON.stringify(generatedQuestions.questions),
       });
 
       const resultResponse = isAssistantAdded
@@ -65,9 +65,11 @@ export async function generateQuestions({
         continue;
       }
 
-      generatedQuestions.setTitle = response.setTitle;
-      generatedQuestions.setDescription = response.setDescription;
-
+      if (i === 0) {
+        generatedQuestions.setTitle = response.setTitle;
+        generatedQuestions.setDescription = response.setDescription;
+      }
+      
       const newQuestions = response.questions;
       console.log("newQuestions:", newQuestions);
 
