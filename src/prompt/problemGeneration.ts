@@ -3,8 +3,6 @@ import {
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
-} from "@langchain/core/prompts";
-import {
   PromptTemplate,
   AIMessagePromptTemplate,
 } from "@langchain/core/prompts";

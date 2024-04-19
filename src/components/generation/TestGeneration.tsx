@@ -5,42 +5,43 @@ import { GenerateQuestionResponse } from "@/types/problems";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import { useTransition } from "react";
-import { requestGeneratedProblemSet } from "@/actions/generateProblemsAction";
 export default function TestGeneration() {
   const [isOCRLoading, setIsOCRLoading] = useState<boolean>(false);
+  const [isOncePressed, setIsOncePressed] = useState<boolean>(false);
+
   const [file, setFile] = useState<File | null>(null);
   const [document, setDocument] = useState<string>("");
-  const [isPending, startTransition] = useTransition();
 
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   useEffect(() => {
-    const serverAction = async () => {
+    const fetch = async () => {
       try {
-        startTransition(async () => {
-          const { error, success } = await requestGeneratedProblemSet({
-            source: document,
-          });
+        setIsSuccess(false);
 
-          if (success) {
-            setIsSuccess(true);
-          } else if (error) {
-            throw new Error(error);
-          }
+        await axios.post("/api/generateProblemsClaude", {
+          source: document,
         });
       } catch (e) {
         if (e instanceof Error) {
           alert(e.message);
         }
+      } finally {
+        setIsSuccess(true);
       }
     };
 
     if (document !== "") {
-      serverAction();
+      fetch();
       setDocument("");
     }
   }, [document]);
+
+  useEffect(() => {
+    if (isOCRLoading) {
+      setIsOncePressed(true);
+    }
+  }, [isOCRLoading]);
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -63,6 +64,7 @@ export default function TestGeneration() {
         />
         <Button
           isLoading={isOCRLoading}
+          disabled={isOncePressed}
           onClick={async () => {
             if (!file) {
               alert("파일을 선택해주세요.");

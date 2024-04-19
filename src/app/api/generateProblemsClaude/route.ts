@@ -1,14 +1,8 @@
-import {
-  GenerateQuestionResponse,
-  GenerateQuestionResponseSchema,
-  ProblemReplacedImageKey,
-} from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ConversationChain } from "langchain/chains";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { postProblems } from "@/service/problems";
 import { BufferMemory } from "langchain/memory";
 import {
   assistantMessage,
@@ -42,13 +36,12 @@ export async function POST(req: NextRequest) {
 
   const source: string | undefined = requestBody.source;
 
-  if(!source) {
+  if (!source) {
     return NextResponse.json(
       { error: "source가 비어있습니다." },
       { status: 400 },
     );
   }
-
 
   // 대화 프롬프트 템플릿 생성
   const chatPrompt = ChatPromptTemplate.fromMessages([
@@ -69,71 +62,14 @@ export async function POST(req: NextRequest) {
   });
 
   try {
-    const parsedJson: GenerateQuestionResponse | null = await generateQuestions(
-      {
-        source,
-        conversationChain: chain,
-        isAssistantAdded: true,
-      },
-    );
+    generateQuestions({
+      source,
+      conversationChain: chain,
+      isAssistantAdded: true,
+      userEmail: session.user.email,
+    });
 
-    if (parsedJson === null) {
-      return NextResponse.json(
-        {
-          error: "문제를 생성하는데 실패했습니다..",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    console.log(parsedJson);
-
-    if (GenerateQuestionResponseSchema.safeParse(parsedJson).success === true) {
-      await postProblems({
-        isPublic: false,
-        problemSetName: parsedJson.setTitle,
-        toBePostedProblems: parsedJson.questions.map<
-          NonNullable<ProblemReplacedImageKey>
-        >((question) => ({
-          type: question.type as "obj" | "sub",
-          question: question.question,
-          candidates:
-            question.options?.map((option, i) => {
-              if (Array.isArray(question.answer)) {
-                return {
-                  id: i,
-                  text: option,
-                  isAnswer: question.answer.every(
-                    (answer) => typeof answer === "number",
-                  )
-                    ? question.answer.includes(i)
-                    : false,
-                };
-              }
-              return { id: null, text: "", isAnswer: false };
-            }) || null,
-          image: null,
-          subAnswer:
-            typeof question.answer === "string" ? question.answer : null,
-          isAnswerMultiple: question.answer.length > 1,
-          additionalView: "",
-          isAdditionalViewButtonClicked: false,
-          isImageButtonClicked: false,
-        })),
-        timeLimit: 0,
-        description: parsedJson.setDescription,
-        userEmail: session.user.email,
-      });
-    } else {
-      return NextResponse.json(
-        { error: "파싱에 실패했습니다." },
-        { status: 400 },
-      );
-    }
-
-    return NextResponse.json(parsedJson, { status: 200 });
+    return NextResponse.json({ success: "요청 생성됨" }, { status: 200 });
   } catch (e) {
     console.error(e);
     return NextResponse.json(

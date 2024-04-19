@@ -1,19 +1,23 @@
 import { exampleQuestions } from "@/prompt/problemGeneration";
 import {
   GenerateQuestionResponseSchema,
+  ProblemReplacedImageKey,
   type GenerateQuestionResponse,
 } from "@/types/problems";
 import type { ConversationChain } from "langchain/chains";
+import { postProblems } from "./problems";
 
 // 질문 생성 함수
 export async function generateQuestions({
   source,
   conversationChain: chain,
   isAssistantAdded,
+  userEmail,
 }: {
   source: string;
   conversationChain: ConversationChain;
   isAssistantAdded?: boolean;
+  userEmail: string;
 }) {
   let retryCount = 0;
   const maxRetryCount = 3;
@@ -132,7 +136,42 @@ export async function generateQuestions({
       generatedQuestions.questions = uniqueQuestions;
     }
 
-    return generatedQuestions.questions.length > 0 ? generatedQuestions : null;
+    await postProblems({
+      isPublic: false,
+      problemSetName: generatedQuestions.setTitle,
+      toBePostedProblems: generatedQuestions.questions.map<
+        NonNullable<ProblemReplacedImageKey>
+      >((question) => ({
+        type: question.type as "obj" | "sub",
+        question: question.question,
+        candidates:
+          question.options?.map((option, i) => {
+            if (Array.isArray(question.answer)) {
+              return {
+                id: i,
+                text: option,
+                isAnswer: question.answer.every(
+                  (answer) => typeof answer === "number",
+                )
+                  ? question.answer.includes(i)
+                  : false,
+              };
+            }
+            return { id: null, text: "", isAnswer: false };
+          }) || null,
+        image: null,
+        subAnswer: typeof question.answer === "string" ? question.answer : null,
+        isAnswerMultiple: question.answer.length > 1,
+        additionalView: "",
+        isAdditionalViewButtonClicked: false,
+        isImageButtonClicked: false,
+      })),
+      timeLimit: 0,
+      description: generatedQuestions.setDescription,
+      userEmail: userEmail,
+    });
+
+
   } catch (e) {
     console.error("error:", e);
     return generatedQuestions;
