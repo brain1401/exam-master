@@ -101,7 +101,7 @@ You must follow all of these instructions:
 
 2. For multiple choice questions, each question must have 4 answer options. Indicate the correct answer(s) for each question by providing the exact index number(s) of the correct option(s) from the "options" array in the "answer" array (e.g., [0] if the first option is correct, [1] if the second option is correct, [0, 2] if the first and third options are correct, etc.). Set the "type" key to "obj" for multiple choice questions. Some questions may have multiple correct answers.
 
-3. For multiple choice questions where the "answer" array contains more than one index number, explicitly state "해당하는 것을 모두 고르시오" in the question text to clearly indicate that the question has more than one correct answer. Only include this instruction if the "answer" array has multiple elements.
+3. For multiple choice questions with more than one correct answer (i.e., where the "answer" array contains multiple index numbers), you MUST explicitly state "해당하는 것을 모두 고르시오" in the question text to clearly indicate that the question has multiple correct answers. This instruction should be included ONLY for questions with multiple correct answers, and not for single-answer questions.
 
 4. For subjective questions, provide the question and a detailed, comprehensive answer that covers all relevant information. The answer should include key terms, phrases, concepts, and explanations that demonstrate a thorough understanding of the topic. Set the "type" key to "sub" for subjective questions.
 
