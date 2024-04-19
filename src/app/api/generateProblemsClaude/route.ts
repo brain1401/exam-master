@@ -15,7 +15,7 @@ const sonnet = "anthropic.claude-3-sonnet-20240229-v1:0";
 const opus = "anthropic.claude-3-opus-20240229-v1:0";
 
 const model = new BedrockChat({
-  temperature: 0.5,
+  temperature: 0.2,
   region: "us-west-2",
   model: opus,
   maxTokens: 4000,
