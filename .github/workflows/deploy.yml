@@ -41,7 +41,7 @@ jobs:
           ENV_OPEN_AI_KEY: ${{ secrets.OPEN_AI_KEY }}
           ENV_PASSWORD_HASH_KEY: ${{ secrets.PASSWORD_HASH_KEY }}
           ENV_AZURE_KEY: ${{ secrets.AZURE_KEY }}
-          AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
+          ENV_AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
           ENV_TZ: ${{ secrets.TZ }}
 
       - name: create .sentryclirc
