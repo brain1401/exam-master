@@ -14,7 +14,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           <div
             ref={ref}
             className={cn(
-              "flex h-[9.5rem]  w-full cursor-pointer flex-col rounded-[0.66rem] border bg-card text-left text-card-foreground shadow-sm hover:shadow-md md:h-full",
+              "flex h-[9.5rem] w-full cursor-pointer flex-col rounded-[0.66rem] border bg-card text-left text-card-foreground shadow-sm hover:shadow-md md:h-full",
               className,
             )}
             {...props}
@@ -69,7 +69,7 @@ const CardDescription = React.forwardRef<
   <p
     ref={ref}
     className={cn(
-      "truncate text-left text-sm text-muted-foreground",
+      "line-clamp-1 text-left text-sm text-muted-foreground",
       className,
     )}
     {...props}
