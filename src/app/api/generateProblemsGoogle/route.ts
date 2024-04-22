@@ -3,8 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ConversationChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
-import { problemGenerationChatPrompt } from "@/prompt/problemGeneration";
+import {
+  defaultTotalQuestionsPromptWithJSON,
+  multipleChoiceTotalQuestionsPromptWithJSON,
+  objectiveProblemGenerationChatPromptWithJSON,
+  problemGenerationChatPrompt,
+  problemGenerationChatPromptWithJSON,
+  subjectiveProblemGenerationChatPromptWithJSON,
+  subjectiveTotalQuestionsPromptWithJSON,
+} from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
+import { CreateOption } from "@/types/problems";
 
 const model = new ChatGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GEMINI_API,
@@ -23,6 +32,26 @@ export async function POST(req: NextRequest) {
   const requestBody = await req.json();
 
   const source: string = requestBody.source;
+  const createOption = requestBody.createOption as CreateOption;
+
+  let problemGenerationPrompt;
+  let totalQuestionsPrompt;
+
+  switch (createOption) {
+    case "obj":
+      problemGenerationPrompt = objectiveProblemGenerationChatPromptWithJSON;
+      totalQuestionsPrompt = multipleChoiceTotalQuestionsPromptWithJSON;
+      break;
+    case "sub":
+      problemGenerationPrompt = subjectiveProblemGenerationChatPromptWithJSON;
+      totalQuestionsPrompt = subjectiveTotalQuestionsPromptWithJSON;
+      break;
+    default:
+      problemGenerationPrompt = problemGenerationChatPromptWithJSON;
+      totalQuestionsPrompt = defaultTotalQuestionsPromptWithJSON;
+  }
+
+  const totalQuestionsChain = totalQuestionsPrompt.pipe(model);
 
   const memory = new BufferMemory({
     inputKey: "source",
@@ -38,6 +67,7 @@ export async function POST(req: NextRequest) {
   try {
     generateQuestions({
       source,
+      totalQuestionsChain: totalQuestionsChain,
       conversationChain: chain,
       userEmail: session.user?.email,
     });
