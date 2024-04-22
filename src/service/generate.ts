@@ -33,6 +33,11 @@ export async function generateQuestions({
   isAssistantAdded?: boolean;
   userEmail: string;
 }) {
+
+  await noticeToPhone({
+    title: "문제 생성 시작",
+    body: `사용자 이메일:${userEmail}\n문제 생성 시작`,
+  });
   let retryCount = 0;
   const maxRetryCount = 3;
 
