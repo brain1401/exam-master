@@ -71,6 +71,7 @@ import {
 import { s3Client } from "@/utils/AWSs3Client";
 import drizzleSession from "@/db/drizzle";
 import { problemShuffle } from "@/utils/problemShuffle";
+import { evaluateSubjectiveProblem } from "./evaluateSubjectiveQuestion";
 
 export async function postProblems({
   problemSetName,
@@ -2369,15 +2370,39 @@ export async function evaluateExamProblems(
             throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
           }
 
+          let evaluationResult: boolean;
+
+          // 정답 가져오기
           const answer: CorrectAnswer = await getAnswerByProblemUuid(
             examProblem.uuid,
             dt,
           );
 
-          const evaluationResult = await validateExamProblemAnswer(
-            examProblem,
-            answer,
-          );
+          if (examProblem.type === "sub") {
+            if (typeof examProblem.subAnswer !== "string") {
+              throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
+            }
+            if (examProblem.subAnswer === "") {
+              evaluationResult = false;
+            } else {
+              const subjectiveEvaluation = await evaluateSubjectiveProblem({
+                question: examProblem.question,
+                answer: examProblem.subAnswer,
+                userAnswer: examProblem.subAnswer,
+              });
+
+              if (subjectiveEvaluation) {
+                evaluationResult = subjectiveEvaluation.isCorrect;
+              } else {
+                throw new Error("주관식 문제 평가 중 오류가 발생했습니다.");
+              }
+            }
+          } else {
+            evaluationResult = await validateExamProblemAnswer(
+              examProblem,
+              answer,
+            );
+          }
 
           await postExamProblemResult({
             order: index + 1,
