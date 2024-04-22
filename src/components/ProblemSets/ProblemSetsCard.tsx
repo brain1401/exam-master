@@ -67,6 +67,10 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
     console.log("localTimeLimit :", localTimeLimit);
   }, [localTimeLimit]);
 
+  useEffect(() => {
+    console.log("isDeleteButtonClicked :", isDeleteButtonClicked);
+  }, [isDeleteButtonClicked]);
+
   // toDeletedUuid가 외부에서 변경되었을 때 isSelected 동기화
   useEffect(() => {
     setIsSelected(
@@ -94,12 +98,12 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
   );
 
   const handleCardClick = () => {
-    console.log("localTimeLimit in handleCardClick :", localTimeLimit);
-    if (localTimeLimit !== "0") {
-      setIsDialogOpen(true);
-    } else {
-      console.log("else문 안에 들어옴");
-      router.push(`/exam/${problemSet.uuid}`);
+    if (!isDeleteButtonClicked) {
+      if (localTimeLimit !== "0") {
+        setIsDialogOpen(true);
+      } else {
+        router.push(`/exam/${problemSet.uuid}`);
+      }
     }
   };
 
@@ -121,20 +125,22 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
   );
 
   return isDeleteButtonClicked ? (
-    <button
-      className="relative flex w-full cursor-pointer flex-col items-center"
-      onClick={() => {
-        if (isDeleteButtonClicked) {
-          if (isSelected === false) {
-            addToDeletedUuid(problemSet.uuid);
-          } else {
-            removeToDeletedUuid(problemSet.uuid);
+    <div className="relative flex justify-center">
+      <button
+        className="flex w-full cursor-pointer flex-col items-center"
+        onClick={() => {
+          if (isDeleteButtonClicked) {
+            if (isSelected === false) {
+              addToDeletedUuid(problemSet.uuid);
+            } else {
+              removeToDeletedUuid(problemSet.uuid);
+            }
+            setIsSelected(!isSelected);
           }
-          setIsSelected(!isSelected);
-        }
-      }}
-    >
-      {CustomCard}
+        }}
+      >
+        {CustomCard}
+      </button>
       {isDeleteButtonClicked && (
         <Checkbox
           className="absolute top-[calc(100%+.2rem)] md:top-[calc(100%+.8rem)]"
@@ -151,7 +157,7 @@ export default function ProblemSetsCard({ type, problemSet }: Props) {
           }}
         />
       )}
-    </button>
+    </div>
   ) : type === "manage" ? (
     <Link href={`/manage/${problemSet.uuid}`}>{CustomCard}</Link>
   ) : (
