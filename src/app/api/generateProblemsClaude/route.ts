@@ -7,6 +7,9 @@ import {
   objectiveProblemGenerationChatPromptWithJSON,
   subjectiveProblemGenerationChatPromptWithJSON,
   problemGenerationChatPromptWithJSON,
+  defaultTotalQuestionsPromptWithJSON,
+  subjectiveTotalQuestionsPromptWithJSON,
+  multipleChoiceTotalQuestionsPromptWithJSON,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 import { claudeOpus } from "@/const/bedrockClaudeModel";
@@ -43,34 +46,41 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let prompt;
+  let problemGenerationPrompt;
+  let totalQuestionsPrompt;
 
   switch (createOption) {
     case "obj":
-      prompt = objectiveProblemGenerationChatPromptWithJSON;
+      problemGenerationPrompt = objectiveProblemGenerationChatPromptWithJSON;
+      totalQuestionsPrompt = multipleChoiceTotalQuestionsPromptWithJSON;
       break;
     case "sub":
-      prompt = subjectiveProblemGenerationChatPromptWithJSON;
+      problemGenerationPrompt = subjectiveProblemGenerationChatPromptWithJSON;
+      totalQuestionsPrompt = subjectiveTotalQuestionsPromptWithJSON;
       break;
     default:
-      prompt = problemGenerationChatPromptWithJSON;
+      problemGenerationPrompt = problemGenerationChatPromptWithJSON;
+      totalQuestionsPrompt = defaultTotalQuestionsPromptWithJSON;
   }
+
+  const totalQuestionsChain = totalQuestionsPrompt.pipe(model);
 
   const memory = new BufferMemory({
     inputKey: "source",
   });
 
   // 대화 체인 생성
-  const chain = new ConversationChain({
+  const conversationChain = new ConversationChain({
     llm: model,
-    prompt: prompt,
+    prompt: problemGenerationPrompt,
     memory: memory,
   });
 
   try {
     generateQuestions({
       source,
-      conversationChain: chain,
+      totalQuestionsChain,
+      conversationChain,
       isAssistantAdded: true,
       userEmail: session.user.email,
     });

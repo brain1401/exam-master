@@ -3,8 +3,6 @@ import {
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
-  PromptTemplate,
-  AIMessagePromptTemplate,
 } from "@langchain/core/prompts";
 import { jsonAssistantMessage } from "./JSONoutputAssistant";
 
@@ -12,7 +10,8 @@ import { jsonAssistantMessage } from "./JSONoutputAssistant";
 export const exampleQuestions: GenerateQuestionResponse["questions"] = [
   {
     type: "obj",
-    question: "다음 중 데이터베이스 정규화의 목적으로 가장 적절한 것을 모두 고르시오.",
+    question:
+      "다음 중 데이터베이스 정규화의 목적으로 가장 적절한 것을 모두 고르시오.",
     options: [
       "데이터의 중복을 최소화하여 저장 공간을 효율적으로 사용하기 위해",
       "데이터 간의 관계를 복잡하게 만들어 데이터 보안을 강화하기 위해",
@@ -75,30 +74,125 @@ export const exampleQuestions: GenerateQuestionResponse["questions"] = [
   },
 ];
 
-export const totalQuestionsPrompt = new PromptTemplate({
-  template: `Based on the given <SourceText> tags below, how many total questions should be generated to comprehensively cover the content? The questions should be a mix of multiple choice (type: "obj") and short answer (type: "sub") questions, with a ratio of 80% multiple choice and 20% short answer.
+export const TotalQuestionsHumanTemplate =
+  HumanMessagePromptTemplate.fromTemplate(
+    `
+<SourceText>{source}</SourceText>
+`,
+  );
 
-Respond ONLY in JSON format, without any additional remarks, using the following key:
+export const defaultTotalQuestionsSystemTemplate =
+  SystemMessagePromptTemplate.fromTemplate(
+    `Based on the given <SourceText> tags below, analyze the content and determine the main topics. Then, decide how many questions should be generated for each topic to comprehensively cover the content. The total number of questions should be proportional to the content of each topic.
+
+The questions should be a mix of multiple choice (type: "obj") and subjective (type: "sub") questions, with a ratio of 80% multiple choice and 20% subjective.
+
+For multiple choice questions, each question should have 4 options, and the number of correct options can vary from 1 to 4.
+
+Generate topics and the number of questions for each topic based on the <SourceText> tags in a way that ensures all the information given in the source text can be made into questions, leaving no unaddressed questions. For each topic, also specify the question types ("obj" for multiple choice, "sub" for subjective) and their respective counts to maintain the 80% multiple choice and 20% subjective ratio.
+
+Respond ONLY in JSON format, without any additional remarks, using the following keys:
 {{
-"totalQuestions": ( total_number_of_questions )
-}}
+"totalQuestions": (total_number_of_questions),
+"topics": [
+  "(topic_1): generate (number_of_multiple_choice_questions_for_topic_1) multiple choice questions, generate (number_of_short_answer_questions_for_topic_1) subjective questions",
+  "(topic_2): generate (number_of_multiple_choice_questions_for_topic_2) multiple choice questions, generate (number_of_short_answer_questions_for_topic_2) subjective questions",
+  ...
+]
+}}`,
+  );
 
-<SourceText>{source}</SourceText>`,
-  inputVariables: ["source"],
-});
+// 대화 프롬프트 템플릿 생성
+export const defaultTotalQuestionsPrompt = ChatPromptTemplate.fromMessages([
+  defaultTotalQuestionsSystemTemplate,
+  TotalQuestionsHumanTemplate,
+]);
 
-const systemTemplate = `
-You are an expert question generator tasked with creating a comprehensive set of questions based on the entire content within the <source> tags. The question generation process will span multiple requests to gradually cover all the content. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
+// 대화 프롬프트 템플릿 생성
+export const defaultTotalQuestionsPromptWithJSON =
+  ChatPromptTemplate.fromMessages([
+    defaultTotalQuestionsSystemTemplate,
+    TotalQuestionsHumanTemplate,
+    jsonAssistantMessage,
+  ]);
+
+export const multipleChoiceTotalQuestionsTemplate =
+  SystemMessagePromptTemplate.fromTemplate(`Based on the given <SourceText> tags below, analyze the content and determine the main topics. Then, decide how many multiple choice questions should be generated for each topic to comprehensively cover the content. The total number of questions should be proportional to the content of each topic.
+
+Each multiple choice question should have 4 options, and the number of correct options can vary from 1 to 4.
+
+Generate topics and the number of questions for each topic based on the <SourceText> tags in a way that ensures all the information given in the source text can be made into questions, leaving no unaddressed questions.
+
+Respond ONLY in JSON format, without any additional remarks, using the following keys:
+{{
+"totalQuestions": (total_number_of_multiple_choice_questions),
+"topics": [
+  "(topic_1): generate (number_of_multiple_choice_questions_for_topic_1) multiple choice questions",
+  "(topic_2): generate (number_of_multiple_choice_questions_for_topic_2) multiple choice questions",
+  ...
+]
+}}`);
+
+// 대화 프롬프트 템플릿 생성
+export const multipleChoiceTotalQuestionsPrompt =
+  ChatPromptTemplate.fromMessages([
+    defaultTotalQuestionsSystemTemplate,
+    TotalQuestionsHumanTemplate,
+  ]);
+
+// 대화 프롬프트 템플릿 생성
+export const multipleChoiceTotalQuestionsPromptWithJSON =
+  ChatPromptTemplate.fromMessages([
+    defaultTotalQuestionsSystemTemplate,
+    TotalQuestionsHumanTemplate,
+    jsonAssistantMessage,
+  ]);
+
+export const subjectiveTotalQuestionsTemplate =
+  SystemMessagePromptTemplate.fromTemplate(`Based on the given <SourceText> tags below, analyze the content and determine the main topics. Then, decide how many subjective questions should be generated for each topic to comprehensively cover the content. The total number of questions should be proportional to the content of each topic.
+
+  The questions should be subjective (type: "sub") questions,
+
+Generate topics and the number of questions for each topic based on the <SourceText> tags in a way that ensures all the information given in the source text can be made into questions, leaving no unaddressed questions.
+
+Respond ONLY in JSON format, without any additional remarks, using the following keys:
+{{
+"totalQuestions": (total_number_of_subjective_questions),
+"topics": [
+  "(topic_1): generate (number_of_subjective_questions_for_topic_1) subjective questions",
+  "(topic_2): generate (number_of_subjective_questions_for_topic_2) subjective questions",
+  ...
+]
+}}`);
+
+// 대화 프롬프트 템플릿 생성
+export const subjectiveTotalQuestionsPrompt = ChatPromptTemplate.fromMessages([
+  defaultTotalQuestionsSystemTemplate,
+  TotalQuestionsHumanTemplate,
+]);
+
+// 대화 프롬프트 템플릿 생성
+export const subjectiveTotalQuestionsPromptWithJSON =
+  ChatPromptTemplate.fromMessages([
+    defaultTotalQuestionsSystemTemplate,
+    TotalQuestionsHumanTemplate,
+    jsonAssistantMessage,
+  ]);
+
+const defaultSystemTemplate = `
+You are an expert question generator tasked with creating a comprehensive set of multiple choice questions based on the entire content within the <source> tags, while strictly adhering to the "topics" array values provided in the <topics> tag. The question generation process will span multiple requests, with each request generating a maximum of 6 questions to gradually cover all the content. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
+
+For each request, you MUST generate multiple choice questions strictly based on the "topics" array values provided in the <topics> tag, which contains the "topics" array from the previous request's JSON response. The number of questions generated for each topic should not exceed the corresponding value in the "topics" array and the total number of questions per request MUST NOT exceed 6 under any circumstances. This is crucial to ensure comprehensive coverage of the <source> content.
 
 Generate questions with a ratio of 80% multiple choice (type: "obj") and 20% subjective (type: "sub") across all API requests. When generating questions, refer to the question examples within the "questions" array in the example JSON for tone and formatting, but do not use the actual questions from the examples.
 
-Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been fully covered by the questions in the <generatedQuestions> tags. In each request, generate as many questions as needed to substantially cover the remaining content within the <source> tags that has not been addressed by the questions in the <generatedQuestions> tags from previous requests. The number of questions per request should be sufficient to make meaningful progress towards complete coverage of the <source> content.
+Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been fully covered by the questions in the <generatedQuestions> tags. In each request, meticulously analyze the <topics>, <source>, and <generatedQuestions> tags to identify the remaining questions to be generated, excluding those that have already been created in previous requests. Generate questions for the topics and the number of questions per topic as specified in the "topics" array provided in the <topics> tag, focusing on the content that has not been addressed in the <generatedQuestions>. The number of questions per topic should not exceed the values in the "topics" array and the total number of questions per request MUST NOT exceed 6 under any circumstances to ensure comprehensive coverage of the <source> content.
 
-Generate questions that cover the content within the <source> tags that has not been addressed in the <generatedQuestions>. Make sure to generate questions that span the entire <source> content, leaving no relevant information unaddressed. Thoroughly review the <source> content and the <generatedQuestions> to ensure comprehensive coverage without gaps or redundancies.
+Make sure to generate questions that span the entire <source> content, leaving no relevant information unaddressed. Thoroughly review the <source> content and the <generatedQuestions> to ensure comprehensive coverage without gaps or redundancies.
 
 Before generating questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question.
 
-After generating questions for each request, meticulously compare the content within the <source> tags and the cumulative questions generated so far, including those in the <generatedQuestions> tags. Systematically analyze whether the <source> content has been comprehensively covered by the questions, ensuring that all key information, concepts, and details have been addressed. If any part of the <source> content remains unaddressed or inadequately covered, continue generating questions in subsequent requests until complete coverage is achieved. Only respond with an empty "questions" array in the JSON format specified in instruction 14 after thorough analysis confirms that the <source> content has been exhaustively covered by the questions across all requests, leaving no relevant information unaddressed. Do not prematurely end the question generation process.
+After generating questions for each request, meticulously compare the content within the <source> tags and the cumulative questions generated so far, including those in the <generatedQuestions> tags. Systematically analyze whether the <source> content has been comprehensively covered by the questions, ensuring that all key information, concepts, and details have been addressed. If any part of the <source> content remains unaddressed or inadequately covered, continue generating questions in subsequent requests until complete coverage is achieved. Only respond with an empty "questions" array in the JSON format specified in instruction 15 after thorough analysis of the <topics>, <source>, and <generatedQuestions> tags confirms that the <source> content has been exhaustively covered by the questions across all requests, leaving no relevant information unaddressed. Do not prematurely end the question generation process.
 
 You must follow all of these instructions:
 
@@ -126,9 +220,11 @@ You must follow all of these instructions:
 
 12. Ensure that the "setTitle" and "setDescription" fields are always present in the JSON response, even if there are no more questions to generate.
 
-13. Continue generating questions across multiple requests, with a sufficient number of questions per request to make substantial progress towards covering the entire <source> content. Avoid generating an excessive number of questions that compromises relevance.
+13. Continue generating questions across multiple requests, with the number of questions per topic not exceeding the values in the "topics" array provided in the <topics> tag and the total number of questions per request MUST NOT exceed 6 under any circumstances. Avoid generating an excessive number of questions that compromises relevance.
 
-14. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
+14. If thorough analysis of the <topics>, <source>, and <generatedQuestions> tags confirms that all relevant information in the <source> content has been exhaustively covered by the questions across all requests, leaving no unaddressed questions, respond with an empty "questions" array in the JSON format specified in instruction 15. Do not prematurely end the question generation process without meticulously analyzing the <topics>, <source>, and <generatedQuestions> tags.
+
+15. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
 
 {{
 "setTitle": "토익 기출 문제",
@@ -142,12 +238,14 @@ You must follow all of these instructions:
 const humanTemplate = `
 <source>{source}</source>
 
+<topics>{topics}</topics>
+
 <generatedQuestions>{generatedQuestions}</generatedQuestions>
 `;
 
 // 시스템 메시지 프롬프트
 export const problemGenerationSystemPrompt =
-  SystemMessagePromptTemplate.fromTemplate(systemTemplate);
+  SystemMessagePromptTemplate.fromTemplate(defaultSystemTemplate);
 
 // 사용자 입력을 위한 프롬프트
 export const problemGenerationHumanPrompt =
@@ -168,17 +266,19 @@ export const problemGenerationChatPromptWithJSON =
   ]);
 
 const subjectiveSystemTemplate = `
-You are an expert question generator tasked with creating a comprehensive set of subjective questions based on the entire content within the <source> tags. The question generation process will span multiple requests to gradually cover all the content. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
+You are an expert question generator tasked with creating a comprehensive set of subjective questions based on the entire content within the <source> tags, while strictly adhering to the "topics" array values provided in the <topics> tag. The question generation process will span multiple requests, with each request generating a maximum of 6 questions to gradually cover all the content. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
+
+For each request, you MUST generate subjective questions strictly based on the "topics" array values provided in the <topics> tag, which contains the "topics" array from the previous request's JSON response. The number of questions generated for each topic should not exceed the corresponding value in the "topics" array and the total number of questions per request MUST NOT exceed 6 under any circumstances. This is crucial to ensure comprehensive coverage of the <source> content.
 
 Generate only subjective questions (type: "sub") across all API requests. When generating questions, refer to the subjective question examples within the "questions" array in the example JSON for tone and formatting, but do not use the actual questions from the examples.
 
-Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been fully covered by the questions in the <generatedQuestions> tags. In each request, generate as many questions as needed to substantially cover the remaining content within the <source> tags that has not been addressed by the questions in the <generatedQuestions> tags from previous requests. The number of questions per request should be sufficient to make meaningful progress towards complete coverage of the <source> content.
+Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been fully covered by the questions in the <generatedQuestions> tags. In each request, meticulously analyze the <topics>, <source>, and <generatedQuestions> tags to identify the remaining questions to be generated, excluding those that have already been created in previous requests. Generate questions for the topics and the number of questions per topic as specified in the "topics" array provided in the <topics> tag, focusing on the content that has not been addressed in the <generatedQuestions>. The number of questions per topic should not exceed the values in the "topics" array and the total number of questions per request MUST NOT exceed 6 under any circumstances to ensure comprehensive coverage of the <source> content.
 
-Generate questions that cover the content within the <source> tags that has not been addressed in the <generatedQuestions>. Make sure to generate questions that span the entire <source> content, leaving no relevant information unaddressed. Thoroughly review the <source> content and the <generatedQuestions> to ensure comprehensive coverage without gaps or redundancies.
+Make sure to generate questions that span the entire <source> content, leaving no relevant information unaddressed. Thoroughly review the <source> content and the <generatedQuestions> to ensure comprehensive coverage without gaps or redundancies.
 
 Before generating questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question.
 
-After generating questions for each request, meticulously compare the content within the <source> tags and the cumulative questions generated so far, including those in the <generatedQuestions> tags. Systematically analyze whether the <source> content has been comprehensively covered by the questions, ensuring that all key information, concepts, and details have been addressed. If any part of the <source> content remains unaddressed or inadequately covered, continue generating questions in subsequent requests until complete coverage is achieved. Only respond with an empty "questions" array in the JSON format specified in instruction 13 after thorough analysis confirms that the <source> content has been exhaustively covered by the questions across all requests, leaving no relevant information unaddressed. Do not prematurely end the question generation process.
+After generating questions for each request, meticulously compare the content within the <source> tags and the cumulative questions generated so far, including those in the <generatedQuestions> tags. Systematically analyze whether the <source> content has been comprehensively covered by the questions, ensuring that all key information, concepts, and details have been addressed. If any part of the <source> content remains unaddressed or inadequately covered, continue generating questions in subsequent requests until complete coverage is achieved. Only respond with an empty "questions" array in the JSON format specified in instruction 14 after thorough analysis of the <topics>, <source>, and <generatedQuestions> tags confirms that the <source> content has been exhaustively covered by the questions across all requests, leaving no relevant information unaddressed. Do not prematurely end the question generation process.
 
 You must follow all of these instructions:
 
@@ -202,11 +302,13 @@ You must follow all of these instructions:
 
 10. Ensure that the "setTitle" and "setDescription" fields are always present and populated in the JSON response, even if there are no more questions to generate. These fields are crucial for providing context and metadata about the question set.
 
-11. Continue generating questions across multiple requests, with a sufficient and balanced number of questions per request to make substantial and steady progress towards covering the entire <source> content. Strike a balance between generating enough questions to move forward and maintaining the relevance and quality of each question.
+11. Continue generating questions across multiple requests, with the number of questions per topic not exceeding the values in the "topics" array provided in the <topics> tag and the total number of questions per request MUST NOT exceed 6 under any circumstances. Avoid generating an excessive number of questions that compromises relevance.
 
 12. Before providing the final JSON response, thoroughly proofread and refine the generated content to ensure it meets the highest standards of clarity, coherence, and depth. Make any necessary revisions to improve the overall quality and effectiveness of the question set.
 
-13. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
+13. If thorough analysis of the <topics>, <source>, and <generatedQuestions> tags confirms that all relevant information in the <source> content has been exhaustively covered by the questions across all requests, leaving no unaddressed questions, respond with an empty "questions" array in the JSON format specified in instruction 14. Do not prematurely end the question generation process without meticulously analyzing the <topics>, <source>, and <generatedQuestions> tags.
+
+14. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
 
 {{
 "setTitle": "토익 기출 문제",
@@ -234,17 +336,19 @@ export const subjectiveProblemGenerationChatPromptWithJSON =
   ]);
 
 const objectiveSystemTemplate = `
-You are an expert question generator tasked with creating a comprehensive set of multiple choice questions based on the entire content within the <source> tags. The question generation process will span multiple requests to gradually cover all the content. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
+You are an expert question generator tasked with creating a comprehensive set of multiple choice questions based on the entire content within the <source> tags, while strictly adhering to the "topics" array values provided in the <topics> tag. The question generation process will span multiple requests, with each request generating a maximum of 6 questions to gradually cover all the content. Before generating the JSON output, take a deep breath and carefully consider my requirements and intentions step by step to ensure the output JSON meets my expectations.
+
+For each request, you MUST generate multiple choice questions strictly based on the "topics" array values provided in the <topics> tag, which contains the "topics" array from the previous request's JSON response. The number of questions generated for each topic should not exceed the corresponding value in the "topics" array and the total number of questions per request MUST NOT exceed 6 under any circumstances. This is crucial to ensure comprehensive coverage of the <source> content.
 
 Generate only multiple choice questions (type: "obj") across all API requests. When generating questions, refer to the multiple choice question examples within the "questions" array in the example JSON for tone and formatting, but do not use the actual questions from the examples.
 
-Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been fully covered by the questions in the <generatedQuestions> tags. In each request, generate as many questions as needed to substantially cover the remaining content within the <source> tags that has not been addressed by the questions in the <generatedQuestions> tags from previous requests. The number of questions per request should be sufficient to make meaningful progress towards complete coverage of the <source> content.
+Throughout this multi-request process, ensure that each request builds upon the previous requests to gradually cover the entire content within the <source> tags until all content has been fully covered by the questions in the <generatedQuestions> tags. In each request, meticulously analyze the <topics>, <source>, and <generatedQuestions> tags to identify the remaining questions to be generated, excluding those that have already been created in previous requests. Generate questions for the topics and the number of questions per topic as specified in the "topics" array provided in the <topics> tag, focusing on the content that has not been addressed in the <generatedQuestions>. The number of questions per topic should not exceed the values in the "topics" array and the total number of questions per request should not exceed 6 to ensure comprehensive coverage of the <source> content.
 
-Generate questions that cover the content within the <source> tags that has not been addressed in the <generatedQuestions>. Make sure to generate questions that span the entire <source> content, leaving no relevant information unaddressed. Thoroughly review the <source> content and the <generatedQuestions> to ensure comprehensive coverage without gaps or redundancies.
+Make sure to generate questions that span the entire <source> content, leaving no relevant information unaddressed. Thoroughly review the <source> content and the <generatedQuestions> to ensure comprehensive coverage without gaps or redundancies.
 
 Before generating questions, carefully review the previously generated questions in the <generatedQuestions> tags to avoid duplicating questions or content. If a potential question or its content overlaps with a previously generated question, discard it and generate a new, unique question.
 
-After generating questions for each request, meticulously compare the content within the <source> tags and the cumulative questions generated so far, including those in the <generatedQuestions> tags. Systematically analyze whether the <source> content has been comprehensively covered by the questions, ensuring that all key information, concepts, and details have been addressed. If any part of the <source> content remains unaddressed or inadequately covered, continue generating questions in subsequent requests until complete coverage is achieved. Only respond with an empty "questions" array in the JSON format specified in instruction 14 after thorough analysis confirms that the <source> content has been exhaustively covered by the questions across all requests, leaving no relevant information unaddressed. Do not prematurely end the question generation process.
+After generating questions for each request, meticulously compare the content within the <source> tags and the cumulative questions generated so far, including those in the <generatedQuestions> tags. Systematically analyze whether the <source> content has been comprehensively covered by the questions, ensuring that all key information, concepts, and details have been addressed. If any part of the <source> content remains unaddressed or inadequately covered, continue generating questions in subsequent requests until complete coverage is achieved. Only respond with an empty "questions" array in the JSON format specified in instruction 15 after thorough analysis of the <topics>, <source>, and <generatedQuestions> tags confirms that the <source> content has been exhaustively covered by the questions across all requests, leaving no relevant information unaddressed. Do not prematurely end the question generation process.
 
 You must follow all of these instructions:
 
@@ -270,11 +374,13 @@ You must follow all of these instructions:
 
 11. Ensure that the "setTitle" and "setDescription" fields are always present and populated in the JSON response, even if there are no more questions to generate. These fields are crucial for providing context and metadata about the question set.
 
-12. Continue generating questions across multiple requests, with a sufficient and balanced number of questions per request to make substantial and steady progress towards covering the entire <source> content. Strike a balance between generating enough questions to move forward and maintaining the relevance, clarity, and quality of each question and its associated elements.
+12. Continue generating questions across multiple requests, with the number of questions per topic not exceeding the values in the "topics" array provided in the <topics> tag and the total number of questions per request not exceeding 6. Avoid generating an excessive number of questions that compromises relevance.
 
 13. Before providing the final JSON response, thoroughly proofread and refine the generated content to ensure it meets the highest standards of accuracy, clarity, and coherence. Review the questions, answer options, correct answers, and explanations to identify and correct any errors, inconsistencies, or areas that need improvement. Make any necessary revisions to enhance the overall quality and effectiveness of the question set.
 
-14. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
+14. If thorough analysis of the <topics>, <source>, and <generatedQuestions> tags confirms that all relevant information in the <source> content has been exhaustively covered by the questions across all requests, leaving no unaddressed questions, respond with an empty "questions" array in the JSON format specified in instruction 15. Do not prematurely end the question generation process without meticulously analyzing the <topics>, <source>, and <generatedQuestions> tags.
+
+15. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in Korean, using the following structure:
 
 {{
 "setTitle": "토익 기출 문제",
@@ -285,6 +391,7 @@ You must follow all of these instructions:
 }}
 
 `;
+
 export const objectiveProblemGenerationSystemPrompt =
   SystemMessagePromptTemplate.fromTemplate(objectiveSystemTemplate);
 
