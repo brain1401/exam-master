@@ -349,3 +349,9 @@ export type UpdateProblemsSetData = {
   description: string;
   problemSetUUID?: string;
 };
+
+export const SubjectiveEvaluationSchema = z.object({
+  isCorrect: z.boolean(),
+});
+
+export type SubjectiveEvaluation = z.infer<typeof SubjectiveEvaluationSchema>;
