@@ -13,7 +13,7 @@ import { claudeOpus } from "@/const/bedrockClaudeModel";
 import { CreateOption } from "@/types/problems";
 
 const model = new BedrockChat({
-  temperature: 0.2,
+  temperature: 0,
   region: "us-west-2",
   model: claudeOpus,
   maxTokens: 4000,
