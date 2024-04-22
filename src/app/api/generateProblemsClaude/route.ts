@@ -78,9 +78,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: "요청 생성됨" }, { status: 200 });
   } catch (e) {
     console.error(e);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    throw e;
   }
 }
