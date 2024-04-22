@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ConversationChain } from "langchain/chains";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { BufferMemory } from "langchain/memory";
 import {
   problemGenerationChatPromptWithJSON,
