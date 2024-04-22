@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { ConversationChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
-import { chatPrompt } from "@/prompt/problemGeneration";
+import { problemGenerationChatPrompt } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 
 const model = new ChatOpenAI({
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   // 대화 체인 생성
   const chain = new ConversationChain({
     llm: model,
-    prompt: chatPrompt,
+    prompt: problemGenerationChatPrompt,
     memory,
   });
 

@@ -5,9 +5,9 @@ import { ConversationChain } from "langchain/chains";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { BufferMemory } from "langchain/memory";
 import {
-  assistantMessage,
-  humanPrompt,
-  systemPrompt,
+  jsonAssistantMessage,
+  problemGenerationHumanPrompt,
+  problemGenerationSystemPrompt,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 import { claudeOpus } from "@/const/bedrockClaudeModel";
@@ -44,9 +44,9 @@ export async function POST(req: NextRequest) {
 
   // 대화 프롬프트 템플릿 생성
   const chatPrompt = ChatPromptTemplate.fromMessages([
-    systemPrompt,
-    humanPrompt,
-    assistantMessage,
+    problemGenerationSystemPrompt,
+    problemGenerationHumanPrompt,
+    jsonAssistantMessage,
   ]);
 
   const memory = new BufferMemory({

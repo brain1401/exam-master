@@ -141,18 +141,18 @@ const humanTemplate = `
 `;
 
 // 시스템 메시지 프롬프트
-export const systemPrompt =
+export const problemGenerationSystemPrompt =
   SystemMessagePromptTemplate.fromTemplate(systemTemplate);
 
 // 사용자 입력을 위한 프롬프트
-export const humanPrompt =
+export const problemGenerationHumanPrompt =
   HumanMessagePromptTemplate.fromTemplate(humanTemplate);
 
 // 대화 프롬프트 템플릿 생성
-export const chatPrompt = ChatPromptTemplate.fromMessages([
-  systemPrompt,
-  humanPrompt,
+export const problemGenerationChatPrompt = ChatPromptTemplate.fromMessages([
+  problemGenerationSystemPrompt,
+  problemGenerationHumanPrompt,
 ]);
 
 // 확실한 JSON 응답을 위한 프롬프트 템플릿
-export const assistantMessage = AIMessagePromptTemplate.fromTemplate("{{");
+export const jsonAssistantMessage = AIMessagePromptTemplate.fromTemplate("{{");
