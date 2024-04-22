@@ -31,6 +31,27 @@ export async function generateQuestions({
     questions: [],
   };
 
+  // 함수 시작 시간 기록
+  const startTime = Date.now();
+
+  // 함수 로깅
+  const checkExecutionTime = async () => {
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - startTime;
+
+    if (elapsedTime > 10 * 60 * 1000) {
+      console.log("함수 실행 시간이 10분을 초과했습니다.");
+      // 추가 작업 수행 (예: 경고 알림, 로깅 등)
+
+      await axios.get(
+        `https://asia-northeast3-noti-lab-production.cloudfunctions.net/api/notification/v1/notification?nickname=Aiden&title=${encodeURIComponent("함수 실행 시간이 10분을 초과했습니다.")}&body=${encodeURIComponent(`generatedQuestions : ${JSON.stringify(generatedQuestions.questions)}`)}&secretKey=a54c661b-3746-492f-9281-ab4eca9fd107`,
+      );
+    }
+  };
+
+  //
+  const checkInterval = setInterval(checkExecutionTime, 60 * 1000); // 1분마다 확인
+
   try {
     while (retryCount < maxRetryCount) {
       console.log(`${i}번째 시도 :`);
@@ -226,5 +247,7 @@ export async function generateQuestions({
         `https://asia-northeast3-noti-lab-production.cloudfunctions.net/api/notification/v1/notification?nickname=Aiden&title=${encodeURIComponent("문제 생성됨 (에러 났지만 에러 난 만큼 보냄)")}&body=${encodeURIComponent(`사용자 이메일:${userEmail}\n문제 ${generatedQuestions.setTitle} 생성됨\n총 ${generatedQuestions.questions.length} 문제 생성됨`)}&secretKey=a54c661b-3746-492f-9281-ab4eca9fd107`,
       );
     }
+  } finally {
+    clearInterval(checkInterval);
   }
 }
