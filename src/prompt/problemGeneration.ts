@@ -6,6 +6,7 @@ import {
   PromptTemplate,
   AIMessagePromptTemplate,
 } from "@langchain/core/prompts";
+import { jsonAssistantMessage } from "./JSONoutputAssistant";
 
 // 예시 질문 생성
 export const exampleQuestions: GenerateQuestionResponse["questions"] = [
@@ -154,5 +155,9 @@ export const problemGenerationChatPrompt = ChatPromptTemplate.fromMessages([
   problemGenerationHumanPrompt,
 ]);
 
-// 확실한 JSON 응답을 위한 프롬프트 템플릿
-export const jsonAssistantMessage = AIMessagePromptTemplate.fromTemplate("{{");
+// JSON ASSISTANT 대화 프롬프트 템플릿 생성
+export const problemGenerationChatPromptWithJSON = ChatPromptTemplate.fromMessages([
+  problemGenerationSystemPrompt,
+  problemGenerationHumanPrompt,
+  jsonAssistantMessage,
+]);

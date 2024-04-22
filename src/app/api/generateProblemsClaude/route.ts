@@ -5,13 +5,10 @@ import { ConversationChain } from "langchain/chains";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { BufferMemory } from "langchain/memory";
 import {
-  jsonAssistantMessage,
-  problemGenerationHumanPrompt,
-  problemGenerationSystemPrompt,
+  problemGenerationChatPromptWithJSON,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 import { claudeOpus } from "@/const/bedrockClaudeModel";
-
 
 const model = new BedrockChat({
   temperature: 0.4,
@@ -42,13 +39,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 대화 프롬프트 템플릿 생성
-  const chatPrompt = ChatPromptTemplate.fromMessages([
-    problemGenerationSystemPrompt,
-    problemGenerationHumanPrompt,
-    jsonAssistantMessage,
-  ]);
-
   const memory = new BufferMemory({
     inputKey: "source",
   });
@@ -56,7 +46,7 @@ export async function POST(req: NextRequest) {
   // 대화 체인 생성
   const chain = new ConversationChain({
     llm: model,
-    prompt: chatPrompt,
+    prompt: problemGenerationChatPromptWithJSON,
     memory: memory,
   });
 
