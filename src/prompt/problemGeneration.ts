@@ -12,7 +12,7 @@ import { jsonAssistantMessage } from "./JSONoutputAssistant";
 export const exampleQuestions: GenerateQuestionResponse["questions"] = [
   {
     type: "obj",
-    question: "다음 중 데이터베이스 정규화의 목적으로 가장 적절한 것은?",
+    question: "다음 중 데이터베이스 정규화의 목적으로 가장 적절한 것을 모두 고르시오.",
     options: [
       "데이터의 중복을 최소화하여 저장 공간을 효율적으로 사용하기 위해",
       "데이터 간의 관계를 복잡하게 만들어 데이터 보안을 강화하기 위해",
@@ -40,7 +40,7 @@ export const exampleQuestions: GenerateQuestionResponse["questions"] = [
   {
     type: "obj",
     question:
-      "유전병 A는 상염색체 열성 유전 형질이다. 이 유전병에 대한 유전자형이 이형접합(Aa)인 남녀가 결혼할 때, 다음 중 이들 사이에서 태어날 자손에 대한 설명으로 옳은 것은?",
+      "유전병 A는 상염색체 열성 유전 형질이다. 이 유전병에 대한 유전자형이 이형접합(Aa)인 남녀가 결혼할 때, 다음 중 이들 사이에서 태어날 자손에 대한 설명으로 옳은 것을 모두 고르시오.",
     options: [
       "자손의 표현형 분리비는 3:1이 될 것이다.",
       "자손의 유전자형 분리비는 1:2:1이 될 것이다.",

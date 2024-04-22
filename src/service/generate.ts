@@ -136,6 +136,7 @@ export async function generateQuestions({
       }
 
       generatedQuestions.questions = uniqueQuestions;
+      i++;
     }
 
     if (generatedQuestions.questions.length !== 0) {
