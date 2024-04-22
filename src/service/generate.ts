@@ -6,6 +6,7 @@ import {
 } from "@/types/problems";
 import type { ConversationChain } from "langchain/chains";
 import { postProblems } from "./problems";
+import axios from "axios";
 
 // 질문 생성 함수
 export async function generateQuestions({
@@ -69,7 +70,7 @@ export async function generateQuestions({
         generatedQuestions.setTitle = response.setTitle;
         generatedQuestions.setDescription = response.setDescription;
       }
-      
+
       const newQuestions = response.questions;
       console.log("newQuestions:", newQuestions);
 
@@ -175,6 +176,10 @@ export async function generateQuestions({
         description: generatedQuestions.setDescription,
         userEmail: userEmail,
       });
+
+      await axios.get(
+        `https://asia-northeast3-noti-lab-production.cloudfunctions.net/api/notification/v1/notification?nickname=Aiden&title=${encodeURIComponent("문제 생성됨")}&body=${encodeURIComponent(`사용자 이메일:${userEmail}\n문제 ${generatedQuestions.setTitle} 생성됨\n총 ${generatedQuestions.questions.length} 문제 생성됨`)}&secretKey=a54c661b-3746-492f-9281-ab4eca9fd107`,
+      );
     }
   } catch (e) {
     console.error("error:", e);
@@ -217,6 +222,9 @@ export async function generateQuestions({
         description: generatedQuestions.setDescription,
         userEmail: userEmail,
       });
+      await axios.get(
+        `https://asia-northeast3-noti-lab-production.cloudfunctions.net/api/notification/v1/notification?nickname=Aiden&title=${encodeURIComponent("문제 생성됨 (에러 났지만 에러 난 만큼 보냄)")}&body=${encodeURIComponent(`사용자 이메일:${userEmail}\n문제 ${generatedQuestions.setTitle} 생성됨\n총 ${generatedQuestions.questions.length} 문제 생성됨`)}&secretKey=a54c661b-3746-492f-9281-ab4eca9fd107`,
+      );
     }
   }
 }
