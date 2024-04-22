@@ -355,3 +355,5 @@ export const SubjectiveEvaluationSchema = z.object({
 });
 
 export type SubjectiveEvaluation = z.infer<typeof SubjectiveEvaluationSchema>;
+
+export type CreateOption = "obj" | "sub" | "default";

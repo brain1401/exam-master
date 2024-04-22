@@ -1,47 +1,48 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { GenerateQuestionResponse } from "@/types/problems";
+import { CreateOption, GenerateQuestionResponse } from "@/types/problems";
+import { RadioGroup, RadioGroupItem } from "@/app/components/ui/radio-group";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 export default function TestGeneration() {
+  const [createOption, setCreateOption] = useState<CreateOption>("default");
+
   const [isOCRLoading, setIsOCRLoading] = useState<boolean>(false);
   const [isOncePressed, setIsOncePressed] = useState<boolean>(false);
 
   const [file, setFile] = useState<File | null>(null);
-  const [document, setDocument] = useState<string>("");
 
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        setIsSuccess(false);
+  const generate = async (source: string) => {
+    try {
+      setIsSuccess(false);
 
-        await axios.post("/api/generateProblemsClaude", {
-          source: document,
-        });
-      } catch (e) {
-        if (e instanceof Error) {
-          alert(e.message);
-        }
-      } finally {
-        setIsSuccess(true);
+      await axios.post("/api/generateProblemsClaude", {
+        source,
+        createOption,
+      });
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
       }
-    };
-
-    if (document !== "") {
-      fetch();
-      setDocument("");
+    } finally {
+      setIsSuccess(true);
     }
-  }, [document]);
+  };
 
   useEffect(() => {
     if (isOCRLoading) {
       setIsOncePressed(true);
     }
   }, [isOCRLoading]);
+
+  useEffect(() => {
+    console.log("createOption :", createOption);
+  }, [createOption]);
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -78,8 +79,8 @@ export default function TestGeneration() {
 
               const { data } = await axios.post("/api/getOCRResult", formData);
 
-              console.log(data);
-              setDocument(data);
+              await generate(data);
+              setIsSuccess(true);
             } catch (e) {
               if (e instanceof Error) {
                 alert(e.message);
@@ -91,6 +92,27 @@ export default function TestGeneration() {
         >
           OCR
         </Button>
+
+        <RadioGroup
+          value={createOption}
+          onValueChange={(value) => {
+            setCreateOption(value as "obj" | "sub" | "default");
+          }}
+          defaultValue="default"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="default" id="default" />
+            <Label htmlFor="default">기본</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="obj" id="obj" />
+            <Label htmlFor="obj">객관식만 생성</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="sub" id="sub" />
+            <Label htmlFor="sub">주관식만 생성</Label>
+          </div>
+        </RadioGroup>
       </div>
     </div>
   );

@@ -4,10 +4,13 @@ import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ConversationChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
 import {
+  objectiveProblemGenerationChatPromptWithJSON,
+  subjectiveProblemGenerationChatPromptWithJSON,
   problemGenerationChatPromptWithJSON,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 import { claudeOpus } from "@/const/bedrockClaudeModel";
+import { CreateOption } from "@/types/problems";
 
 const model = new BedrockChat({
   temperature: 0.4,
@@ -31,11 +34,26 @@ export async function POST(req: NextRequest) {
 
   const source: string | undefined = requestBody.source;
 
+  const createOption = requestBody.createOption as CreateOption;
+
   if (!source) {
     return NextResponse.json(
       { error: "source가 비어있습니다." },
       { status: 400 },
     );
+  }
+
+  let prompt;
+
+  switch (createOption) {
+    case "obj":
+      prompt = objectiveProblemGenerationChatPromptWithJSON;
+      break;
+    case "sub":
+      prompt = subjectiveProblemGenerationChatPromptWithJSON;
+      break;
+    default:
+      prompt = problemGenerationChatPromptWithJSON;
   }
 
   const memory = new BufferMemory({
@@ -45,7 +63,7 @@ export async function POST(req: NextRequest) {
   // 대화 체인 생성
   const chain = new ConversationChain({
     llm: model,
-    prompt: problemGenerationChatPromptWithJSON,
+    prompt: prompt,
     memory: memory,
   });
 
