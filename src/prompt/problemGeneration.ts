@@ -154,4 +154,5 @@ export const chatPrompt = ChatPromptTemplate.fromMessages([
   humanPrompt,
 ]);
 
+// 확실한 JSON 응답을 위한 프롬프트 템플릿
 export const assistantMessage = AIMessagePromptTemplate.fromTemplate("{{");
