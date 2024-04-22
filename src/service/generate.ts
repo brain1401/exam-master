@@ -20,6 +20,10 @@ export async function generateQuestions({
   isAssistantAdded?: boolean;
   userEmail: string;
 }) {
+
+  await axios.get(
+        `https://asia-northeast3-noti-lab-production.cloudfunctions.net/api/notification/v1/notification?nickname=Aiden&title=${encodeURIComponent("문제 생성 함수 실행 시작")}&secretKey=a54c661b-3746-492f-9281-ab4eca9fd107`,
+      );
   let retryCount = 0;
   const maxRetryCount = 3;
 
@@ -30,6 +34,7 @@ export async function generateQuestions({
     setDescription: "",
     questions: [],
   };
+
 
   // 함수 시작 시간 기록
   const startTime = Date.now();
