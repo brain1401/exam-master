@@ -12,13 +12,13 @@ import {
   multipleChoiceTotalQuestionsPromptWithJSON,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
-import { claudeOpus } from "@/const/bedrockClaudeModel";
+import { claudeSonnet } from "@/const/bedrockClaudeModel";
 import { CreateOption } from "@/types/problems";
 
 const model = new BedrockChat({
   temperature: 0.1,
   region: "us-west-2",
-  model: claudeOpus,
+  model: claudeSonnet,
   maxTokens: 4000,
   credentials: {
     accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID || "",
