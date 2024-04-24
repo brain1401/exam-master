@@ -6,34 +6,25 @@ import {
   totalQuestionsSchema,
   type GenerateQuestionResponse,
 } from "@/types/problems";
-import type { ConversationChain } from "langchain/chains";
 import { postProblems } from "./problems";
-import type { Runnable, RunnableConfig } from "@langchain/core/runnables";
-import type { BaseMessageChunk } from "@langchain/core/messages";
+import type { Runnable } from "@langchain/core/runnables";
 import { noticeToPhone } from "./notice";
 import partialParse from "@/utils/parse";
-
+import type { RunnableSequence } from "@langchain/core/runnables";
 // 질문 생성 함수
 export async function generateQuestions({
   source,
-  conversationChain,
+  problemGenerationChain,
   totalQuestionsChain,
   isAssistantAdded,
   userEmail,
 }: {
   source: string;
-  conversationChain: ConversationChain;
-  totalQuestionsChain: Runnable<
-    {
-      source: any;
-    },
-    BaseMessageChunk,
-    RunnableConfig
-  >;
+  problemGenerationChain: RunnableSequence;
+  totalQuestionsChain: Runnable<any>;
   isAssistantAdded?: boolean;
   userEmail: string;
 }) {
-
   let retryCount = 0;
   const maxRetryCount = 3;
 
@@ -86,9 +77,12 @@ export async function generateQuestions({
         const totalQuestionsResult = await totalQuestionsChain.invoke({
           source,
         });
+        
+        console.log("totalQuestionsResult :", totalQuestionsResult);
 
-        const totalQuestionsRawString =
-          (isAssistantAdded ? "{" : "") + totalQuestionsResult.content;
+        const totalQuestionsRawString = isAssistantAdded
+          ? "{" + totalQuestionsResult.content
+          : totalQuestionsResult;
 
         console.log("totalQuestionsRawString :", totalQuestionsRawString);
 
@@ -128,7 +122,7 @@ export async function generateQuestions({
         console.log(`${i}번째 시도 :`);
 
         // 대화 체인을 사용하여 질문 생성
-        const result = await conversationChain.call({
+        const result = await problemGenerationChain.invoke({
           source,
           generatedQuestions:
             generatedQuestions.questions.length === 0
@@ -137,9 +131,9 @@ export async function generateQuestions({
           topics: JSON.stringify(totalQuestions?.topics) || "",
         });
 
-        const resultResponse = isAssistantAdded
-          ? "{" + result.response
-          : result.response;
+        console.log("result :", result);
+
+        const resultResponse = isAssistantAdded ? "{" + result : result;
 
         let response: GenerateQuestionResponse | null = null;
 

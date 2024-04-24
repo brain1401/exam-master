@@ -43,6 +43,7 @@ jobs:
           ENV_AZURE_KEY: ${{ secrets.AZURE_KEY }}
           ENV_AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
           ENV_PHONE_NOTICE_KEY: ${{ secrets.PHONE_NOTICE_KEY }}
+          ENV_COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
           ENV_TZ: ${{ secrets.TZ }}
 
       - name: create .sentryclirc

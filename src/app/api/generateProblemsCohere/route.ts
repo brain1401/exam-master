@@ -1,29 +1,25 @@
+import { Cohere } from "@langchain/cohere";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { ChatOpenAI } from "@langchain/openai";
 import {
-  defaultTotalQuestionsPrompt,
-  multipleChoiceTotalQuestionsPrompt,
   objectiveProblemGenerationChatPrompt,
-  problemGenerationChatPrompt,
   subjectiveProblemGenerationChatPrompt,
+  problemGenerationChatPrompt,
+  defaultTotalQuestionsPrompt,
   subjectiveTotalQuestionsPrompt,
+  multipleChoiceTotalQuestionsPrompt,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 import { CreateOption } from "@/types/problems";
 import { RunnableSequence } from "@langchain/core/runnables";
 
-const model = new ChatOpenAI({
-  openAIApiKey: process.env.OPEN_AI_KEY,
-  temperature: 0.4,
+const model = new Cohere({
+  model: "command-r-plus",
+  temperature: 0.3,
+  apiKey: process.env.COHERE_API_KEY || "",
   maxTokens: 4000,
-  modelName: "gpt-4-turbo",
-  model: "gpt-4-turbo",
-  presencePenalty: 2,
 }).bind({
-  response_format: {
-    type: "json_object",
-  },
+  presencePenalty: 1,
 });
 
 export async function POST(req: NextRequest) {
@@ -35,9 +31,16 @@ export async function POST(req: NextRequest) {
 
   const requestBody = await req.json();
 
-  const source: string = requestBody.source;
+  const source: string | undefined = requestBody.source;
 
   const createOption = requestBody.createOption as CreateOption;
+
+  if (!source) {
+    return NextResponse.json(
+      { error: "source가 비어있습니다." },
+      { status: 400 },
+    );
+  }
 
   let problemGenerationPrompt;
   let totalQuestionsPrompt;
@@ -58,7 +61,6 @@ export async function POST(req: NextRequest) {
 
   const totalQuestionsChain = totalQuestionsPrompt.pipe(model);
 
-  // 대화 체인 생성
   const problemGenerationChain = RunnableSequence.from([
     {
       topics: (input) => input.topics,
@@ -68,20 +70,18 @@ export async function POST(req: NextRequest) {
     problemGenerationPrompt,
     model,
   ]);
+
   try {
     generateQuestions({
       source,
       totalQuestionsChain,
       problemGenerationChain,
-      userEmail: session.user?.email,
+      userEmail: session.user.email,
     });
 
     return NextResponse.json({ success: "요청 생성됨" }, { status: 200 });
   } catch (e) {
     console.error(e);
-    return NextResponse.json(
-      { error: "문제 생성에 실패했습니다." },
-      { status: 500 },
-    );
+    throw e;
   }
 }

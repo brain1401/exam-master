@@ -1,19 +1,17 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { ConversationChain } from "langchain/chains";
-import { BufferMemory } from "langchain/memory";
 import {
   defaultTotalQuestionsPromptWithJSON,
   multipleChoiceTotalQuestionsPromptWithJSON,
   objectiveProblemGenerationChatPromptWithJSON,
-  problemGenerationChatPrompt,
   problemGenerationChatPromptWithJSON,
   subjectiveProblemGenerationChatPromptWithJSON,
   subjectiveTotalQuestionsPromptWithJSON,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 import { CreateOption } from "@/types/problems";
+import { RunnableSequence } from "@langchain/core/runnables";
 
 const model = new ChatGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GEMINI_API,
@@ -53,22 +51,23 @@ export async function POST(req: NextRequest) {
 
   const totalQuestionsChain = totalQuestionsPrompt.pipe(model);
 
-  const memory = new BufferMemory({
-    inputKey: "source",
-  });
 
   // 대화 체인 생성
-  const chain = new ConversationChain({
-    llm: model,
-    prompt: problemGenerationChatPrompt,
-    memory,
-  });
+  const problemGenerationChain = RunnableSequence.from([
+    {
+      topics: (input) => input.topics,
+      source: (input) => input.source,
+      generatedQuestions: (input) => input.generatedQuestions,
+    },
+    problemGenerationPrompt,
+    model,
+  ]);
 
   try {
     generateQuestions({
       source,
-      totalQuestionsChain: totalQuestionsChain,
-      conversationChain: chain,
+      totalQuestionsChain,
+      problemGenerationChain,
       userEmail: session.user?.email,
     });
 

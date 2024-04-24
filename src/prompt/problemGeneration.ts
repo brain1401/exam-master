@@ -200,7 +200,14 @@ You must follow all of these instructions:
 
 2. For multiple choice questions, each question must have 4 answer options. Indicate the correct answer(s) for each question by providing the exact index number(s) of the correct option(s) from the "options" array in the "answer" array (e.g., [0] if the first option is correct, [1] if the second option is correct, [0, 2] if the first and third options are correct, etc.). Set the "type" key to "obj" for multiple choice questions. Some questions may have multiple correct answers.
 
-3. For multiple choice questions with more than one correct answer (i.e., where the "answer" array contains multiple index numbers), you MUST explicitly state "해당하는 것을 모두 고르시오" in the question text to clearly indicate that the question has multiple correct answers. This instruction should be included ONLY for questions with multiple correct answers, and not for single-answer questions.
+3. For multiple choice questions with more than one correct answer (i.e., where the "answer" array contains multiple index numbers), you MUST explicitly state like "해당하는 것을 모두 고르시오." in the "question" key of the JSON object to clearly indicate that the question has multiple correct answers, as shown in the example question:
+
+{{ 
+  "type": "obj", "question": "다음 중 데이터베이스 정규화의 목적으로 가장 적절한 것을 모두 고르시오.", "options": \[ "데이터의 중복을 최소화하여 저장 공간을 효율적으로 사용하기 위해", "데이터 간의 관계를 복잡하게 만들어 데이터 보안을 강화하기 위해", "데이터베이스 성능을 저하시켜 시스템 부하를 증가시키기 위해", "데이터의 일관성과 무결성을 보장하기 위해" \], "answer": \[0, 3\], "explanation": "데이터베이스 정규화의 주된 목적은 데이터의 중복을 제거하여 저장 공간을 효율적으로 사용하고, 데이터의 일관성과 무결성을 유지하는 것입니다. 정규화를 통해 데이터 간의 관계가 명확해지고, 데이터 수정 시 발생할 수 있는 이상 현상을 방지할 수 있습니다." 
+}}
+
+This instruction should be included ONLY for questions with multiple correct answers, and not for single-answer questions.
+
 
 4. For subjective questions, provide the question and a detailed, comprehensive answer that covers all relevant information. The answer should include key terms, phrases, concepts, and explanations that demonstrate a thorough understanding of the topic. Set the "type" key to "sub" for subjective questions.
 
@@ -356,7 +363,14 @@ You must follow all of these instructions:
 
 2. Each question must have exactly 4 answer options. Indicate the correct answer(s) for each question by providing the exact index number(s) of the correct option(s) from the "options" array in the "answer" array (e.g., [0] if the first option is correct, [1] if the second option is correct, [0, 2] if the first and third options are correct, etc.). Set the "type" key to "obj" for multiple choice questions. Some questions may have multiple correct answers.
 
-3. For questions with more than one correct answer (i.e., where the "answer" array contains multiple index numbers), you MUST explicitly state "해당하는 것을 모두 고르시오" at the end of the question text to clearly indicate that the question has multiple correct answers. This instruction should be included ONLY for questions with multiple correct answers, and not for single-answer questions.
+3. For multiple choice questions with more than one correct answer (i.e., where the "answer" array contains multiple index numbers), you MUST explicitly state like "해당하는 것을 모두 고르시오." in the "question" key of the JSON object to clearly indicate that the question has multiple correct answers, as shown in the example question:
+
+{{ 
+  "type": "obj", "question": "다음 중 데이터베이스 정규화의 목적으로 가장 적절한 것을 모두 고르시오.", "options": \[ "데이터의 중복을 최소화하여 저장 공간을 효율적으로 사용하기 위해", "데이터 간의 관계를 복잡하게 만들어 데이터 보안을 강화하기 위해", "데이터베이스 성능을 저하시켜 시스템 부하를 증가시키기 위해", "데이터의 일관성과 무결성을 보장하기 위해" \], "answer": \[0, 3\], "explanation": "데이터베이스 정규화의 주된 목적은 데이터의 중복을 제거하여 저장 공간을 효율적으로 사용하고, 데이터의 일관성과 무결성을 유지하는 것입니다. 정규화를 통해 데이터 간의 관계가 명확해지고, 데이터 수정 시 발생할 수 있는 이상 현상을 방지할 수 있습니다." 
+}}
+
+This instruction should be included ONLY for questions with multiple correct answers, and not for single-answer questions.
+
 
 4. Provide a detailed and thorough explanation for each question, discussing why the correct answer option(s) are correct and the incorrect options are incorrect. The explanations should be comprehensive, insightful, and not overly brief. Aim to provide explanations that not only justify the answer but also deepen the reader's understanding of the concepts involved. Remember that the "explanation" key should contain an explanation that goes beyond just restating the question or answer.
 

@@ -21,7 +21,7 @@ export default function TestGeneration() {
     try {
       setIsSuccess(false);
 
-      await axios.post("/api/generateProblemsClaude", {
+      await axios.post("/api/generateProblemsCohere", {
         source,
         createOption,
       });
