@@ -77,7 +77,7 @@ export async function generateQuestions({
         const totalQuestionsResult = await totalQuestionsChain.invoke({
           source,
         });
-        
+
         console.log("totalQuestionsResult :", totalQuestionsResult);
 
         const totalQuestionsRawString = isAssistantAdded
@@ -325,7 +325,7 @@ export async function generateQuestions({
 
     await noticeToPhone({
       title: "문제 생성 중 에러 발생",
-      body: `사용자 이메일:${userEmail}\n문제 ${generatedQuestions.setTitle} 생성 중 에러 발생\n총 ${generatedQuestions.questions.length} 문제 생성됨`,
+      body: `사용자 이메일:${userEmail}\n문제 ${generatedQuestions.setTitle} 생성 중 에러 ${e} 발생\n총 ${generatedQuestions.questions.length} 문제 생성됨`,
     });
   } finally {
     clearInterval(checkInterval);

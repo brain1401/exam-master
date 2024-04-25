@@ -91,7 +91,7 @@ For multiple choice questions, each question should have 4 options, and the numb
 
 Generate topics and the number of questions for each topic based on the <SourceText> tags in a way that ensures all the information given in the source text can be made into questions, leaving no unaddressed questions. For each topic, also specify the question types ("obj" for multiple choice, "sub" for subjective) and their respective counts to maintain the 80% multiple choice and 20% subjective ratio.
 
-Respond ONLY in JSON format, without any additional remarks, using the following keys:
+Respond ONLY in JSON format, without any additional remarks, using the following keys and format:
 {{
 "totalQuestions": (total_number_of_questions),
 "topics": [
@@ -123,7 +123,7 @@ Each multiple choice question should have 4 options, and the number of correct o
 
 Generate topics and the number of questions for each topic based on the <SourceText> tags in a way that ensures all the information given in the source text can be made into questions, leaving no unaddressed questions.
 
-Respond ONLY in JSON format, without any additional remarks, using the following keys:
+Respond ONLY in JSON format, without any additional remarks, using the following keys and format: 
 {{
 "totalQuestions": (total_number_of_multiple_choice_questions),
 "topics": [
@@ -155,7 +155,7 @@ export const subjectiveTotalQuestionsTemplate =
 
 Generate topics and the number of questions for each topic based on the <SourceText> tags in a way that ensures all the information given in the source text can be made into questions, leaving no unaddressed questions.
 
-Respond ONLY in JSON format, without any additional remarks, using the following keys:
+Respond ONLY in JSON format, without any additional remarks, using the following keys and format:
 {{
 "totalQuestions": (total_number_of_subjective_questions),
 "topics": [
