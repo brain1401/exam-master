@@ -19,7 +19,7 @@ const model = new Cohere({
   apiKey: process.env.COHERE_API_KEY || "",
   maxTokens: 4000,
 }).bind({
-  presencePenalty: 1,
+  presencePenalty: 0.8,
 });
 
 export async function POST(req: NextRequest) {
