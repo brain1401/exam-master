@@ -77,6 +77,7 @@ export default function ExamProblem({
       onChange={(e) => {
         setCurrentExamProblemSubAnswer(e.target.value);
       }}
+      value={currentProblem.subAnswer ?? ""}
     />
   );
 
