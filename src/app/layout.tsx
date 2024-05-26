@@ -4,7 +4,6 @@ import { Viewport } from "next";
 import MainNavbar from "@/components/Navbar/MainNavbar";
 import AuthContext from "@/context/AuthContext";
 import localFont from "next/font/local";
-import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import ReduxProvider from "@/context/ReduxContext";
 import ReactQueryContext from "@/context/ReactQueryContext";
@@ -115,7 +114,6 @@ export default function RootLayout({
               </JotaiProvider>
             </ReactQueryContext>
           </ReduxProvider>
-          <Analytics />
         </AuthContext>
       </body>
     </html>
