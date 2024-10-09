@@ -96,6 +96,9 @@ export default function RootLayout({
           gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
         `}
       </Script>
+      <head>
+        <GoogleAdsense />
+      </head>
 
       <body
         className={`${NotoSansKR.className} bg-background bg-cover bg-repeat antialiased`}
@@ -118,7 +121,6 @@ export default function RootLayout({
           </ReduxProvider>
         </AuthContext>
       </body>
-      <GoogleAdsense />
     </html>
   );
 }
