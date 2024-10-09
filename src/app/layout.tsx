@@ -10,6 +10,7 @@ import ReactQueryContext from "@/context/ReactQueryContext";
 import { Toaster } from "@/components/ui/toaster";
 import JotaiProvider from "@/context/JotaiContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import GoogleAdsense from "./components/googleAdsense";
 
 const NotoSansKR = localFont({
   src: [
@@ -95,12 +96,7 @@ export default function RootLayout({
           gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
         `}
       </Script>
-      <Script
-        async
-        strategy="lazyOnload"
-        crossOrigin="anonymous"
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_ID}`}
-      />
+
       <body
         className={`${NotoSansKR.className} bg-background bg-cover bg-repeat antialiased`}
       >
@@ -122,6 +118,7 @@ export default function RootLayout({
           </ReduxProvider>
         </AuthContext>
       </body>
+      <GoogleAdsense />
     </html>
   );
 }
