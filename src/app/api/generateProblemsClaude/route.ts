@@ -16,7 +16,7 @@ import { RunnableSequence } from "@langchain/core/runnables";
 
 const model = new BedrockChat({
   temperature: 0.1,
-  region: "us-west-2",
+  region: "ap-northeast-2",
   model: claudeSonnet,
   maxTokens: 4000,
   credentials: {

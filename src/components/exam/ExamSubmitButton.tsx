@@ -30,6 +30,8 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const [isError, setIsError] = useState(false);
+
   const { revalidateAllPathAndRedirect } = useRevalidation();
 
   const isUserLoggedIn = session ? true : false;
@@ -71,6 +73,8 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
       console.log("uuid :", uuid);
     } catch (e) {
       if (e instanceof Error) {
+        alert(e.message);
+        setIsError(true);
         console.error(e);
       }
     } finally {

@@ -23,6 +23,7 @@ import {
   analyzeProblemsImagesAndDoCallback,
   generateFileHash,
   isImageUrlObject,
+  isString,
   isValidUUID,
 } from "@/utils/problems";
 import {
@@ -2378,6 +2379,10 @@ export async function evaluateExamProblems(
             dt,
           );
 
+          if (answer === null) {
+            throw new Error("정답을 찾을 수 없습니다.");
+          }
+
           if (examProblem.type === "sub") {
             if (typeof examProblem.subAnswer !== "string") {
               throw new Error("주관식 문제입니다. 정답을 입력해주세요.");
@@ -2387,7 +2392,7 @@ export async function evaluateExamProblems(
             } else {
               const subjectiveEvaluation = await evaluateSubjectiveProblem({
                 question: examProblem.question,
-                answer: examProblem.subAnswer,
+                answer: isString(answer) ? answer : "",
                 userAnswer: examProblem.subAnswer,
               });
 

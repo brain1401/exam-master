@@ -9,7 +9,7 @@ import { RunnableSequence } from "@langchain/core/runnables";
 
 const model = new BedrockChat({
   temperature: 0,
-  region: "us-west-2",
+  region: "ap-northeast-2",
   model: claudeSonnet,
   maxTokens: 500,
   credentials: {
@@ -32,11 +32,14 @@ export async function evaluateSubjectiveProblem({
     model,
   ]);
 
-  const response = await chain.invoke({
-    question,
-    answer,
-    userAnswer,
-  });
+  const response = await chain.invoke(
+    {
+      question,
+      answer,
+      userAnswer,
+    },
+    {},
+  );
 
   try {
     const content = "{" + response.content;
