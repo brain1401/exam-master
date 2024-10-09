@@ -11,6 +11,7 @@ import type { Runnable } from "@langchain/core/runnables";
 import { noticeToPhone } from "./notice";
 import partialParse from "@/utils/parse";
 import type { RunnableSequence } from "@langchain/core/runnables";
+import { AIMessage } from "@langchain/core/messages";
 // 질문 생성 함수
 export async function generateQuestions({
   source,
@@ -122,14 +123,16 @@ export async function generateQuestions({
         console.log(`${i}번째 시도 :`);
 
         // 대화 체인을 사용하여 질문 생성
-        const result = await problemGenerationChain.invoke({
-          source,
-          generatedQuestions:
-            generatedQuestions.questions.length === 0
-              ? ""
-              : JSON.stringify(generatedQuestions.questions),
-          topics: JSON.stringify(totalQuestions?.topics) || "",
-        });
+        const result = (
+          (await problemGenerationChain.invoke({
+            source,
+            generatedQuestions:
+              generatedQuestions.questions.length === 0
+                ? ""
+                : JSON.stringify(generatedQuestions.questions),
+            topics: JSON.stringify(totalQuestions?.topics) || "",
+          })) as AIMessage
+        ).content as string;
 
         console.log("result :", result);
 

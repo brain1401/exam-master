@@ -13,7 +13,6 @@ const endpoint = process.env.AZURE_ENDPOINT || "";
 const client = DocumentIntelligence(endpoint, new AzureKeyCredential(key));
 
 export async function POST(req: NextRequest) {
-
   const session = getServerSession();
 
   if (!session) {
@@ -32,25 +31,31 @@ export async function POST(req: NextRequest) {
 
   const base64 = Buffer.from(arrayBuffer).toString("base64");
 
-  const initialResponse = await client
-    .path("/documentModels/{modelId}:analyze", "prebuilt-read")
-    .post({
-      contentType: "application/json",
-      body: {
-        base64Source: base64,
-      },
-    });
+  try {
+    const initialResponse = await client
+      .path("/documentModels/{modelId}:analyze", "prebuilt-read")
+      .post({
+        contentType: "application/json",
+        body: {
+          base64Source: base64,
+        },
+      });
 
-  if (isUnexpected(initialResponse)) {
-    return NextResponse.json(
-      { error: "Failed to analyze document" },
-      { status: 500 },
-    );
+    if (isUnexpected(initialResponse)) {
+      return NextResponse.json(
+        { error: "Failed to analyze document" },
+        { status: 500 },
+      );
+    }
+
+    const poller = await getLongRunningPoller(client, initialResponse);
+    const result = (await poller.pollUntilDone())
+      .body as AnalyzeResultOperationOutput;
+
+    return NextResponse.json(result.analyzeResult?.content);
+  } catch (e) {
+    if (e instanceof Error) {
+      return NextResponse.json({ error: e.message }, { status: 500 });
+    }
   }
-
-  const poller = await getLongRunningPoller(client, initialResponse);
-  const result = (await poller.pollUntilDone())
-    .body as AnalyzeResultOperationOutput;
-
-  return NextResponse.json(result.analyzeResult?.content);
 }
