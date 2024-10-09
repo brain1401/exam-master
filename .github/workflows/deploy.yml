@@ -33,6 +33,7 @@ jobs:
           ENV_NEXT_PUBLIC_GTM: ${{ secrets.NEXT_PUBLIC_GTM }}
           ENV_NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           ENV_NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          ENV_NEXT_PUBLIC_ADSENSE_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_ID }}
           ENV_GOOGLE_GEMINI_API: ${{ secrets.GOOGLE_GEMINI_API }}
           ENV_GOOGLE_API: ${{ secrets.GOOGLE_API }}
           ENV_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
