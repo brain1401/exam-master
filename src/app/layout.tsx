@@ -95,6 +95,11 @@ export default function RootLayout({
           gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
         `}
       </Script>
+      <Script
+        strategy="lazyOnload"
+        crossOrigin="anonymous"
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_ID}`}
+      />
       <body
         className={`${NotoSansKR.className} bg-background bg-cover bg-repeat antialiased`}
       >
