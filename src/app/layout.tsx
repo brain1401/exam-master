@@ -10,7 +10,7 @@ import ReactQueryContext from "@/context/ReactQueryContext";
 import { Toaster } from "@/components/ui/toaster";
 import JotaiProvider from "@/context/JotaiContext";
 import { ThemeProvider } from "@/context/ThemeContext";
-import GoogleAdsense from "./components/googleAdsense";
+import GoogleAdsense from "./components/GoogleAdsense";
 
 const NotoSansKR = localFont({
   src: [
