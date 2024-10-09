@@ -96,9 +96,7 @@ export default function RootLayout({
           gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
         `}
       </Script>
-      <head>
-        <GoogleAdsense />
-      </head>
+      <GoogleAdsense />
 
       <body
         className={`${NotoSansKR.className} bg-background bg-cover bg-repeat antialiased`}
