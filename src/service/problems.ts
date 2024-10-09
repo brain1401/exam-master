@@ -1832,7 +1832,7 @@ export async function getPublicProblemSetByUUID(problemSetUUID: string) {
               text: candidate.text,
               isAnswer: false,
             })) ?? null,
-          subAnswer: "" ?? null,
+          subAnswer: "",
           image: problem.image ?? null,
           additionalView: problem.additionalView ?? "",
           isAnswerMultiple: problem.isAnswerMultiple ?? false,

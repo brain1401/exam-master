@@ -17,8 +17,7 @@ const model = new ChatOpenAI({
   openAIApiKey: process.env.OPEN_AI_KEY,
   temperature: 0.4,
   maxTokens: 4000,
-  modelName: "gpt-4-turbo",
-  model: "gpt-4-turbo",
+  model: "gpt-4o",
   presencePenalty: 2,
 }).bind({
   response_format: {
