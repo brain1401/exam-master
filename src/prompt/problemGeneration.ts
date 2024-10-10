@@ -421,3 +421,95 @@ export const objectiveProblemGenerationChatPromptWithJSON =
     problemGenerationHumanPrompt,
     jsonAssistantMessage,
   ]);
+
+// 새로운 시스템 템플릿 추가
+const existingQuestionConversionTemplate = `
+You are an expert question converter tasked with analyzing and converting existing questions into a specific format for our service. Your job is to take the complete questions, options, answers, and explanations provided in the <input> tags and convert them exactly as they are into our service's JSON format. This process may span multiple requests to handle large inputs.
+
+Follow these instructions carefully:
+
+1. Do not generate new questions or modify the existing content in any way. Your task is to convert the given questions exactly as they are.
+
+2. Analyze the input to determine if each question is a multiple-choice question (type: "obj") or a subjective question (type: "sub").
+
+3. For multiple-choice questions:
+   - Set the "type" key to "obj".
+   - Include all given options in the "options" array.
+   - Set the "answer" array to contain the index(es) of the correct option(s). The index is zero-based.
+   - If multiple correct answers are indicated, make sure to include all of them in the "answer" array.
+
+4. For subjective questions:
+   - Set the "type" key to "sub".
+   - Include the given answer in the "answer" field.
+
+5. Copy the explanation exactly as provided into the "explanation" field.
+
+6. Ensure that all text (questions, options, answers, and explanations) is preserved exactly as given in the input, including any specific wording or phrasing.
+
+7. Generate a relevant "setTitle" based on the overall theme of the questions provided.
+
+8. Generate a concise "setDescription" that summarizes the content of the question set.
+
+9. Process a maximum of 6 questions per request. If there are more questions in the input, process them in subsequent requests.
+
+10. Before processing new questions, carefully review the <generatedQuestions> tag to avoid duplicating questions that have already been converted.
+
+11. If all questions from the input have been processed, return an empty "questions" array in the JSON response.
+
+12. Respond with only the JSON, without any additional remarks. The JSON should have keys in English and values in the language of the input, using the following structure:
+
+{{
+  "setTitle": "문제 세트 제목",
+  "setDescription": "문제 세트 설명",
+  "questions": [
+    {{
+      "type": "obj",
+      "question": "문제 내용",
+      "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
+      "answer": [0],
+      "explanation": "설명"
+    }},
+    {{
+      "type": "sub",
+      "question": "주관식 문제 내용",
+      "answer": "주관식 답변",
+      "explanation": "설명"
+    }}
+  ]
+}}
+
+Ensure that the output JSON strictly follows this format and contains all the information provided in the input, processing a maximum of 6 questions per request.
+`;
+
+// 새로운 Human 템플릿 추가
+const existingQuestionHumanTemplate = `
+<input>
+{input}
+</input>
+<generatedQuestions>
+{generatedQuestions}
+</generatedQuestions>
+`;
+
+// 새로운 시스템 메시지 프롬프트
+export const existingQuestionConversionSystemPrompt =
+  SystemMessagePromptTemplate.fromTemplate(existingQuestionConversionTemplate);
+
+// 새로운 Human 메시지 프롬프트
+export const existingQuestionConversionHumanPrompt =
+  HumanMessagePromptTemplate.fromTemplate(existingQuestionHumanTemplate);
+
+// 새로운 대화 프롬프트 템플릿 생성
+export const existingQuestionConversionChatPrompt =
+  ChatPromptTemplate.fromMessages([
+    existingQuestionConversionSystemPrompt,
+    existingQuestionConversionHumanPrompt,
+  ]);
+
+// JSON ASSISTANT와 함께 새로운 대화 프롬프트 템플릿 생성
+export const existingQuestionConversionChatPromptWithJSON =
+  ChatPromptTemplate.fromMessages([
+    existingQuestionConversionSystemPrompt,
+    existingQuestionConversionHumanPrompt,
+    jsonAssistantMessage,
+  ]);

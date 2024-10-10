@@ -25,6 +25,7 @@ export default function TestGeneration() {
         source,
         createOption,
       });
+      
     } catch (e) {
       if (e instanceof Error) {
         alert(e.message);
@@ -96,7 +97,7 @@ export default function TestGeneration() {
         <RadioGroup
           value={createOption}
           onValueChange={(value) => {
-            setCreateOption(value as "obj" | "sub" | "default");
+            setCreateOption(value as CreateOption);
           }}
           defaultValue="default"
         >
@@ -111,6 +112,10 @@ export default function TestGeneration() {
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="sub" id="sub" />
             <Label htmlFor="sub">주관식만 생성</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="existing" id="existing" />
+            <Label htmlFor="existing">기존 문제 변환</Label>
           </div>
         </RadioGroup>
       </div>

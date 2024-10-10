@@ -356,7 +356,7 @@ export const SubjectiveEvaluationSchema = z.object({
 
 export type SubjectiveEvaluation = z.infer<typeof SubjectiveEvaluationSchema>;
 
-export type CreateOption = "obj" | "sub" | "default";
+export type CreateOption = "obj" | "sub" | "default" | "existing";
 
 export const totalQuestionsSchema = z.object({
   totalQuestions: z.number(),
@@ -364,4 +364,3 @@ export const totalQuestionsSchema = z.object({
 });
 
 export type TotalQuestions = z.infer<typeof totalQuestionsSchema>;
-

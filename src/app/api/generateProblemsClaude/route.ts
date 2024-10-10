@@ -8,6 +8,7 @@ import {
   defaultTotalQuestionsPromptWithJSON,
   subjectiveTotalQuestionsPromptWithJSON,
   multipleChoiceTotalQuestionsPromptWithJSON,
+  existingQuestionConversionChatPromptWithJSON,
 } from "@/prompt/problemGeneration";
 import { generateQuestions } from "@/service/generate";
 import { claudeSonnet } from "@/const/bedrockClaudeModel";
@@ -57,12 +58,15 @@ export async function POST(req: NextRequest) {
       problemGenerationPrompt = subjectiveProblemGenerationChatPromptWithJSON;
       totalQuestionsPrompt = subjectiveTotalQuestionsPromptWithJSON;
       break;
+    case "existing":
+      problemGenerationPrompt = existingQuestionConversionChatPromptWithJSON;
+      break;
     default:
       problemGenerationPrompt = problemGenerationChatPromptWithJSON;
       totalQuestionsPrompt = defaultTotalQuestionsPromptWithJSON;
   }
 
-  const totalQuestionsChain = totalQuestionsPrompt.pipe(model);
+  const totalQuestionsChain = totalQuestionsPrompt?.pipe(model);
 
   // 대화 체인 생성
   const problemGenerationChain = RunnableSequence.from([
@@ -82,6 +86,7 @@ export async function POST(req: NextRequest) {
       problemGenerationChain,
       isAssistantAdded: true,
       userEmail: session.user.email,
+      existingMode: createOption === "existing",
     });
 
     return NextResponse.json({ success: "요청 생성됨" }, { status: 200 });
