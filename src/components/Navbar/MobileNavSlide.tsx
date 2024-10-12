@@ -41,7 +41,7 @@ export default function MobileNavSlide({ loginButton }: Props) {
       } absolute right-0 top-0 z-50 h-screen w-3/4 bg-background transition-all duration-300 ease-in-out`}
     >
       <ul className="flex w-full flex-col items-center justify-center">
-        <li className="flex w-full items-center justify-center border-b border-gray-300 py-2 ">
+        <li className="flex w-full items-center justify-center border-b border-gray-300 py-2">
           <Link href="/" onClick={() => setMobileMenuOpen(false)}>
             <Logo className="h-[2rem] w-[8rem] dark:fill-primary" />
           </Link>
@@ -64,6 +64,11 @@ export default function MobileNavSlide({ loginButton }: Props) {
         <li className={MOBILE_LIST_ITEM}>
           <Link href="/results" onClick={() => setMobileMenuOpen(false)}>
             시험 결과
+          </Link>
+        </li>
+        <li className={MOBILE_LIST_ITEM}>
+          <Link href="/about" onClick={() => setMobileMenuOpen(false)}>
+            서비스 안내
           </Link>
         </li>
         <li className="py-2" onClick={() => setMobileMenuOpen(false)}>

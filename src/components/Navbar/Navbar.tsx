@@ -54,6 +54,11 @@ export default function Navbar({ loginButton }: Props) {
                   시험 결과
                 </Link>
               </li>
+              <li className={LIST_ITEM}>
+                <Link href="/about" className="py-2">
+                  서비스 안내
+                </Link>
+              </li>
             </ul>
           </div>
 
