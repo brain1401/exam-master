@@ -48,7 +48,7 @@ export default function Announcements() {
       </p>
 
       <p className="text-md mt-4 text-center">
-        문의사항, 저작권 관련 요청 또는 버그 제보는{" "}
+        문의사항, 저작권 관련 요청 또는 버그 제보는
         <CopyableText text="brain1401@gmail.com" />
         으로 연락해주세요.
       </p>
