@@ -61,11 +61,11 @@ export const metadata: Metadata = {
     default: "Exam Master",
   },
   description:
-    "실제 시험을 보듯이 시험 문제를 외우는 것을 도와주는 서비스입니다.",
+    "AI기반으로 시험 문제집을 생성하고 모의시험을 볼 수 있는 AI CBT 서비스입니다.",
   openGraph: {
     title: "Exam Master",
     description:
-      "실제 시험을 보듯이 시험 문제를 외우는 것을 도와주는 서비스입니다.",
+      "AI 기반으로 시험 문제집을 생성하고 모의시험을 볼 수 있는 AI CBT 서비스입니다.",
     type: "website",
     locale: "ko_KR",
   },
