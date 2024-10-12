@@ -4,11 +4,14 @@ import Link from "next/link";
 import Logo from "../../../public/images/Exam Master.svg";
 import { useRef, useEffect } from "react";
 import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
+import { NAV_ITEMS } from "./Navbar";
+
 const MOBILE_LIST_ITEM = "py-2 w-full border-b border-gray-300 text-center";
 
 type Props = {
   loginButton: JSX.Element;
 };
+
 export default function MobileNavSlide({ loginButton }: Props) {
   const menuRef = useRef<HTMLDivElement>(null);
   const { isMobileMenuOpen, setMobileMenuOpen } = useIsMobileNavMenuOpen();
@@ -42,36 +45,26 @@ export default function MobileNavSlide({ loginButton }: Props) {
     >
       <ul className="flex w-full flex-col items-center justify-center">
         <li className="flex w-full items-center justify-center border-b border-gray-300 py-2">
-          <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+          <Link
+            href="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex h-full w-full items-center justify-center"
+          >
             <Logo className="h-[2rem] w-[8rem] dark:fill-primary" />
           </Link>
         </li>
-        <li className={MOBILE_LIST_ITEM}>
-          <Link href="/exam" onClick={() => setMobileMenuOpen(false)}>
-            내 문제 풀기
-          </Link>
-        </li>
-        <li className={MOBILE_LIST_ITEM}>
-          <Link href="/manage" onClick={() => setMobileMenuOpen(false)}>
-            내 문제 관리
-          </Link>
-        </li>
-        <li className={MOBILE_LIST_ITEM}>
-          <Link href="/create" onClick={() => setMobileMenuOpen(false)}>
-            문제 만들기
-          </Link>
-        </li>
-        <li className={MOBILE_LIST_ITEM}>
-          <Link href="/results" onClick={() => setMobileMenuOpen(false)}>
-            시험 결과
-          </Link>
-        </li>
-        <li className={MOBILE_LIST_ITEM}>
-          <Link href="/about" onClick={() => setMobileMenuOpen(false)}>
-            서비스 안내
-          </Link>
-        </li>
-        <li className="py-2" onClick={() => setMobileMenuOpen(false)}>
+        {NAV_ITEMS.map((item, index) => (
+          <li key={index} className={MOBILE_LIST_ITEM}>
+            <Link
+              href={item.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className="block h-full w-full py-2"
+            >
+              {item.text}
+            </Link>
+          </li>
+        ))}
+        <li className="w-full py-2" onClick={() => setMobileMenuOpen(false)}>
           {loginButton}
         </li>
       </ul>

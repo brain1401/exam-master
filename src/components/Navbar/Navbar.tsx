@@ -3,14 +3,20 @@ import Link from "next/link";
 import Logo from "../../../public/images/Exam Master.svg";
 import { HiMenu } from "react-icons/hi";
 import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "../ui/button";
-import { useEffect } from "react";
 import ToggleThemeButton from "../ui/ToggleThemeButton";
 
 const LIST_ITEM =
   "hidden md:flex text-md font-bold items-center justify-center list-none";
+
+export const NAV_ITEMS = [
+  { href: "/exam", text: "내 문제 풀기" },
+  { href: "/manage", text: "내 문제 관리" },
+  { href: "/create", text: "문제 만들기" },
+  { href: "/generate", text: "AI 문제 생성" },
+  { href: "/results", text: "시험 결과" },
+  { href: "/about", text: "서비스 안내" },
+];
 
 type Props = {
   loginButton: JSX.Element;
@@ -18,13 +24,10 @@ type Props = {
 
 export default function Navbar({ loginButton }: Props) {
   const { resolvedTheme } = useTheme();
-
   const { toggleMobileMenu } = useIsMobileNavMenuOpen();
 
   return (
-    <nav // navbar
-      className="z-30 flex h-[3.6rem] w-full justify-center border-b border-gray-300"
-    >
+    <nav className="z-30 flex h-[3.6rem] w-full justify-center border-b border-gray-300">
       <div className="flex w-full max-w-[110rem] items-center justify-center">
         <div className="flex w-full items-center justify-between md:gap-3">
           <div className="flex items-center justify-center">
@@ -34,31 +37,13 @@ export default function Navbar({ loginButton }: Props) {
               </Link>
             </div>
             <ul className="flex items-center gap-3">
-              <li className={LIST_ITEM}>
-                <Link href="/exam" className="py-2">
-                  내 문제 풀기
-                </Link>
-              </li>
-              <li className={LIST_ITEM}>
-                <Link href="/manage" className="py-2">
-                  내 문제 관리
-                </Link>
-              </li>
-              <li className={LIST_ITEM}>
-                <Link href="/create" className="py-2">
-                  문제 생성
-                </Link>
-              </li>
-              <li className={LIST_ITEM}>
-                <Link href="/results" className="py-2">
-                  시험 결과
-                </Link>
-              </li>
-              <li className={LIST_ITEM}>
-                <Link href="/about" className="py-2">
-                  서비스 안내
-                </Link>
-              </li>
+              {NAV_ITEMS.map((item, index) => (
+                <li key={index} className={LIST_ITEM}>
+                  <Link href={item.href} className="py-2">
+                    {item.text}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
