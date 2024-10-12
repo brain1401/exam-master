@@ -4,6 +4,7 @@ import {
   MdCopyright,
   MdBugReport,
   MdCoffee,
+  MdAutoAwesome,
 } from "react-icons/md";
 import AnnouncementSection from "./AnnouncementSection";
 import CopyableText from "./CopyableText";
@@ -15,6 +16,12 @@ export default function Announcements() {
         icon={<MdInfo className="h-6 w-6 text-blue-500" />}
         title="서비스 안내"
         content={`현재는 구글 로그인만 지원합니다.\n추후에 다양한 로그인 방식을 추가할 예정입니다.\n또한 현재 개발 중인 앱으로 디자인 등을 개선 중에 있습니다.`}
+      />
+
+      <AnnouncementSection
+        icon={<MdAutoAwesome className="h-6 w-6 text-purple-500" />}
+        title="주관식 문제 채점 안내"
+        content={`주관식 문제의 채점은 AI를 활용하여 이루어집니다. 이를 통해 다양한 표현과 답변 방식을 고려한 유연한 채점이 가능합니다. 다만, AI 채점 결과에 오류가 있을 수 있음을 참고해 주시기 바랍니다.`}
       />
 
       <AnnouncementSection
