@@ -66,28 +66,28 @@ export default function MainProblemSetsGrid() {
           <ProblemSetsGridLayout type="public">
             {publicProblemSets?.data.map((publicProblemSet, i) => (
               <ProblemGridCardLayout key={publicProblemSet.uuid}>
-                <Card>
+                <Card className="flex h-full flex-col">
                   <Link
                     href={`/public-problem/${publicProblemSet.uuid}`}
                     className="flex h-full w-full flex-col"
                   >
-                    <CardHeader>
-                      <CardTitle>{publicProblemSet.name}</CardTitle>
-                      <CardDescription>
+                    <CardHeader className="flex-grow">
+                      <CardTitle className="line-clamp-2 text-lg">
+                        {publicProblemSet.name}
+                      </CardTitle>
+                      <CardDescription className="line-clamp-2">
                         {publicProblemSet.description ?? ""}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-col items-start justify-center">
-                        <div className="space-y-[.002rem] text-[.9rem] text-gray-500 dark:text-gray-400">
-                          <div className="text-sm">
+                        <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="truncate">
                             {publicProblemSet.createdBy}
                           </div>
-                          <div className="text-sm">{`${publicProblemSet.examProblemsCount}문제`}</div>
-                          <div className="text-sm">
-                            {new Date(
-                              publicProblemSet.updatedAt,
-                            ).toLocaleString("ko-KR", {
+                          <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
+                          <div>
+                            {new Date(publicProblemSet.updatedAt).toLocaleString("ko-KR", {
                               year: "numeric",
                               month: "long",
                               day: "2-digit",
