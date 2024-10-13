@@ -16,4 +16,4 @@ export default defineConfig({
 });
 
 // 프로덕션 데이터베이스에 스키마 동기화 명령어
-// npx drizzle-kit push --config=drizzle-prod.config.ts
+// npx drizzle-kit push --config=drizzle-prod.config.ts --verbose

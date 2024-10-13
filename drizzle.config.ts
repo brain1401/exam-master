@@ -14,3 +14,5 @@ export default defineConfig({
     url: DEV_DATABASE_URL,
   },
 });
+
+// npx drizzle-kit push --verbose
