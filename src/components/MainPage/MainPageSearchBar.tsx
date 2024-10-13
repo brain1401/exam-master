@@ -10,7 +10,6 @@ import {
 } from "../ui/select";
 import useRevalidation from "@/hooks/useRevalidate";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import usePublicProblem from "@/hooks/usePublicProblem";
 import { SortType } from "@/types/problems";
 

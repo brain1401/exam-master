@@ -48,7 +48,7 @@ export default function Navbar({ loginButton }: Props) {
           </div>
 
           <div>
-            <div className="hidden md:mr-[10vw] md:flex md:gap-x-2 ">
+            <div className="hidden md:mr-[10vw] md:flex md:gap-x-2">
               <ToggleThemeButton />
               <div className="flex h-full w-full items-center justify-center">
                 {loginButton}

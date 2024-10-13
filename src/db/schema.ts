@@ -280,7 +280,7 @@ export const user = pgTable(
   },
 );
 
-export const userRelation = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many }) => ({
   likedProblemSets: many(likedProblemSets),
   problemSetComments: many(problemSetComment),
   images: many(imageToUser),
@@ -288,6 +288,7 @@ export const userRelation = relations(user, ({ many }) => ({
   problemSets: many(problemSet),
   results: many(result),
   problemResults: many(problemResult),
+  generationCounts: many(generationCount),
 }));
 
 export const likedProblemSets = pgTable(
@@ -413,3 +414,40 @@ export const problemSetCommentRelation = relations(
     }),
   }),
 );
+
+export const generationCount = pgTable(
+  "GenerationCount",
+  {
+    uuid: uuid("uuid")
+      .primaryKey()
+      .notNull()
+      .default(sql`uuid_generate_v4()`),
+    userUuid: uuid("userUuid")
+      .notNull()
+      .references(() => user.uuid, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    count: integer("count").notNull().default(0),
+    weekStart: timestamp("weekStart", {
+      precision: 0,
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      userWeekIndex: uniqueIndex("GenerationCount_userUuid_weekStart_key").on(
+        table.userUuid,
+        table.weekStart
+      ),
+    };
+  }
+);
+
+export const generationCountRelations = relations(generationCount, ({ one }) => ({
+  user: one(user, {
+    fields: [generationCount.userUuid],
+    references: [user.uuid],
+  }),
+}));

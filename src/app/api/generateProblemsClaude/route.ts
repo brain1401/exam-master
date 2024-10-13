@@ -14,6 +14,7 @@ import { generateQuestions } from "@/service/generate";
 import { claudeSonnet } from "@/const/bedrockClaudeModel";
 import { CreateOption } from "@/types/problems";
 import { RunnableSequence } from "@langchain/core/runnables";
+import { canUserGenerateProblemSet, incrementGenerationCount } from "@/service/user";
 
 const model = new BedrockChat({
   temperature: 0.1,
@@ -28,9 +29,16 @@ const model = new BedrockChat({
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession();
+  const email = session?.user?.email;
 
-  if (!session || !session.user?.email) {
+  if (!session || !email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const canGenerate = await canUserGenerateProblemSet(email);
+
+  if (!canGenerate) {
+    return NextResponse.json({ error: "Limit reached" }, { status: 403 });
   }
 
   const requestBody = await req.json();
@@ -85,9 +93,11 @@ export async function POST(req: NextRequest) {
       totalQuestionsChain,
       problemGenerationChain,
       isAssistantAdded: true,
-      userEmail: session.user.email,
+      userEmail: email,
       existingMode: createOption === "existing",
     });
+
+    await incrementGenerationCount(email);
 
     return NextResponse.json({ success: "요청 생성됨" }, { status: 200 });
   } catch (e) {

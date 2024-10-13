@@ -1,0 +1,1 @@
+export const MAX_GENERATION_COUNT_PER_WEEK = 5;

@@ -1,3 +1,4 @@
+import { canUserGenerateProblemSet } from "@/service/user";
 import DocumentIntelligence, {
   isUnexpected,
   getLongRunningPoller,
@@ -13,10 +14,17 @@ const endpoint = process.env.AZURE_ENDPOINT || "";
 const client = DocumentIntelligence(endpoint, new AzureKeyCredential(key));
 
 export async function POST(req: NextRequest) {
-  const session = getServerSession();
+  const session = await getServerSession();
+  const email = session?.user?.email;
 
-  if (!session) {
+  if (!session || !email) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const canGenerate = await canUserGenerateProblemSet(email);
+
+  if (!canGenerate) {
+    return NextResponse.json({ error: "Limit reached" }, { status: 403 });
   }
 
   const formData = await req.formData();
