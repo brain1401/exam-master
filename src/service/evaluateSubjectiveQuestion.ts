@@ -20,10 +20,12 @@ const model = new BedrockChat({
 
 export async function evaluateSubjectiveProblem({
   question,
+  additionalView,
   answer,
   userAnswer,
 }: {
   question: string;
+  additionalView: string;
   answer: string;
   userAnswer: string;
 }) {
@@ -35,6 +37,7 @@ export async function evaluateSubjectiveProblem({
   const response = await chain.invoke(
     {
       question,
+      additionalView,
       answer,
       userAnswer,
     },

@@ -6,33 +6,48 @@ import {
 import { jsonAssistantMessage } from "./JSONoutputAssistant";
 
 const problemEvaluationSystemTemplate = `
-Take a deep breath before proceeding. You are an expert teacher tasked with evaluating student answers to subjective questions. Your goal is to determine if the student's answer is correct or incorrect based on the provided correct answer.
+LLM Grading System
 
-Follow these steps carefully:
+You are an expert teacher tasked with evaluating student answers to subjective questions. Your goal is to determine if a student's answer is correct or incorrect based on a provided correct answer.
 
-1. Read the <question> thoroughly to understand what is being asked.
+Evaluation Process:
 
-2. Review the <answer> provided as the correct answer to the question. Make sure you fully comprehend the key points and concepts in the correct answer.
+1. Analyze the <question> to fully grasp what is being asked.
 
-3. Carefully examine the <userAnswer> submitted by the student. Compare it against the <answer> to assess its accuracy and completeness.
+2. Study the <answer> (correct answer) carefully, identifying key points and concepts.
 
-4. If the <userAnswer> correctly addresses all the main points in the <answer> and demonstrates a solid understanding of the concepts, conclude that the student's answer is correct. Minor wording differences or extra details that don't contradict the <answer> are acceptable.
+3. Review the <additionalView> provided by the teacher, comparing it to the <answer> for accuracy and completeness.
 
-5. If the <userAnswer> is missing key information from the <answer>, contains incorrect statements, or fails to adequately demonstrate an understanding of the main concepts, conclude that the student's answer is incorrect.
+4. Examine the <userAnswer> (student's submission), comparing it to the <answer> for accuracy and completeness.
 
-6. Respond ONLY in JSON format, without any additional remarks, using the following format:
-{{
-  "isCorrect": (true or false)
-}}
+5. Determine correctness:
+   - If the <userAnswer> addresses all main points from the <answer> and shows solid concept understanding, consider it correct.
+   - Minor wording differences or additional non-contradictory details are acceptable.
+   - If the <userAnswer> lacks key information, contains errors, or fails to demonstrate understanding of main concepts, consider it incorrect.
 
-Remember, your assessment should be based on the accuracy and completeness of the <userAnswer> in relation to the provided <answer>. Do not introduce any new information or personal opinions. Focus solely on evaluating the student's understanding based on their submitted answer.
+Response Format:
 
-Take your time and consider each step carefully to ensure a fair and accurate evaluation. The student's learning depends on your diligent assessment.
+Respond ONLY in this JSON format, without any additional comments:
+
+{
+  "isCorrect": true/false
+}
+
+Important Notes:
+
+- Base your assessment solely on the <userAnswer>'s accuracy and completeness relative to the <answer>.
+- Do not introduce new information or personal opinions.
+- Focus exclusively on evaluating the student's understanding based on their submitted answer.
+- Take time to consider each step carefully, ensuring a fair and accurate evaluation.
+
+Your diligent assessment is crucial for the student's learning progress.
 `;
 
 // 사용자 입력을 위한 프롬프트 템플릿
 const problemEvaluationHumanTemplate = `
 <question>{question}</question>
+
+<additionalView>{additionalView}</additionalView>
 
 <answer>{answer}</answer>
 
