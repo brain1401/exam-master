@@ -41,7 +41,6 @@ export async function evaluateSubjectiveProblem({
       answer,
       userAnswer,
     },
-    {},
   );
 
   try {

@@ -29,9 +29,9 @@ Response Format:
 
 Respond ONLY in this JSON format, without any additional comments:
 
-{
+{{
   "isCorrect": true/false
-}
+}}
 
 Important Notes:
 
