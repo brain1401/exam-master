@@ -8,13 +8,13 @@ export async function POST(req: NextRequest) {
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   const requestBody = await req.json();
 
   const question = requestBody.question;
   const answer = requestBody.answer;
   const userAnswer = requestBody.userAnswer;
-
+  const additionalView = requestBody.additionalView;
   if (!question || !answer || !userAnswer) {
     return NextResponse.json(
       { error: "question, answer, userAnswer 중 하나가 비어있습니다." },
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
   }
 
   const result = await evaluateSubjectiveProblem({
+    additionalView,
     answer,
     question,
     userAnswer,

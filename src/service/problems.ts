@@ -2391,6 +2391,7 @@ export async function evaluateExamProblems(
               evaluationResult = false;
             } else {
               const subjectiveEvaluation = await evaluateSubjectiveProblem({
+                additionalView: examProblem.additionalView,
                 question: examProblem.question,
                 answer: isString(answer) ? answer : "",
                 userAnswer: examProblem.subAnswer,
