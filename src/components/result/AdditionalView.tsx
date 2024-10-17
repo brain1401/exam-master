@@ -10,7 +10,7 @@ export default function AdditionalView() {
   return (
     <>
       {additionalView && (
-        <div className="mb-5 whitespace-pre-line border border-black p-3">
+        <div className="mb-5 whitespace-pre-wrap border border-black p-3">
           {additionalView}
         </div>
       )}

@@ -84,8 +84,8 @@ export default function ExamProblem({
   const imageURL = currentProblem.image?.url ?? "";
 
   const additionalView = currentProblem.additionalView ? (
-    <div className="mb-5 flex w-full items-center justify-center whitespace-pre-line rounded-md border border-black px-2 py-4 sm:py-8">
-      {currentProblem?.additionalView}
+    <div className="mb-5 flex w-full items-center justify-center whitespace-pre-wrap rounded-md border border-black px-2 py-4 sm:py-8">
+      {currentProblem.additionalView}
     </div>
   ) : null;
 
