@@ -36,7 +36,7 @@ export default function TestGeneration() {
       setIsSuccess(false);
 
       await axios.post("/api/generateProblemsClaude", {
-        source,
+        ...(createOption === "existing" ? { source } : { topics: source }),
         createOption,
       });
     } catch (e) {
