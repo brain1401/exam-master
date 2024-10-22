@@ -1,17 +1,22 @@
-const nextBuildId = require("next-build-id");
+import type { NextConfig } from "next";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const GIT_HASH = process.env.GIT_HASH;
+
+const nextConfig: NextConfig = {
   reactStrictMode: false,
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: process.env.AWS_CLOUDFRONT_DOMAIN,
+        hostname: process.env.AWS_CLOUDFRONT_DOMAIN || "",
       },
     ],
   },
-  webpack(config) {
+  webpack(config, { buildId }) {
+    console.log(`현재 GIT HASH : ${GIT_HASH || "찾을 수 없음"}`);
+
+    console.log(`현재 Build ID : ${buildId}`);
+
     config.module.rules.push({
       test: /\.svg$/i,
       use: ["@svgr/webpack"],
@@ -38,7 +43,14 @@ const nextConfig = {
         },
       }
     : ""),
-  generateBuildId: () => nextBuildId({ dir: __dirname }),
+
+  ...(GIT_HASH
+    ? {
+        generateBuildId: async () => GIT_HASH,
+      }
+    : {}),
+  cacheHandler: require.resolve("./cache-handler.js"),
+  cacheMaxMemorySize: 0,
 };
 
 module.exports = nextConfig;

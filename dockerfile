@@ -17,15 +17,6 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-# ARG DATABASE_URL
-
-# RUN npm install -g drizzle-kit 
-# RUN npm install -g drizzle-orm
-
-# RUN \
-#   drizzle-kit generate:pg --schema=./schema.ts && \
-#   drizzle-kit push:pg --driver=pg --schema=./schema.ts --connectionString=$DATABASE_URL
-
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -80,9 +71,14 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
+ARG GIT_HASH
+ENV GIT_HASH=$GIT_HASH
+
+
 HEALTHCHECK --interval=1s --timeout=10s --start-period=5s --retries=60 \
   CMD curl --fail http://localhost:3000/ || exit 1
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
 CMD ["pm2-runtime", "start", "server.js"]
+
