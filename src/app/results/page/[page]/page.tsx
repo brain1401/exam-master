@@ -1,12 +1,18 @@
 import ResultsPaginationPage from "@/components/pagination/ResultsPaginationPage";
 
 type Props = {
-  params: {
+  params: Promise<{
     page: string;
-  };
+  }>;
 };
 
-export async function generateMetadata({ params: { page } }: Props) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
+
+  const {
+    page
+  } = params;
+
   return {
     title: `문제집 관리 | ${page} 페이지`,
     description: `문제집 관리 목록의 ${page} 페이지입니다.`,
@@ -18,6 +24,12 @@ export async function generateMetadata({ params: { page } }: Props) {
   };
 }
 
-export default async function ResultsPage({ params: { page } }: Props) {
+export default async function ResultsPage(props: Props) {
+  const params = await props.params;
+
+  const {
+    page
+  } = params;
+
   return <ResultsPaginationPage page={Number(page)} />;
 }

@@ -8,12 +8,18 @@ import {
 import { isValidUUID } from "@/utils/problems";
 
 type Props = {
-  params: {
+  params: Promise<{
     UUID: string;
-  };
+  }>;
 };
 
-export default async function PublicProblemResult({ params: { UUID } }: Props) {
+export default async function PublicProblemResult(props: Props) {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   if (
     !UUID ||
     !isValidUUID(UUID) ||

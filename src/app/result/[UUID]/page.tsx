@@ -13,14 +13,18 @@ import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 type Props = {
-  params: {
+  params: Promise<{
     UUID: string;
-  };
+  }>;
 };
 
-export async function generateMetadata({
-  params: { UUID },
-}: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   if (!isValidUUID(UUID)) {
     return {
       title: "시험 결과가 존재하지 않습니다.",
@@ -50,7 +54,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function page({ params: { UUID } }: Props) {
+export default async function page(props: Props) {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   if (!isValidUUID(UUID)) {
     // 에러 페이지로 리다이렉트 필요
     return <div>시험 결과가 존재하지 않습니다.</div>;

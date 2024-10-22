@@ -2,12 +2,16 @@ import ManagePaginationPage from "@/components/pagination/ManagePaginationPage";
 import type { Metadata } from "next";
 
 type Props = {
-  params: { query: string };
+  params: Promise<{ query: string }>;
 };
 
-export async function generateMetadata({
-  params: { query },
-}: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    query
+  } = params;
+
   const seachString = decodeURIComponent(
     Array.isArray(query) ? query.join(" ") : query,
   );
@@ -23,7 +27,13 @@ export async function generateMetadata({
   };
 }
 
-export default function ManageSearchPage({ params: { query } }: Props) {
+export default async function ManageSearchPage(props: Props) {
+  const params = await props.params;
+
+  const {
+    query
+  } = params;
+
   const seachString = Array.isArray(query) ? query.join(" ") : query;
 
   return (

@@ -13,14 +13,18 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 type Props = {
-  params: {
+  params: Promise<{
     UUID: string;
-  };
+  }>;
 };
 
-export async function generateMetadata({
-  params: { UUID },
-}: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   const session = await getServerSession();
 
   if (session?.user?.email) {
@@ -51,7 +55,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function DetailedExamPage({ params: { UUID } }: Props) {
+export default async function DetailedExamPage(props: Props) {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   const session = await getServerSession();
 
   if (!session || !session.user?.email) {

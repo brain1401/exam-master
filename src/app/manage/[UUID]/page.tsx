@@ -12,14 +12,18 @@ import CustomError from "@/components/error/CustomError";
 import ProblemSetAccessDenied from "@/components/ui/ProblemSetAccessDenied";
 import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 type Props = {
-  params: {
+  params: Promise<{
     UUID: string;
-  };
+  }>;
 };
 
-export async function generateMetadata({
-  params: { UUID },
-}: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   const session = await getServerSession();
 
   if (session?.user?.email) {
@@ -51,7 +55,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function ManageProblem({ params: { UUID } }: Props) {
+export default async function ManageProblem(props: Props) {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   const session = await getServerSession();
 
   if (!session || !session.user?.email) {

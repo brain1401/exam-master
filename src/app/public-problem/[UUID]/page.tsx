@@ -18,14 +18,18 @@ import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
-  params: {
+  params: Promise<{
     UUID: string;
-  };
+  }>;
 };
 
-export async function generateMetadata({
-  params: { UUID },
-}: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   if (!isValidUUID(UUID)) {
     return {
       title: "문제 세트를 찾을 수 없음",
@@ -63,7 +67,13 @@ export async function generateMetadata({
 
 export const dynamic = "force-dynamic";
 
-export default async function ProblemPage({ params: { UUID } }: Props) {
+export default async function ProblemPage(props: Props) {
+  const params = await props.params;
+
+  const {
+    UUID
+  } = params;
+
   const [session] = await Promise.all([getServerSession()]);
 
   const queryClient = new QueryClient();
