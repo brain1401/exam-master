@@ -28,11 +28,29 @@ export default function ExamHeader({
       setCurrentExamProblemIndex(currentExamProblemIndex + 1);
     }
   };
+
   const [value, setValue] = useState("1");
 
   useEffect(() => {
     setValue((currentExamProblemIndex + 1).toString());
   }, [currentExamProblemIndex]);
+
+  // 키보드 이벤트 핸들러
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        handlePrevQuestion();
+      } else if (e.key === "ArrowRight") {
+        handleNextQuestion();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentExamProblemIndex, totalProblems]);
 
   const handleChangeQuestion = () => {
     const newIndex = parseInt(value, 10) - 1;
