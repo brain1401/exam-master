@@ -17,7 +17,20 @@ export default function ExamHeader({
   totalProblems,
   publicExamProblemLength,
 }: Props) {
-  
+  // 다음 문제로 이동
+  const handleNextQuestion = useCallback(() => {
+    if (currentExamProblemIndex < totalProblems - 1) {
+      setCurrentExamProblemIndex(currentExamProblemIndex + 1);
+    }
+  }, [currentExamProblemIndex, setCurrentExamProblemIndex, totalProblems]);
+
+  // 다음 10문제 이동
+  const handleNextTenQuestion = useCallback(() => {
+    if (currentExamProblemIndex + 10 < totalProblems) {
+      setCurrentExamProblemIndex(currentExamProblemIndex + 10);
+    }
+  }, [currentExamProblemIndex, setCurrentExamProblemIndex, totalProblems]);
+
   // 이전 문제로 이동
   const handlePrevQuestion = useCallback(() => {
     if (currentExamProblemIndex > 0) {
@@ -25,12 +38,12 @@ export default function ExamHeader({
     }
   }, [currentExamProblemIndex, setCurrentExamProblemIndex]);
 
-  // 다음 문제로 이동
-  const handleNextQuestion = useCallback(() => {
-    if (currentExamProblemIndex < totalProblems - 1) {
-      setCurrentExamProblemIndex(currentExamProblemIndex + 1);
+  // 이전 10문제 이동
+  const handlePrevTenQuestion = useCallback(() => {
+    if (currentExamProblemIndex - 10 > 0) {
+      setCurrentExamProblemIndex(currentExamProblemIndex - 10);
     }
-  }, [currentExamProblemIndex, setCurrentExamProblemIndex, totalProblems]);
+  }, [currentExamProblemIndex, setCurrentExamProblemIndex]);
 
   const [value, setValue] = useState("1");
 
@@ -41,10 +54,20 @@ export default function ExamHeader({
   // 키보드 이벤트 핸들러
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        handlePrevQuestion();
-      } else if (e.key === "ArrowRight") {
-        handleNextQuestion();
+      const { key } = e;
+      switch (key) {
+        case "ArrowLeft":
+          handlePrevQuestion();
+          break;
+        case "ArrowRight":
+          handleNextQuestion();
+          break;
+        case "ArrowUp":
+          handleNextTenQuestion();
+          break;
+        case "ArrowDown":
+          handlePrevTenQuestion();
+          break;
       }
     };
 
@@ -53,7 +76,12 @@ export default function ExamHeader({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handlePrevQuestion, handleNextQuestion]);
+  }, [
+    handlePrevQuestion,
+    handleNextQuestion,
+    handleNextTenQuestion,
+    handlePrevTenQuestion,
+  ]);
 
   const handleChangeQuestion = () => {
     const newIndex = parseInt(value, 10) - 1;
