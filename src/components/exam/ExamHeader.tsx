@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -17,17 +17,20 @@ export default function ExamHeader({
   totalProblems,
   publicExamProblemLength,
 }: Props) {
-  const handlePrevQuestion = () => {
+  
+  // 이전 문제로 이동
+  const handlePrevQuestion = useCallback(() => {
     if (currentExamProblemIndex > 0) {
       setCurrentExamProblemIndex(currentExamProblemIndex - 1);
     }
-  };
+  }, [currentExamProblemIndex, setCurrentExamProblemIndex]);
 
-  const handleNextQuestion = () => {
+  // 다음 문제로 이동
+  const handleNextQuestion = useCallback(() => {
     if (currentExamProblemIndex < totalProblems - 1) {
       setCurrentExamProblemIndex(currentExamProblemIndex + 1);
     }
-  };
+  }, [currentExamProblemIndex, setCurrentExamProblemIndex, totalProblems]);
 
   const [value, setValue] = useState("1");
 
@@ -50,7 +53,7 @@ export default function ExamHeader({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [currentExamProblemIndex, totalProblems]);
+  }, [handlePrevQuestion, handleNextQuestion]);
 
   const handleChangeQuestion = () => {
     const newIndex = parseInt(value, 10) - 1;
