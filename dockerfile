@@ -29,6 +29,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
+ARG GIT_HASH
+ENV GIT_HASH=$GIT_HASH
+
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
@@ -70,10 +73,6 @@ ENV PORT 3000
 
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
-
-ARG GIT_HASH
-ENV GIT_HASH=$GIT_HASH
-
 
 HEALTHCHECK --interval=1s --timeout=10s --start-period=5s --retries=60 \
   CMD curl --fail http://localhost:3000/ || exit 1
