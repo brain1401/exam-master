@@ -4,9 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next --turbo",
-    "build:win": "gsudo pnpm next build",
-    "build:notWin": "pnpm next build",
-    "build": "node -e \"require('child_process').execSync(process.platform === 'win32' ? 'pnpm run build:win' : 'pnpm run build:notWin', {stdio: 'inherit'})\"",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -17,7 +15,7 @@
     "@aws-sdk/credential-provider-node": "^3.682.0",
     "@aws-sdk/s3-presigned-post": "^3.685.0",
     "@aws-sdk/types": "^3.679.0",
-    "@azure-rest/ai-document-intelligence": "^1.0.0-beta.3",
+    "@azure-rest/ai-document-intelligence": "1.0.0-beta.3",
     "@azure/core-auth": "^1.9.0",
     "@azure/identity": "^4.5.0",
     "@langchain/anthropic": "^0.3.7",
@@ -40,8 +38,8 @@
     "@radix-ui/react-toast": "^1.2.2",
     "@reduxjs/toolkit": "^2.3.0",
     "@sentry/nextjs": "^8.36.0",
-    "@tanstack/react-query": "^5.59.16",
-    "@tanstack/react-query-devtools": "^5.59.16",
+    "@tanstack/react-query": "^5.59.17",
+    "@tanstack/react-query-devtools": "^5.59.17",
     "@types/node": "22.8.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -84,6 +82,7 @@
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.2",
     "validator": "^13.12.0",
+    "workerpool": "^9.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
