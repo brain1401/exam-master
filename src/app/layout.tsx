@@ -86,7 +86,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" className="w-full md:w-auto" suppressHydrationWarning>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
       />
@@ -102,7 +102,7 @@ export default function RootLayout({
       <GoogleAdsense />
 
       <body
-        className={`${NotoSansKR.className} bg-background bg-cover bg-repeat antialiased`}
+        className={`${NotoSansKR.className} w-full bg-background bg-cover bg-repeat antialiased md:w-auto`}
       >
         <AuthContext>
           <ReduxProvider>
