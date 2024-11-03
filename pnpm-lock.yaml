@@ -96,14 +96,14 @@ importers:
         specifier: ^8.36.0
         version: 8.36.0(@opentelemetry/core@1.27.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.27.0(@opentelemetry/api@1.9.0))(next@15.0.2(@babel/core@7.26.0)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.96.1(esbuild@0.19.12))
       '@tanstack/react-query':
-        specifier: ^5.59.17
-        version: 5.59.17(react@18.3.1)
+        specifier: ^5.59.18
+        version: 5.59.18(react@18.3.1)
       '@tanstack/react-query-devtools':
-        specifier: ^5.59.17
-        version: 5.59.17(@tanstack/react-query@5.59.17(react@18.3.1))(react@18.3.1)
+        specifier: ^5.59.18
+        version: 5.59.18(@tanstack/react-query@5.59.18(react@18.3.1))(react@18.3.1)
       '@types/node':
-        specifier: 22.8.6
-        version: 22.8.6
+        specifier: 22.8.7
+        version: 22.8.7
       '@types/react':
         specifier: ^18.3.12
         version: 18.3.12
@@ -3216,14 +3216,14 @@ packages:
   '@tanstack/query-devtools@5.58.0':
     resolution: {integrity: sha512-iFdQEFXaYYxqgrv63ots+65FGI+tNp5ZS5PdMU1DWisxk3fez5HG3FyVlbUva+RdYS5hSLbxZ9aw3yEs97GNTw==}
 
-  '@tanstack/react-query-devtools@5.59.17':
-    resolution: {integrity: sha512-P5lRlPmSKXQZ+pzVFPMCrwKPyRtUk/yggtuceB435JPLiaP7UGoO6JQfSsaXHnVC9+LzRMYJjIEq6zm+1HteeQ==}
+  '@tanstack/react-query-devtools@5.59.18':
+    resolution: {integrity: sha512-9JqRPbt7p3mo0HhQpwxv7btu58o0Ew7CErFGgrO9s/fzj2+i1C2/XI1rSkYJKhKcun/iLRn56+zx2rYLkMiPoQ==}
     peerDependencies:
-      '@tanstack/react-query': ^5.59.17
+      '@tanstack/react-query': ^5.59.18
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.59.17':
-    resolution: {integrity: sha512-2taBKHT3LrRmS9ttUOmtaekVOXlZ5JXzNhL9Kmi6BSBdfIAZwEinMXZ8hffVuDpFoRCWlBaGcNkhP/zXgzq5ow==}
+  '@tanstack/react-query@5.59.18':
+    resolution: {integrity: sha512-tp/EP5q5ug9ijVB+3c9n4uULG9d2qmhMllqhtRMYv/l9PqqIA7C9s0ULsMxEeMNCQCdJ4gJqBSvqrC5Hz+fU+A==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -3276,11 +3276,11 @@ packages:
   '@types/node@10.14.22':
     resolution: {integrity: sha512-9taxKC944BqoTVjE+UT3pQH0nHZlTvITwfsOZqyc+R3sfJuxaTtxWjfn1K2UlxyPcKHf0rnaXcVFrS9F9vf0bw==}
 
-  '@types/node@18.19.63':
-    resolution: {integrity: sha512-hcUB7THvrGmaEcPcvUZCZtQ2Z3C+UR/aOcraBLCvTsFMh916Gc1kCCYcfcMuB76HM2pSerxl1PoP3KnmHzd9Lw==}
+  '@types/node@18.19.64':
+    resolution: {integrity: sha512-955mDqvO2vFf/oL7V3WiUtiz+BugyX8uVbaT2H8oj3+8dRyH2FLiNdowe7eNqRM7IOIZvzDH76EoAT+gwm6aIQ==}
 
-  '@types/node@22.8.6':
-    resolution: {integrity: sha512-tosuJYKrIqjQIlVCM4PEGxOmyg3FCPa/fViuJChnGeEIhjA46oy8FMVoF9su1/v8PNs2a8Q0iFNyOx0uOF91nw==}
+  '@types/node@22.8.7':
+    resolution: {integrity: sha512-LidcG+2UeYIWcMuMUpBKOnryBWG/rnmOHQR5apjn8myTQcx3rinFRn7DcIFhMnS0PPFSC6OafdIKEad0lj6U0Q==}
 
   '@types/pg-pool@2.0.6':
     resolution: {integrity: sha512-TaAUE5rq2VQYxab5Ts7WZhKNmuN78Q6PiFonTDdpbx8a1H0M1vhy3rhiMjl+e2iHmogyMw7jZF4FrE6eJUy5HQ==}
@@ -3647,8 +3647,8 @@ packages:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
 
-  caniuse-lite@1.0.30001676:
-    resolution: {integrity: sha512-Qz6zwGCiPghQXGJvgQAem79esjitvJ+CxSbSQkW9H/UX5hg8XM88d4lp2W+MEQ81j+Hip58Il+jGVdazk1z9cw==}
+  caniuse-lite@1.0.30001677:
+    resolution: {integrity: sha512-fmfjsOlJUpMWu+mAAtZZZHz7UEwsUxIIvu1TJfO1HqFQvB/B+ii0xr9B5HpbZY/mC4XZ8SvjHJqtAY6pDPQEog==}
 
   canvas-confetti@1.9.3:
     resolution: {integrity: sha512-rFfTURMvmVEX1gyXFgn5QMn81bYk70qa0HLzcIOSVEyl57n6o9ItHeBtUSWdvKAPY0xlvBHno4/v3QPrT83q9g==}
@@ -6096,7 +6096,7 @@ snapshots:
 
   '@anthropic-ai/sdk@0.27.3':
     dependencies:
-      '@types/node': 18.19.63
+      '@types/node': 18.19.64
       '@types/node-fetch': 2.6.11
       abort-controller: 3.0.0
       agentkeepalive: 4.5.0
@@ -6108,7 +6108,7 @@ snapshots:
 
   '@anthropic-ai/sdk@0.31.0':
     dependencies:
-      '@types/node': 18.19.63
+      '@types/node': 18.19.64
       '@types/node-fetch': 2.6.11
       abort-controller: 3.0.0
       agentkeepalive: 4.5.0
@@ -7872,7 +7872,7 @@ snapshots:
 
   '@ibm-cloud/watsonx-ai@1.1.2':
     dependencies:
-      '@types/node': 18.19.63
+      '@types/node': 18.19.64
       extend: 3.0.2
       ibm-cloud-sdk-core: 5.1.0
     transitivePeerDependencies:
@@ -9578,13 +9578,13 @@ snapshots:
 
   '@tanstack/query-devtools@5.58.0': {}
 
-  '@tanstack/react-query-devtools@5.59.17(@tanstack/react-query@5.59.17(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-query-devtools@5.59.18(@tanstack/react-query@5.59.18(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/query-devtools': 5.58.0
-      '@tanstack/react-query': 5.59.17(react@18.3.1)
+      '@tanstack/react-query': 5.59.18(react@18.3.1)
       react: 18.3.1
 
-  '@tanstack/react-query@5.59.17(react@18.3.1)':
+  '@tanstack/react-query@5.59.18(react@18.3.1)':
     dependencies:
       '@tanstack/query-core': 5.59.17
       react: 18.3.1
@@ -9597,7 +9597,7 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 22.8.6
+      '@types/node': 22.8.7
 
   '@types/crypto-js@4.2.2': {}
 
@@ -9629,20 +9629,20 @@ snapshots:
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 22.8.6
+      '@types/node': 22.8.7
 
   '@types/node-fetch@2.6.11':
     dependencies:
-      '@types/node': 22.8.6
+      '@types/node': 22.8.7
       form-data: 4.0.1
 
   '@types/node@10.14.22': {}
 
-  '@types/node@18.19.63':
+  '@types/node@18.19.64':
     dependencies:
       undici-types: 5.26.5
 
-  '@types/node@22.8.6':
+  '@types/node@22.8.7':
     dependencies:
       undici-types: 6.19.8
 
@@ -9652,13 +9652,13 @@ snapshots:
 
   '@types/pg@8.11.10':
     dependencies:
-      '@types/node': 22.8.6
+      '@types/node': 22.8.7
       pg-protocol: 1.7.0
       pg-types: 4.0.2
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 22.8.6
+      '@types/node': 22.8.7
       pg-protocol: 1.7.0
       pg-types: 2.2.0
 
@@ -9990,7 +9990,7 @@ snapshots:
   autoprefixer@10.4.20(postcss@8.4.47):
     dependencies:
       browserslist: 4.24.2
-      caniuse-lite: 1.0.30001676
+      caniuse-lite: 1.0.30001677
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.1
@@ -10070,7 +10070,7 @@ snapshots:
 
   browserslist@4.24.2:
     dependencies:
-      caniuse-lite: 1.0.30001676
+      caniuse-lite: 1.0.30001677
       electron-to-chromium: 1.5.50
       node-releases: 2.0.18
       update-browserslist-db: 1.1.1(browserslist@4.24.2)
@@ -10102,7 +10102,7 @@ snapshots:
 
   camelcase@6.3.0: {}
 
-  caniuse-lite@1.0.30001676: {}
+  caniuse-lite@1.0.30001677: {}
 
   canvas-confetti@1.9.3: {}
 
@@ -11197,7 +11197,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.8.6
+      '@types/node': 22.8.7
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -11477,7 +11477,7 @@ snapshots:
       '@swc/counter': 0.1.3
       '@swc/helpers': 0.5.13
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001676
+      caniuse-lite: 1.0.30001677
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -11574,7 +11574,7 @@ snapshots:
 
   openai@4.70.2(zod@3.23.8):
     dependencies:
-      '@types/node': 18.19.63
+      '@types/node': 18.19.64
       '@types/node-fetch': 2.6.11
       abort-controller: 3.0.0
       agentkeepalive: 4.5.0
