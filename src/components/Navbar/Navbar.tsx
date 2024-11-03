@@ -3,7 +3,6 @@ import Link from "next/link";
 import Logo from "../../../public/images/Exam Master.svg";
 import { HiMenu } from "react-icons/hi";
 import useIsMobileNavMenuOpen from "@/hooks/useIsMobileNavMenuOpen";
-import { useTheme } from "next-themes";
 import ToggleThemeButton from "../ui/ToggleThemeButton";
 
 const LIST_ITEM =
@@ -23,11 +22,10 @@ type Props = {
 };
 
 export default function Navbar({ loginButton }: Props) {
-  const { resolvedTheme } = useTheme();
   const { toggleMobileMenu } = useIsMobileNavMenuOpen();
 
   return (
-    <nav className="relative z-30 flex h-[3.6rem] justify-center after:absolute after:bottom-0 after:left-[-10rem] after:right-[-10rem] after:h-[1px] after:bg-gray-300 after:content-['']">
+    <nav className="relative z-30 flex h-[3.6rem] justify-center border-b border-gray-300 md:border-none md:after:absolute md:after:bottom-0 md:after:left-[-10rem] md:after:right-[-10rem] md:after:h-[1px] md:after:bg-gray-300 md:after:content-['']">
       <div className="flex w-[100dvw] max-w-[110rem] items-center justify-center">
         <div className="flex w-full items-center justify-between md:gap-3">
           <div className="flex items-center justify-center">
