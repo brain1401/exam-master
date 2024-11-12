@@ -4,13 +4,13 @@ import { Viewport } from "next";
 import MainNavbar from "@/components/Navbar/MainNavbar";
 import AuthContext from "@/context/AuthContext";
 import localFont from "next/font/local";
-import Script from "next/script";
 import ReduxProvider from "@/context/ReduxContext";
 import ReactQueryContext from "@/context/ReactQueryContext";
 import { Toaster } from "@/components/ui/toaster";
 import JotaiProvider from "@/context/JotaiContext";
-import { ThemeProvider } from "@/context/ThemeContext";
-import GoogleAdsense from "./components/GoogleAdsense";
+import { ThemeProvider } from "next-themes";
+import GoogleAdsense from "../components/script/GoogleAdsense";
+import GoogleAnalytics from "@/components/script/GoogleAnalytics";
 
 const NotoSansKR = localFont({
   src: [
@@ -87,18 +87,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className="w-full md:w-auto" suppressHydrationWarning>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
-      />
-      <Script id="google-analytics">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
- 
-          gtag('config', '${process.env.NEXT_PUBLIC_GTM}');
-        `}
-      </Script>
+      <GoogleAnalytics />
       <GoogleAdsense />
 
       <body
