@@ -23,16 +23,6 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
-  experimental: {
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
-      },
-    },
-  },
   output: "standalone",
   ...(process.env.NODE_ENV === "production"
     ? {
@@ -42,7 +32,18 @@ const nextConfig: NextConfig = {
           },
         },
       }
-    : ""),
+    : {
+        experimental: {
+          turbo: {
+            rules: {
+              "*.svg": {
+                loaders: ["@svgr/webpack"],
+                as: "*.js",
+              },
+            },
+          },
+        },
+      }),
 
   ...(GIT_HASH
     ? {
