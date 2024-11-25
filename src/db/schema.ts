@@ -47,11 +47,7 @@ export const problemSet = pgTable(
     }).notNull(),
     isPublic: boolean("isPublic").default(false).notNull(),
   },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("ProblemSet_uuid_key").on(table.uuid),
-    };
-  },
+  (table) => [uniqueIndex("ProblemSet_uuid_key").on(table.uuid)],
 );
 
 export const problemSetRelation = relations(problemSet, ({ many, one }) => ({
@@ -95,14 +91,10 @@ export const problem = pgTable(
       }),
     isAnswerMultiple: boolean("isAnswerMultiple").default(false).notNull(),
   },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("Problem_uuid_key").on(table.uuid),
-    };
-  },
+  (table) => [uniqueIndex("Problem_uuid_key").on(table.uuid)],
 );
 
-export const problemRelation = relations(problem, ({ one, many }) => ({
+export const problemRelation = relations(problem, ({ one }) => ({
   problemSet: one(problemSet, {
     fields: [problem.problemSetUuid],
     references: [problemSet.uuid],
@@ -143,11 +135,7 @@ export const result = pgTable(
       withTimezone: true,
     }).notNull(),
   },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("Result_uuid_key").on(table.uuid),
-    };
-  },
+  (table) => [uniqueIndex("Result_uuid_key").on(table.uuid)],
 );
 
 export const resultRelation = relations(result, ({ many, one }) => ({
@@ -198,11 +186,7 @@ export const problemResult = pgTable(
       withTimezone: true,
     }).notNull(),
   },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("ProblemResult_uuid_key").on(table.uuid),
-    };
-  },
+  (table) => [uniqueIndex("ProblemResult_uuid_key").on(table.uuid)],
 );
 
 export const problemResultRelation = relations(problemResult, ({ one }) => ({
@@ -232,9 +216,7 @@ export const imageToUser = pgTable(
         onUpdate: "cascade",
       }),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.imageUuid, t.userUuid] }),
-  }),
+  (t) => [primaryKey({ columns: [t.imageUuid, t.userUuid] })],
 );
 
 export const imageToUserRelation = relations(imageToUser, ({ one }) => ({
@@ -271,12 +253,10 @@ export const user = pgTable(
       withTimezone: true,
     }).notNull(),
   },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("User_uuid_key").on(table.uuid),
-      emailKey: uniqueIndex("User_email_key").on(table.email),
-    };
-  },
+  (table) => [
+    uniqueIndex("User_uuid_key").on(table.uuid),
+    uniqueIndex("User_email_key").on(table.email),
+  ],
 );
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -313,9 +293,7 @@ export const likedProblemSets = pgTable(
       .default(sql`now()`)
       .notNull(),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.problemSetUuid, t.userUuid] }),
-  }),
+  (t) => [primaryKey({ columns: [t.problemSetUuid, t.userUuid] })],
 );
 
 export const likedProblemSetsRelation = relations(
@@ -344,17 +322,15 @@ export const image = pgTable(
     url: text("url").notNull(),
     hash: text("hash").notNull(),
   },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("Image_uuid_key").on(table.uuid),
-      keyKey: uniqueIndex("Image_key_key").on(table.key),
-      urlKey: uniqueIndex("Image_url_key").on(table.url),
-      hashKey: uniqueIndex("Image_hash_key").on(table.hash),
-    };
-  },
+  (table) => [
+    uniqueIndex("Image_uuid_key").on(table.uuid),
+    uniqueIndex("Image_key_key").on(table.key),
+    uniqueIndex("Image_url_key").on(table.url),
+    uniqueIndex("Image_hash_key").on(table.hash),
+  ],
 );
 
-export const imageRelation = relations(image, ({ many, one }) => ({
+export const imageRelation = relations(image, ({ many }) => ({
   users: many(imageToUser),
   problems: many(problem),
   problemResults: many(problemResult),
@@ -393,11 +369,7 @@ export const problemSetComment = pgTable(
       withTimezone: true,
     }).notNull(),
   },
-  (table) => {
-    return {
-      uuidKey: uniqueIndex("Comment_uuid_key").on(table.uuid),
-    };
-  },
+  (table) => [uniqueIndex("Comment_uuid_key").on(table.uuid)],
 );
 
 export const problemSetCommentRelation = relations(
@@ -434,14 +406,12 @@ export const generationCount = pgTable(
       withTimezone: true,
     }).notNull(),
   },
-  (table) => {
-    return {
-      userWeekIndex: uniqueIndex("GenerationCount_userUuid_weekStart_key").on(
-        table.userUuid,
-        table.weekStart
-      ),
-    };
-  }
+  (table) => [
+    uniqueIndex("GenerationCount_userUuid_weekStart_key").on(
+      table.userUuid,
+      table.weekStart,
+    ),
+  ],
 );
 
 export const generationCountRelations = relations(generationCount, ({ one }) => ({
