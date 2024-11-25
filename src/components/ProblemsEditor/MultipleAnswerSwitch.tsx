@@ -1,15 +1,11 @@
-import SimpleLabel from "../ui/SimpleLabel";
-import { ChangeEvent } from "react";
 import useProblems from "@/hooks/useProblems";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 
 export default function MultipleAnswerSwitch() {
-  const {currentProblem, setCurrentProblem} = useProblems();
+  const { currentProblem, setCurrentProblem } = useProblems();
 
-  const handleMultipleAnswerCheckboxChange = (
-    checked: boolean,
-  ) => {
+  const handleMultipleAnswerCheckboxChange = (checked: boolean) => {
     if (!currentProblem) throw new Error("무언가가 잘못되었습니다.");
 
     const count = currentProblem.candidates?.reduce((acc, cur) => {

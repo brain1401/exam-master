@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { canUserGenerateProblemSet } from "@/service/user";
 
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
   const session = await getServerSession();
   const email = session?.user?.email;
   

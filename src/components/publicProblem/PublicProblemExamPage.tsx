@@ -8,21 +8,14 @@ import ExamLayout from "../layouts/ExamLayout";
 
 export default function PublicProblemExamPage() {
   const {
-    isExamStarted,
     currentPublicExamProblem,
     timeLimit,
     publicExamProblemSet,
     publicExamProblems,
-    isRandomSelected,
     isTimeOver,
     setIsTimeOver,
-    setPublicExamProblemSet,
     currentPublicExamProblemCandidates,
-    setCurrentPublicExamProblem,
     setCurrentPublicExamProblemCandidates,
-    setPublicExamProblems,
-    setTimeLimit,
-    setIsExamStarted,
     setCurrentPublicExamProblemSubAnswer,
     currentExamProblemIndex,
     setCurrentExamProblemIndex,
@@ -46,7 +39,7 @@ export default function PublicProblemExamPage() {
   }, [publicExamProblems]);
 
   return (
-    <ExamLayout > 
+    <ExamLayout>
       <ExamHeader
         totalProblems={publicExamProblems?.length ?? 0}
         currentExamProblemIndex={currentExamProblemIndex}

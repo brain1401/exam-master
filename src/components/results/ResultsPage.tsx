@@ -12,16 +12,17 @@ import {
   userEmailAtom,
 } from "@/jotai/pagination";
 import useRevalidation from "@/hooks/useRevalidate";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ResultsWithPagination } from "@/types/problems";
 import { fetchExamResults } from "@/utils/problems";
-import { defaultPageSize } from "@/const/pageSize";
+
 type Props = {
   userEmail: string;
   maxPage: number;
   page: number;
   searchString?: string;
 };
+
 export default function ResultsPage({
   userEmail,
   maxPage,
@@ -37,7 +38,6 @@ export default function ResultsPage({
   //화면 전환 시 자연스러운 페이지네이션 바를 위한 전역 상태
   const {
     resultPage,
-    resultMaxPage,
     pageSize,
     setUserEmail,
     setResultsPage,

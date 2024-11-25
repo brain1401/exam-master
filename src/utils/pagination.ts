@@ -1,4 +1,3 @@
-import usePagenationState from "@/hooks/usePagenationState";
 import {
   fetchExamResults,
   fetchProblemSets,

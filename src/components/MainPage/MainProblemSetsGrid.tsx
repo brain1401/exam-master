@@ -9,7 +9,6 @@ import {
   CardTitle,
   CardHeader,
   CardDescription,
-  CardFooter,
 } from "../ui/problemGridCard";
 import { fetchPublicProblemSets } from "@/utils/problems";
 import PublicProblemSetsCardSkeleton from "./PublicProblemSetsCardSkeleton";
@@ -64,7 +63,7 @@ export default function MainProblemSetsGrid() {
       return (
         publicProblemSets?.data && (
           <ProblemSetsGridLayout type="public">
-            {publicProblemSets?.data.map((publicProblemSet, i) => (
+            {publicProblemSets?.data.map((publicProblemSet) => (
               <ProblemGridCardLayout key={publicProblemSet.uuid}>
                 <Card className="flex h-full flex-col">
                   <Link
@@ -87,7 +86,9 @@ export default function MainProblemSetsGrid() {
                           </div>
                           <div>{`${publicProblemSet.examProblemsCount}문제`}</div>
                           <div>
-                            {new Date(publicProblemSet.updatedAt).toLocaleString("ko-KR", {
+                            {new Date(
+                              publicProblemSet.updatedAt,
+                            ).toLocaleString("ko-KR", {
                               year: "numeric",
                               month: "long",
                               day: "2-digit",

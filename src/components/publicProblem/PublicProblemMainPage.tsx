@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useRevalidation from "@/hooks/useRevalidate";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -22,7 +22,6 @@ type Props = {
 export default function PublicProblemMainPage({
   publicSetUUID,
   userEmail,
-  userName,
   userUUID,
 }: Props) {
   const {
@@ -50,7 +49,6 @@ export default function PublicProblemMainPage({
     queryKey: ["publicProblemLikes", publicSetUUID, userEmail],
     queryFn: () => fetchPublicProblemLikes(publicSetUUID),
   });
-
 
   useEffect(() => {
     if (isRandomSelected) {

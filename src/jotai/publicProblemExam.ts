@@ -104,8 +104,7 @@ export const currentPublicExamProblemSubAnswerAtom = atom(
   },
 );
 
-
-export const resetPublicProblemExamAtom = atom(null, (get, set) => {
+export const resetPublicProblemExamAtom = atom(null, (_, set) => {
   set(isExamStartedAtom, false);
   set(isTimeOverAtom, false);
   set(currentExamProblemIndexAtom, 0);

@@ -6,8 +6,6 @@ import ProblemsOption from "@/components/ProblemsEditor/ProblemsOption";
 import ManageProblemSubmitButton from "@/components/ManageProblems/ManageProblemSubmitButton";
 import ProblemEditorLayout from "../layouts/ProblemEditorLayout";
 import useProblems from "@/hooks/useProblems";
-import { Button } from "../ui/button";
-import { FiShare } from "react-icons/fi";
 import { ProblemSetWithName } from "@/types/problems";
 import { useHydrateAtoms } from "jotai/utils";
 import {

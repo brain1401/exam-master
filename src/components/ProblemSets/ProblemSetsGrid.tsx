@@ -2,13 +2,11 @@
 import ProblemSetsCard from "./ProblemSetsCard";
 import { ProblemSet, ProblemSetWithPagination } from "@/types/problems";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import usePagenationState from "@/hooks/usePagenationState";
 import ProblemSetsCardSkeleton from "./ProblemSetsCardSkeleton";
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
 import { fetchProblemSets } from "@/utils/problems";
 import ProblemGridCardLayout from "../layouts/ProblemGridCardLayout";
-import JotaiProvider from "@/context/JotaiContext";
 
 type Props = {
   type: "manage" | "exam";

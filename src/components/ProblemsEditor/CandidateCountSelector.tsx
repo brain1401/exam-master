@@ -1,13 +1,11 @@
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ChangeEvent, useEffect, useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import useProblems from "@/hooks/useProblems";
 import { Label } from "../ui/label";
 export default function CandidateCountSelector() {

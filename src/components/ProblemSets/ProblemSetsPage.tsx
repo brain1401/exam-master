@@ -88,7 +88,7 @@ export default function ProblemSetsPage({
     searchString ?? "",
   );
 
-  const { isRandomExam, setIsRandomExam } = useExamExternelState();
+  const { setIsRandomExam } = useExamExternelState();
 
   const [localIsRandomExam, setLocalIsRandomExam] = useState(false);
 

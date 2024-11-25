@@ -13,13 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import CopyableText from "@/components/ui/CopyableText";
 
-type GeneratePageContentProps = {
-  email: string | null;
-};
-
-export default function GeneratePageContent({
-  email,
-}: GeneratePageContentProps) {
+export default function GeneratePageContent() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -47,7 +41,9 @@ export default function GeneratePageContent({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="dark:bg-gray-800">
           <DialogHeader>
-            <DialogTitle className="dark:text-white">AI 문제 생성 안내</DialogTitle>
+            <DialogTitle className="dark:text-white">
+              AI 문제 생성 안내
+            </DialogTitle>
             <DialogDescription className="dark:text-gray-300">
               AI를 이용한 문제 생성 기능에 대한 중요한 안내사항입니다.
             </DialogDescription>
@@ -70,7 +66,9 @@ export default function GeneratePageContent({
                   <span className="mr-3 mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white dark:bg-blue-600">
                     {index + 1}
                   </span>
-                  <span className="text-gray-700 dark:text-gray-300">{item}</span>
+                  <span className="text-gray-700 dark:text-gray-300">
+                    {item}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -81,7 +79,12 @@ export default function GeneratePageContent({
             </p>
           </div>
           <DialogFooter>
-            <Button onClick={handleConfirm} className="dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white">오늘은 그만보기</Button>
+            <Button
+              onClick={handleConfirm}
+              className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+            >
+              오늘은 그만보기
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

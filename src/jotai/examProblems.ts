@@ -128,7 +128,7 @@ export const examProblemSetNameAtom = atom(
   },
 );
 
-export const resetExamProblemAnswersAtom = atom(null, (get, set) => {
+export const resetExamProblemAnswersAtom = atom(null, (_, set) => {
   set(currentExamProblemIndexAtom, 0);
   set(examProblemSetAtom, null);
   set(isExamStartedAtom, false);

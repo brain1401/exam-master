@@ -67,7 +67,7 @@ export default function ExamComments({
       );
       return { previousComment };
     },
-    onError: (err, newComment, context) => {
+    onError: (_error, _newComment, context) => {
       queryClient.setQueryData<ProblemSetComment[]>(
         ["problemSetComments", publicSetUUID],
         context?.previousComment,
@@ -106,7 +106,7 @@ export default function ExamComments({
 
       return { previousComment };
     },
-    onError: (err, commentUUID, context) => {
+    onError: (_error, _commentUUID, context) => {
       queryClient.setQueryData<ProblemSetComment[]>(
         ["problemSetComments", publicSetUUID],
         context?.previousComment,
@@ -164,7 +164,7 @@ export default function ExamComments({
       return;
     }
   };
-  
+
   return (
     <div className="mt-8">
       <h2 className="text-xl font-semibold">{`댓글 (${comments?.length})`}</h2>

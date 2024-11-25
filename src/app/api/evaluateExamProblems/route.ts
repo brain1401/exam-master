@@ -1,5 +1,5 @@
 import { evaluateExamProblems } from "@/service/problems";
-import { ExamProblem, examProblemsSchema, uuidSchema } from "@/types/problems";
+import { ExamProblem, examProblemsSchema } from "@/types/problems";
 import { getServerSession } from "next-auth";
 import { NextResponse, NextRequest } from "next/server";
 

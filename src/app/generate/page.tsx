@@ -21,5 +21,5 @@ export default async function GeneratePage() {
     redirect("/generate/limit-reached");
   }
 
-  return <GeneratePageContent email={email} />;
+  return <GeneratePageContent />;
 }

@@ -1,16 +1,12 @@
 "use client";
 
-import { SortType } from "@/types/problems";
 import MainPageSearchBar from "./MainPageSearchBar";
 import { useHydrateAtoms } from "jotai/utils";
 import {
   publicProblemSetsMaxPageAtom,
   publicProblemSetsPageAtom,
 } from "@/jotai/pagination";
-import {
-  publicProblemSetSearchStringAtom,
-  publicProblemSetSortAtom,
-} from "@/jotai/publicProblem";
+import { publicProblemSetSearchStringAtom } from "@/jotai/publicProblem";
 import MainProblemSetsGrid from "./MainProblemSetsGrid";
 import PaginationButton from "../ui/PaginationButton";
 import { useEffect } from "react";
@@ -72,7 +68,7 @@ export default function PublicProblemsPage({
   return (
     <div className="mx-auto flex w-full max-w-[70rem] justify-center px-5">
       <div>{/* 광고 */}</div>
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div>
           <div className="flex w-full flex-col pt-10">
             <h2 className="mb-4 text-[1.5rem] font-semibold text-primary">

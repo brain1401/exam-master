@@ -8,7 +8,6 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import JotaiProvider from "@/context/JotaiContext";
 import { isValidUUID } from "@/utils/problems";
-import CustomError from "@/components/error/CustomError";
 import ProblemSetAccessDenied from "@/components/ui/ProblemSetAccessDenied";
 import ProblemSetNotFound from "@/components/ui/ProblemSetNotFound";
 type Props = {

@@ -1,12 +1,5 @@
 import ProblemSetsGridLayout from "../layouts/ProblemSetsGridLayout";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 
 type Props = {

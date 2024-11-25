@@ -14,7 +14,7 @@ import {
   currentProblemAtom,
   currentProblemCandidatesAtom,
 } from "@/jotai/problems";
-import { useAtom, useSetAtom, useAtomValue } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 
 export default function useProblems() {
   const [problems, setProblems] = useAtom(problemsAtom);

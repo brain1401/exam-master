@@ -371,8 +371,7 @@ export async function fetchPublicProblemSetsMaxPage(
 
     if (data) {
       return data.pagination.pageCount;
-    }
-    else {
+    } else {
       return null;
     }
   } catch (err) {
@@ -540,7 +539,7 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
               "캐시에는 있는데 해당하는 이미지 정보를 찾지 못했습니다.",
             );
 
-          const { index, image } = values;
+          const { index } = values;
           imageCache.set(imageKey, {
             index: [...index, i],
             isUnique: false,
@@ -628,7 +627,6 @@ export async function analyzeProblemsImagesAndDoCallback<T>({
 
   for (const value of imageCache.values()) {
     const index = value.index;
-    const image = value.image;
     const isUnique = value.isUnique;
 
     for (const i of index) {

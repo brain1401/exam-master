@@ -13,8 +13,6 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
-  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
@@ -29,8 +27,6 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const [isError, setIsError] = useState(false);
 
   const { revalidateAllPathAndRedirect } = useRevalidation();
 
@@ -74,7 +70,6 @@ export default function ExamSubmitButton({ problemSet, className }: Props) {
     } catch (e) {
       if (e instanceof Error) {
         alert(e.message);
-        setIsError(true);
         console.error(e);
       }
     } finally {

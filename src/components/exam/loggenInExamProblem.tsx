@@ -3,7 +3,6 @@ import usePreventClose from "@/hooks/usePreventClose";
 import useExamProblems from "@/hooks/useExamProblems";
 import { ExamProblemSet } from "@/types/problems";
 import { useEffect } from "react";
-import useRevalidation from "@/hooks/useRevalidate";
 import ExamLayout from "../layouts/ExamLayout";
 import ExamHeader from "../exam/ExamHeader";
 import ExamProblem from "../exam/ExamProblem";

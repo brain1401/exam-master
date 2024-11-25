@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CreateOption, GenerateQuestionResponse } from "@/types/problems";
+import { CreateOption } from "@/types/problems";
 import { RadioGroup, RadioGroupItem } from "@/app/components/ui/radio-group";
 import axios from "axios";
 import { useEffect, useState } from "react";

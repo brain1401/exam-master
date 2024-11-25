@@ -14,7 +14,7 @@ import CorrectMark from "../../../public/images/correctCircle.png";
 import WrongMark from "../../../public/images/wrong.png";
 import Image from "next/image";
 import { isImageUrlObject } from "@/utils/problems";
-import { ExamResultsSet, ProblemResult } from "@/types/problems";
+import { ExamResultsSet } from "@/types/problems";
 import { useHydrateAtoms } from "jotai/utils";
 import { examResultsSetAtom } from "@/jotai/examResult";
 import { Button } from "../ui/button";

@@ -22,7 +22,6 @@ import {
   DialogTitle,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
   DialogTrigger,
 } from "../ui/dialog";
 import { useToast } from "../ui/use-toast";
@@ -34,6 +33,7 @@ import {
   HoverCardTrigger,
 } from "@/app/components/ui/hover-card";
 import { Info } from "lucide-react";
+import ProblemGroupSetterDialog from "./ProblemGroupSetterDialog";
 
 const BUTTON_CLASSNAMES = "w-[4rem] rounded-lg";
 // "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
@@ -64,7 +64,9 @@ export default function ProblemsOption({ type }: Props) {
   const [textarea, setTextarea] = useState(description);
   const [timeInput, setTimeInput] = useState(timeLimit || "0");
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isProblemSetSettingDialogOpen, setIsProblemSetSettingDialogOpen] =
+    useState(false);
+
   const { toast } = useToast();
   const handleProblemLengthChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -181,7 +183,7 @@ export default function ProblemsOption({ type }: Props) {
   const onProblemSetDescriptionOK = () => {
     setDescription(textarea);
     setTimeLimit(timeInput);
-    setIsDialogOpen(false);
+    setIsProblemSetSettingDialogOpen(false);
   };
 
   const onProblemSetDescriptionCancel = () => {
@@ -191,6 +193,9 @@ export default function ProblemsOption({ type }: Props) {
 
   return (
     <div className="my-5 flex w-full flex-col gap-2">
+      <ProblemGroupSetterDialog>
+        <Button>문제 그룹 설정</Button>
+      </ProblemGroupSetterDialog>
       <div className="flex items-center">
         <Label className="mr-2 text-[.9rem]">최대 문제 수</Label>
         <Input
@@ -249,7 +254,10 @@ export default function ProblemsOption({ type }: Props) {
               </div>
 
               {problemSetIsPublic ? (
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog
+                  open={isProblemSetSettingDialogOpen}
+                  onOpenChange={setIsProblemSetSettingDialogOpen}
+                >
                   <DialogTrigger
                     className="absolute left-0 right-0 top-full mt-2 flex justify-end max-[520px]:w-[7rem] max-[520px]:justify-start md:block md:w-full"
                     asChild
@@ -295,14 +303,14 @@ export default function ProblemsOption({ type }: Props) {
                         )}
 
                         <div className="flex items-center justify-center">
-                          <Label className="mr-2 text-[.9rem] ">제한시간</Label>
+                          <Label className="mr-2 text-[.9rem]">제한시간</Label>
                           <Input
                             inputClassName="w-[3rem] h-[2.2rem] text-center"
                             value={timeInput}
                             allowOnlyNumber
                             onChange={(e) => setTimeInput(e.target.value)}
                           />
-                          <Label className="ml-2 text-[.9rem] ">분</Label>
+                          <Label className="ml-2 text-[.9rem]">분</Label>
                         </div>
                       </div>
                       <DialogTitle>{`문제집 ${type === "manage" ? "수정" : "설정"}`}</DialogTitle>

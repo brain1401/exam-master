@@ -7,10 +7,7 @@ import Link from "next/link";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
-  CardProps,
   CardTitle,
 } from "../ui/problemGridCard";
 import { useEffect, useState } from "react";

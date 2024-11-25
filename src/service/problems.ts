@@ -16,13 +16,11 @@ import {
   ExamResultsSet,
   ProblemSetWithName,
   ExamResultCandidate,
-  ProblemResult,
 } from "@/types/problems";
 import { getUserUUIDbyEmail } from "./user";
 import {
   analyzeProblemsImagesAndDoCallback,
   generateFileHash,
-  isImageUrlObject,
   isString,
   isValidUUID,
 } from "@/utils/problems";
@@ -35,26 +33,12 @@ import {
 
 import {
   eq,
-  ne,
-  gt,
-  gte,
-  lt,
-  lte,
-  isNull,
-  isNotNull,
-  between,
-  notBetween,
   like,
-  ilike,
-  notLike,
-  not,
   and,
   or,
   inArray,
-  notInArray,
   count,
   desc,
-  asc,
 } from "drizzle-orm";
 
 import {
@@ -244,7 +228,6 @@ export async function updateProblems({
           duplicateIndexes,
           isFirstImage,
           imageKey,
-          toBeCallbacked,
         }) => {
           if (!isNoImage && isFirstImage && imageKey) {
             const uuid = await createImageOnDBIfNotExistByS3Key(
@@ -639,7 +622,7 @@ export async function getRandomExamProblemsByProblemSetUUID(
     throw null;
   }
 
-  const examProblems: ExamProblem[] = data.problems.map((problem, i) => {
+  const examProblems: ExamProblem[] = data.problems.map((problem) => {
     if (!problem) throw new Error("문제가 없습니다.");
 
     return {
@@ -689,7 +672,7 @@ export async function getExamProblemsByProblemSetUUID(
     throw null;
   }
 
-  const examProblems: ExamProblem[] = data.problems.map((problem, i) => {
+  const examProblems: ExamProblem[] = data.problems.map((problem) => {
     if (!problem) throw new Error("문제가 없습니다.");
 
     return {
@@ -932,27 +915,6 @@ export function isCandidateArray(candidates: any): candidates is Candidate[] {
     })
   );
 }
-
-function stringToBoolean(value: string): boolean {
-  if (value === "true") {
-    return true;
-  } else if (value === "false") {
-    return false;
-  }
-  throw new Error("Invalid input");
-}
-
-type ProblemsAndSetName = {
-  problemSetName: string;
-  problemSetIsPublic: boolean;
-  description?: string;
-  timeLimit?: number;
-  problems: ProblemReplacedImageKey[];
-};
-
-type ProblemsAndSetsNameWithUUID = ProblemsAndSetName & {
-  problemSetUUID: string;
-};
 
 export async function getExamResultsByUUID(
   resultUuid: string,
@@ -1272,7 +1234,7 @@ export async function deleteImagesFromSet(
             const command = new PutObjectCommand({
               Bucket: process.env.AWS_S3_BUCKET_NAME,
               Key: image.imageKey,
-              Body: (await image.imageFile.arrayBuffer()) as Uint8Array,
+              Body: (await image.imageFile.arrayBuffer()) as unknown as Uint8Array,
               ContentType: image.imageFile.type,
             });
             const response = await s3.send(command);
@@ -1678,7 +1640,7 @@ export async function getPublicProblemSetsByName(
             ),
           offset: (page - 1) * pageSize,
           limit: pageSize,
-          orderBy: (problemSet, { desc, asc }) => [desc(problemSet.updatedAt)],
+          orderBy: (problemSet, { desc }) => [desc(problemSet.updatedAt)],
           with: {
             problems: {
               orderBy: (problem, { asc }) => [asc(problem.order)],
@@ -2578,4 +2540,46 @@ export async function getPublicProblemSetsMaxPage(
     console.log(err);
     throw new Error("문제집 페이지 수를 불러오는 중 오류가 발생했습니다.");
   }
+}
+
+export async function getUserProblemSetsInfos(userUUID: string) {
+  const data = await drizzleSession.transaction(async (dt) => {
+    const problemSetUUIDs = await dt.query.problemSet.findMany({
+      where: eq(problemSet.userUuid, userUUID),
+    });
+
+    return problemSetUUIDs.map((problemSet) => ({
+      name: problemSet.name,
+      uuid: problemSet.uuid,
+    }));
+  });
+
+  return data;
+}
+
+export async function getUserProblemGroupsInfos(
+  userUUID: string,
+  search?: string,
+) {
+  const data = await drizzleSession.transaction(async (dt) => {
+    const problemGroupUUIDs = await dt.query.problemSetGroup.findMany({
+      where: (problemSetGroup, { and, eq, like }) => {
+        if (search) {
+          console.log("search : ", search);
+          return and(
+            eq(problemSetGroup.userUuid, userUUID),
+            like(problemSetGroup.name, `%${search}%`),
+          );
+        }
+        return eq(problemSetGroup.userUuid, userUUID);
+      },
+    });
+
+    return problemGroupUUIDs.map((problemGroup) => ({
+      name: problemGroup.name,
+      uuid: problemGroup.uuid,
+    }));
+  });
+
+  return data;
 }

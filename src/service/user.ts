@@ -1,9 +1,8 @@
 import drizzleSession from "@/db/drizzle";
-import { eq, and, gte } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import {
   user as userTable,
   problem as problemTable,
-  image as imageTable,
   generationCount as generationCountTable,
 } from "@/db/schema";
 import { DrizzleTransaction } from "@/types/problems";

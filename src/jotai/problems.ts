@@ -44,7 +44,7 @@ export const problemLengthAtom = atom("10");
 
 export const candidatesCountAtom = atom("4");
 
-export const resetProblemsAtom = atom(null, (get, set) => {
+export const resetProblemsAtom = atom(null, (_, set) => {
   set(
     problemsAtom,
     Array.from(Array<Problem>(10), (_, i) =>
@@ -115,9 +115,9 @@ export const currentProblemAtom = atom(
 
     return problems[currentProblemIndex];
   },
-  (_get, set, update: Partial<Problem>) => {
+  (get, set, update: Partial<Problem>) => {
     set(problemsAtom, (prev) => {
-      const currentProblemIndex = _get(currentProblemIndexAtom);
+      const currentProblemIndex = get(currentProblemIndexAtom);
       const problems = [...prev];
       problems[currentProblemIndex] = {
         ...problems[currentProblemIndex],

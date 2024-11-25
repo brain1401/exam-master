@@ -41,7 +41,7 @@ export const examResultsAtom = atom(
   },
 );
 
-export const resetExamProblemResultsAtom = atom(null, (get, set) => {
+export const resetExamProblemResultsAtom = atom(null, (_, set) => {
   set(examResultsSetAtom, {} as ExamResultsSet);
   set(currentExamResultIndexAtom, 0);
 });

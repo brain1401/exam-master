@@ -1,30 +1,20 @@
 import { handleEnterKeyPress } from "@/utils/keyboard";
 import { Button } from "../ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/app/components/ui/popover";
-import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardProps,
   CardTitle,
 } from "../ui/card";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
-  DialogPortal,
   DialogTitle,
-  DialogTrigger,
 } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -98,7 +88,7 @@ export default function PublicExamProblemCard({
 
       return { previousLike };
     },
-    onError: (err, newLiked, context) => {
+    onError: (_error, _newLiked, context) => {
       queryClient.setQueryData<Like>(
         ["publicProblemLikes", problemSetUUID],
         context?.previousLike,

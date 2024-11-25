@@ -1,4 +1,3 @@
-import usePublicProblem from "@/hooks/usePublicProblem";
 import {
   Pagination,
   PaginationContent,
@@ -8,7 +7,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "./pagination";
-import usePagenationState from "@/hooks/usePagenationState";
 
 type TypeType = "manage" | "public" | "results" | "exam";
 
@@ -81,7 +79,6 @@ export default function PaginationButton({
   page,
   searchString,
 }: Props) {
-
   const getVisiblePages = () => {
     if (maxPage <= 5) {
       return Array.from({ length: maxPage }, (_, i) => i + 1);
