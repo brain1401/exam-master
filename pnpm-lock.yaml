@@ -101,18 +101,6 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.61.3
         version: 5.61.3(@tanstack/react-query@5.61.3(react@18.3.1))(react@18.3.1)
-      '@types/node':
-        specifier: 22.9.3
-        version: 22.9.3
-      '@types/react':
-        specifier: ^18.3.12
-        version: 18.3.12
-      '@types/react-dom':
-        specifier: ^18.3.1
-        version: 18.3.1
-      '@types/validator':
-        specifier: ^13.12.2
-        version: 13.12.2
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -143,12 +131,6 @@ importers:
       drizzle-orm:
         specifier: ^0.36.4
         version: 0.36.4(@opentelemetry/api@1.9.0)(@types/pg@8.11.10)(@types/react@18.3.12)(pg@8.13.1)(postgres@3.4.5)(react@18.3.1)
-      eslint-config-next:
-        specifier: ^15.0.3
-        version: 15.0.3(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2)
-      eslint-plugin-drizzle:
-        specifier: ^0.2.3
-        version: 0.2.3(eslint@9.15.0(jiti@1.21.6))
       framer-motion:
         specifier: ^11.11.17
         version: 11.11.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -255,12 +237,30 @@ importers:
       '@types/eslint__js':
         specifier: ^8.42.3
         version: 8.42.3
+      '@types/node':
+        specifier: 22.9.3
+        version: 22.9.3
       '@types/pg':
         specifier: ^8.11.10
         version: 8.11.10
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.12
+      '@types/react-dom':
+        specifier: ^18.3.1
+        version: 18.3.1
       '@types/uuid':
         specifier: ^10.0.0
         version: 10.0.0
+      '@types/validator':
+        specifier: ^13.12.2
+        version: 13.12.2
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.15.0
+        version: 8.15.0(@typescript-eslint/parser@8.15.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2))(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2)
+      '@typescript-eslint/parser':
+        specifier: ^8.15.0
+        version: 8.15.0(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2)
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -270,6 +270,21 @@ importers:
       eslint:
         specifier: ^9.15.0
         version: 9.15.0(jiti@1.21.6)
+      eslint-config-next:
+        specifier: ^15.0.3
+        version: 15.0.3(eslint@9.15.0(jiti@1.21.6))(typescript@5.7.2)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@9.15.0(jiti@1.21.6))
+      eslint-plugin-drizzle:
+        specifier: ^0.2.3
+        version: 0.2.3(eslint@9.15.0(jiti@1.21.6))
+      eslint-plugin-react:
+        specifier: ^7.37.2
+        version: 7.37.2(eslint@9.15.0(jiti@1.21.6))
+      eslint-plugin-react-hooks:
+        specifier: ^5.0.0
+        version: 5.0.0(eslint@9.15.0(jiti@1.21.6))
       postcss:
         specifier: ^8.4.49
         version: 8.4.49
@@ -4095,6 +4110,12 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  eslint-config-prettier@9.1.0:
+    resolution: {integrity: sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
 
   eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
@@ -10604,6 +10625,10 @@ snapshots:
       - eslint-import-resolver-webpack
       - eslint-plugin-import-x
       - supports-color
+
+  eslint-config-prettier@9.1.0(eslint@9.15.0(jiti@1.21.6)):
+    dependencies:
+      eslint: 9.15.0(jiti@1.21.6)
 
   eslint-import-resolver-node@0.3.9:
     dependencies:
