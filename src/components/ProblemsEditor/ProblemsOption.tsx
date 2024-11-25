@@ -33,7 +33,6 @@ import {
   HoverCardTrigger,
 } from "@/app/components/ui/hover-card";
 import { Info } from "lucide-react";
-import ProblemGroupSetterDialog from "./ProblemGroupSetterDialog";
 
 const BUTTON_CLASSNAMES = "w-[4rem] rounded-lg";
 // "ml-2 bg-[#1E90FF] text-white px-[.5rem] text-[.9rem]";
@@ -193,9 +192,6 @@ export default function ProblemsOption({ type }: Props) {
 
   return (
     <div className="my-5 flex w-full flex-col gap-2">
-      <ProblemGroupSetterDialog>
-        <Button>문제 그룹 설정</Button>
-      </ProblemGroupSetterDialog>
       <div className="flex items-center">
         <Label className="mr-2 text-[.9rem]">최대 문제 수</Label>
         <Input
