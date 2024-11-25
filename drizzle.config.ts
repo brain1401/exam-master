@@ -15,4 +15,5 @@ export default defineConfig({
   },
 });
 
-// npx drizzle-kit push --verbose
+// 개발 데이터베이스에 스키마 동기화 명령어
+// pnpm drizzle-kit push --verbose
