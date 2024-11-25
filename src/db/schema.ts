@@ -4,7 +4,6 @@ import {
   text,
   integer,
   uniqueIndex,
-  index,
   boolean,
   jsonb,
   uuid,
