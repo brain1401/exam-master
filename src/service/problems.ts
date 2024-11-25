@@ -2557,29 +2557,29 @@ export async function getUserProblemSetsInfos(userUUID: string) {
   return data;
 }
 
-export async function getUserProblemGroupsInfos(
-  userUUID: string,
-  search?: string,
-) {
-  const data = await drizzleSession.transaction(async (dt) => {
-    const problemGroupUUIDs = await dt.query.problemSetGroup.findMany({
-      where: (problemSetGroup, { and, eq, like }) => {
-        if (search) {
-          console.log("search : ", search);
-          return and(
-            eq(problemSetGroup.userUuid, userUUID),
-            like(problemSetGroup.name, `%${search}%`),
-          );
-        }
-        return eq(problemSetGroup.userUuid, userUUID);
-      },
-    });
+// export async function getUserProblemGroupsInfos(
+//   userUUID: string,
+//   search?: string,
+// ) {
+//   const data = await drizzleSession.transaction(async (dt) => {
+//     const problemGroupUUIDs = await dt.query.problemSetGroup.findMany({
+//       where: (problemSetGroup, { and, eq, like }) => {
+//         if (search) {
+//           console.log("search : ", search);
+//           return and(
+//             eq(problemSetGroup.userUuid, userUUID),
+//             like(problemSetGroup.name, `%${search}%`),
+//           );
+//         }
+//         return eq(problemSetGroup.userUuid, userUUID);
+//       },
+//     });
 
-    return problemGroupUUIDs.map((problemGroup) => ({
-      name: problemGroup.name,
-      uuid: problemGroup.uuid,
-    }));
-  });
+//     return problemGroupUUIDs.map((problemGroup) => ({
+//       name: problemGroup.name,
+//       uuid: problemGroup.uuid,
+//     }));
+//   });
 
-  return data;
-}
+//   return data;
+// }
