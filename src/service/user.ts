@@ -122,7 +122,7 @@ export async function canUserGenerateProblemSet(
 
       const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
 
-      let [record] = await tx
+      const [record] = await tx
         .select()
         .from(generationCountTable)
         .where(
@@ -151,7 +151,7 @@ export async function incrementGenerationCount(email: string) {
 
       const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
 
-      let [record] = await tx
+      const [record] = await tx
         .select()
         .from(generationCountTable)
         .where(

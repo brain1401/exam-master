@@ -92,7 +92,7 @@ export async function generateQuestions({
 
   let iteration = 0;
 
-  let generatedQuestions: GenerateQuestionResponse = {
+  const generatedQuestions: GenerateQuestionResponse = {
     setTitle: "",
     setDescription: "",
     questions: [],

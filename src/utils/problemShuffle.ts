@@ -6,7 +6,7 @@ export function problemShuffle<T extends Problem[] | ExamProblem[]>(
   const newArray = [...array] as T;
 
   for (let i = newArray.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
   }
 
@@ -14,7 +14,7 @@ export function problemShuffle<T extends Problem[] | ExamProblem[]>(
     if (!problem?.candidates) return;
 
     for (let i = problem.candidates.length - 1; i > 0; i--) {
-      let j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(Math.random() * (i + 1));
       [problem.candidates[i], problem.candidates[j]] = [
         problem.candidates[j],
         problem.candidates[i],
